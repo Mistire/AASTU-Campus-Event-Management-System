@@ -128,7 +128,66 @@ CEMS follows a **Modular Monolith** architecture using NestJS — providing the 
 
 ### High-Level Architecture
 
-![AASTU CEMS Architecture](../architecture-mermaid-diagram.png)
+```mermaid
+graph TD
+    subgraph Client_Layer [Client Layer]
+        Mobile[Flutter Mobile App]
+        Web[Next.js Web App]
+    end
+
+    subgraph Reverse_Proxy [Reverse Proxy / Nginx]
+        Nginx[Nginx / HTTPS]
+    end
+
+    subgraph NestJS_App [NestJS Application]
+        subgraph Internal_Modules [Internal Modules]
+            AuthM[Auth Module]
+            UserM[User Module]
+            AnalyticsM[Analytics Module]
+            AdminM[Admin Module]
+            RegM[Registration Module]
+            AIM[AI Recommendation Module]
+            EventM[Event Module]
+            NotifM[Notification Module]
+        end
+
+        subgraph Persistence_Storage [Persistence / Storage]
+            DB[(PostgreSQL)]
+            Cache[(Redis)]
+            S3[S3 / Cloudinary]
+        end
+    end
+
+    subgraph Async_Processing [Async Processing]
+        MQ[Message Queue / BullMQ + Redis]
+        Worker[Background Workers]
+    end
+
+    subgraph External_Gateways [External Gateways]
+        FCM[Firebase Push]
+        SMTP[Email Gateway]
+    end
+
+    %% Client to Proxy
+    Mobile & Web --> Nginx
+    Nginx --> AuthM
+
+    %% Auth fans out to modules
+    AuthM --> UserM & AnalyticsM & AdminM & RegM & AIM & EventM & NotifM
+
+    %% Modules to Persistence
+    UserM --> DB
+    AnalyticsM --> DB
+    AdminM --> DB
+    RegM --> DB
+    AIM --> DB & Cache
+    EventM --> DB & S3
+
+    %% Notification to Async
+    NotifM --> MQ
+    MQ --> Worker
+    Worker --> FCM & SMTP
+```
 
 ### Why Modular Monolith?
 
