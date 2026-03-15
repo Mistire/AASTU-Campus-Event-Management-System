@@ -1,0 +1,284 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  roleName    String   @map("role_name") @db.VarChar
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  users       User[]
+
+  @@map("roles")
+}
+
+model User {
+  id               Int               @id @default(autoincrement())
+  fullName         String            @map("full_name") @db.VarChar
+  email            String            @unique @db.VarChar
+  passwordHash     String            @map("password_hash") @db.VarChar
+  roleId           Int               @map("role_id")
+  departmentId     Int?              @map("department_id")
+  phone            String?           @db.VarChar
+  profileImage     String?           @map("profile_image") @db.VarChar
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  
+  role             Role              @relation(fields: [roleId], references: [id])
+  department       Department?       @relation(fields: [departmentId], references: [id])
+  notifications    Notification[]
+  registrations    Registration[]
+  attendance       Attendance[]
+  feedback         Feedback[]
+  userInterests    UserInterests[]
+  eventOrganizers  EventOrganizers[]
+  eventWaitlist    EventWaitlist[]
+  auditLogs        AuditLogs[]
+
+  @@map("users")
+}
+
+model Department {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar
+  faculty String?  @db.VarChar
+  users   User[]
+
+  @@map("departments")
+}
+
+model EventStatus {
+  id          Int      @id @default(autoincrement())
+  statusName  String   @map("status_name") @db.VarChar
+  description String?  @db.Text
+  events      Event[]
+
+  @@map("event_status")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar
+  description String?  @db.Text
+  events      Event[]
+
+  @@map("categories")
+}
+
+model Interest {
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar
+  description   String?         @db.Text
+  userInterests UserInterests[]
+
+  @@map("interests")
+}
+
+model Tag {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar
+  eventTags EventTags[]
+
+  @@map("tags")
+}
+
+model Venue {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar
+  building    String?  @db.VarChar
+  roomNumber  String?  @map("room_number") @db.VarChar
+  capacity    Int?
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  events      Event[]
+
+  @@map("venues")
+}
+
+model Event {
+  id               Int               @id @default(autoincrement())
+  title            String            @db.VarChar
+  description      String?           @db.Text
+  categoryId       Int               @map("category_id")
+  statusId         Int               @map("status_id")
+  venueId          Int               @map("venue_id")
+  startTime        DateTime          @map("start_time")
+  endTime          DateTime          @map("end_time")
+  capacity         Int
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  category         Category          @relation(fields: [categoryId], references: [id])
+  status           EventStatus       @relation(fields: [statusId], references: [id])
+  venue            Venue             @relation(fields: [venueId], references: [id])
+  sessions         EventSessions[]
+  organizers       EventOrganizers[]
+  tags             EventTags[]
+  media            EventMedia[]
+  registrations    Registration[]
+  attendance       Attendance[]
+  feedback         Feedback[]
+  waitlist         EventWaitlist[]
+  announcements    Announcements[]
+
+  @@map("events")
+}
+
+model EventSessions {
+  id        Int      @id @default(autoincrement())
+  eventId   Int      @map("event_id")
+  title     String   @db.VarChar
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  
+  event     Event    @relation(fields: [eventId], references: [id])
+  attendance Attendance[]
+
+  @@map("event_sessions")
+}
+
+model EventOrganizers {
+  id      Int     @id @default(autoincrement())
+  eventId Int     @map("event_id")
+  userId  Int     @map("user_id")
+  role    String? @db.VarChar
+
+  event   Event   @relation(fields: [eventId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("event_organizers")
+}
+
+model AuditLogs {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  action     String   @db.VarChar
+  entityType String   @map("entity_type") @db.VarChar
+  entityId   Int?     @map("entity_id")
+  details    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Announcements {
+  id        Int      @id @default(autoincrement())
+  eventId   Int      @map("event_id")
+  title     String   @db.VarChar
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@map("announcements")
+}
+
+model EventWaitlist {
+  id       Int      @id @default(autoincrement())
+  userId   Int      @map("user_id")
+  eventId  Int      @map("event_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  position Int
+
+  user     User     @relation(fields: [userId], references: [id])
+  event    Event    @relation(fields: [eventId], references: [id])
+
+  @@map("event_waitlist")
+}
+
+model UserInterests {
+  id         Int @id @default(autoincrement())
+  userId     Int @map("user_id")
+  interestId Int @map("interest_id")
+
+  user       User     @relation(fields: [userId], references: [id])
+  interest   Interest @relation(fields: [interestId], references: [id])
+
+  @@map("user_interests")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String   @db.VarChar
+  message   String   @db.Text
+  type      String   @db.VarChar
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Registration {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  eventId          Int      @map("event_id")
+  registrationDate DateTime @default(now()) @map("registration_date")
+  status           String   @db.VarChar
+
+  user             User     @relation(fields: [userId], references: [id])
+  event            Event    @relation(fields: [eventId], references: [id])
+
+  @@map("registrations")
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  eventId     Int      @map("event_id")
+  sessionId   Int?     @map("session_id")
+  checkInTime DateTime @map("check_in_time")
+  qrToken     String   @map("qr_token") @db.VarChar
+
+  user        User     @relation(fields: [userId], references: [id])
+  event       Event    @relation(fields: [eventId], references: [id])
+  session     EventSessions? @relation(fields: [sessionId], references: [id])
+
+  @@map("attendance")
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  eventId   Int      @map("event_id")
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@map("feedback")
+}
+
+model EventMedia {
+  id         Int      @id @default(autoincrement())
+  eventId    Int      @map("event_id")
+  fileUrl    String   @map("file_url") @db.VarChar
+  mediaType  String   @map("media_type") @db.VarChar
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  event      Event    @relation(fields: [eventId], references: [id])
+
+  @@map("event_media")
+}
+
+model EventTags {
+  id      Int @id @default(autoincrement())
+  eventId Int @map("event_id")
+  tagId   Int @map("tag_id")
+
+  event   Event @relation(fields: [eventId], references: [id])
+  tag     Tag   @relation(fields: [tagId], references: [id])
+
+  @@map("event_tags")
+}
