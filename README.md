@@ -18,22 +18,17 @@
 
 ## Table of Contents
 
-- [Overview](#-overview)
-- [Problem Statement](#-problem-statement)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Technology Stack](#-technology-stack)
-- [System Modules](#-system-modules)
-- [User Roles](#-user-roles)
-- [AI Recommendation Engine](#-ai-recommendation-engine)
-- [Security Design](#-security-design)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Deployment](#-deployment)
-- [API Documentation](#-api-documentation)
-- [Contributing](#-contributing)
-- [Team](#-team)
-- [License](#-license)
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Technology Stack](#technology-stack)
+- [System Modules](#system-modules)
+- [User Roles](#user-roles)
+- [AI Recommendation Engine](#ai-recommendation-engine)
+- [Security Design](#security-design)
+- [Project Structure](#project-structure)
+- [Team](#team)
 
 ---
 
@@ -366,17 +361,6 @@ AASTU-Campus-Event-Management-System/
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** ≥ 18.x
-- **npm** or **yarn**
-- **PostgreSQL** ≥ 14.x
-- **Redis** ≥ 7.x
-- **Docker** (recommended)
-- **Flutter SDK** (for mobile development)
-
 ## Team
 
 | Name | ID | Role |
@@ -387,7 +371,7 @@ AASTU-Campus-Event-Management-System/
 | Natan Addis | ETS 1199/14 | Team Member |
 | Nathnael Keleme | ETS 1222/14 | Team Member |
 
-**Advisor:** Inst. Befekadu
+**Advisor:** Inst. Befekadu Belete
 
 **Institution:** Addis Ababa Science and Technology University — College of Engineering, Department of Software Engineering
 
