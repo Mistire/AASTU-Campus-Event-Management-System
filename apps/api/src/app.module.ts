@@ -12,6 +12,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { MediaModule } from './media/media.module';
 import { AdminModule } from './admin/admin.module';
 import { RoleModule } from './role/role.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RoleModule } from './role/role.module';
     MediaModule,
     AdminModule,
     RoleModule,
+    PermissionModule,
   ],
 })
 export class AppModule {}
