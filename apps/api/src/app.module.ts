@@ -11,6 +11,7 @@ import { RecommendationModule } from './recommendation/recommendation.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MediaModule } from './media/media.module';
 import { AdminModule } from './admin/admin.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AdminModule } from './admin/admin.module';
     AnalyticsModule,
     MediaModule,
     AdminModule,
+    RoleModule,
   ],
 })
 export class AppModule {}
