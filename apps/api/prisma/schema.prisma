@@ -1,29 +1,55 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output     = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  engineType = "binary"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Role {
-  id          Int      @id @default(autoincrement())
-  roleName    String   @map("role_name") @db.VarChar
+  id          String   @id @default(uuid()) @db.Uuid
+  roleName    String   @unique @map("role_name") @db.VarChar
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
   users       User[]
+  permissions RolePermission[]
 
   @@map("roles")
 }
 
+model Permission {
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String           @unique @db.VarChar
+  description String?          @db.Text
+  createdAt   DateTime         @default(now()) @map("created_at")
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid()) @db.Uuid
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
 model User {
-  id               Int               @id @default(autoincrement())
+  id               String            @id @default(uuid()) @db.Uuid
   fullName         String            @map("full_name") @db.VarChar
   email            String            @unique @db.VarChar
   passwordHash     String            @map("password_hash") @db.VarChar
-  roleId           Int               @map("role_id")
-  departmentId     Int?              @map("department_id")
+  roleId           String            @map("role_id") @db.Uuid
+  departmentId     String?           @map("department_id") @db.Uuid
   phone            String?           @db.VarChar
   profileImage     String?           @map("profile_image") @db.VarChar
   createdAt        DateTime          @default(now()) @map("created_at")
@@ -44,7 +70,7 @@ model User {
 }
 
 model Department {
-  id      Int      @id @default(autoincrement())
+  id      String   @id @default(uuid()) @db.Uuid
   name    String   @db.VarChar
   faculty String?  @db.VarChar
   users   User[]
@@ -53,7 +79,7 @@ model Department {
 }
 
 model EventStatus {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid()) @db.Uuid
   statusName  String   @map("status_name") @db.VarChar
   description String?  @db.Text
   events      Event[]
@@ -62,7 +88,7 @@ model EventStatus {
 }
 
 model Category {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid()) @db.Uuid
   name        String   @db.VarChar
   description String?  @db.Text
   events      Event[]
@@ -71,7 +97,7 @@ model Category {
 }
 
 model Interest {
-  id            Int             @id @default(autoincrement())
+  id            String          @id @default(uuid()) @db.Uuid
   name          String          @db.VarChar
   description   String?         @db.Text
   userInterests UserInterests[]
@@ -80,7 +106,7 @@ model Interest {
 }
 
 model Tag {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(uuid()) @db.Uuid
   name      String     @db.VarChar
   eventTags EventTags[]
 
@@ -88,7 +114,7 @@ model Tag {
 }
 
 model Venue {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid()) @db.Uuid
   name        String   @db.VarChar
   building    String?  @db.VarChar
   roomNumber  String?  @map("room_number") @db.VarChar
@@ -101,12 +127,12 @@ model Venue {
 }
 
 model Event {
-  id               Int               @id @default(autoincrement())
+  id               String            @id @default(uuid()) @db.Uuid
   title            String            @db.VarChar
   description      String?           @db.Text
-  categoryId       Int               @map("category_id")
-  statusId         Int               @map("status_id")
-  venueId          Int               @map("venue_id")
+  categoryId       String            @map("category_id") @db.Uuid
+  statusId         String            @map("status_id") @db.Uuid
+  venueId          String            @map("venue_id") @db.Uuid
   startTime        DateTime          @map("start_time")
   endTime          DateTime          @map("end_time")
   capacity         Int
@@ -130,8 +156,8 @@ model Event {
 }
 
 model EventSessions {
-  id        Int      @id @default(autoincrement())
-  eventId   Int      @map("event_id")
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
   title     String   @db.VarChar
   startTime DateTime @map("start_time")
   endTime   DateTime @map("end_time")
@@ -143,9 +169,9 @@ model EventSessions {
 }
 
 model EventOrganizers {
-  id      Int     @id @default(autoincrement())
-  eventId Int     @map("event_id")
-  userId  Int     @map("user_id")
+  id      String  @id @default(uuid()) @db.Uuid
+  eventId String  @map("event_id") @db.Uuid
+  userId  String  @map("user_id") @db.Uuid
   role    String? @db.VarChar
 
   event   Event   @relation(fields: [eventId], references: [id])
@@ -155,11 +181,11 @@ model EventOrganizers {
 }
 
 model AuditLogs {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
   action     String   @db.VarChar
   entityType String   @map("entity_type") @db.VarChar
-  entityId   Int?     @map("entity_id")
+  entityId   String?  @map("entity_id") @db.Uuid
   details    String?  @db.Text
   createdAt  DateTime @default(now()) @map("created_at")
 
@@ -169,8 +195,8 @@ model AuditLogs {
 }
 
 model Announcements {
-  id        Int      @id @default(autoincrement())
-  eventId   Int      @map("event_id")
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
   title     String   @db.VarChar
   message   String   @db.Text
   createdAt DateTime @default(now()) @map("created_at")
@@ -181,9 +207,9 @@ model Announcements {
 }
 
 model EventWaitlist {
-  id       Int      @id @default(autoincrement())
-  userId   Int      @map("user_id")
-  eventId  Int      @map("event_id")
+  id       String   @id @default(uuid()) @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  eventId  String   @map("event_id") @db.Uuid
   joinedAt DateTime @default(now()) @map("joined_at")
   position Int
 
@@ -194,9 +220,9 @@ model EventWaitlist {
 }
 
 model UserInterests {
-  id         Int @id @default(autoincrement())
-  userId     Int @map("user_id")
-  interestId Int @map("interest_id")
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @map("user_id") @db.Uuid
+  interestId String @map("interest_id") @db.Uuid
 
   user       User     @relation(fields: [userId], references: [id])
   interest   Interest @relation(fields: [interestId], references: [id])
@@ -205,8 +231,8 @@ model UserInterests {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
   title     String   @db.VarChar
   message   String   @db.Text
   type      String   @db.VarChar
@@ -219,9 +245,9 @@ model Notification {
 }
 
 model Registration {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @map("user_id")
-  eventId          Int      @map("event_id")
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  eventId          String   @map("event_id") @db.Uuid
   registrationDate DateTime @default(now()) @map("registration_date")
   status           String   @db.VarChar
 
@@ -232,10 +258,10 @@ model Registration {
 }
 
 model Attendance {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  eventId     Int      @map("event_id")
-  sessionId   Int?     @map("session_id")
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  sessionId   String?  @map("session_id") @db.Uuid
   checkInTime DateTime @map("check_in_time")
   qrToken     String   @map("qr_token") @db.VarChar
 
@@ -247,9 +273,9 @@ model Attendance {
 }
 
 model Feedback {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  eventId   Int      @map("event_id")
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
   rating    Int
   comment   String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
@@ -261,8 +287,8 @@ model Feedback {
 }
 
 model EventMedia {
-  id         Int      @id @default(autoincrement())
-  eventId    Int      @map("event_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  eventId    String   @map("event_id") @db.Uuid
   fileUrl    String   @map("file_url") @db.VarChar
   mediaType  String   @map("media_type") @db.VarChar
   uploadedAt DateTime @default(now()) @map("uploaded_at")
@@ -273,9 +299,9 @@ model EventMedia {
 }
 
 model EventTags {
-  id      Int @id @default(autoincrement())
-  eventId Int @map("event_id")
-  tagId   Int @map("tag_id")
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+  tagId   String @map("tag_id") @db.Uuid
 
   event   Event @relation(fields: [eventId], references: [id])
   tag     Tag   @relation(fields: [tagId], references: [id])

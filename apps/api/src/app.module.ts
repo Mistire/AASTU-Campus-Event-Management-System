@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
@@ -13,6 +11,7 @@ import { RecommendationModule } from './recommendation/recommendation.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MediaModule } from './media/media.module';
 import { AdminModule } from './admin/admin.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -28,8 +27,7 @@ import { AdminModule } from './admin/admin.module';
     AnalyticsModule,
     MediaModule,
     AdminModule,
+    RoleModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

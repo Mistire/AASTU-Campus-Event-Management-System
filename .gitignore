@@ -28,3 +28,4 @@ redisdata/
 
 # Prisma
 apps/api/prisma/migrations/**/migration_lock.toml
+apps/api/src/generated/
