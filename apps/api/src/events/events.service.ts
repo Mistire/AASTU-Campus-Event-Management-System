@@ -1,12 +1,33 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
+import { EventQueryDto } from './dto/event-query.dto';
+import { VenuesService } from './venues.service';
 
 @Injectable()
 export class EventsService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly venuesService: VenuesService,
+    ) { }
 
     async create(dto: CreateEventDto) {
+        const isAvailable = await this.venuesService.checkAvailability(
+            dto.venueId,
+            new Date(dto.startTime),
+            new Date(dto.endTime),
+        );
+
+        if (!isAvailable) {
+            throw new BadRequestException(
+                'The venue is already booked for this time range',
+            );
+        }
+
         return this.prisma.event.create({
             data: {
                 title: dto.title,
@@ -26,13 +47,72 @@ export class EventsService {
         });
     }
 
-    async findAll() {
+    async findAll(query: EventQueryDto) {
+        const { category, date, department, sortBy, search } = query;
+
+        const where: any = {};
+
+        if (category) where.categoryId = category;
+        if (date) {
+            where.startTime = {
+                gte: new Date(date),
+                lt: new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000),
+            };
+        }
+        if (department) {
+            where.organizers = {
+                some: {
+                    user: {
+                        departmentId: department,
+                    },
+                },
+            };
+        }
+        if (search) {
+            where.OR = [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        const orderBy: any = {};
+        if (sortBy === 'date') orderBy.startTime = 'asc';
+        if (sortBy === 'popularity') {
+            return this.prisma.event.findMany({
+                where,
+                include: {
+                    category: true,
+                    venue: true,
+                    status: true,
+                    _count: { select: { registrations: true } },
+                },
+                orderBy: {
+                    registrations: { _count: 'desc' },
+                },
+            });
+        }
+
         return this.prisma.event.findMany({
+            where,
             include: {
                 category: true,
                 venue: true,
                 status: true,
+                _count: { select: { registrations: true } },
             },
+            orderBy: Object.keys(orderBy).length ? orderBy : { createdAt: 'desc' },
+        });
+    }
+
+    async getUpcoming() {
+        return this.prisma.event.findMany({
+            where: {
+                startTime: { gte: new Date() },
+                status: { statusName: 'APPROVED' },
+            },
+            take: 10,
+            orderBy: { startTime: 'asc' },
+            include: { category: true, venue: true },
         });
     }
 
@@ -55,6 +135,15 @@ export class EventsService {
         }
 
         return event;
+    }
+
+    async updateStatus(id: string, statusId: string) {
+        await this.findOne(id);
+        return this.prisma.event.update({
+            where: { id },
+            data: { statusId },
+            include: { status: true },
+        });
     }
 
     async update(id: string, dto: UpdateEventDto) {

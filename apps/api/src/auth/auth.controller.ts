@@ -8,7 +8,7 @@ import { JwtAuthGuard } from './guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   @Public()
   @Post('signup')
   signup(@Body() dto: SignUpDto) {

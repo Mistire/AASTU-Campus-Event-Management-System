@@ -6,10 +6,12 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
+import { EventQueryDto } from './dto/event-query.dto';
 import { JwtAuthGuard } from 'src/auth/guard';
 
 @UseGuards(JwtAuthGuard)
@@ -23,8 +25,19 @@ export class EventsController {
     }
 
     @Get()
-    findAll() {
-        return this.eventsService.findAll();
+    findAll(@Query() query: EventQueryDto) {
+        return this.eventsService.findAll(query);
+    }
+
+    @Get('upcoming')
+    getUpcoming() {
+        return this.eventsService.getUpcoming();
+    }
+
+    @Get('calendar')
+    getCalendar(@Query() query: EventQueryDto) {
+        // Basic calendar view returns events within a month
+        return this.eventsService.findAll(query);
     }
 
     @Get(':id')
@@ -35,6 +48,11 @@ export class EventsController {
     @Patch(':id')
     update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
         return this.eventsService.update(id, dto);
+    }
+
+    @Patch(':id/status')
+    updateStatus(@Param('id') id: string, @Body('statusId') statusId: string) {
+        return this.eventsService.updateStatus(id, statusId);
     }
 
     @Delete(':id')
