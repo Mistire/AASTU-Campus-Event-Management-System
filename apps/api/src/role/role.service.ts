@@ -316,3 +316,17 @@ export class RoleService {
     return { message: 'Permission deleted successfully' };
   }
 }
+
+// export const basePermissions = [
+//   'role:create',
+//   'role:read',
+//   'role:update',
+//   'role:delete',
+//   'role:assign-permissions',
+//   'permission:create',
+//   'permission:read',
+//   'permission:update',
+//   'permission:delete',
+//   'user:read',
+//   'user:assign-role',
+// ];
