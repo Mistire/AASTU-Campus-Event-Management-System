@@ -9,12 +9,15 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Permissions, Roles } from 'src/auth/decorator';
 import { JwtAuthGuard, PermissionsGuard, RolesGuard } from 'src/auth/guard';
 import { CreatePermissionDto, UpdatePermissionDto } from 'src/role/dto/roles.dto';
 import { RoleService } from 'src/role/role.service';
 
+@ApiTags('Permissions')
+@ApiBearerAuth('access-token')
 @Controller('permission')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles('Admin')
