@@ -33,15 +33,17 @@ services:
       timeout: 5s
       retries: 5
 
-  # ─── NestJS API ─────────────────────────────────────────
+  # ─── NestJS API (Development – live reload) ──────────────
   api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile
+      target: development # use the "development" stage → npm run start:dev
     container_name: cems-api
     restart: unless-stopped
     ports:
       - '3000:3000'
+      - '9229:9229' # debug port
     environment:
       DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
       REDIS_HOST: redis
@@ -51,11 +53,17 @@ services:
       JWT_REFRESH_EXPIRATION: 7d
       PORT: 3000
       NODE_ENV: development
+    volumes:
+      # Mount source for live-reload (node_modules stays inside container)
+      - ./apps/api/src:/usr/src/app/src:delegated
+      - ./apps/api/prisma:/usr/src/app/prisma:delegated
+      - /usr/src/app/node_modules # anonymous volume keeps container node_modules
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    command: npm run start:dev
 
   # ─── Nginx Reverse Proxy ────────────────────────────────
   nginx:
