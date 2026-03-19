@@ -42,7 +42,7 @@ services:
     container_name: cems-api
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '4000:4000'
       - '9229:9229' # debug port
     environment:
       DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
@@ -51,7 +51,7 @@ services:
       JWT_SECRET: dev-jwt-secret-change-in-production
       JWT_EXPIRATION: 15m
       JWT_REFRESH_EXPIRATION: 7d
-      PORT: 3000
+      PORT: 4000
       NODE_ENV: development
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
