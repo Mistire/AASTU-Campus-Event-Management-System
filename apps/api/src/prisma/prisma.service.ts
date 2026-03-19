@@ -5,10 +5,7 @@ import { PrismaClient } from 'src/generated/prisma/client';
 import { Pool } from 'pg';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private pool: Pool;
   constructor(config: ConfigService) {
     const connectionString = config.get<string>('DATABASE_URL');
@@ -24,11 +21,21 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+    } catch (err) {
+      console.error('PrismaService.onModuleInit error:', err);
+      throw err;
+    }
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
-    await this.pool.end();
+    try {
+      await this.$disconnect();
+      await this.pool.end();
+    } catch (err) {
+      console.error('PrismaService.onModuleDestroy error:', err);
+      throw err;
+    }
   }
 }
