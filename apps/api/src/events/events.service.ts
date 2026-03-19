@@ -3,7 +3,7 @@ import {
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { EventQueryDto } from './dto/event-query.dto';
 import { VenuesService } from './venues.service';
