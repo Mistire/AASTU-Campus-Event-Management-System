@@ -11,6 +11,8 @@
     "db:rm": "docker compose rm postgres -s -f -v",
     "db:up": "docker compose up postgres -d",
     "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "nest build && node dist/src/prisma/seed.js",
+    "db:seed": "npm run prisma:seed",
     "db:restart": "npm run db:rm && npm run db:up && timeout /T 1 /NOBREAK > NUL && npm prisma:deploy",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -22,6 +24,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "prisma": {
+    "seed": "npm run prisma:seed"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

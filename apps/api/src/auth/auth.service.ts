@@ -303,8 +303,14 @@ export class AuthService {
         throw new BadRequestException('Email already in use');
       }
 
+      const requestedRole = dto.roleName?.trim() || 'student';
       const role = await this.prisma.role.findFirst({
-        where: { roleName: dto.roleName ?? 'STUDENT' },
+        where: {
+          roleName: {
+            equals: requestedRole,
+            mode: 'insensitive',
+          },
+        },
       });
 
       if (!role) throw new BadRequestException('Role not found');
@@ -356,6 +362,7 @@ export class AuthService {
       }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+      console.log('Tokens: ', tokens);
       return {
         user: this.buildUserResponse(user),
         ...tokens,

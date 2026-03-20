@@ -13,7 +13,7 @@ import {
 } from './dto';
 import { Public } from './decorator';
 import { JwtAuthGuard } from './guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -80,10 +80,11 @@ export class AuthController {
   verifySession(@Req() req: any) {
     return this.authService.verifySessions(req.user.id, req.user.sessionId);
   }
-
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(@Req() req: any) {
+  me(@Headers() headers: any, @Req() req: any) {
+    console.log('HEADERS:', headers);
     return req.user;
   }
 }

@@ -12,10 +12,11 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     if (isPublicRoute(this.reflector, context)) return true;
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles =
+      this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? [];
 
     if (!requiredRoles.length) return true;
 
@@ -23,7 +24,10 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
     if (!user) return false;
 
-    return requiredRoles.includes(user.role);
+    const normalizedRequiredRoles = requiredRoles.map((role) => role.toLowerCase());
+    const normalizedUserRole = String(user.role ?? '').toLowerCase();
+
+    return normalizedRequiredRoles.includes(normalizedUserRole);
   }
 }
 
