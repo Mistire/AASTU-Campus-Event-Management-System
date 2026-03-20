@@ -14,7 +14,9 @@ import { JwtAuthGuard, PermissionsGuard, RolesGuard } from 'src/auth/guard';
 import { RoleService } from './role.service';
 import { Permissions, Roles } from 'src/auth/decorator';
 import { AssignRolePermissionDto, CreateRoleDto, UpdateRoleDto } from './dto/roles.dto';
-
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiTags('Roles')
+@ApiBearerAuth('access-token')
 @Controller('role')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles('admin')

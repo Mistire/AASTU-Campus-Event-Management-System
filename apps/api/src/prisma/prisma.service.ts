@@ -23,11 +23,21 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+    } catch (err) {
+      console.error('PrismaService.onModuleInit error:', err);
+      throw err;
+    }
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
-    await this.pool.end();
+    try {
+      await this.$disconnect();
+      await this.pool.end();
+    } catch (err) {
+      console.error('PrismaService.onModuleDestroy error:', err);
+      throw err;
+    }
   }
 }

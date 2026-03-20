@@ -12,7 +12,10 @@ import { Permissions, Roles } from 'src/auth/decorator';
 import { JwtAuthGuard, PermissionsGuard, RolesGuard } from 'src/auth/guard';
 import { AdminService } from './admin.service';
 import { AssignRoleDto, ListUserQueryDto } from './dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Admin')
+@ApiBearerAuth('access-token')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles('Admin')
