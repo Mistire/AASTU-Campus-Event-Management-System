@@ -1,0 +1,62 @@
+[
+    {
+        "icon": "fa-light fa-dashboard",
+        "title": "Home",
+        "parent": "/dashboard",
+        "to": "/dashboard",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STUDENT",
+            "STAFF"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "fa-light fa-dashboard",
+        "title": "Events Control",
+        "parent": "/events",
+        "to": "/events",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "fa-light fa-person",
+        "title": "User Management",
+        "parent": "/users",
+        "to": "/users",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "mdi-alert-circle-outline",
+        "title": "SOS & Feedback",
+        "parent": "/support",
+        "to": "/support",
+        "allowed": [
+            "ADMIN",
+            "STAFF"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "mdi-export-variant",
+        "title": "Analytics Logs",
+        "parent": "/export-logs",
+        "to": "/export-logs",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    }
+]
