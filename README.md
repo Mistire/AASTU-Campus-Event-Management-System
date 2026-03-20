@@ -371,7 +371,7 @@ AASTU-Campus-Event-Management-System/
 | Natan Addis | ETS 1199/14 | Team Member |
 | Nathnael Keleme | ETS 1222/14 | Team Member |
 
-**Advisor:** Inst. Befekadu Belete
+**Advisor:** Inst. Befekadu Belete.
 
 **Institution:** Addis Ababa Science and Technology University — College of Engineering, Department of Software Engineering
 
