@@ -1,0 +1,9 @@
+dist
+.git
+.gitignore
+*.md
+*.log
+coverage
+.env
+.env.*
+!.env.example

@@ -15,6 +15,16 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Swagger setup
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('AASTU Campus Event Management System API')
+    .setDescription('The API documentation for the AASTU Campus Event Management System')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
+
   // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
