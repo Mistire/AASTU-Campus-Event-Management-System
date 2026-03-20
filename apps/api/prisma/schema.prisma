@@ -8,6 +8,10 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum OneTimeTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
 
 model Role {
   id          String   @id @default(uuid()) @db.Uuid
@@ -54,6 +58,11 @@ model User {
   profileImage     String?           @map("profile_image") @db.VarChar
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
+
+
+  isEmailVerified  Boolean           @default(false) @map("is_email_verified")
+  emailVerifiedAt  DateTime?         @map("email_verified_at")
+  passwordChangedAt DateTime?        @map("password_changed_at")
   
   role             Role              @relation(fields: [roleId], references: [id])
   department       Department?       @relation(fields: [departmentId], references: [id])
@@ -62,11 +71,64 @@ model User {
   attendance       Attendance[]
   feedback         Feedback[]
   userInterests    UserInterests[]
+  categoryPreferences UserCategoryPreferences[]
   eventOrganizers  EventOrganizers[]
   eventWaitlist    EventWaitlist[]
   auditLogs        AuditLogs[]
 
+  authSessions AuthSession[]
+  oneTimeTokens OneTimeToken[]
+
   @@map("users")
+} 
+
+
+model UserCategoryPreferences {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId])
+  @@map("user_category_preferences")
+}
+
+model AuthSession {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  refreshTokenHash String @map("refresh_token_hash") @db.VarChar
+  userAgent String? @map("user_agent") @db.VarChar
+  ipAddress String? @map("ip_address") @db.VarChar
+  isRevoked Boolean @default(false) @map("is_revoked")
+  expiresAt DateTime @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRevoked])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+model OneTimeToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String  @map("token_hash") @db.VarChar
+  type OneTimeTokenType
+  expiresAt DateTime @map("expires_at")
+  usedAt DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, type, usedAt])
+  @@index([expiresAt])
+  @@map("one_time_tokens")
 }
 
 model Department {
@@ -92,6 +154,7 @@ model Category {
   name        String   @db.VarChar
   description String?  @db.Text
   events      Event[]
+  userPreferences UserCategoryPreferences[]
 
   @@map("categories")
 }
