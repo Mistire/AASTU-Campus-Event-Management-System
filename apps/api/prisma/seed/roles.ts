@@ -10,94 +10,99 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-    console.log('Seeding Roles and Permissions...');
+  console.log('Seeding Roles and Permissions...');
 
-    // 1. Create permissions
-    const permissions = [
-        { name: 'CREATE_EVENT', description: 'Can create new events' },
-        { name: 'UPDATE_EVENT', description: 'Can update existing events' },
-        { name: 'DELETE_EVENT', description: 'Can delete events' },
-        { name: 'APPROVE_EVENT', description: 'Can approve or reject pending events' },
-        { name: 'MANAGE_USERS', description: 'Can manage platform users' },
-        { name: 'VIEW_EVENTS', description: 'Can browse and view events' },
-        { name: 'REGISTER_EVENT', description: 'Can register for an event' },
-    ];
+  // 1. Create permissions in the same format used by @Permissions('resource:action')
+  const permissions = [
+    { name: 'user:read', description: 'Can read platform users' },
+    { name: 'user:assign-role', description: 'Can assign roles to users' },
+    { name: 'role:create', description: 'Can create roles' },
+    { name: 'role:read', description: 'Can read roles' },
+    { name: 'role:update', description: 'Can update roles' },
+    { name: 'role:delete', description: 'Can delete roles' },
+    { name: 'role:assign-permissions', description: 'Can assign permissions to roles' },
+    { name: 'permission:create', description: 'Can create permissions' },
+    { name: 'permission:read', description: 'Can read permissions' },
+    { name: 'permission:update', description: 'Can update permissions' },
+    { name: 'permission:delete', description: 'Can delete permissions' },
+    { name: 'event:create', description: 'Can create events' },
+    { name: 'event:read', description: 'Can read events' },
+    { name: 'event:update', description: 'Can update events' },
+    { name: 'event:delete', description: 'Can delete events' },
+    { name: 'event:approve', description: 'Can approve or reject events' },
+    { name: 'event:register', description: 'Can register for events' },
+  ];
 
-    for (const perm of permissions) {
-        await prisma.permission.upsert({
-            where: { name: perm.name },
-            update: {},
-            create: perm,
+  for (const perm of permissions) {
+    await prisma.permission.upsert({
+      where: { name: perm.name },
+      update: {},
+      create: perm,
+    });
+  }
+  console.log('Permissions seeded.');
+
+  // Fetch all permissions to link them
+  const allPerms = await prisma.permission.findMany();
+
+  // 2. Create Roles
+  const roles = [
+    {
+      roleName: 'Admin',
+      description: 'System Administrator',
+      perms: allPerms.map((p) => p.name), // All permissions
+    },
+    {
+      roleName: 'Organizer',
+      description: 'Event Organizer',
+      perms: ['event:create', 'event:read', 'event:update', 'event:register'],
+    },
+    {
+      roleName: 'Student',
+      description: 'Standard Student Participant',
+      perms: ['event:read', 'event:register'],
+    },
+  ];
+
+  for (const r of roles) {
+    const roleRecord = await prisma.role.upsert({
+      where: { roleName: r.roleName },
+      update: {},
+      create: {
+        roleName: r.roleName,
+        description: r.description,
+      },
+    });
+
+    // Link permissions to role
+    for (const pName of r.perms) {
+      const permRecord = allPerms.find((p) => p.name === pName);
+      if (permRecord) {
+        // Find existing to avoid unique constraint error
+        const existingRp = await prisma.rolePermission.findFirst({
+          where: { roleId: roleRecord.id, permissionId: permRecord.id },
         });
-    }
-    console.log('Permissions seeded.');
 
-    // Fetch all permissions to link them
-    const allPerms = await prisma.permission.findMany();
-
-    // 2. Create Roles
-    const roles = [
-        {
-            roleName: 'ADMIN',
-            description: 'System Administrator',
-            perms: allPerms.map((p) => p.name), // All permissions
-        },
-        {
-            roleName: 'ORGANIZER',
-            description: 'Event Organizer',
-            perms: [
-                'CREATE_EVENT',
-                'UPDATE_EVENT',
-                'VIEW_EVENTS',
-                'REGISTER_EVENT',
-            ],
-        },
-        {
-            roleName: 'STUDENT',
-            description: 'Standard Student Participant',
-            perms: ['VIEW_EVENTS', 'REGISTER_EVENT'],
-        },
-    ];
-
-    for (const r of roles) {
-        const roleRecord = await prisma.role.upsert({
-            where: { roleName: r.roleName },
-            update: {},
-            create: {
-                roleName: r.roleName,
-                description: r.description,
+        if (!existingRp) {
+          await prisma.rolePermission.create({
+            data: {
+              roleId: roleRecord.id,
+              permissionId: permRecord.id,
             },
-        });
-
-        // Link permissions to role
-        for (const pName of r.perms) {
-            const permRecord = allPerms.find((p) => p.name === pName);
-            if (permRecord) {
-                // Find existing to avoid unique constraint error
-                const existingRp = await prisma.rolePermission.findFirst({
-                    where: { roleId: roleRecord.id, permissionId: permRecord.id },
-                });
-
-                if (!existingRp) {
-                    await prisma.rolePermission.create({
-                        data: {
-                            roleId: roleRecord.id,
-                            permissionId: permRecord.id,
-                        },
-                    });
-                }
-            }
+          });
         }
+      }
     }
+  }
 
-    console.log('Roles and RolePermissions seeded.');
+  console.log('Roles and RolePermissions seeded.');
 }
 
 main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -1,7 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import { Body, Controller, Get, Headers, Ip, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Ip,
+  Post,
+  Query,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import {
   ForgotPasswordDto,
@@ -14,29 +26,26 @@ import {
 import { Public } from './decorator';
 import { JwtAuthGuard } from './guard';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthUser } from './jwt.strategy';
+import { ConfigService } from '@nestjs/config';
+
+type AuthenticatedRequest = Request & { user?: AuthUser };
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
   @Public()
   @Post('signup')
   signup(@Body() dto: SignUpDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
-    if (userAgent) {
-      console.log('User Agent:', userAgent);
-    } else {
-      console.log('User Agent header is missing');
-    }
     return this.authService.signUp(dto, { ip, userAgent });
   }
   @Public()
   @Post('login')
   login(@Body() dto: LoginDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
-    if (userAgent) {
-      console.log('User Agent:', userAgent);
-    } else {
-      console.log('User Agent header is missing');
-    }
     return this.authService.login(dto, { ip, userAgent });
   }
   @Public()
@@ -49,6 +58,28 @@ export class AuthController {
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);
+  }
+
+  @Public()
+  @Get('reset-password')
+  resetPasswordLink(@Query('token') token?: string) {
+    if (!token) {
+      throw new BadRequestException('Missing reset token');
+    }
+
+    const frontendBaseUrl = this.configService.get<string>('FRONTEND_URL');
+    if (frontendBaseUrl) {
+      return {
+        message: 'Open this URL in your browser to set a new password.',
+        redirectTo: `${frontendBaseUrl}/auth/reset-password?token=${encodeURIComponent(token)}`,
+      };
+    }
+
+    return {
+      message:
+        'Use POST /api/auth/reset-password with JSON body: { "token": "...", "newPassword": "..." }',
+      token,
+    };
   }
 
   @Public()
@@ -83,7 +114,20 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(@Req() req: any) {
-    return req.user;
+  me(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Authentication required');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      permissions: user.permissions,
+      sessionId: user.sessionId,
+      isEmailVerified: user.isEmailVerified,
+    };
   }
 }

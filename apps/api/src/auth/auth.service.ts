@@ -33,7 +33,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
 
-  private async issueEmailVerificationToken(userId: string, email: string) {
+  private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
     const rawToken = randomBytes(32).toString('hex');
     const hash = await argon.hash(rawToken);
 
@@ -48,7 +48,13 @@ export class AuthService {
       },
     });
 
-    await this.emailService.sendVerificationEmail(email, rawToken);
+    try {
+      await this.emailService.sendVerificationEmail(email, rawToken);
+      return true;
+    } catch (err) {
+      console.error('AuthService.issueEmailVerificationToken email send failed:', err);
+      return false;
+    }
   }
   private async issuePasswordResetToken(userId: string, email: string) {
     const rawToken = randomBytes(32).toString('hex');
@@ -248,7 +254,11 @@ export class AuthService {
         };
       }
 
-      await this.issuePasswordResetToken(user.id, user.email);
+      try {
+        await this.issuePasswordResetToken(user.id, user.email);
+      } catch (err) {
+        console.error('AuthService.forgotPassword email send failed:', err);
+      }
 
       return {
         message: 'If an account with that email exists, a password reset link has been sent.',
@@ -304,7 +314,7 @@ export class AuthService {
       }
 
       const role = await this.prisma.role.findFirst({
-        where: { roleName: dto.roleName ?? 'STUDENT' },
+        where: { roleName: dto.roleName ?? 'Student' },
       });
 
       if (!role) throw new BadRequestException('Role not found');
@@ -324,13 +334,25 @@ export class AuthService {
         },
       });
 
-      await this.issueEmailVerificationToken(user.id, user.email);
+      console.log('New user created:', user.email);
+
+      const verificationEmailSent = await this.issueEmailVerificationToken(user.id, user.email);
+
+      if (verificationEmailSent) {
+        console.log('Email verification token issued for:', user.email);
+      } else {
+        console.warn('Signup completed but verification email could not be sent:', user.email);
+      }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+      console.log('Session and tokens created for:', user.email);
       return {
         user: this.buildUserResponse(user),
         ...tokens,
-        message: 'Signup successful. Please verify your email.',
+        message: verificationEmailSent
+          ? 'Signup successful. Please verify your email.'
+          : 'Signup successful, but we could not send the verification email right now. Please try again later.',
       };
     } catch (err) {
       console.error('AuthService.signUp error:', err);

@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { Pool } from 'pg';
@@ -17,9 +14,9 @@ async function main() {
   console.log('Seeding Users...');
 
   // Get roles
-  const adminRole = await prisma.role.findUnique({ where: { roleName: 'ADMIN' } });
-  const studentRole = await prisma.role.findUnique({ where: { roleName: 'STUDENT' } });
-  const organizerRole = await prisma.role.findUnique({ where: { roleName: 'ORGANIZER' } });
+  const adminRole = await prisma.role.findUnique({ where: { roleName: 'Admin' } });
+  const studentRole = await prisma.role.findUnique({ where: { roleName: 'Student' } });
+  const organizerRole = await prisma.role.findUnique({ where: { roleName: 'Organizer' } });
 
   if (!adminRole || !studentRole || !organizerRole) {
     throw new Error('Roles not found. Please run `npm run script_roles` first.');
@@ -45,6 +42,8 @@ async function main() {
       roleId: adminRole.id,
       departmentId: dept.id,
       phone: '+251900000001',
+      isEmailVerified: true,
+      emailVerifiedAt: new Date(),
     },
     {
       email: 'student@aastu.edu.et',
@@ -53,6 +52,8 @@ async function main() {
       roleId: studentRole.id,
       departmentId: dept.id,
       phone: '+251900000002',
+      isEmailVerified: true,
+      emailVerifiedAt: new Date(),
     },
     {
       email: 'organizer@aastu.edu.et',
@@ -61,6 +62,8 @@ async function main() {
       roleId: organizerRole.id,
       departmentId: dept.id,
       phone: '+251900000003',
+      isEmailVerified: true,
+      emailVerifiedAt: new Date(),
     },
   ];
 
