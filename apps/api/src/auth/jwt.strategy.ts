@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -18,6 +19,7 @@ export type AuthUser = {
   permissions: string[];
   sessionId: string;
   isEmailVerified: boolean;
+  isCampusIdVerified: boolean;
 };
 
 @Injectable()
@@ -89,6 +91,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       permissions,
       sessionId: session.id,
       isEmailVerified: user.isEmailVerified,
+      isCampusIdVerified: user.isCampusIdVerified,
     };
   }
 }

@@ -21,6 +21,7 @@ import {
   RefereshTokenDto,
   ResetPasswordDto,
   SignUpDto,
+  VerifyCampusIdDto,
   VerifyEmailDto,
 } from './dto';
 import { Public } from './decorator';
@@ -88,6 +89,17 @@ export class AuthController {
     return this.authService.resetPassword(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('verify-campus-id')
+  verifyCampusId(@Req() req: AuthenticatedRequest, @Body() dto: VerifyCampusIdDto) {
+    const user = req.user;
+    if (!user) {
+      throw new UnauthorizedException('Authentication required');
+    }
+
+    return this.authService.verifyCampusId(user.id, dto);
+  }
+
   @Public()
   @Get('verify-email')
   verifyEmail(@Query() dto: VerifyEmailDto) {
@@ -128,6 +140,7 @@ export class AuthController {
       permissions: user.permissions,
       sessionId: user.sessionId,
       isEmailVerified: user.isEmailVerified,
+      isCampusIdVerified: user.isCampusIdVerified,
     };
   }
 }
