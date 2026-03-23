@@ -463,7 +463,7 @@ export class AuthService {
         throw new UnauthorizedException('Please verify your email first');
       }
 
-      if (!user.isCampusIdVerified) {
+      if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
         throw new UnauthorizedException('Please verify your campus ID QR first');
       }
 
