@@ -49,6 +49,8 @@ model User {
   fullName         String            @map("full_name") @db.VarChar
   email            String            @unique @db.VarChar
   passwordHash     String            @map("password_hash") @db.VarChar
+  studentId        String?           @unique @map("student_id") @db.VarChar
+  academicProgram  String?           @map("academic_program") @db.VarChar
   roleId           String            @map("role_id") @db.Uuid
   departmentId     String?           @map("department_id") @db.Uuid
   phone            String?           @db.VarChar
@@ -59,6 +61,8 @@ model User {
 
   isEmailVerified  Boolean           @default(false) @map("is_email_verified")
   emailVerifiedAt  DateTime?         @map("email_verified_at")
+  isCampusIdVerified Boolean         @default(false) @map("is_campus_id_verified")
+  campusIdVerifiedAt DateTime?       @map("campus_id_verified_at")
   passwordChangedAt DateTime?        @map("password_changed_at")
   
   role             Role              @relation(fields: [roleId], references: [id])
