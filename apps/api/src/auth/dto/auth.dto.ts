@@ -47,3 +47,8 @@ export class VerifyEmailDto {
   @IsString()
   token: string;
 }
+
+export class VerifyCampusIdDto {
+  @IsString()
+  qrPayload: string;
+}

@@ -20,10 +20,25 @@ async function bootstrap() {
     .setTitle('AASTU Campus Event Management System API')
     .setDescription('The API documentation for the AASTU Campus Event Management System')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+        description: 'Paste access token only (without "Bearer ").',
+      },
+      'access-token',
+    )
+    .addSecurityRequirements('access-token')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   // Global pipes
   app.useGlobalPipes(
@@ -34,18 +49,6 @@ async function bootstrap() {
       errorHttpStatusCode: 422,
     }),
   );
-
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('AASTU Campus Event Managemment API')
-    .setDescription('RolRole, permission, admin, auth, and event APIs')
-    .setVersion('1.0.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document, {
-    swaggerOptions: { persistAuthorization: true },
-  });
 
   // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -61,4 +64,4 @@ async function bootstrap() {
 
   logger.log(`Application is running on: http://localhost:${port}/api`);
 }
-bootstrap();
+void bootstrap();

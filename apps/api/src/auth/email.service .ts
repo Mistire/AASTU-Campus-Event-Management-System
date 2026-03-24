@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -18,12 +17,14 @@ export class EmailService {
     const smtpUser = this.configService.get<string>('SMTP_USER');
     const smtpPass = this.configService.get<string>('SMTP_PASS');
     const smtpHost = this.configService.get<string>('SMTP_HOST');
-    const smtpPort = this.configService.get<number>('SMTP_PORT');
+    const smtpPort = Number(this.configService.get<number>('SMTP_PORT') ?? 587);
+    const smtpSecure = smtpPort === 465;
 
-    const transportConfig: any = {
+    const transportConfig: SMTPTransport.Options = {
       host: smtpHost,
-      port: Number(smtpPort),
-      secure: false,
+      port: smtpPort,
+      secure: smtpSecure,
+      requireTLS: !smtpSecure,
     };
 
     if (smtpUser && smtpPass) {
@@ -53,8 +54,10 @@ export class EmailService {
   }
 
   async sendVerificationEmail(email: string, token: string) {
-    const baseUrl = this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
-    const verifyUrl = `${baseUrl}/auth/verify-email?token=${encodeURIComponent(token)}`;
+    const backendBaseUrl =
+      this.configService.get<string>('BACKEND_URL') ??
+      `http://localhost:${this.configService.get<number>('PORT') ?? 3000}`;
+    const verifyUrl = `${backendBaseUrl}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 
     await this.sendMail(
       email,
@@ -68,8 +71,14 @@ export class EmailService {
   }
 
   async sendPasswordResetEmail(email: string, token: string) {
-    const baseUrl = this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
-    const verifyUrl = `${baseUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
+    const frontendBaseUrl = this.configService.get<string>('FRONTEND_URL');
+    const backendBaseUrl =
+      this.configService.get<string>('BACKEND_URL') ??
+      `http://localhost:${this.configService.get<number>('PORT') ?? 3000}`;
+
+    const resetUrl = frontendBaseUrl
+      ? `${frontendBaseUrl}/auth/reset-password?token=${encodeURIComponent(token)}`
+      : `${backendBaseUrl}/api/auth/reset-password?token=${encodeURIComponent(token)}`;
 
     await this.sendMail(
       email,
@@ -77,7 +86,7 @@ export class EmailService {
       `
         <p>You requested a password reset.</p>
         <p>Please reset your password by clicking the link below:</p>
-        <a href="${verifyUrl}">Reset Password</a>
+        <a href="${resetUrl}">Reset Password</a>
         <p>This link expires in 15 minutes.</p>
       `,
     );
