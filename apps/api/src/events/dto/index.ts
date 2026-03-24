@@ -9,3 +9,7 @@ export * from './event-type.dto';
 export * from './tag.dto';
 export * from './announcement.dto';
 export * from './invitation.dto';
+export * from './session.dto';
+export * from './speaker.dto';
+export * from './form-field.dto';
+export * from './hackathon.dto';

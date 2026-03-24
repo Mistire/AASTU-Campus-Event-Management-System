@@ -1,21 +1,43 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
+// ── Shared ─────────────────────────────────────────────────────────────
 export class InviteResponseDto {
-    @ApiProperty({ description: 'Accept or reject the invitation', example: true })
-    @IsBoolean()
-    @IsNotEmpty()
-    accept: boolean;
+  @ApiProperty({ description: 'Accept or reject the invitation', example: true })
+  @IsBoolean()
+  @IsNotEmpty()
+  accept: boolean;
 }
 
-export class InviteOrganizerDto {
-    @ApiProperty({ description: 'UUID of the user to invite as organizer' })
-    @IsUUID()
-    @IsNotEmpty()
-    userId: string;
+// ── Attendee Invitations (EventInvites table) ──────────────────────────
+export class BulkInviteAttendeesDto {
+  @ApiProperty({
+    description: 'Array of email addresses to invite as attendees',
+    example: ['student1@aastu.edu.et', 'student2@aastu.edu.et'],
+  })
+  @IsArray()
+  @IsEmail({}, { each: true })
+  @IsNotEmpty()
+  emails: string[];
+}
 
-    @ApiPropertyOptional({ description: 'Role for the organizer', example: 'Co-Organizer' })
-    @IsString()
-    @IsOptional()
-    role?: string;
+// ── Organizer Invitations (EventOrganizers table) ──────────────────────
+export class InviteOrganizerDto {
+  @ApiProperty({ description: 'UUID of the user to invite as co-organizer' })
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
+
+  @ApiPropertyOptional({ description: 'Role for the organizer', example: 'Co-Organizer' })
+  @IsString()
+  @IsOptional()
+  role?: string;
 }

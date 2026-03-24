@@ -124,6 +124,25 @@ export class OrganizersService {
     });
   }
 
+  async findMyInvitations(userId: string) {
+    return this.prisma.eventOrganizers.findMany({
+      where: { userId },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+            startTime: true,
+            endTime: true,
+            venue: { select: { name: true, building: true } },
+            creator: { select: { id: true, fullName: true } },
+          },
+        },
+      },
+      orderBy: { invitedAt: 'desc' },
+    });
+  }
+
   async remove(id: string, userId: string) {
     const organizer = await this.prisma.eventOrganizers.findUnique({
       where: { id },

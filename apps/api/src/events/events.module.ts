@@ -17,6 +17,12 @@ import { AnnouncementsService } from './announcements.service';
 import { AnnouncementsController } from './announcements.controller';
 import { InvitationsService } from './invitations.service';
 import { InvitationsController } from './invitations.controller';
+import { SpeakersService } from './speakers.service';
+import { SpeakersController } from './speakers.controller';
+import { FormFieldsService } from './form-fields.service';
+import { FormFieldsController } from './form-fields.controller';
+import { HackathonsService } from './hackathons.service';
+import { HackathonsController } from './hackathons.controller';
 
 @Module({
   controllers: [
@@ -29,6 +35,9 @@ import { InvitationsController } from './invitations.controller';
     TagsController,
     AnnouncementsController,
     InvitationsController,
+    SpeakersController,
+    FormFieldsController,
+    HackathonsController,
   ],
   providers: [
     EventsService,
@@ -40,6 +49,9 @@ import { InvitationsController } from './invitations.controller';
     TagsService,
     AnnouncementsService,
     InvitationsService,
+    SpeakersService,
+    FormFieldsService,
+    HackathonsService,
   ],
   exports: [EventsService, VenuesService, CategoriesService, EventTypesService, TagsService],
 })

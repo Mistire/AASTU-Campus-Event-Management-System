@@ -16,8 +16,9 @@ import { parse } from 'csv-parse/sync';
 export class InvitationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async importCsv(eventId: string, userId: string, fileBuffer: Buffer) {
-    // Verify event exists and user is organizer
+  // ── Helpers ────────────────────────────────────────────────────────────
+
+  private async assertOrganizerAndAllowedStatus(eventId: string, userId: string) {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
       include: {
@@ -38,34 +39,16 @@ export class InvitationsService {
       );
     }
 
-    // Parse CSV
-    let records: any[];
-    try {
-      records = parse(fileBuffer, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true,
-      });
-    } catch {
-      throw new BadRequestException('Invalid CSV file format');
-    }
+    return event;
+  }
 
-    // Extract emails from CSV
-    const emails: string[] = [];
-    for (const record of records) {
-      const email = record.email || record.Email || record.EMAIL;
-      if (email && typeof email === 'string' && email.includes('@')) {
-        emails.push(email.trim().toLowerCase());
-      }
-    }
-
-    if (emails.length === 0) {
-      throw new BadRequestException(
-        'No valid emails found in CSV. Ensure the file has an "email" column.',
-      );
-    }
-
-    const uniqueEmails = [...new Set(emails)];
+  private async processEmails(
+    eventId: string,
+    userId: string,
+    emails: string[],
+    eventTitle: string,
+  ) {
+    const uniqueEmails = [...new Set(emails.map((e) => e.trim().toLowerCase()))];
 
     const registeredUsers = await this.prisma.user.findMany({
       where: { email: { in: uniqueEmails } },
@@ -82,7 +65,6 @@ export class InvitationsService {
     });
     const existingEmails = new Set(existingInvites.map((i) => i.invitedEmail));
 
-    // Create new invitations
     const newInvites: any[] = [];
     const notifications: any[] = [];
     const skipped: string[] = [];
@@ -107,7 +89,7 @@ export class InvitationsService {
         notifications.push({
           userId: matchedUserId,
           title: 'Event Invitation',
-          message: `You've been invited to "${event.title}". Check your invitations to respond.`,
+          message: `You've been invited to attend "${eventTitle}". Check your invitations to respond.`,
           type: 'EVENT_INVITATION',
         });
       }
@@ -122,7 +104,7 @@ export class InvitationsService {
     }
 
     return {
-      message: 'Invitations processed',
+      message: 'Attendee invitations processed',
       total: uniqueEmails.length,
       created: newInvites.length,
       skippedDuplicates: skipped.length,
@@ -130,6 +112,54 @@ export class InvitationsService {
       unmatchedEmails: uniqueEmails.length - registeredUsers.length,
     };
   }
+
+  // ── Import from CSV ────────────────────────────────────────────────────
+
+  async importCsv(eventId: string, userId: string, fileBuffer: Buffer) {
+    const event = await this.assertOrganizerAndAllowedStatus(eventId, userId);
+
+    // Parse CSV
+    let records: any[];
+    try {
+      records = parse(fileBuffer, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+      });
+    } catch {
+      throw new BadRequestException('Invalid CSV file format');
+    }
+
+    const emails: string[] = [];
+    for (const record of records) {
+      const email = record.email || record.Email || record.EMAIL;
+      if (email && typeof email === 'string' && email.includes('@')) {
+        emails.push(email);
+      }
+    }
+
+    if (emails.length === 0) {
+      throw new BadRequestException(
+        'No valid emails found in CSV. Ensure the file has an "email" column.',
+      );
+    }
+
+    return this.processEmails(eventId, userId, emails, event.title);
+  }
+
+  // ── Bulk invite by JSON email array ────────────────────────────────────
+
+  async bulkInvite(eventId: string, userId: string, emails: string[]) {
+    const event = await this.assertOrganizerAndAllowedStatus(eventId, userId);
+
+    if (!emails || emails.length === 0) {
+      throw new BadRequestException('At least one email is required');
+    }
+
+    return this.processEmails(eventId, userId, emails, event.title);
+  }
+
+  // ── List invites for an event (organizer view) ─────────────────────────
 
   async findAllByEvent(eventId: string) {
     return this.prisma.eventInvites.findMany({
@@ -141,6 +171,29 @@ export class InvitationsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  // ── My attendee invitations (user view) ────────────────────────────────
+
+  async findMyInvitations(userId: string) {
+    return this.prisma.eventInvites.findMany({
+      where: { userId },
+      include: {
+        event: {
+          select: {
+            id: true,
+            title: true,
+            startTime: true,
+            endTime: true,
+            venue: { select: { name: true, building: true } },
+          },
+        },
+        inviter: { select: { id: true, fullName: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  // ── Respond to invitation ──────────────────────────────────────────────
 
   async respond(inviteId: string, userId: string, accept: boolean) {
     const invite = await this.prisma.eventInvites.findUnique({
@@ -170,13 +223,15 @@ export class InvitationsService {
       data: {
         userId: invite.invitedBy,
         title: 'Invitation Response',
-        message: `Your invitation for "${invite.event.title}" was ${newStatus.toLowerCase()} by a user.`,
+        message: `Your attendee invitation for "${invite.event.title}" was ${newStatus.toLowerCase()}.`,
         type: 'INVITATION_RESPONSE',
       },
     });
 
     return updated;
   }
+
+  // ── Cancel invitation ──────────────────────────────────────────────────
 
   async cancel(inviteId: string, userId: string) {
     const invite = await this.prisma.eventInvites.findUnique({

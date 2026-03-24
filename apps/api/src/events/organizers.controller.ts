@@ -18,7 +18,7 @@ import { JwtAuthGuard, RolesGuard } from '../auth/guard';
 import { Roles, GetUser } from '../auth/decorator';
 import type { AuthUser } from '../auth/jwt.strategy';
 
-@ApiTags('Event Organizers')
+@ApiTags('Event Organizer Invitations')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller()
@@ -54,6 +54,14 @@ export class OrganizersController {
   })
   findAllByEvent(@Param('eventId') eventId: string, @Query('includeAll') includeAll?: string) {
     return this.organizersService.findAllByEvent(eventId, includeAll === 'true');
+  }
+
+  @Get('my/organizer-invitations')
+  @ApiOperation({
+    summary: 'View my organizer invitations — pending, accepted, and rejected (Authenticated user)',
+  })
+  findMyInvitations(@GetUser() user: AuthUser) {
+    return this.organizersService.findMyInvitations(user.id);
   }
 
   @Delete('organizers/:id')

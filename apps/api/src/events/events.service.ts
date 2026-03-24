@@ -332,7 +332,14 @@ export class EventsService {
           select: { id: true, fullName: true, email: true, profileImage: true },
         },
         eventCategories: { include: { category: true } },
-        sessions: true,
+        sessions: {
+          include: {
+            speakers: { include: { speaker: true } },
+            media: true,
+            _count: { select: { attendance: true } },
+          },
+          orderBy: { startTime: 'asc' },
+        },
         organizers: {
           where: { status: 'ACCEPTED' },
           include: {
@@ -342,7 +349,9 @@ export class EventsService {
         tags: { include: { tag: true } },
         media: true,
         access: true,
-        _count: { select: { registrations: true, feedback: true } },
+        formFields: { orderBy: { id: 'asc' } },
+        hackathons: true,
+        _count: { select: { registrations: true, feedback: true, teams: true, judges: true } },
       },
     });
 
@@ -421,8 +430,38 @@ export class EventsService {
   }
 
   private async deleteEvent(eventId: string) {
-    // Delete related records first
+    // Delete related records in proper order (deepest children first)
+    // 1. Session children (speakers, media, attendance with sessionId)
+    const sessionIds = (
+      await this.prisma.eventSessions.findMany({
+        where: { eventId },
+        select: { id: true },
+      })
+    ).map((s) => s.id);
+
+    if (sessionIds.length > 0) {
+      await this.prisma.$transaction([
+        this.prisma.sessionSpeakers.deleteMany({ where: { sessionId: { in: sessionIds } } }),
+        this.prisma.sessionMedia.deleteMany({ where: { sessionId: { in: sessionIds } } }),
+        this.prisma.attendance.deleteMany({ where: { sessionId: { in: sessionIds } } }),
+      ]);
+    }
+
+    // 2. Form response children
+    const formFieldIds = (
+      await this.prisma.formFields.findMany({
+        where: { eventId },
+        select: { id: true },
+      })
+    ).map((f) => f.id);
+
+    if (formFieldIds.length > 0) {
+      await this.prisma.formResponses.deleteMany({ where: { fieldId: { in: formFieldIds } } });
+    }
+
+    // 3. Delete all direct children and the event
     await this.prisma.$transaction([
+      this.prisma.eventSessions.deleteMany({ where: { eventId } }),
       this.prisma.eventTags.deleteMany({ where: { eventId } }),
       this.prisma.eventCategory.deleteMany({ where: { eventId } }),
       this.prisma.eventOrganizers.deleteMany({ where: { eventId } }),
@@ -431,6 +470,8 @@ export class EventsService {
       this.prisma.eventAccess.deleteMany({ where: { eventId } }),
       this.prisma.eventMedia.deleteMany({ where: { eventId } }),
       this.prisma.eventWaitlist.deleteMany({ where: { eventId } }),
+      this.prisma.formFields.deleteMany({ where: { eventId } }),
+      this.prisma.hackathons.deleteMany({ where: { eventId } }),
       this.prisma.event.delete({ where: { id: eventId } }),
     ]);
 
