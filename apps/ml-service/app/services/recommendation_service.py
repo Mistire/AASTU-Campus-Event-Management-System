@@ -2,8 +2,12 @@ import logging
 import joblib
 import os
 import uuid as _uuid
-from datetime import datetime
+import pandas as pd
+import shutil
+import tempfile
 
+from app.utils.database import get_engine
+from datetime import datetime
 from app.config import settings
 from app.utils.database import load_all_tables
 from app.utils.preprocessing import run_full_cleaning_pipeline
@@ -43,90 +47,119 @@ def load_models():
         logger.warning("Trained models not found. Run /retrain first.")
         return False
 
-    _state["hybrid_model"] = joblib.load(os.path.join(model_dir, "hybrid_model.pkl"))
-    _state["event_features"] = joblib.load(os.path.join(model_dir, "event_features.pkl"))
-    _state["user_profiles"] = joblib.load(os.path.join(model_dir, "user_profiles.pkl"))
-    _state["event_id_to_idx"] = joblib.load(os.path.join(model_dir, "event_id_to_idx.pkl"))
-    _state["idx_to_event_id"] = joblib.load(os.path.join(model_dir, "idx_to_event_id.pkl"))
-    _state["user_id_to_idx"] = joblib.load(os.path.join(model_dir, "user_id_to_idx.pkl"))
-    _state["idx_to_user_id"] = joblib.load(os.path.join(model_dir, "idx_to_user_id.pkl"))
-    _state["user_interaction_counts"] = joblib.load(os.path.join(model_dir, "user_interaction_counts.pkl"))
-
-    import pandas as pd
-    from app.utils.database import get_engine
+    # Load all into a temp state first to ensure consistency
+    new_state = {}
     try:
-        _state["events_df"] = pd.read_sql("SELECT id, title FROM events", get_engine())
-    except Exception:
-        _state["events_df"] = None
+        new_state["hybrid_model"] = joblib.load(os.path.join(model_dir, "hybrid_model.pkl"))
+        new_state["event_features"] = joblib.load(os.path.join(model_dir, "event_features.pkl"))
+        new_state["user_profiles"] = joblib.load(os.path.join(model_dir, "user_profiles.pkl"))
+        new_state["event_id_to_idx"] = joblib.load(os.path.join(model_dir, "event_id_to_idx.pkl"))
+        new_state["idx_to_event_id"] = joblib.load(os.path.join(model_dir, "idx_to_event_id.pkl"))
+        new_state["user_id_to_idx"] = joblib.load(os.path.join(model_dir, "user_id_to_idx.pkl"))
+        new_state["idx_to_user_id"] = joblib.load(os.path.join(model_dir, "idx_to_user_id.pkl"))
+        new_state["user_interaction_counts"] = joblib.load(os.path.join(model_dir, "user_interaction_counts.pkl"))
+        
 
-    _state["last_trained"] = datetime.utcnow().isoformat()
-    logger.info("Models loaded successfully")
-    return True
+        try:
+            new_state["events_df"] = pd.read_sql("SELECT id, title FROM events", get_engine())
+        except Exception:
+            new_state["events_df"] = None
+
+        # Update global state atomically
+        for key, value in new_state.items():
+            _state[key] = value
+
+        _state["last_trained"] = datetime.utcfromtimestamp(
+            os.path.getmtime(os.path.join(model_dir, "hybrid_model.pkl"))
+        ).isoformat() + "Z"
+        
+        logger.info(f"Models loaded successfully. Timestamp: {_state['last_trained']}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to load models: {str(e)}")
+        return False
 
 
 def retrain():
     logger.info("Starting retrain pipeline...")
+
+    
+    # 1. Create a temporary directory for atomic swap
     model_dir = settings.model_path
-    os.makedirs(model_dir, exist_ok=True)
+    temp_dir = tempfile.mkdtemp(dir=os.path.dirname(model_dir) or ".")
+    
+    try:
+        # 2. Load fresh data from DB
+        raw_data = load_all_tables()
+        logger.info(f"Loaded {len(raw_data['users'])} users, {len(raw_data['events'])} events")
 
-    # 1. Load fresh data from DB
-    raw_data = load_all_tables()
-    logger.info(f"Loaded {len(raw_data['users'])} users, {len(raw_data['events'])} events")
+        # 3. Clean
+        cleaned = run_full_cleaning_pipeline(raw_data)
 
-    # 2. Clean
-    cleaned = run_full_cleaning_pipeline(raw_data)
+        # 4. Build event features
+        eb = EventFeatureBuilder(max_tfidf_features=100)
+        ef, eid2idx, idx2eid = eb.fit_transform(
+            cleaned["events"], cleaned["registrations"],
+            cleaned["feedback"], cleaned["categories"]
+        )
 
-    # 3. Build event features
-    eb = EventFeatureBuilder(max_tfidf_features=100)
-    ef, eid2idx, idx2eid = eb.fit_transform(
-        cleaned["events"], cleaned["registrations"],
-        cleaned["feedback"], cleaned["categories"]
-    )
+        # 5. Build user profiles
+        ub = UserFeatureBuilder(ef, eid2idx)
+        profiles, uid2idx, idx2uid, counts = ub.build_all_profiles(
+            cleaned["users"], cleaned["registrations"],
+            cleaned["attendance"], cleaned["feedback"],
+            cleaned["user_interests"], cleaned["events"]
+        )
 
-    # 4. Build user profiles
-    ub = UserFeatureBuilder(ef, eid2idx)
-    profiles, uid2idx, idx2uid, counts = ub.build_all_profiles(
-        cleaned["users"], cleaned["registrations"],
-        cleaned["attendance"], cleaned["feedback"],
-        cleaned["user_interests"], cleaned["events"]
-    )
+        # 6. Build interaction matrix
+        im, _, _ = build_interaction_matrix(
+            cleaned["users"], cleaned["events"],
+            cleaned["registrations"], cleaned["attendance"],
+            cleaned["feedback"]
+        )
 
-    # 5. Build interaction matrix
-    im, _, _ = build_interaction_matrix(
-        cleaned["users"], cleaned["events"],
-        cleaned["registrations"], cleaned["attendance"],
-        cleaned["feedback"]
-    )
+        # 7. Train hybrid model
+        hybrid = HybridRecommender(
+            content_weight=settings.content_weight,
+            collab_weight=settings.collab_weight,
+        )
+        n_factors = min(20, min(im.shape) - 1)
+        hybrid.fit(ef, im, n_factors=max(n_factors, 1))
 
-    # 6. Train hybrid model
-    hybrid = HybridRecommender(
-        content_weight=settings.content_weight,
-        collab_weight=settings.collab_weight,
-    )
-    n_factors = min(20, min(im.shape) - 1)
-    hybrid.fit(ef, im, n_factors=max(n_factors, 1))
+        # 8. Save all artifacts to TEMP directory
+        joblib.dump(hybrid, os.path.join(temp_dir, "hybrid_model.pkl"))
+        joblib.dump(ef, os.path.join(temp_dir, "event_features.pkl"))
+        joblib.dump(profiles, os.path.join(temp_dir, "user_profiles.pkl"))
+        joblib.dump(eid2idx, os.path.join(temp_dir, "event_id_to_idx.pkl"))
+        joblib.dump(idx2eid, os.path.join(temp_dir, "idx_to_event_id.pkl"))
+        joblib.dump(uid2idx, os.path.join(temp_dir, "user_id_to_idx.pkl"))
+        joblib.dump(idx2uid, os.path.join(temp_dir, "idx_to_user_id.pkl"))
+        joblib.dump(counts, os.path.join(temp_dir, "user_interaction_counts.pkl"))
+        joblib.dump(eb, os.path.join(temp_dir, "event_feature_builder.pkl"))
 
-    # 7. Save all artifacts
-    joblib.dump(hybrid, os.path.join(model_dir, "hybrid_model.pkl"))
-    joblib.dump(ef, os.path.join(model_dir, "event_features.pkl"))
-    joblib.dump(profiles, os.path.join(model_dir, "user_profiles.pkl"))
-    joblib.dump(eid2idx, os.path.join(model_dir, "event_id_to_idx.pkl"))
-    joblib.dump(idx2eid, os.path.join(model_dir, "idx_to_event_id.pkl"))
-    joblib.dump(uid2idx, os.path.join(model_dir, "user_id_to_idx.pkl"))
-    joblib.dump(idx2uid, os.path.join(model_dir, "idx_to_user_id.pkl"))
-    joblib.dump(counts, os.path.join(model_dir, "user_interaction_counts.pkl"))
-    joblib.dump(eb, os.path.join(model_dir, "event_feature_builder.pkl"))
+        # 9. Atomic Swap
+        # Remove old dir if exists, then rename temp to production
+        if os.path.exists(model_dir):
+            shutil.rmtree(model_dir)
+        os.rename(temp_dir, model_dir)
+        logger.info(f"Atomic model swap complete: {model_dir}")
 
-    # 8. Reload into memory
-    load_models()
+        # 10. Reload into memory
+        load_models()
 
-    stats = {
-        "events_count": len(cleaned["events"]),
-        "users_count": len(cleaned["users"]),
-        "registrations_count": len(cleaned["registrations"]),
-    }
-    logger.info(f"Retrain complete: {stats}")
-    return stats
+        stats = {
+            "events_count": len(cleaned["events"]),
+            "users_count": len(cleaned["users"]),
+            "registrations_count": len(cleaned["registrations"]),
+            "last_trained": _state["last_trained"]
+        }
+        logger.info(f"Retrain complete: {stats}")
+        return stats
+    except Exception as e:
+        logger.error(f"Retrain failed: {str(e)}")
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+        raise e
 
 
 def _resolve_key(key, mapping):
