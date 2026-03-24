@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppConfigModule } from './config/config.module';
 import { HealthModule } from './health/health.module';
@@ -21,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
   imports: [
     PrismaModule,
     AppConfigModule,
+    ScheduleModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
