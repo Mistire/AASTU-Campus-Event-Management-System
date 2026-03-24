@@ -23,7 +23,7 @@ export class EmailService {
     const transportConfig: any = {
       host: smtpHost,
       port: Number(smtpPort),
-      secure: false,
+      secure: Number(smtpPort) === 465,
     };
 
     if (smtpUser && smtpPass) {
