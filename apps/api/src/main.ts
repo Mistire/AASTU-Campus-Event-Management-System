@@ -20,10 +20,25 @@ async function bootstrap() {
     .setTitle('AASTU Campus Event Management System API')
     .setDescription('The API documentation for the AASTU Campus Event Management System')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+        description: 'Paste access token only (without "Bearer ").',
+      },
+      'access-token',
+    )
+    .addSecurityRequirements('access-token')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   // Global pipes
   app.useGlobalPipes(
@@ -52,4 +67,4 @@ async function bootstrap() {
 
   logger.log(`Application is running on: http://localhost:${port}/api`);
 }
-bootstrap();
+void bootstrap();

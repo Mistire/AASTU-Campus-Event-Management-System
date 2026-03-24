@@ -1,11 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class EventQueryDto {
-    @ApiPropertyOptional({ description: 'Filter events by category UUID' })
-    @IsUUID()
+    @ApiPropertyOptional({ description: 'Search term for event titles or descriptions' })
+    @IsString()
     @IsOptional()
-    category?: string;
+    search?: string;
 
     @ApiPropertyOptional({ description: 'Filter events by a specific date', example: '2026-10-15' })
     @IsDateString()
@@ -17,13 +18,40 @@ export class EventQueryDto {
     @IsOptional()
     department?: string;
 
+    @ApiPropertyOptional({
+        description: 'Filter events by status name',
+        enum: ['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'LIVE', 'CANCELLED', 'ARCHIVED'],
+    })
+    @IsString()
+    @IsOptional()
+    status?: string;
+
+    @ApiPropertyOptional({ description: 'Filter events by event type UUID' })
+    @IsUUID()
+    @IsOptional()
+    eventType?: string;
+
+    @ApiPropertyOptional({ description: 'Filter events by tag UUID' })
+    @IsUUID()
+    @IsOptional()
+    tag?: string;
+
     @ApiPropertyOptional({ description: 'Sort results by popularity or date', enum: ['popularity', 'date'] })
     @IsString()
     @IsOptional()
-    sortBy?: 'popularity' | 'date'; // popularity uses registration count
+    sortBy?: 'popularity' | 'date';
 
-    @ApiPropertyOptional({ description: 'Search term for event titles or descriptions' })
-    @IsString()
+    @ApiPropertyOptional({ description: 'Page number (1-indexed)', default: 1 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
     @IsOptional()
-    search?: string;
+    page?: number;
+
+    @ApiPropertyOptional({ description: 'Number of results per page', default: 10 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    limit?: number;
 }

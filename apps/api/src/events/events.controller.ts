@@ -1,74 +1,114 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-    Query,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { EventsService } from './events.service';
-import { CreateEventDto, UpdateEventDto } from './dto';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 import { EventQueryDto } from './dto/event-query.dto';
-import { JwtAuthGuard } from 'src/auth/guard';
+import { JwtAuthGuard, RolesGuard } from '../auth/guard';
+import { Roles, GetUser } from '../auth/decorator';
+import type { AuthUser } from '../auth/jwt.strategy';
 
 @ApiTags('Events')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('events')
 export class EventsController {
-    constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new event' })
-    @ApiResponse({ status: 201, description: 'The event has been successfully created.' })
-    create(@Body() dto: CreateEventDto) {
-        return this.eventsService.create(dto);
-    }
+  @Post()
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Create a new event (Organizer, Admin). Status auto-set to DRAFT.' })
+  @ApiResponse({ status: 201, description: 'Event created in DRAFT status.' })
+  create(@GetUser() user: AuthUser, @Body() dto: CreateEventDto) {
+    return this.eventsService.create(user, dto);
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all events with optional filtering' })
-    findAll(@Query() query: EventQueryDto) {
-        return this.eventsService.findAll(query);
-    }
+  @Get()
+  @ApiOperation({ summary: 'Get all events with filtering and pagination' })
+  findAll(@Query() query: EventQueryDto) {
+    return this.eventsService.findAll(query);
+  }
 
-    @Get('upcoming')
-    @ApiOperation({ summary: 'Get upcoming events' })
-    getUpcoming() {
-        return this.eventsService.getUpcoming();
-    }
+  @Get('upcoming')
+  @ApiOperation({ summary: 'Get upcoming approved/live events' })
+  getUpcoming() {
+    return this.eventsService.getUpcoming();
+  }
 
-    @Get('calendar')
-    @ApiOperation({ summary: 'Get events for calendar view' })
-    getCalendar(@Query() query: EventQueryDto) {
-        // Basic calendar view returns events within a month
-        return this.eventsService.findAll(query);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get full event details by ID' })
+  findOne(@Param('id') id: string) {
+    return this.eventsService.findOne(id);
+  }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Get a single event by ID' })
-    findOne(@Param('id') id: string) {
-        return this.eventsService.findOne(id);
-    }
+  @Patch(':id')
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Update event (only DRAFT or PENDING status). Organizer/Creator only.' })
+  @ApiResponse({ status: 403, description: 'Cannot edit event in current status.' })
+  update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateEventDto) {
+    return this.eventsService.update(id, user.id, dto);
+  }
 
-    @Patch(':id')
-    @ApiOperation({ summary: 'Update an existing event' })
-    update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
-        return this.eventsService.update(id, dto);
-    }
+  @Patch(':id/submit')
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Submit event for admin approval (DRAFT → PENDING)' })
+  submitForApproval(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.submitForApproval(id, user.id);
+  }
 
-    @Patch(':id/status')
-    @ApiOperation({ summary: 'Update the status of an event' })
-    updateStatus(@Param('id') id: string, @Body('statusId') statusId: string) {
-        return this.eventsService.updateStatus(id, statusId);
-    }
+  @Patch(':id/approve')
+  @Roles('Admin')
+  @ApiOperation({ summary: 'Approve event (PENDING → APPROVED). Admin only.' })
+  approve(@Param('id') id: string) {
+    return this.eventsService.approve(id);
+  }
 
-    @Delete(':id')
-    @ApiOperation({ summary: 'Delete an event' })
-    remove(@Param('id') id: string) {
-        return this.eventsService.remove(id);
-    }
+  @Patch(':id/reject')
+  @Roles('Admin')
+  @ApiOperation({ summary: 'Reject event (PENDING → REJECTED). Admin only.' })
+  reject(@Param('id') id: string, @Body('reason') reason?: string) {
+    return this.eventsService.reject(id, reason);
+  }
+
+  @Patch(':id/cancel')
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({
+    summary: 'Cancel event (Organizer/Creator). Works from DRAFT, PENDING, or APPROVED.',
+  })
+  cancel(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.cancel(id, user.id);
+  }
+
+  @Patch(':id/go-live')
+  @Roles('Admin')
+  @ApiOperation({ summary: 'Set event live (APPROVED → LIVE). Admin only.' })
+  goLive(@Param('id') id: string) {
+    return this.eventsService.goLive(id);
+  }
+
+  @Patch(':id/archive')
+  @Roles('Admin')
+  @ApiOperation({ summary: 'Archive event (LIVE → ARCHIVED). Admin only.' })
+  archive(@Param('id') id: string) {
+    return this.eventsService.archive(id);
+  }
+
+  @Delete(':id')
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Delete event (Admin: any; Organizer: only DRAFT)' })
+  remove(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.remove(id, user);
+  }
 }

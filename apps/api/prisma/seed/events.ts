@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -10,78 +13,278 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-    console.log('Seeding Events...');
+  console.log('Seeding Events Module Data...');
 
-    // 1. Create Categories
-    const categoryNames = ['Technology', 'Sports', 'Seminar', 'Workshop'];
-    for (const name of categoryNames) {
-        await prisma.category.create({
-            data: { name, description: `Events related to ${name}` },
+  const statuses = [
+    {
+      statusName: 'DRAFT',
+      description:
+        'The event is currently being prepared by the Organizer and has not been submitted yet.',
+    },
+    {
+      statusName: 'PENDING',
+      description:
+        'The organizer has submitted the event, and it is waiting for an Admin decision.',
+    },
+    {
+      statusName: 'APPROVED',
+      description: 'The event meets all requirements and is cleared to be published.',
+    },
+    {
+      statusName: 'REJECTED',
+      description: 'The Admin has denied the event, and it is permanently stored as rejected.',
+    },
+    { statusName: 'LIVE', description: 'The event is now live and visible to attendees.' },
+    {
+      statusName: 'CANCELLED',
+      description: 'The organizer has cancelled the event, and it is no longer active.',
+    },
+    {
+      statusName: 'ARCHIVED',
+      description:
+        "The event's scheduled lifetime has ended; stored for historical data and analytics.",
+    },
+  ];
+
+  for (const s of statuses) {
+    await prisma.eventStatus.upsert({
+      where: { statusName: s.statusName },
+      update: { description: s.description },
+      create: s,
+    });
+  }
+  console.log(`✅ ${statuses.length} Event Statuses seeded.`);
+
+  const eventTypes = [
+    { name: 'Seminar', description: 'A formal academic presentation or lecture.' },
+    {
+      name: 'Workshop',
+      description: 'A hands-on, interactive session where students learn a specific skill.',
+    },
+    {
+      name: 'Guest Lecture',
+      description: 'A talk given by an invited industry expert or visiting professor.',
+    },
+    {
+      name: 'Conference',
+      description:
+        'A large-scale academic gathering with multiple speakers and paper presentations.',
+    },
+    { name: 'Hackathon', description: 'An intensive coding or engineering competition.' },
+    {
+      name: 'Exhibition',
+      description: 'A showcase of student projects, innovations, or club achievements.',
+    },
+    {
+      name: 'Competition',
+      description: 'General contests (e.g., robotics challenges, math Olympiads).',
+    },
+    {
+      name: 'Career Fair',
+      description: 'An event where companies set up booths to recruit students.',
+    },
+    {
+      name: 'Networking Event',
+      description: 'An informal gathering for students to meet alumni or industry professionals.',
+    },
+    {
+      name: 'Panel Discussion',
+      description: 'A moderated conversation with multiple experts on a specific topic.',
+    },
+    { name: 'Club Meeting', description: 'Regular gatherings for student associations or clubs.' },
+    {
+      name: 'Cultural Festival',
+      description: 'Campus-wide celebrations, music, art, or food events.',
+    },
+    { name: 'Sports Event', description: 'Inter-departmental or campus-wide tournaments.' },
+  ];
+
+  for (const t of eventTypes) {
+    await prisma.eventType.upsert({
+      where: { name: t.name },
+      update: { description: t.description },
+      create: t,
+    });
+  }
+  console.log(`✅ ${eventTypes.length} Event Types seeded.`);
+
+  const tags = [
+    // Technology & Skills
+    '#WebDevelopment',
+    '#AppDevelopment',
+    '#AI',
+    '#MachineLearning',
+    '#DataScience',
+    '#CyberSecurity',
+    '#CloudComputing',
+    '#IoT',
+    '#Robotics',
+    '#UIUX',
+    '#Python',
+    '#Java',
+    '#JavaScript',
+    '#Flutter',
+    '#React',
+    '#AutoCAD',
+    '#CivilEngineering',
+    '#ElectricalEngineering',
+    // Target Audience & Eligibility
+    '#AllStudents',
+    '#Freshmen',
+    '#Sophomores',
+    '#Juniors',
+    '#Seniors',
+    '#PostGrads',
+    '#WomenInTech',
+    '#BeginnerFriendly',
+    '#AdvancedLevel',
+    // Perks & Incentives
+    '#FreeFood',
+    '#CertificateProvided',
+    '#PrizeMoney',
+    '#FreeSwag',
+    '#Networking',
+    '#CareerOpportunity',
+    '#Internship',
+    // Event Format & Vibe
+    '#InPerson',
+    '#Online',
+    '#Hybrid',
+    '#HandsOn',
+    '#Interactive',
+    '#Lecture',
+    '#QandA',
+    // Campus Life & Extracurriculars
+    '#Sports',
+    '#E_Sports',
+    '#Music',
+    '#Art',
+    '#Volunteering',
+    '#Charity',
+    '#MentalHealth',
+    '#Leadership',
+    '#Innovation',
+  ];
+
+  for (const name of tags) {
+    await prisma.tag.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
+  console.log(`✅ ${tags.length} Tags seeded.`);
+
+  const categoryNames = ['Technology', 'Sports', 'Seminar', 'Workshop', 'Cultural', 'Career'];
+  for (const name of categoryNames) {
+    const exists = await prisma.category.findFirst({ where: { name } });
+    if (!exists) {
+      await prisma.category.create({
+        data: { name, description: `Events related to ${name}` },
+      });
+    }
+  }
+  console.log(`✅ Categories seeded.`);
+
+  const venues = [
+    {
+      name: 'Red Carpet Hall',
+      building: 'Block 40',
+      capacity: 80,
+      description: 'Large multi-purpose hall',
+    },
+    {
+      name: 'Red Carpet Hall B',
+      building: 'Block 55',
+      capacity: 80,
+      description: 'Large multi-purpose hall',
+    },
+    {
+      name: 'Old Graduation Hall',
+      building: 'Block 10',
+      capacity: 300,
+      description: 'Main campus auditorium',
+    },
+    {
+      name: 'Seminar Room 201',
+      building: 'Block 20',
+      roomNumber: '201',
+      capacity: 80,
+      description: 'Medium seminar room',
+    },
+  ];
+
+  for (const v of venues) {
+    const exists = await prisma.venue.findFirst({ where: { name: v.name, building: v.building } });
+    if (!exists) {
+      await prisma.venue.create({ data: v });
+    }
+  }
+  console.log(`✅ Venues seeded.`);
+
+  const draftStatus = await prisma.eventStatus.findUnique({ where: { statusName: 'DRAFT' } });
+  const seminarType = await prisma.eventType.findUnique({ where: { name: 'Seminar' } });
+  const hallVenue = await prisma.venue.findFirst({ where: { name: 'Red Carpet Hall' } });
+
+  if (draftStatus && seminarType && hallVenue) {
+    const existingEvent = await prisma.event.findFirst({
+      where: { title: 'Annual Tech Summit 2026' },
+    });
+
+    if (!existingEvent) {
+      // Get an organizer user (if seeded)
+      const organizer = await prisma.user.findFirst({
+        where: { role: { roleName: 'Organizer' } },
+      });
+
+      if (organizer) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 7);
+        const dayAfter = new Date(tomorrow);
+        dayAfter.setDate(dayAfter.getDate() + 1);
+
+        const event = await prisma.event.create({
+          data: {
+            title: 'Annual Tech Summit 2026',
+            description: 'A grand summit showcasing student tech projects and innovations.',
+            capacity: 300,
+            startTime: tomorrow,
+            endTime: dayAfter,
+            statusId: draftStatus.id,
+            eventTypeId: seminarType.id,
+            venueId: hallVenue.id,
+            createdBy: organizer.id,
+            requiresApproval: false,
+          },
         });
-    }
 
-    const techCategory = await prisma.category.findFirst({ where: { name: 'Technology' } });
-
-    // 2. Create Event Statuses
-    const statuses = ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'];
-    for (const statusName of statuses) {
-        await prisma.eventStatus.create({
-            data: { statusName, description: `${statusName} status for events` },
+        // Add creator as organizer
+        await prisma.eventOrganizers.create({
+          data: {
+            eventId: event.id,
+            userId: organizer.id,
+            role: 'Creator',
+            status: 'ACCEPTED',
+          },
         });
+
+        console.log('✅ Sample Event "Annual Tech Summit 2026" seeded in DRAFT status.');
+      } else {
+        console.log('⚠️  No organizer user found. Run script_users first to seed users.');
+      }
+    } else {
+      console.log('ℹ️  Sample event already exists, skipping.');
     }
+  }
 
-    const approvedStatus = await prisma.eventStatus.findFirst({ where: { statusName: 'APPROVED' } });
-
-    // 3. Create Venues
-    const venues = [
-        { name: 'Red Carpet Hall', building: 'Block 40', capacity: 500 },
-        { name: 'ICT Lab 1', building: 'Block 55', capacity: 50 },
-    ];
-
-    for (const v of venues) {
-        await prisma.venue.create({ data: v });
-    }
-
-    const hallVenue = await prisma.venue.findFirst({ where: { name: 'Red Carpet Hall' } });
-
-    // 4. Create an Event
-    if (techCategory && approvedStatus && hallVenue) {
-        // Check if event exists
-        const existingEvent = await prisma.event.findFirst({ where: { title: 'Annual Tech Summit 2026' } });
-
-        if (!existingEvent) {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            const dayAfterTomorrow = new Date();
-            dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-
-            await prisma.event.create({
-                data: {
-                    title: 'Annual Tech Summit 2026',
-                    description: 'A grand summit showcasing student tech projects.',
-                    capacity: 300,
-                    startTime: tomorrow,
-                    endTime: dayAfterTomorrow,
-                    categoryId: techCategory.id,
-                    statusId: approvedStatus.id,
-                    venueId: hallVenue.id,
-                },
-            });
-            console.log('Sample Event "Annual Tech Summit 2026" seeded.');
-        } else {
-            console.log('Event already exists, skipping.');
-        }
-    }
-
-    console.log('Events seeded.');
+  console.log('\n🎉 Events module data seeding complete!');
 }
 
 main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

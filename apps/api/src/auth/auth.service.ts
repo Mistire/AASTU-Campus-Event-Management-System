@@ -13,6 +13,7 @@ import {
   RefereshTokenDto,
   ResetPasswordDto,
   SignUpDto,
+  VerifyCampusIdDto,
   VerifyEmailDto,
 } from './dto';
 import { EmailService } from './email.service ';
@@ -24,6 +25,12 @@ type JwtPayload = {
   sid: string;
 };
 
+type ParsedCampusQr = {
+  fullName: string;
+  studentId: string;
+  academicProgram: string;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -33,7 +40,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
 
-  private async issueEmailVerificationToken(userId: string, email: string) {
+  private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
     const rawToken = randomBytes(32).toString('hex');
     const hash = await argon.hash(rawToken);
 
@@ -48,7 +55,13 @@ export class AuthService {
       },
     });
 
-    await this.emailService.sendVerificationEmail(email, rawToken);
+    try {
+      await this.emailService.sendVerificationEmail(email, rawToken);
+      return true;
+    } catch (err) {
+      console.error('AuthService.issueEmailVerificationToken email send failed:', err);
+      return false;
+    }
   }
   private async issuePasswordResetToken(userId: string, email: string) {
     const rawToken = randomBytes(32).toString('hex');
@@ -80,7 +93,38 @@ export class AuthService {
       role: user.role.roleName,
       permissions: user.role.permissions.map((rp: any) => rp.permission.name),
       isEmailVerified: user.isEmailVerified,
+      isCampusIdVerified: user.isCampusIdVerified,
+      studentId: user.studentId,
+      academicProgram: user.academicProgram,
     };
+  }
+
+  private normalizeFullName(value: string) {
+    return value.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  }
+
+  private parseCampusQrPayload(rawPayload: string): ParsedCampusQr {
+    const payload = rawPayload.trim();
+    const pattern = /^(.*?)\s*\(([^)]+)\)\s*-\s*(.+)$/;
+    const match = payload.match(pattern);
+
+    if (!match) {
+      throw new BadRequestException(
+        'Invalid campus QR payload format. Expected: FULL NAME (STUDENT_ID) - PROGRAM',
+      );
+    }
+
+    const fullName = match[1]?.trim();
+    const studentId = match[2]?.trim();
+    const academicProgram = match[3]?.trim();
+
+    console.log('Parsed campus QR payload:', { fullName, studentId, academicProgram });
+
+    if (!fullName || !studentId || !academicProgram) {
+      throw new BadRequestException('Campus QR payload is missing required values');
+    }
+
+    return { fullName, studentId, academicProgram };
   }
 
   private async consumeOneTimeToken(
@@ -248,7 +292,11 @@ export class AuthService {
         };
       }
 
-      await this.issuePasswordResetToken(user.id, user.email);
+      try {
+        await this.issuePasswordResetToken(user.id, user.email);
+      } catch (err) {
+        console.error('AuthService.forgotPassword email send failed:', err);
+      }
 
       return {
         message: 'If an account with that email exists, a password reset link has been sent.',
@@ -293,6 +341,54 @@ export class AuthService {
     return { message: 'Logged out successfully' };
   }
 
+  async verifyCampusId(userId: string, dto: VerifyCampusIdDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const parsed = this.parseCampusQrPayload(dto.qrPayload);
+
+      if (this.normalizeFullName(parsed.fullName) !== this.normalizeFullName(user.fullName)) {
+        throw new BadRequestException('Campus QR full name does not match your signup full name');
+      }
+
+      const existingStudent = await this.prisma.user.findFirst({
+        where: {
+          studentId: parsed.studentId,
+          id: { not: user.id },
+        },
+      });
+
+      if (existingStudent) {
+        throw new BadRequestException('This campus ID is already linked to another account');
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          studentId: parsed.studentId,
+          academicProgram: parsed.academicProgram,
+          isCampusIdVerified: true,
+          campusIdVerifiedAt: new Date(),
+        },
+      });
+
+      return {
+        message: 'Campus ID verified successfully',
+        studentId: parsed.studentId,
+        academicProgram: parsed.academicProgram,
+      };
+    } catch (err) {
+      console.error('AuthService.verifyCampusId error:', err);
+      throw err;
+    }
+  }
+
   async signUp(dto: SignUpDto, meta?: { ip?: string; userAgent?: string }) {
     try {
       const exists = await this.prisma.user.findUnique({
@@ -304,7 +400,7 @@ export class AuthService {
       }
 
       const role = await this.prisma.role.findFirst({
-        where: { roleName: dto.roleName ?? 'STUDENT' },
+        where: { roleName: dto.roleName ?? 'Student' },
       });
 
       if (!role) throw new BadRequestException('Role not found');
@@ -324,13 +420,25 @@ export class AuthService {
         },
       });
 
-      await this.issueEmailVerificationToken(user.id, user.email);
+      console.log('New user created:', user.email);
+
+      const verificationEmailSent = await this.issueEmailVerificationToken(user.id, user.email);
+
+      if (verificationEmailSent) {
+        console.log('Email verification token issued for:', user.email);
+      } else {
+        console.warn('Signup completed but verification email could not be sent:', user.email);
+      }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+      console.log('Session and tokens created for:', user.email);
       return {
         user: this.buildUserResponse(user),
         ...tokens,
-        message: 'Signup successful. Please verify your email.',
+        message: verificationEmailSent
+          ? 'Signup successful. Please verify your email and campus ID QR to complete registration.'
+          : 'Signup successful, but we could not send the verification email right now. Please try again later, then complete campus ID QR verification.',
       };
     } catch (err) {
       console.error('AuthService.signUp error:', err);
@@ -353,6 +461,10 @@ export class AuthService {
 
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Please verify your email first');
+      }
+
+      if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
+        throw new UnauthorizedException('Please verify your campus ID QR first');
       }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
