@@ -28,6 +28,8 @@ export class RecommendationService {
   }
 
   async getRecommendations(userId: string, n: number = 10) {
+    const cacheKey = `recommendations:${userId}:${n}`;
+
     try {
       // 1. Check Redis Cache
       const cacheKey = `recommendations:user:${userId}:${n}`;
@@ -47,9 +49,11 @@ export class RecommendationService {
       await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 3600);
 
       return response.data;
-    } catch (error: any) {
-      this.logger.error(`Failed to get recommendations: ${error.message}`);
-      if (error.response?.status === 503) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to get recommendations: ${errorMessage}`);
+      const axiosError = error as any;
+      if (axiosError.response?.status === 503) {
         throw new HttpException(
           'Recommendation service unavailable. Models not trained yet.',
           HttpStatus.SERVICE_UNAVAILABLE,
@@ -60,6 +64,8 @@ export class RecommendationService {
   }
 
   async getSimilarEvents(eventId: string, n: number = 10) {
+    const cacheKey = `similar_events:${eventId}:${n}`;
+
     try {
       // 1. Check Cache
       const cacheKey = `recommendations:similar:${eventId}:${n}`;
@@ -77,9 +83,11 @@ export class RecommendationService {
       await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 86400);
 
       return response.data;
-    } catch (error: any) {
-      this.logger.error(`Failed to get similar events: ${error.message}`);
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to get similar events: ${errorMessage}`);
+      const axiosError = error as any;
+      if (axiosError.response?.status === 404) {
         throw new HttpException('Event not found in recommendation model', HttpStatus.NOT_FOUND);
       }
       throw new HttpException('Failed to get similar events', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -143,11 +151,12 @@ export class RecommendationService {
         this.httpService.get(`${this.mlServiceUrl}/health`),
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         status: 'unreachable',
         service: 'ml-recommendation',
-        error: error.message,
+        error: errorMessage,
       };
     }
   }
