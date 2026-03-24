@@ -1,19 +1,56 @@
+'use client';
+
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     return (
-        <div className="flex bg-gray-50 min-h-screen">
-            {/* Sidebar - hidden on mobile by default, could add mobile menu later */}
-            <div className="hidden md:flex w-64 flex-col fixed inset-y-0 z-50">
-                <Sidebar />
-            </div>
+        <div className="flex bg-gray-50/50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-700">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar Container */}
+            <aside
+                className={cn(
+                    "fixed inset-y-0 left-0 z-50 w-72 bg-gray-900 shadow-2xl transition-transform duration-300 ease-in-out md:translate-x-0",
+                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                )}
+            >
+                <Sidebar onClose={() => setIsSidebarOpen(false)} />
+            </aside>
 
             {/* Main Content Area */}
-            <div className="md:pl-64 flex flex-col flex-1">
-                <Header />
-                <main className="flex-1 p-6 lg:p-8">
-                    {children}
+            <div className="flex flex-col flex-1 md:pl-72 min-w-0">
+                <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-white/80 backdrop-blur-md px-4 md:px-8">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="mr-4 md:hidden text-gray-600 hover:bg-gray-100"
+                        onClick={() => setIsSidebarOpen(true)}
+                    >
+                        <Menu className="h-6 w-6" />
+                        <span className="sr-only">Open sidebar</span>
+                    </Button>
+                    <div className="flex-1">
+                        <Header />
+                    </div>
+                </header>
+
+                <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>
