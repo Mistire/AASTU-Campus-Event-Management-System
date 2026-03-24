@@ -1,20 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SpeakersService } from './speakers.service';
 import { CreateSpeakerDto, UpdateSpeakerDto } from './dto/speaker.dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guard';
-import { Roles } from '../auth/decorator';
+import { Roles, GetUser } from '../auth/decorator';
+import type { AuthUser } from '../auth/jwt.strategy';
 
 @ApiTags('Speakers')
 @ApiBearerAuth()
@@ -24,8 +16,8 @@ export class SpeakersController {
   constructor(private readonly speakersService: SpeakersService) {}
 
   @Post()
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Create a new speaker profile (Admin/Organizer)' })
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Create a new speaker profile (Organizer)' })
   @ApiResponse({ status: 201, description: 'Speaker created.' })
   create(@Body() dto: CreateSpeakerDto) {
     return this.speakersService.create(dto);
@@ -44,16 +36,18 @@ export class SpeakersController {
   }
 
   @Patch(':id')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Update speaker profile (Admin/Organizer)' })
-  update(@Param('id') id: string, @Body() dto: UpdateSpeakerDto) {
-    return this.speakersService.update(id, dto);
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Update speaker profile (Organizer)' })
+  update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateSpeakerDto) {
+    return this.speakersService.update(id, user.id, dto);
   }
 
   @Delete(':id')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Delete a speaker and remove all session assignments (Admin/Organizer)' })
-  remove(@Param('id') id: string) {
-    return this.speakersService.remove(id);
+  @Roles('Organizer')
+  @ApiOperation({
+    summary: 'Delete a speaker and remove all session assignments (Organizer)',
+  })
+  remove(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.speakersService.remove(id, user.id);
   }
 }

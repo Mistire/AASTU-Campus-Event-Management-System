@@ -13,8 +13,8 @@ export class EventTypesController {
   constructor(private readonly eventTypesService: EventTypesService) {}
 
   @Post()
-  @Roles('Admin')
-  @ApiOperation({ summary: 'Create a new event type (Admin only)' })
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Create a new event type (Admin, Organizer)' })
   @ApiResponse({ status: 201, description: 'Event type created.' })
   @ApiResponse({ status: 409, description: 'Event type with this name already exists.' })
   create(@Body() dto: CreateEventTypeDto) {

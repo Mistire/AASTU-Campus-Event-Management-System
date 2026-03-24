@@ -36,7 +36,7 @@ export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
 
   @Post('events/:eventId/invitations/import')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -64,7 +64,7 @@ export class InvitationsController {
   }
 
   @Post('events/:eventId/invitations/bulk')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({
     summary: 'Bulk invite attendees via JSON email array (Organizer). Alternative to CSV import.',
   })
@@ -78,7 +78,7 @@ export class InvitationsController {
   }
 
   @Get('events/:eventId/invitations')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'List all attendee invitations for an event (Organizer view)' })
   findAllByEvent(@Param('eventId') eventId: string) {
     return this.invitationsService.findAllByEvent(eventId);
@@ -97,7 +97,7 @@ export class InvitationsController {
   }
 
   @Delete('invitations/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Cancel a pending attendee invitation (Inviter only)' })
   cancel(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.invitationsService.cancel(id, user.id);

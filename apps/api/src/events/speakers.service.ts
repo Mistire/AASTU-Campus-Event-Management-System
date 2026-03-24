@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +15,58 @@ import { CreateSpeakerDto, UpdateSpeakerDto } from './dto/speaker.dto';
 @Injectable()
 export class SpeakersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  // ── Helpers ────────────────────────────────────────────────────────────
+
+  private async assertInvolvedOrganizer(speakerId: string, userId: string) {
+    const speaker = await this.prisma.speaker.findUnique({
+      where: { id: speakerId },
+      include: {
+        sessionSpeakers: {
+          include: {
+            session: {
+              select: {
+                eventId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!speaker) throw new NotFoundException(`Speaker with ID ${speakerId} not found`);
+
+    // If speaker is not assigned to any sessions, we can't tie it to an event.
+    // In this case, we check if the user is an Organizer of ANY event (already handled by RolesGuard).
+    // But to be even stricter, we could track who created it.
+    // However, the user said "owner of the event", so we check the speaker's assigned events.
+    if (speaker.sessionSpeakers.length === 0) {
+      // Allow any organizer to manage floating speakers for now
+      return speaker;
+    }
+
+    const assignedEventIds = speaker.sessionSpeakers.map((ss) => ss.session.eventId);
+
+    // Check if the user is an organizer of at least one of these events
+    const validEvents = await this.prisma.event.findMany({
+      where: {
+        id: { in: assignedEventIds },
+        OR: [
+          { createdBy: userId },
+          { organizers: { some: { userId, status: 'ACCEPTED' } } },
+        ],
+      },
+      select: { id: true },
+    });
+
+    if (validEvents.length === 0) {
+      throw new ForbiddenException(
+        'You are not an authorized organizer for any events associated with this speaker',
+      );
+    }
+
+    return speaker;
+  }
 
   async create(dto: CreateSpeakerDto) {
     return this.prisma.speaker.create({
@@ -66,8 +119,8 @@ export class SpeakersService {
     return speaker;
   }
 
-  async update(id: string, dto: UpdateSpeakerDto) {
-    await this.findOne(id);
+  async update(id: string, userId: string, dto: UpdateSpeakerDto) {
+    await this.assertInvolvedOrganizer(id, userId);
 
     return this.prisma.speaker.update({
       where: { id },
@@ -80,8 +133,8 @@ export class SpeakersService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, userId: string) {
+    await this.assertInvolvedOrganizer(id, userId);
 
     // Remove speaker assignments first, then the speaker
     await this.prisma.sessionSpeakers.deleteMany({ where: { speakerId: id } });

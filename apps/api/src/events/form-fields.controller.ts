@@ -1,15 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { FormFieldsService } from './form-fields.service';
 import { CreateFormFieldDto, UpdateFormFieldDto } from './dto/form-field.dto';
@@ -25,7 +16,7 @@ export class FormFieldsController {
   constructor(private readonly formFieldsService: FormFieldsService) {}
 
   @Post('events/:eventId/form-fields')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Add a custom registration form field to an event (Organizer)' })
   @ApiResponse({ status: 201, description: 'Form field created.' })
   create(
@@ -49,18 +40,14 @@ export class FormFieldsController {
   }
 
   @Patch('form-fields/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Update a form field (Organizer)' })
-  update(
-    @Param('id') id: string,
-    @GetUser() user: AuthUser,
-    @Body() dto: UpdateFormFieldDto,
-  ) {
+  update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateFormFieldDto) {
     return this.formFieldsService.update(id, user.id, dto);
   }
 
   @Delete('form-fields/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Delete a form field and all its responses (Organizer)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.formFieldsService.remove(id, user.id);

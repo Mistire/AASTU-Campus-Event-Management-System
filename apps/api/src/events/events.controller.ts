@@ -28,8 +28,8 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Create a new event (Organizer, Admin). Status auto-set to DRAFT.' })
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Create a new event (Organizer). Status auto-set to DRAFT.' })
   @ApiResponse({ status: 201, description: 'Event created in DRAFT status.' })
   create(@GetUser() user: AuthUser, @Body() dto: CreateEventDto) {
     return this.eventsService.create(user, dto);
@@ -47,6 +47,12 @@ export class EventsController {
     return this.eventsService.getUpcoming();
   }
 
+  @Get('my-organized')
+  @ApiOperation({ summary: 'Get events managed by the authenticated user (Creator or Co-organizer)' })
+  getMyOrganized(@GetUser() user: AuthUser, @Query() query: EventQueryDto) {
+    return this.eventsService.getMyOrganizedEvents(user.id, query);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get full event details by ID' })
   findOne(@Param('id') id: string) {
@@ -54,18 +60,25 @@ export class EventsController {
   }
 
   @Patch(':id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Update event (only DRAFT or PENDING status). Organizer/Creator only.' })
   @ApiResponse({ status: 403, description: 'Cannot edit event in current status.' })
   update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateEventDto) {
     return this.eventsService.update(id, user.id, dto);
   }
 
-  @Patch(':id/submit')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Submit event for admin approval (DRAFT → PENDING)' })
-  submitForApproval(@Param('id') id: string, @GetUser() user: AuthUser) {
+  @Post(':id/submit')
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Submit event for admin approval' })
+  submit(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.eventsService.submitForApproval(id, user.id);
+  }
+
+  @Post(':id/go-live')
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Manually set an event to LIVE' })
+  goLive(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.goLive(id, user.id);
   }
 
   @Patch(':id/approve')
@@ -83,7 +96,7 @@ export class EventsController {
   }
 
   @Patch(':id/cancel')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({
     summary: 'Cancel event (Organizer/Creator). Works from DRAFT, PENDING, or APPROVED.',
   })
@@ -91,23 +104,16 @@ export class EventsController {
     return this.eventsService.cancel(id, user.id);
   }
 
-  @Patch(':id/go-live')
-  @Roles('Admin')
-  @ApiOperation({ summary: 'Set event live (APPROVED → LIVE). Admin only.' })
-  goLive(@Param('id') id: string) {
-    return this.eventsService.goLive(id);
-  }
-
   @Patch(':id/archive')
-  @Roles('Admin')
-  @ApiOperation({ summary: 'Archive event (LIVE → ARCHIVED). Admin only.' })
-  archive(@Param('id') id: string) {
-    return this.eventsService.archive(id);
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Archive event (LIVE → ARCHIVED). Organizers only.' })
+  archive(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.archive(id, user.id);
   }
 
   @Delete(':id')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Delete event (Admin: any; Organizer: only DRAFT)' })
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Delete event (Organizer: only DRAFT)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.eventsService.remove(id, user);
   }
