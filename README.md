@@ -256,8 +256,8 @@ graph TD
 - Approve, update, or delete any event
 - Manage user accounts and roles
 - Monitor scheduling conflicts
-- View system-wide analytics
-- Oversee platform settings and announcements
+- View system-wide analytics,
+- Oversee platform settings and announcements.
 
 ---
 
