@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateAnnouncementDto {
     @ApiProperty({ description: 'Announcement title', example: 'Schedule Change' })
@@ -23,4 +24,20 @@ export class UpdateAnnouncementDto {
     @IsString()
     @IsOptional()
     message?: string;
+}
+
+export class AnnouncementQueryDto {
+    @ApiPropertyOptional({ description: 'Page number (1-indexed)', default: 1 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    page?: number;
+
+    @ApiPropertyOptional({ description: 'Number of results per page', default: 10 })
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @IsOptional()
+    limit?: number;
 }

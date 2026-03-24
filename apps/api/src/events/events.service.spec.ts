@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { VenuesService } from './venues.service';
 import { BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AuthUser } from '../auth/jwt.strategy';
+import { EmailService } from '../auth/email.service';
 
 const mockPrismaService = {
   event: {
@@ -33,12 +34,23 @@ const mockPrismaService = {
   },
   notification: {
     create: jest.fn(),
+    createMany: jest.fn(),
+  },
+  user: {
+    findMany: jest.fn(),
+  },
+  registration: {
+    findMany: jest.fn(),
   },
   $transaction: jest.fn(),
 };
 
 const mockVenuesService = {
   checkAvailability: jest.fn(),
+};
+
+const mockEmailService = {
+  sendEventLiveEmail: jest.fn(),
 };
 
 const mockUser: AuthUser = {
@@ -60,6 +72,7 @@ describe('EventsService', () => {
   let service: EventsService;
   let prisma: typeof mockPrismaService;
   let venuesService: typeof mockVenuesService;
+  let emailService: typeof mockEmailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -67,12 +80,14 @@ describe('EventsService', () => {
         EventsService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: VenuesService, useValue: mockVenuesService },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
     service = module.get<EventsService>(EventsService);
     prisma = module.get(PrismaService);
     venuesService = module.get(VenuesService);
+    emailService = module.get(EmailService);
   });
 
   afterEach(() => {
@@ -166,6 +181,36 @@ describe('EventsService', () => {
       await expect(service.update('evt-id', mockUser.id, { title: 'Updated' })).rejects.toThrow(
         ForbiddenException,
       );
+    });
+  });
+
+  describe('getMyOrganizedEvents', () => {
+    it('should return events where user is creator or organizer', async () => {
+      const mockEvents = [{ id: 'evt-1', title: 'My Event' }];
+      prisma.event.findMany.mockResolvedValue(mockEvents);
+      prisma.event.count.mockResolvedValue(1);
+
+      const result = await service.getMyOrganizedEvents('user-id', {});
+
+      expect(prisma.event.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            OR: [
+              { createdBy: 'user-id' },
+              { organizers: { some: { userId: 'user-id', status: 'ACCEPTED' } } },
+            ],
+          },
+        }),
+      );
+      expect(result).toEqual({
+        data: mockEvents,
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
+      });
     });
   });
 });

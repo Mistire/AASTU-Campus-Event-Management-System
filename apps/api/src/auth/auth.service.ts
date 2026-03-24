@@ -16,7 +16,7 @@ import {
   VerifyCampusIdDto,
   VerifyEmailDto,
 } from './dto';
-import { EmailService } from './email.service ';
+import { EmailService } from './email.service';
 import { randomBytes } from 'crypto';
 
 type JwtPayload = {

@@ -7,6 +7,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,6 +16,8 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { EventQueryDto } from './dto/event-query.dto';
 import { VenuesService } from './venues.service';
 import { AuthUser } from '../auth/jwt.strategy';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { EmailService } from '../auth/email.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -32,9 +35,11 @@ const EDITABLE_STATUSES = ['DRAFT', 'PENDING'];
 
 @Injectable()
 export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly venuesService: VenuesService,
+    private readonly emailService: EmailService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -125,12 +130,52 @@ export class EventsService {
 
   async submitForApproval(eventId: string, userId: string) {
     const event = await this.assertOrganizerOrCreator(eventId, userId);
-    return this.transitionStatus(event.id, event.statusId, 'PENDING');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'PENDING');
+
+    // 1. Notify the owner (creator)
+    await this.prisma.notification.create({
+      data: {
+        userId: event.createdBy,
+        title: 'Event Submitted',
+        message: `Your event "${event.title}" has been submitted for approval and is now pending.`,
+        type: 'EVENT_SUBMITTED_OWNER',
+      },
+    });
+
+    // 2. Notify all Admins
+    const admins = await this.prisma.user.findMany({
+      where: { role: { roleName: 'Admin' } },
+      select: { id: true },
+    });
+
+    if (admins.length > 0) {
+      await this.prisma.notification.createMany({
+        data: admins.map((admin) => ({
+          userId: admin.id,
+          title: 'New Event Pending Approval',
+          message: `Event "${event.title}" has been submitted for approval.`,
+          type: 'EVENT_SUBMITTED',
+        })),
+      });
+    }
+
+    return updated;
   }
 
   async approve(eventId: string) {
     const event = await this.findOneRaw(eventId);
-    return this.transitionStatus(event.id, event.statusId, 'APPROVED');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'APPROVED');
+
+    await this.prisma.notification.create({
+      data: {
+        userId: event.createdBy,
+        title: 'Event Approved',
+        message: `Your event "${event.title}" has been approved and is now ready.`,
+        type: 'EVENT_APPROVED',
+      },
+    });
+
+    return updated;
   }
 
   async reject(eventId: string, reason?: string) {
@@ -154,14 +199,78 @@ export class EventsService {
     return this.transitionStatus(event.id, event.statusId, 'CANCELLED');
   }
 
-  async goLive(eventId: string) {
+  async goLive(eventId: string, userId?: string) {
+    if (userId) {
+      await this.assertOrganizerOrCreator(eventId, userId);
+    }
     const event = await this.findOneRaw(eventId);
-    return this.transitionStatus(event.id, event.statusId, 'LIVE');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'LIVE');
+
+    // Notify all registered attendees
+    const registrations = await this.prisma.registration.findMany({
+      where: { eventId, deletedAt: null },
+      include: { user: { select: { id: true, email: true } } },
+    });
+
+    if (registrations.length > 0) {
+      const attendeeIds = registrations.map((r) => r.userId);
+      const attendeeEmails = registrations.map((r) => r.user.email);
+
+      // 1. In-app notifications
+      await this.prisma.notification.createMany({
+        data: attendeeIds.map((id) => ({
+          userId: id,
+          title: 'Event is LIVE!',
+          message: `The event "${event.title}" has officially started. Join now!`,
+          type: 'EVENT_LIVE',
+        })),
+      });
+
+      // 2. Email notifications
+      await this.emailService.sendEventLiveEmail(attendeeEmails, event.title);
+    }
+
+    return updated;
   }
 
-  async archive(eventId: string) {
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleCronGoLive() {
+    const now = new Date();
+    const approvedEvents = await this.prisma.event.findMany({
+      where: {
+        status: { statusName: 'APPROVED' },
+        startTime: { lte: now },
+      },
+    });
+
+    if (approvedEvents.length === 0) return;
+
+    this.logger.log(`Cron: Setting ${approvedEvents.length} approved events to LIVE`);
+
+    for (const event of approvedEvents) {
+      try {
+        await this.goLive(event.id);
+      } catch (error) {
+        this.logger.error(`Failed to set event ${event.id} to LIVE: ${error.message}`);
+      }
+    }
+  }
+
+  async archive(eventId: string, userId: string) {
+    await this.assertOrganizerOrCreator(eventId, userId);
     const event = await this.findOneRaw(eventId);
     return this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
+  }
+
+  async remove(eventId: string, user: AuthUser) {
+    const event = await this.assertOrganizerOrCreator(eventId, user.id);
+
+    const draftStatus = await this.getStatusByName('DRAFT');
+    if (event.statusId !== draftStatus.id) {
+      throw new BadRequestException('Only DRAFT events can be deleted');
+    }
+
+    return this.prisma.event.delete({ where: { id: eventId } });
   }
 
   async update(eventId: string, userId: string, dto: UpdateEventDto) {
@@ -305,6 +414,57 @@ export class EventsService {
     };
   }
 
+  // MY ORGANIZED — events where user is creator or accepted co-organizer
+
+  async getMyOrganizedEvents(userId: string, query: EventQueryDto) {
+    const { search, status, page = 1, limit = 10 } = query;
+
+    const where: any = {
+      OR: [{ createdBy: userId }, { organizers: { some: { userId, status: 'ACCEPTED' } } }],
+    };
+
+    if (search) {
+      where.AND = [
+        {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        },
+      ];
+    }
+
+    if (status) {
+      where.status = { statusName: status };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.event.findMany({
+        where,
+        include: {
+          ...this.defaultIncludes(),
+          _count: { select: { registrations: true } },
+        },
+        orderBy: { startTime: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.event.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   // UPCOMING — approved/live events in the future
 
   async getUpcoming() {
@@ -360,31 +520,6 @@ export class EventsService {
     }
 
     return event;
-  }
-
-  // DELETE — Admin or Organizer (if DRAFT)
-
-  async remove(eventId: string, user: AuthUser) {
-    const event = await this.findOneRaw(eventId);
-    const currentStatus = await this.prisma.eventStatus.findUnique({
-      where: { id: event.statusId },
-    });
-
-    // Admin can delete any event
-    if (user.role === 'Admin') {
-      return this.deleteEvent(eventId);
-    }
-
-    // Organizer can only delete DRAFT events they created/organize
-    if (event.createdBy !== user.id) {
-      throw new ForbiddenException('Only the event creator or admin can delete this event');
-    }
-
-    if (currentStatus?.statusName !== 'DRAFT') {
-      throw new ForbiddenException('Organizers can only delete events in DRAFT status');
-    }
-
-    return this.deleteEvent(eventId);
   }
 
   // PRIVATE HELPERS
@@ -485,6 +620,12 @@ export class EventsService {
       venue: true,
       tags: { include: { tag: true } },
       eventCategories: { include: { category: true } },
+      sessions: {
+        include: {
+          speakers: { include: { speaker: true } },
+        },
+        orderBy: { startTime: 'asc' as const },
+      },
     };
   }
 
