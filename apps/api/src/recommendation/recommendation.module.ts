@@ -4,6 +4,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { RecommendationService } from './recommendation.service';
 import { RecommendationController } from './recommendation.controller';
 import { RecommendationProcessor } from './recommendation.processor';
+import { RecommendationScheduler } from './recommendation.scheduler';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { RecommendationProcessor } from './recommendation.processor';
     }),
   ],
   controllers: [RecommendationController],
-  providers: [RecommendationService, RecommendationProcessor],
+  providers: [RecommendationService, RecommendationProcessor, RecommendationScheduler],
   exports: [RecommendationService],
 })
 export class RecommendationModule {}
