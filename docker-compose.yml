@@ -9,11 +9,28 @@ services:
       POSTGRES_PASSWORD: cems_secret
       POSTGRES_DB: cems_db
     ports:
-      - '5433:5432'
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -U cems -d cems_db' ]
+      test: ["CMD-SHELL", "pg_isready -U cems -d cems_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: cems-postgres-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cems
+      POSTGRES_PASSWORD: cems_secret
+      POSTGRES_DB: cems_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cems -d cems_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,11 +41,11 @@ services:
     container_name: cems-redis
     restart: unless-stopped
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - redisdata:/data
     healthcheck:
-      test: [ 'CMD', 'redis-cli', 'ping' ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,8 +59,8 @@ services:
     container_name: cems-api
     restart: unless-stopped
     ports:
-      - '4000:4000'
-      - '9229:9229' # debug port
+      - "4000:4000"
+      - "9229:9229" # debug port
     environment:
       DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
       REDIS_HOST: redis
@@ -73,7 +90,7 @@ services:
     container_name: cems-nginx
     restart: unless-stopped
     ports:
-      - '80:80'
+      - "80:80"
     depends_on:
       - api
 
