@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsService } from './events.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -115,7 +114,6 @@ describe('EventsService', () => {
       });
       prisma.eventOrganizers.create.mockResolvedValue({});
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result = await service.create(mockUser, createDto);
 
       expect(prisma.eventStatus.findUnique).toHaveBeenCalledWith({

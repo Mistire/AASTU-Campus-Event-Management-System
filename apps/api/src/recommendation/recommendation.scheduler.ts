@@ -26,7 +26,6 @@ export class RecommendationScheduler {
         jobId,
         removeOnComplete: true,
         removeOnFail: false,
-        timeout: 900000, // 15 minutes timeout
       },
     );
 
