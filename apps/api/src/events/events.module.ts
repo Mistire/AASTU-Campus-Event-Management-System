@@ -26,6 +26,7 @@ import { HackathonsService } from './hackathons.service';
 import { HackathonsController } from './hackathons.controller';
 
 @Module({
+  imports: [AuthModule],
   controllers: [
     EventsController,
     VenuesController,

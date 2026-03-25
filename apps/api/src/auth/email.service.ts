@@ -108,7 +108,9 @@ export class EmailService {
         `,
       });
 
-      this.logger.log(`Bulk 'Event Live' email sent to ${emails.length} attendees for event: ${eventTitle}`);
+      this.logger.log(
+        `Bulk 'Event Live' email sent to ${emails.length} attendees for event: ${eventTitle}`,
+      );
     } catch (err) {
       this.logger.error(`Failed to send bulk 'Event Live' email: ${err.message}`);
     }
