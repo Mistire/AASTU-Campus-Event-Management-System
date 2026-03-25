@@ -108,7 +108,6 @@ export class RecommendationService {
           jobId,
           removeOnComplete: true,
           removeOnFail: false,
-          timeout: 900000, // 15 minute timeout for training
         },
       );
 

@@ -7,11 +7,16 @@ import { request, spec } from 'pactum';
 import * as argon from 'argon2';
 import type { AddressInfo } from 'net';
 
+jest.mock('nodemailer', () => ({
+  createTransport: () => ({
+    sendMail: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 import { AppConfigModule } from '../src/config/config.module';
 import { PrismaModule } from '../src/prisma/prisma.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthModule } from '../src/auth/auth.module';
-import { EmailService } from '../src/auth/email.service ';
 
 describe('Auth Module (e2e)', () => {
   let app: INestApplication;
@@ -89,10 +94,6 @@ describe('Auth Module (e2e)', () => {
     request.setBaseUrl(`http://127.0.0.1:${address.port}`);
 
     prisma = app.get(PrismaService);
-
-    const emailService = app.get(EmailService);
-    jest.spyOn(emailService, 'sendVerificationEmail').mockResolvedValue();
-    jest.spyOn(emailService, 'sendPasswordResetEmail').mockResolvedValue();
   });
 
   beforeEach(async () => {
