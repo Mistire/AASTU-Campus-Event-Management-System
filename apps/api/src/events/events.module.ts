@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from '../auth/auth.module';
 import { EventsService } from './events.service';
 import { EventsController } from './events.controller';
 import { VenuesService } from './venues.service';
@@ -9,22 +10,50 @@ import { SessionsService } from './sessions.service';
 import { SessionsController } from './sessions.controller';
 import { OrganizersService } from './organizers.service';
 import { OrganizersController } from './organizers.controller';
+import { EventTypesService } from './event-types.service';
+import { EventTypesController } from './event-types.controller';
+import { TagsService } from './tags.service';
+import { TagsController } from './tags.controller';
+import { AnnouncementsService } from './announcements.service';
+import { AnnouncementsController } from './announcements.controller';
+import { InvitationsService } from './invitations.service';
+import { InvitationsController } from './invitations.controller';
+import { SpeakersService } from './speakers.service';
+import { SpeakersController } from './speakers.controller';
+import { FormFieldsService } from './form-fields.service';
+import { FormFieldsController } from './form-fields.controller';
+import { HackathonsService } from './hackathons.service';
+import { HackathonsController } from './hackathons.controller';
 
 @Module({
-    controllers: [
-        EventsController,
-        VenuesController,
-        CategoriesController,
-        SessionsController,
-        OrganizersController,
-    ],
-    providers: [
-        EventsService,
-        VenuesService,
-        CategoriesService,
-        SessionsService,
-        OrganizersService,
-    ],
-    exports: [EventsService, VenuesService, CategoriesService],
+  controllers: [
+    EventsController,
+    VenuesController,
+    CategoriesController,
+    SessionsController,
+    OrganizersController,
+    EventTypesController,
+    TagsController,
+    AnnouncementsController,
+    InvitationsController,
+    SpeakersController,
+    FormFieldsController,
+    HackathonsController,
+  ],
+  providers: [
+    EventsService,
+    VenuesService,
+    CategoriesService,
+    SessionsService,
+    OrganizersService,
+    EventTypesService,
+    TagsService,
+    AnnouncementsService,
+    InvitationsService,
+    SpeakersService,
+    FormFieldsService,
+    HackathonsService,
+  ],
+  exports: [EventsService, VenuesService, CategoriesService, EventTypesService, TagsService],
 })
-export class EventsModule { }
+export class EventsModule {}
