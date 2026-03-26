@@ -6,7 +6,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as fs from 'fs';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -14,10 +13,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-
-    // Log to file for debugging
-    const logMsg = `[${new Date().toISOString()}] ${request.method} ${request.url} - ${JSON.stringify(exception)}\n`;
-    fs.appendFileSync('/tmp/api_error.log', logMsg);
 
     const status =
       exception instanceof HttpException
@@ -28,11 +23,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getResponse()
         : 'Internal server error';
-
-    console.log('[HttpExceptionFilter] Status:', status, 'Message:', JSON.stringify(message));
-    if (status === 401) {
-      console.log('[HttpExceptionFilter] Unauthorized details:', exception);
-    }
 
     const responseBody = {
       statusCode: status,

@@ -27,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private prisma: PrismaService,
   ) {
     const jwtSecret = config.get<string>('JWT_SECRET');
+    console.log('[JwtStrategy] Secret length:', jwtSecret?.length);
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined in configuration');
     }
@@ -39,7 +40,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload): Promise<AuthUser> {
     try {
-      console.log('[JwtStrategy] Payload sub:', payload.sub, 'sid:', payload.sid);
       const [user, session] = await Promise.all([
         this.prisma.user.findUnique({
           where: { id: payload.sub },
@@ -55,10 +55,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           where: { id: payload.sid },
         }),
       ]);
-
-      console.log('[JwtStrategy] User found:', !!user, 'Session found:', !!session);
-      if (user) console.log('[JwtStrategy] User Role:', user.role?.roleName);
-      if (session) console.log('[JwtStrategy] Session matches User:', session.userId === user?.id, 'Is Revoked:', session.isRevoked, 'Expired:', session.expiresAt <= new Date());
 
       if (!user) {
         throw new UnauthorizedException('Invalid token user');
