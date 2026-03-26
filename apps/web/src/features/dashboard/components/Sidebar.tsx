@@ -38,16 +38,17 @@ interface SidebarProps {
 
 export function Sidebar({ onClose }: SidebarProps) {
     const pathname = usePathname();
-    const { hasAnyRole, clearAuth, profile } = useAuthStore();
-    const { data: systemRoles, isLoading: isLoadingRoles } = useRoles();
-
-    // Filter the JSON menu items based on the user's role
-    const allowedMenu = mainPages.filter((item: any) => hasAnyRole(item.allowed));
+    const { clearAuth, profile } = useAuthStore();
 
     const handleLogout = () => {
         clearAuth();
         window.location.href = '/login';
     };
+
+    // Filter the JSON menu items based on the user's role
+    const allowedMenu = mainPages.filter((item: any) =>
+        profile && item.allowed.includes(profile.role)
+    );
 
     return (
         <div className="flex flex-col h-full text-gray-300">
@@ -110,10 +111,10 @@ export function Sidebar({ onClose }: SidebarProps) {
                     <div className="px-3 py-4 mt-auto rounded-2xl bg-gray-800/30 border border-gray-700/50">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                <span className="text-blue-500 font-bold">{profile.full_name.charAt(0)}</span>
+                                <span className="text-blue-500 font-bold">{profile.fullName.charAt(0)}</span>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-white truncate">{profile.full_name}</p>
+                                <p className="text-sm font-semibold text-white truncate">{profile.fullName}</p>
                                 <p className="text-xs text-gray-500 truncate capitalize">{profile.role.toLowerCase()}</p>
                             </div>
                         </div>

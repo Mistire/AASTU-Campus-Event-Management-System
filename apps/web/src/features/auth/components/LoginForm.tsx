@@ -26,24 +26,24 @@ export function LoginForm() {
                 password
             });
 
-            const { access_token, refresh_token, user } = res.data;
+            // Handle the nested data object from NestJS interceptor
+            const { access_token, refresh_token, user } = res.data.data;
 
-            // Save to Zustand
+            // Save to Zustand & Cookies
             setAuth(access_token, refresh_token, {
                 id: user.id,
-                full_name: user.fullName,
+                fullName: user.fullName,
                 email: user.email,
-                phone: user.phone || '',
+                phone: user.phone,
                 role: user.role,
-                roles: [user.role],
-                user_roles: [{ role: { name: user.role } }]
+                permissions: user.permissions || []
             });
 
             // Redirect based on role
             if (user.role === 'ADMIN' || user.role === 'ORGANIZER' || user.role === 'STAFF') {
                 router.push('/dashboard');
             } else {
-                router.push('/dashboard'); // Can be changed based on routing structure
+                router.push('/');
             }
 
         } catch (err: any) {

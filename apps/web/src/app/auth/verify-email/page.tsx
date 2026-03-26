@@ -42,24 +42,24 @@ function VerifyEmailContent() {
     }, [token]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-            <div className="max-w-md w-full p-8 rounded-3xl bg-white shadow-2xl border border-gray-100 text-center">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4">
+            <div className="max-w-md w-full p-8 rounded-3xl bg-card shadow-2xl border border-border text-center">
                 {status === "loading" && (
                     <div className="flex flex-col items-center">
-                        <Loader2 className="h-16 w-16 animate-spin mb-6 text-black" />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifying Email</h2>
-                        <p className="text-gray-500">{message}</p>
+                        <Loader2 className="h-16 w-16 animate-spin mb-6 text-primary" />
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Verifying Email</h2>
+                        <p className="text-muted-foreground">{message}</p>
                     </div>
                 )}
 
                 {status === "success" && (
                     <div className="flex flex-col items-center">
                         <CheckCircle2 className="h-16 w-16 text-green-500 mb-6" />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Verified!</h2>
-                        <p className="text-gray-600 mb-8 leading-relaxed">{message}</p>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Verified!</h2>
+                        <p className="text-muted-foreground mb-8 leading-relaxed">{message}</p>
                         <Link
                             href="/login"
-                            className="w-full inline-flex justify-center items-center py-3.5 px-4 font-semibold rounded-xl text-white bg-black hover:bg-gray-800 transition-colors"
+                            className="w-full inline-flex justify-center items-center py-3.5 px-4 font-semibold rounded-xl text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
                         >
                             Log In to Your Account
                         </Link>
@@ -68,12 +68,12 @@ function VerifyEmailContent() {
 
                 {status === "error" && (
                     <div className="flex flex-col items-center">
-                        <XCircle className="h-16 w-16 text-red-500 mb-6" />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Failed</h2>
-                        <p className="text-red-600 mb-8 leading-relaxed bg-red-50 p-4 rounded-xl w-full">{message}</p>
+                        <XCircle className="h-16 w-16 text-destructive mb-6" />
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Verification Failed</h2>
+                        <p className="text-destructive mb-8 leading-relaxed bg-destructive/10 p-4 rounded-xl w-full">{message}</p>
                         <Link
                             href="/signup"
-                            className="w-full inline-flex justify-center items-center py-3.5 px-4 font-semibold rounded-xl text-white bg-black hover:bg-gray-800 transition-colors"
+                            className="w-full inline-flex justify-center items-center py-3.5 px-4 font-semibold rounded-xl text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
                         >
                             Return to Sign Up
                         </Link>
@@ -87,8 +87,8 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-                <Loader2 className="animate-spin text-black h-8 w-8" />
+            <div className="min-h-screen flex items-center justify-center bg-background px-4">
+                <Loader2 className="animate-spin text-primary h-8 w-8" />
             </div>
         }>
             <VerifyEmailContent />

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from 'next/link';
+import api from '@/lib/axios';
 
 export function SignupForm() {
     const router = useRouter();
@@ -25,21 +26,10 @@ export function SignupForm() {
         setError("");
 
         try {
-            const res = await fetch("http://localhost:4000/api/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || "Something went wrong during signup");
-            }
-
+            await api.post("/auth/signup", formData);
             setSuccess(true);
         } catch (err: any) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message || "Something went wrong during signup");
         } finally {
             setLoading(false);
         }
@@ -108,18 +98,23 @@ export function SignupForm() {
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <select
-                        className="appearance-none relative block w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
-                        value={formData.roleName}
-                        onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
-                    >
-                        <option value="STUDENT">Student</option>
-                        <option value="ORGANIZER">Organizer</option>
-                        <option value="STAFF">Staff</option>
-                    </select>
-                </div>
+                {/* Role selection logic: If STUDENT role is pre-selected, hide it. If ADMIN/Special, show options */}
+                {(formData.roleName === 'STUDENT' || !formData.roleName) ? (
+                    <input type="hidden" name="roleName" value="STUDENT" />
+                ) : (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <select
+                            className="appearance-none relative block w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
+                            value={formData.roleName}
+                            onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
+                        >
+                            <option value="ORGANIZER">Organizer</option>
+                            <option value="STAFF">Staff</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                )}
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>

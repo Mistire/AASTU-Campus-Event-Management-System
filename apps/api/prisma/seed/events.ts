@@ -13,11 +13,25 @@ async function main() {
     console.log('Seeding Events...');
 
     // 1. Create Categories
-    const categoryNames = ['Technology', 'Sports', 'Seminar', 'Workshop'];
-    for (const name of categoryNames) {
-        await prisma.category.create({
-            data: { name, description: `Events related to ${name}` },
-        });
+    const categories = [
+        { name: 'Technology', description: 'Events related to Software, AI, and Engineering' },
+        { name: 'Sports', description: 'Campus sports tournaments and athletics' },
+        { name: 'Seminar', description: 'Academic talks and guest lectures' },
+        { name: 'Workshop', description: 'Hands-on learning sessions' },
+        { name: 'Arts & Culture', description: 'Music, drama, and cultural exhibitions' },
+        { name: 'Career', description: 'Job fairs and professional development' },
+        { name: 'Health & Wellness', description: 'Fitness and mental health sessions' },
+        { name: 'Community', description: 'Social gatherings and networking' },
+    ];
+
+    for (const cat of categories) {
+        const existing = await prisma.category.findFirst({ where: { name: cat.name } });
+        if (!existing) {
+            await prisma.category.create({ data: cat });
+            console.log(`Category "${cat.name}" created.`);
+        } else {
+            console.log(`Category "${cat.name}" already exists.`);
+        }
     }
 
     const techCategory = await prisma.category.findFirst({ where: { name: 'Technology' } });
