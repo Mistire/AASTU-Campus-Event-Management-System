@@ -31,7 +31,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   private async issueEmailVerificationToken(userId: string, email: string) {
     const rawToken = randomBytes(32).toString('hex');
@@ -105,8 +105,14 @@ export class AuthService {
   private async signAccessToken(userId: string, email: string, sid: string) {
     const payload: JwtPayload = { sub: userId, email, sid };
 
+    const jwtSecret = this.config.get<string>('JWT_SECRET');
+    console.log('[JwtStrategy] Secret length:', jwtSecret?.length);
+    if (!jwtSecret) {
+      console.log('[AuthService] JWT_SECRET is not defined!');
+      throw new Error('JWT_SECRET is not defined');
+    }
     return await this.jwt.signAsync(payload, {
-      secret: this.config.get<string>('JWT_SECRET'),
+      secret: jwtSecret,
       expiresIn: this.config.get('JWT_EXPIRATION') ?? '15m',
     });
   }
