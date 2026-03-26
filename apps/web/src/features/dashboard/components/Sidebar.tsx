@@ -16,7 +16,13 @@ import {
     LogOut,
     X,
     Settings,
-    ShieldCheck
+    ShieldCheck,
+    Layers,
+    MapPin,
+    Shield,
+    Heart,
+    MessageSquare,
+    ClipboardCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -30,6 +36,12 @@ const iconMap: Record<string, React.ElementType> = {
     Headset: Headset,
     AlertTriangle: AlertTriangle,
     FileDown: FileDown,
+    Layers: Layers,
+    MapPin: MapPin,
+    Shield: Shield,
+    Heart: Heart,
+    MessageSquare: MessageSquare,
+    ClipboardCheck: ClipboardCheck,
 };
 
 interface SidebarProps {

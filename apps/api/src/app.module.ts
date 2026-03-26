@@ -13,6 +13,9 @@ import { MediaModule } from './media/media.module';
 import { AdminModule } from './admin/admin.module';
 import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
+import { InterestModule } from './interests/interest.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -30,6 +33,9 @@ import { PermissionModule } from './permission/permission.module';
     AdminModule,
     RoleModule,
     PermissionModule,
+    InterestModule,
+    FeedbackModule,
+    AttendanceModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

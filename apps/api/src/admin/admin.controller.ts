@@ -18,9 +18,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiBearerAuth('access-token')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles('Admin')
+@Roles('ADMIN')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Get('users')
   @Permissions('user:read')
@@ -40,9 +40,14 @@ export class AdminController {
     return this.adminService.assignRoleToUser(userId, dto);
   }
 
-  @Get('users/:id/effective-permissions')
-  @Permissions('user:read')
+  @Permissions('VIEW_EVENTS')
   getEffectivePermissions(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.adminService.getUserEffectivePermissions(id);
+  }
+
+  @Get('stats')
+  @Permissions('VIEW_EVENTS') // Using VIEW_EVENTS temporarily as it is seeded
+  getStats() {
+    return this.adminService.getDashboardStats();
   }
 }

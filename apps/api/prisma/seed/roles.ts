@@ -21,6 +21,13 @@ async function main() {
         { name: 'MANAGE_USERS', description: 'Can manage platform users' },
         { name: 'VIEW_EVENTS', description: 'Can browse and view events' },
         { name: 'REGISTER_EVENT', description: 'Can register for an event' },
+        { name: 'MANAGE_CATEGORIES', description: 'Can manage event categories' },
+        { name: 'MANAGE_ROLES', description: 'Can manage roles and permissions' },
+        { name: 'MANAGE_VENUES', description: 'Can manage event venues' },
+        { name: 'MANAGE_INTERESTS', description: 'Can manage student interests' },
+        { name: 'MANAGE_ATTENDANCE', description: 'Can manage event attendance' },
+        { name: 'VIEW_FEEDBACK', description: 'Can view user feedback' },
+        { name: 'MANAGE_DEPARTMENTS', description: 'Can manage campus departments' },
     ];
 
     for (const perm of permissions) {

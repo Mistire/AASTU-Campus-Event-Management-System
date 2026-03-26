@@ -5,53 +5,92 @@ import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { RolesList } from '@/features/dashboard/components/RolesList';
 import api from '@/lib/axios';
-import { CheckCircle2, Circle, Sparkles, Calendar, Users, Activity, Loader2, ShieldCheck, Headset, LayoutDashboard, ArrowRight } from 'lucide-react';
+import {
+    CheckCircle2,
+    Circle,
+    Sparkles,
+    Calendar,
+    Users,
+    Activity,
+    Loader2,
+    ShieldCheck,
+    Headset,
+    LayoutDashboard,
+    ArrowRight,
+    TrendingUp
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+interface DashboardStats {
+    totalUsers: number;
+    totalStudents: number;
+    activeEvents: number;
+    pendingEvents: number;
+    systemHealth: string;
+    supportTickets: number;
+}
 
 export default function DashboardPage() {
     const { profile } = useAuthStore();
     const [categories, setCategories] = useState<any[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [hasPreferences, setHasPreferences] = useState(false);
     const [events, setEvents] = useState<any[]>([]);
+    const [stats, setStats] = useState<DashboardStats | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             if (!profile) return;
+            setLoading(true);
+
             try {
-                // Fetch all categories - public endpoint
-                const catRes = await api.get('/categories');
-                const cats = catRes.data?.data || catRes.data || [];
-                setCategories(Array.isArray(cats) ? cats : []);
+                // Parallel fetching for performance
+                const promises = [];
+
+                // Admin Stats
+                if (['ADMIN', 'SUPER_ADMIN'].includes(profile.role)) {
+                    promises.push(
+                        api.get('/admin/stats').then(res => setStats(res.data?.data || res.data)).catch(e => console.error('Stats error', e))
+                    );
+                }
+
+                // Categories
+                promises.push(
+                    api.get('/categories').then(res => {
+                        const cats = res.data?.data || res.data || [];
+                        setCategories(Array.isArray(cats) ? cats : []);
+                    }).catch(e => console.error('Categories error', e))
+                );
+
+                // Student Specifics
+                if (profile.role === 'STUDENT') {
+                    promises.push(
+                        api.get('/users/categories/preferences').then(res => {
+                            const prefs = res.data?.data || res.data || [];
+                            if (Array.isArray(prefs) && prefs.length > 0) {
+                                setSelectedCategories(prefs.map((p: any) => p.categoryId || p.id));
+                                setHasPreferences(true);
+                            }
+                        }).catch(e => console.error('Prefs error', e))
+                    );
+
+                    promises.push(
+                        api.get('/events/upcoming').then(res => {
+                            const evts = res.data?.data || res.data || [];
+                            setEvents(Array.isArray(evts) ? evts : []);
+                        }).catch(e => console.error('Events error', e))
+                    );
+                }
+
+                await Promise.all(promises);
             } catch (err) {
-                console.error('Failed to fetch categories', err);
+                console.error('Dashboard fetchData error:', err);
+            } finally {
+                setLoading(false);
             }
-
-            if (profile.role === 'STUDENT') {
-                try {
-                    const prefRes = await api.get('/users/categories/preferences');
-                    const prefs = prefRes.data?.data || prefRes.data || [];
-                    if (Array.isArray(prefs) && prefs.length > 0) {
-                        setSelectedCategories(prefs.map((p: any) => p.categoryId || p.id));
-                        setHasPreferences(true);
-                    }
-                } catch (err) {
-                    console.error('Failed to fetch preferences', err);
-                }
-
-                try {
-                    // Fetch upcoming events - public endpoint
-                    const eventsRes = await api.get('/events/upcoming');
-                    const evts = eventsRes.data?.data || eventsRes.data || [];
-                    setEvents(Array.isArray(evts) ? evts : []);
-                } catch (err) {
-                    console.error('Failed to fetch events', err);
-                }
-            }
-
-            setIsLoading(false);
         };
 
         fetchData();
@@ -75,7 +114,7 @@ export default function DashboardPage() {
         }
     };
 
-    if (isLoading) {
+    if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -86,7 +125,7 @@ export default function DashboardPage() {
     if (profile?.role === 'STUDENT') {
         return (
             <div className="space-y-8 animate-in fade-in duration-700">
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 p-2">
                     <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
                         Welcome back, <span className="text-blue-600">{profile.fullName.split(' ')[0]}</span>!
                     </h1>
@@ -100,7 +139,7 @@ export default function DashboardPage() {
                                 <Sparkles className="w-5 h-5 text-blue-600" />
                                 Personalize Your Experience
                             </CardTitle>
-                            <p className="text-sm text-blue-700/70 mt-1">Select at least 3 categories you're interested in.</p>
+                            <p className="text-sm text-blue-700/70 mt-1">Select categories you're interested in to get better recommendations.</p>
                         </CardHeader>
                         <CardContent className="p-8">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -143,61 +182,58 @@ export default function DashboardPage() {
                     </Card>
                 )}
 
-                {hasPreferences && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                <Sparkles className="w-6 h-6 text-blue-600" />
-                                Recommended Events
-                            </h2>
-                            <Button variant="ghost" className="text-blue-600 font-semibold hover:bg-blue-50">View Calendar</Button>
-                        </div>
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                            <Sparkles className="w-6 h-6 text-blue-600" />
+                            {hasPreferences ? 'Recommended Events' : 'Upcoming Events'}
+                        </h2>
+                        <Button variant="ghost" onClick={() => window.location.href = '/events'} className="text-blue-600 font-semibold hover:bg-blue-50">View All</Button>
+                    </div>
 
-                        {events.length === 0 ? (
-                            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-gray-200">
-                                <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold text-gray-900">No events found</h3>
-                                <p className="text-gray-500">Check back later for new activities.</p>
-                            </div>
-                        ) : (
-                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {events.map((event) => (
-                                    <Card key={event.id} className="rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-none bg-white overflow-hidden group">
-                                        {/* Colored Banner based on category */}
-                                        <div className="h-32 bg-gradient-to-br from-blue-500 to-indigo-600 relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
-                                            <div className="absolute top-4 left-4">
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest border border-white/20">
-                                                    {event.category?.name || 'Event'}
-                                                </span>
+                    {events.length === 0 ? (
+                        <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-gray-200">
+                            <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold text-gray-900">No events found</h3>
+                            <p className="text-gray-500">Check back later for new activities.</p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {events.map((event) => (
+                                <Card key={event.id} className="rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-none bg-white overflow-hidden group">
+                                    <div className="h-32 bg-gradient-to-br from-blue-500 to-indigo-600 relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
+                                        <div className="absolute top-4 left-4">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-widest border border-white/20">
+                                                {event.category?.name || 'Event'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <CardContent className="p-6">
+                                        <div className="mb-4">
+                                            <h3 className="font-extrabold text-xl text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">{event.title}</h3>
+                                            <p className="text-sm text-gray-500 line-clamp-2 mt-2 leading-relaxed">{event.description}</p>
+                                        </div>
+
+                                        <div className="space-y-3 mb-6">
+                                            <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2.5 rounded-xl">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                                                    <Calendar className="w-4 h-4" />
+                                                </div>
+                                                <span className="font-medium">{new Date(event.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
                                             </div>
                                         </div>
 
-                                        <CardContent className="p-6">
-                                            <div className="mb-4">
-                                                <h3 className="font-extrabold text-xl text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">{event.title}</h3>
-                                                <p className="text-sm text-gray-500 line-clamp-2 mt-2 leading-relaxed">{event.description}</p>
-                                            </div>
-
-                                            <div className="space-y-3 mb-6">
-                                                <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-2.5 rounded-xl">
-                                                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
-                                                        <Calendar className="w-4 h-4" />
-                                                    </div>
-                                                    <span className="font-medium">{new Date(event.startTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
-                                                </div>
-                                            </div>
-
-                                            <Button className="w-full rounded-xl py-6 bg-gray-900 hover:bg-blue-600 transition-colors text-white font-bold shadow-md hover:shadow-blue-500/25">
-                                                View Details
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
+                                        <Button className="w-full rounded-xl py-6 bg-gray-900 hover:bg-blue-600 transition-colors text-white font-bold shadow-md hover:shadow-blue-500/25">
+                                            View Details
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
@@ -220,9 +256,9 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="relative z-10 flex items-center gap-3">
-                    <Button onClick={() => window.location.href = '/events/create'} className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6 py-6 h-auto transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <Button onClick={() => window.location.href = '/events'} className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6 py-6 h-auto transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
                         <Sparkles className="w-5 h-5" />
-                        New Event
+                        Create Event
                     </Button>
                 </div>
             </div>
@@ -230,10 +266,34 @@ export default function DashboardPage() {
             {/* Quick Stats overview */}
             <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {[
-                    { title: 'Total Students', value: '1,204', trend: '+12% this week', icon: Users, color: 'blue' },
-                    { title: 'Active Events', value: '45', trend: '8 pending approval', icon: Calendar, color: 'indigo' },
-                    { title: 'System Health', value: 'Optimal', trend: 'All services running', icon: Activity, color: 'emerald' },
-                    { title: 'Support Tickets', value: '12', trend: '4 urgent', icon: Headset, color: 'orange' },
+                    {
+                        title: 'Total Users',
+                        value: stats?.totalUsers ?? '...',
+                        trend: 'Registered accounts',
+                        icon: Users,
+                        color: 'blue'
+                    },
+                    {
+                        title: 'Active Events',
+                        value: stats?.activeEvents ?? '...',
+                        trend: `${stats?.pendingEvents ?? 0} pending approval`,
+                        icon: Calendar,
+                        color: 'indigo'
+                    },
+                    {
+                        title: 'System Health',
+                        value: stats?.systemHealth ?? 'Optimal',
+                        trend: 'All services running',
+                        icon: Activity,
+                        color: 'emerald'
+                    },
+                    {
+                        title: 'Total Students',
+                        value: stats?.totalStudents ?? '...',
+                        trend: `${((stats?.totalStudents ?? 0) / (stats?.totalUsers || 1) * 100).toFixed(0)}% of users`,
+                        icon: TrendingUp,
+                        color: 'orange'
+                    },
                 ].map((stat, i) => (
                     <Card key={i} className={`rounded-3xl border-none shadow-sm bg-white overflow-hidden group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
                         <CardContent className="p-6 relative">
@@ -299,9 +359,4 @@ export default function DashboardPage() {
             </Card>
         </div>
     );
-}
-
-// Simple cn utility if not available (though it is usually imported from @/lib/utils)
-function cn(...classes: any[]) {
-    return classes.filter(Boolean).join(' ');
 }
