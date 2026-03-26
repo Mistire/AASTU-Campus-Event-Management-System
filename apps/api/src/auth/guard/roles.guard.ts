@@ -8,14 +8,14 @@ import { isPublicRoute } from '.';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean {
     if (isPublicRoute(this.reflector, context)) return true;
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
-    ]);
+    ]) ?? [];
 
     if (!requiredRoles.length) return true;
 

@@ -38,9 +38,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             localStorage.setItem('auth-token', token);
             localStorage.setItem('auth-refresh-token', refreshToken);
             localStorage.setItem('auth-profile', JSON.stringify(profile));
-            // Also set cookies for the user's specific request
-            document.cookie = `auth-token=${token}; path=/; max-age=3600; SameSite=Lax`;
-            document.cookie = `profile=${JSON.stringify(profile)}; path=/; max-age=3600; SameSite=Lax`;
+            // Access token cookie: 7 days
+            document.cookie = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+            // Refresh token cookie: 30 days
+            document.cookie = `auth-refresh-token=${refreshToken}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+            document.cookie = `profile=${encodeURIComponent(JSON.stringify(profile))}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
         }
         set({ token, refreshToken, profile });
     },

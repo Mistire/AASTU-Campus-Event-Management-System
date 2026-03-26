@@ -5,7 +5,7 @@ import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { RolesList } from '@/features/dashboard/components/RolesList';
 import api from '@/lib/axios';
-import { CheckCircle2, Circle, Sparkles, Calendar, Users, Activity, Loader2 } from 'lucide-react';
+import { CheckCircle2, Circle, Sparkles, Calendar, Users, Activity, Loader2, ShieldCheck, Headset, LayoutDashboard, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function DashboardPage() {
@@ -203,47 +203,95 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Admin Dashboard</h1>
+        <div className="space-y-8 animate-in fade-in duration-700 pb-10">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+
+                <div className="relative z-10 flex flex-col gap-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 w-fit mb-2">
+                        <ShieldCheck className="w-4 h-4 text-blue-600" />
+                        <span className="text-xs font-bold text-blue-700 uppercase tracking-widest">{profile?.role || 'Admin'} View</span>
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
+                        AASTU <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Control Center</span>
+                    </h1>
+                    <p className="text-gray-500 font-medium">Manage events, users, and overall campus activity</p>
+                </div>
+
+                <div className="relative z-10 flex items-center gap-3">
+                    <Button onClick={() => window.location.href = '/events/create'} className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20 font-bold px-6 py-6 h-auto transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5" />
+                        New Event
+                    </Button>
+                </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="rounded-2xl border-none shadow-sm bg-white overflow-hidden group">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-500">Total Users</CardTitle>
-                        <Users className="w-4 h-4 text-blue-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-extrabold text-gray-900 group-hover:text-blue-600 transition-colors">1,204</div>
-                        <p className="text-[10px] font-bold text-green-600 mt-1 uppercase tracking-tighter">+20% this month</p>
-                    </CardContent>
-                </Card>
-                <Card className="rounded-2xl border-none shadow-sm bg-white overflow-hidden group">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-500">Active Events</CardTitle>
-                        <Calendar className="w-4 h-4 text-purple-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-extrabold text-gray-900 group-hover:text-purple-600 transition-colors">45</div>
-                        <p className="text-[10px] font-bold text-blue-600 mt-1 uppercase tracking-tighter">8 pending approval</p>
-                    </CardContent>
-                </Card>
-                <Card className="rounded-2xl border-none shadow-sm bg-white overflow-hidden group">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-500">System Activity</CardTitle>
-                        <Activity className="w-4 h-4 text-orange-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-extrabold text-gray-900 group-hover:text-orange-600 transition-colors">High</div>
-                        <p className="text-[10px] font-bold text-gray-500 mt-1 uppercase tracking-tighter">Peak: 2:00 PM</p>
-                    </CardContent>
-                </Card>
+            {/* Quick Stats overview */}
+            <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {[
+                    { title: 'Total Students', value: '1,204', trend: '+12% this week', icon: Users, color: 'blue' },
+                    { title: 'Active Events', value: '45', trend: '8 pending approval', icon: Calendar, color: 'indigo' },
+                    { title: 'System Health', value: 'Optimal', trend: 'All services running', icon: Activity, color: 'emerald' },
+                    { title: 'Support Tickets', value: '12', trend: '4 urgent', icon: Headset, color: 'orange' },
+                ].map((stat, i) => (
+                    <Card key={i} className={`rounded-3xl border-none shadow-sm bg-white overflow-hidden group hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
+                        <CardContent className="p-6 relative">
+                            <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110 duration-500`}></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">{stat.title}</h3>
+                                    <div className={`w-8 h-8 rounded-full bg-${stat.color}-100 flex items-center justify-center text-${stat.color}-600`}>
+                                        <stat.icon className="w-4 h-4" />
+                                    </div>
+                                </div>
+                                <div className="mt-2 text-3xl font-extrabold text-gray-900">{stat.value}</div>
+                                <p className={`text-xs font-bold text-${stat.color}-600 mt-2 tracking-wide`}>{stat.trend}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
 
-            <Card className="rounded-3xl border-none shadow-sm overflow-hidden bg-white">
-                <CardHeader className="border-b border-gray-50">
-                    <CardTitle className="text-lg font-bold">Role Management Context</CardTitle>
+            {/* Management Modules */}
+            <h2 className="text-xl font-extrabold text-gray-900 mt-10 mb-6 flex items-center gap-2 px-2">
+                <LayoutDashboard className="w-6 h-6 text-blue-600" />
+                Management Modules
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-6">
+                <div onClick={() => window.location.href = '/users'} className="group cursor-pointer bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-bl-full transition-transform group-hover:scale-125 duration-700"></div>
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-6 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                        <Users className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">User Management</h3>
+                    <p className="text-gray-500 font-medium leading-relaxed mb-6">Manage roles, permissions, departments, and approve new organizer accounts. Full control over the campus directory.</p>
+                    <div className="flex items-center text-blue-600 font-bold text-sm tracking-wide">
+                        Manage Users <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                </div>
+
+                <div onClick={() => window.location.href = '/events'} className="group cursor-pointer bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full transition-transform group-hover:scale-125 duration-700"></div>
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-6 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+                        <Calendar className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">Event Control</h3>
+                    <p className="text-gray-500 font-medium leading-relaxed mb-6">Review pending event requests, manage venues, update categories, and oversee all campus activities in one place.</p>
+                    <div className="flex items-center text-indigo-600 font-bold text-sm tracking-wide">
+                        Manage Events <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                </div>
+            </div>
+
+            <Card className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white mt-8">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 px-8 py-6 flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle className="text-lg font-extrabold text-gray-900">Security & Roles Context</CardTitle>
+                        <p className="text-sm text-gray-500 font-medium mt-1">Live overview of available roles and mapped permissions</p>
+                    </div>
+                    <Button variant="outline" className="rounded-xl font-bold bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-gray-900">Edit Roles</Button>
                 </CardHeader>
                 <CardContent className="p-0">
                     <RolesList />

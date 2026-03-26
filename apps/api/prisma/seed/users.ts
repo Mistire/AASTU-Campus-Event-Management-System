@@ -42,6 +42,7 @@ async function main() {
             roleId: adminRole.id,
             departmentId: dept.id,
             phone: '+251900000001',
+            isEmailVerified: true,
         },
         {
             email: 'student@aastu.edu.et',
@@ -50,6 +51,7 @@ async function main() {
             roleId: studentRole.id,
             departmentId: dept.id,
             phone: '+251900000002',
+            isEmailVerified: true,
         },
         {
             email: 'organizer@aastu.edu.et',
@@ -58,13 +60,14 @@ async function main() {
             roleId: organizerRole.id,
             departmentId: dept.id,
             phone: '+251900000003',
+            isEmailVerified: true,
         },
     ];
 
     for (const u of users) {
         await prisma.user.upsert({
             where: { email: u.email },
-            update: {},
+            update: { isEmailVerified: true },
             create: u,
         });
     }
