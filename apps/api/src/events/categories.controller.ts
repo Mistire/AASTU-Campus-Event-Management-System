@@ -11,6 +11,7 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { JwtAuthGuard } from 'src/auth/guard';
+import { Public } from 'src/auth/decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('categories')

@@ -14,6 +14,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { EventQueryDto } from './dto/event-query.dto';
 import { JwtAuthGuard } from 'src/auth/guard';
+import { Public } from 'src/auth/decorator';
 
 @ApiTags('Events')
 @ApiBearerAuth()

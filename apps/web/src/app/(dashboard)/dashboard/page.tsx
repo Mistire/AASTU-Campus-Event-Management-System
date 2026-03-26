@@ -21,28 +21,37 @@ export default function DashboardPage() {
         const fetchData = async () => {
             if (!profile) return;
             try {
-                // Fetch all categories
+                // Fetch all categories - public endpoint
                 const catRes = await api.get('/categories');
-                setCategories(catRes.data.data || []);
+                const cats = catRes.data?.data || catRes.data || [];
+                setCategories(Array.isArray(cats) ? cats : []);
+            } catch (err) {
+                console.error('Failed to fetch categories', err);
+            }
 
-                // Fetch current preferences
-                if (profile.role === 'STUDENT') {
+            if (profile.role === 'STUDENT') {
+                try {
                     const prefRes = await api.get('/users/categories/preferences');
-                    const prefs = prefRes.data.data || [];
-                    if (prefs.length > 0) {
-                        setSelectedCategories(prefs.map((p: any) => p.categoryId));
+                    const prefs = prefRes.data?.data || prefRes.data || [];
+                    if (Array.isArray(prefs) && prefs.length > 0) {
+                        setSelectedCategories(prefs.map((p: any) => p.categoryId || p.id));
                         setHasPreferences(true);
                     }
-
-                    // Fetch upcoming events for the dashboard
-                    const eventsRes = await api.get('/events/upcoming');
-                    setEvents(eventsRes.data.data || []);
+                } catch (err) {
+                    console.error('Failed to fetch preferences', err);
                 }
-            } catch (err) {
-                console.error('Failed to fetch dashboard data', err);
-            } finally {
-                setIsLoading(false);
+
+                try {
+                    // Fetch upcoming events - public endpoint
+                    const eventsRes = await api.get('/events/upcoming');
+                    const evts = eventsRes.data?.data || eventsRes.data || [];
+                    setEvents(Array.isArray(evts) ? evts : []);
+                } catch (err) {
+                    console.error('Failed to fetch events', err);
+                }
             }
+
+            setIsLoading(false);
         };
 
         fetchData();

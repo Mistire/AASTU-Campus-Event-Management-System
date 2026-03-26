@@ -14,6 +14,7 @@ export default function ProfilePage() {
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -22,15 +23,21 @@ export default function ProfilePage() {
                 return;
             }
             try {
-                const [catRes, prefRes] = await Promise.all([
-                    api.get('/categories'),
-                    api.get('/users/categories/preferences')
-                ]);
+                // Fetch individually to handle potential 500 errors gracefully
+                const catRes = await api.get('/categories');
                 setCategories(catRes.data.data || []);
-                const prefs = prefRes.data.data || [];
-                setSelectedCategories(prefs.map((p: any) => p.categoryId));
-            } catch (err) {
-                console.error('Failed to fetch categories or preferences', err);
+
+                try {
+                    const prefRes = await api.get('/users/categories/preferences');
+                    const prefs = prefRes.data.data || [];
+                    setSelectedCategories(prefs.map((p: any) => p.categoryId));
+                } catch (prefErr: any) {
+                    console.error('Failed to fetch preferences', prefErr);
+                    setFetchError('Failed to load your category preferences. Please try again later.');
+                }
+            } catch (err: any) {
+                console.error('Failed to fetch categories', err);
+                setFetchError('Failed to load available categories. The server might be experiencing issues.');
             } finally {
                 setIsLoadingCategories(false);
             }
@@ -144,7 +151,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Areas of Interest Management (For Students) */}
-            {profile.role === 'STUDENT' && !isLoadingCategories && (
+            {profile.role === 'STUDENT' && (
                 <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
                     <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                         <div className="flex items-center justify-between">
@@ -157,7 +164,7 @@ export default function ProfilePage() {
                             </div>
                             <Button
                                 onClick={handleSavePreferences}
-                                disabled={isSaving || selectedCategories.length === 0}
+                                disabled={isSaving || selectedCategories.length === 0 || isLoadingCategories || !!fetchError}
                                 className="rounded-xl px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md hover:shadow-blue-500/20 transition-all"
                             >
                                 {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -166,32 +173,42 @@ export default function ProfilePage() {
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {categories.map((cat) => (
-                                <div
-                                    key={cat.id}
-                                    onClick={() => handleToggleCategory(cat.id)}
-                                    className={cn(
-                                        "group cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col items-center text-center gap-3",
-                                        selectedCategories.includes(cat.id)
-                                            ? "bg-blue-600 border-blue-600 text-white shadow-md"
-                                            : "bg-white border-gray-100 hover:border-blue-200 text-gray-700 hover:bg-gray-50/50"
-                                    )}
-                                >
-                                    <div className={cn(
-                                        "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-                                        selectedCategories.includes(cat.id) ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100"
-                                    )}>
-                                        {selectedCategories.includes(cat.id) ? (
-                                            <CheckCircle2 className="w-5 h-5" />
-                                        ) : (
-                                            <Circle className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                        {isLoadingCategories ? (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+                            </div>
+                        ) : fetchError ? (
+                            <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 text-sm font-medium text-center">
+                                {fetchError}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {categories.map((cat) => (
+                                    <div
+                                        key={cat.id}
+                                        onClick={() => handleToggleCategory(cat.id)}
+                                        className={cn(
+                                            "group cursor-pointer p-4 rounded-2xl border-2 transition-all flex flex-col items-center text-center gap-3",
+                                            selectedCategories.includes(cat.id)
+                                                ? "bg-blue-600 border-blue-600 text-white shadow-md"
+                                                : "bg-white border-gray-100 hover:border-blue-200 text-gray-700 hover:bg-gray-50/50"
                                         )}
+                                    >
+                                        <div className={cn(
+                                            "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                                            selectedCategories.includes(cat.id) ? "bg-white/20" : "bg-gray-100 group-hover:bg-blue-100"
+                                        )}>
+                                            {selectedCategories.includes(cat.id) ? (
+                                                <CheckCircle2 className="w-5 h-5" />
+                                            ) : (
+                                                <Circle className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                                            )}
+                                        </div>
+                                        <span className="font-bold text-xs uppercase tracking-wider">{cat.name}</span>
                                     </div>
-                                    <span className="font-bold text-xs uppercase tracking-wider">{cat.name}</span>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}

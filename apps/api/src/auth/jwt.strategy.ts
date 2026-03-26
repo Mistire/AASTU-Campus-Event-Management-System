@@ -38,48 +38,51 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthUser> {
-    const [user, session] = await Promise.all([
-      this.prisma.user.findUnique({
-        where: {
-          id: payload.sub,
-        },
-        include: {
-          role: {
-            include: {
-              permissions: { include: { permission: true } },
+    try {
+      const [user, session] = await Promise.all([
+        this.prisma.user.findUnique({
+          where: { id: payload.sub },
+          include: {
+            role: {
+              include: {
+                permissions: { include: { permission: true } },
+              },
             },
           },
-        },
-      }),
+        }),
+        this.prisma.authSession.findUnique({
+          where: { id: payload.sid },
+        }),
+      ]);
 
-      this.prisma.authSession.findUnique({
-        where: { id: payload.sid },
-      }),
-    ]);
-    if (!user) {
-      throw new UnauthorizedException('Invalid token user');
+      if (!user) {
+        throw new UnauthorizedException('Invalid token user');
+      }
+
+      if (
+        !session ||
+        session.userId !== user.id ||
+        session.isRevoked ||
+        session.expiresAt <= new Date()
+      ) {
+        throw new UnauthorizedException('Session expired or revoked');
+      }
+
+      return {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role?.roleName || '',
+        permissions: user.role?.permissions?.map((rp) => rp.permission?.name).filter(Boolean) as string[] || [],
+        sessionId: session.id,
+        isEmailVerified: user.isEmailVerified,
+      };
+    } catch (err) {
+      // Re-throw HttpExceptions (like UnauthorizedException) as-is
+      if (err instanceof UnauthorizedException) throw err;
+      // Log any unexpected errors with full stack trace
+      console.error('[JwtStrategy] Unexpected error in validate():', err);
+      throw new UnauthorizedException('Authentication failed due to a server error');
     }
-
-    if (
-      !session ||
-      session.userId !== user.id ||
-      session.isRevoked ||
-      session.expiresAt <= new Date()
-    ) {
-      throw new UnauthorizedException('Session expired or revoked');
-    }
-    // if (!user) {
-    //   throw new UnauthorizedException('Invalid token user');
-    // }
-
-    return {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role.roleName,
-      permissions: user.role.permissions.map((rp) => rp.permission.name),
-      sessionId: session.id,
-      isEmailVerified: user.isEmailVerified,
-    };
   }
 }
