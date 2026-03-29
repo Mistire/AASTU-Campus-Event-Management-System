@@ -1,33 +1,19 @@
-import { IsDateString, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+// Legacy DTO — kept for backward compatibility
+// New session DTOs are in session.dto.ts
+// Organizer invite DTOs are in invitation.dto.ts
 
-export class CreateSessionDto {
-    @IsUUID()
-    @IsNotEmpty()
-    eventId: string;
-
-    @IsString()
-    @IsNotEmpty()
-    title: string;
-
-    @IsDateString()
-    @IsNotEmpty()
-    startTime: string;
-
-    @IsDateString()
-    @IsNotEmpty()
-    endTime: string;
-}
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateOrganizerDto {
-    @IsUUID()
-    @IsNotEmpty()
-    eventId: string;
+  @IsUUID()
+  @IsNotEmpty()
+  eventId: string;
 
-    @IsUUID()
-    @IsNotEmpty()
-    userId: string;
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
 
-    @IsString()
-    @IsNotEmpty()
-    role: string;
+  @IsString()
+  @IsNotEmpty()
+  role: string;
 }

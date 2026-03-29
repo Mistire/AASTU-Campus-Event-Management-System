@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -18,6 +22,7 @@ export type AuthUser = {
   permissions: string[];
   sessionId: string;
   isEmailVerified: boolean;
+  isCampusIdVerified: boolean;
 };
 
 @Injectable()
@@ -39,51 +44,58 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthUser> {
-    try {
-      const [user, session] = await Promise.all([
-        this.prisma.user.findUnique({
-          where: { id: payload.sub },
-          include: {
-            role: {
-              include: {
-                permissions: { include: { permission: true } },
-              },
+    if (!payload?.sub || !payload?.sid) {
+      throw new UnauthorizedException('Invalid token payload');
+    }
+
+    const [user, session] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: {
+          id: payload.sub,
+        },
+        include: {
+          role: {
+            include: {
+              permissions: { include: { permission: true } },
             },
           },
-        }),
-        this.prisma.authSession.findUnique({
-          where: { id: payload.sid },
-        }),
-      ]);
+        },
+      }),
 
-      if (!user) {
-        throw new UnauthorizedException('Invalid token user');
-      }
-
-      if (
-        !session ||
-        session.userId !== user.id ||
-        session.isRevoked ||
-        session.expiresAt <= new Date()
-      ) {
-        throw new UnauthorizedException('Session expired or revoked');
-      }
-
-      return {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role?.roleName || '',
-        permissions: user.role?.permissions?.map((rp) => rp.permission?.name).filter(Boolean) as string[] || [],
-        sessionId: session.id,
-        isEmailVerified: user.isEmailVerified,
-      };
-    } catch (err) {
-      // Re-throw HttpExceptions (like UnauthorizedException) as-is
-      if (err instanceof UnauthorizedException) throw err;
-      // Log any unexpected errors with full stack trace
-      console.error('[JwtStrategy] Unexpected error in validate():', err);
-      throw new UnauthorizedException('Authentication failed due to a server error');
+      this.prisma.authSession.findUnique({
+        where: { id: payload.sid },
+      }),
+    ]);
+    if (!user) {
+      throw new UnauthorizedException('Invalid token user');
     }
+
+    if (!user.role) {
+      throw new UnauthorizedException('User role not found');
+    }
+
+    if (
+      !session ||
+      session.userId !== user.id ||
+      session.isRevoked ||
+      session.expiresAt <= new Date()
+    ) {
+      throw new UnauthorizedException('Session expired or revoked');
+    }
+
+    const permissions = (user.role.permissions ?? [])
+      .map((rp) => rp.permission?.name)
+      .filter((name): name is string => Boolean(name));
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role.roleName,
+      permissions,
+      sessionId: session.id,
+      isEmailVerified: user.isEmailVerified,
+      isCampusIdVerified: user.isCampusIdVerified,
+    };
   }
 }

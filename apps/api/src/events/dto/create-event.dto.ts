@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+    IsArray,
+    IsBoolean,
     IsDateString,
     IsInt,
     IsNotEmpty,
@@ -10,7 +12,7 @@ import {
 } from 'class-validator';
 
 export class CreateEventDto {
-    @ApiProperty({ description: 'The title of the event', example: 'Networking Night' })
+    @ApiProperty({ description: 'The title of the event', example: 'Annual Tech Summit 2026' })
     @IsString()
     @IsNotEmpty()
     title: string;
@@ -20,15 +22,10 @@ export class CreateEventDto {
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: 'UUID of the category for the event' })
+    @ApiProperty({ description: 'UUID of the event type' })
     @IsUUID()
     @IsNotEmpty()
-    categoryId: string;
-
-    @ApiProperty({ description: 'UUID of the current status of the event' })
-    @IsUUID()
-    @IsNotEmpty()
-    statusId: string;
+    eventTypeId: string;
 
     @ApiProperty({ description: 'UUID of the venue where the event is held' })
     @IsUUID()
@@ -50,4 +47,21 @@ export class CreateEventDto {
     @Min(1)
     @IsNotEmpty()
     capacity: number;
+
+    @ApiPropertyOptional({ description: 'Whether registration requires organizer approval', default: false })
+    @IsBoolean()
+    @IsOptional()
+    requiresApproval?: boolean;
+
+    @ApiPropertyOptional({ description: 'Array of tag IDs to attach to the event', type: [String] })
+    @IsArray()
+    @IsUUID('all', { each: true })
+    @IsOptional()
+    tagIds?: string[];
+
+    @ApiPropertyOptional({ description: 'Array of category IDs to attach to the event', type: [String] })
+    @IsArray()
+    @IsUUID('all', { each: true })
+    @IsOptional()
+    categoryIds?: string[];
 }

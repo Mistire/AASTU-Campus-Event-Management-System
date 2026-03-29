@@ -6,13 +6,18 @@ datasource db {
   provider = "postgresql"
 }
 
+enum OneTimeTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
 model Role {
   id          String           @id @default(uuid()) @db.Uuid
   roleName    String           @unique @map("role_name") @db.VarChar
-  description String?
+  description String?          @db.Text
   createdAt   DateTime         @default(now()) @map("created_at")
-  permissions RolePermission[]
   users       User[]
+  permissions RolePermission[]
 
   @@map("roles")
 }
@@ -32,68 +37,75 @@ model RolePermission {
   roleId       String     @map("role_id") @db.Uuid
   permissionId String     @map("permission_id") @db.Uuid
   createdAt    DateTime   @default(now()) @map("created_at")
-  permission   Permission @relation(fields: [permissionId], references: [id])
+
   role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
 
   @@unique([roleId, permissionId])
   @@map("role_permissions")
 }
 
 model User {
-  id                  String                    @id @default(uuid()) @db.Uuid
-  fullName            String                    @map("full_name") @db.VarChar
-  email               String                    @unique @db.VarChar
-  passwordHash        String                    @map("password_hash") @db.VarChar
-  roleId              String                    @map("role_id") @db.Uuid
-  departmentId        String?                   @map("department_id") @db.Uuid
-  phone               String?                   @db.VarChar
-  profileImage        String?                   @map("profile_image") @db.VarChar
-  createdAt           DateTime                  @default(now()) @map("created_at")
-  updatedAt           DateTime                  @updatedAt @map("updated_at")
-  emailVerifiedAt     DateTime?                 @map("email_verified_at")
-  isEmailVerified     Boolean                   @default(false) @map("is_email_verified")
-  passwordChangedAt   DateTime?                 @map("password_changed_at")
-  attendance          Attendance[]
-  auditLogs           AuditLogs[]
-  authSessions        AuthSession[]
-  eventOrganizers     EventOrganizers[]
-  eventWaitlist       EventWaitlist[]
-  feedback            Feedback[]
-  notifications       Notification[]
-  oneTimeTokens       OneTimeToken[]
-  registrations       Registration[]
+  id               String            @id @default(uuid()) @db.Uuid
+  fullName         String            @map("full_name") @db.VarChar
+  email            String            @unique @db.VarChar
+  passwordHash     String            @map("password_hash") @db.VarChar
+  roleId           String            @map("role_id") @db.Uuid
+  departmentId     String?           @map("department_id") @db.Uuid
+  phone            String?           @db.VarChar
+  profileImage     String?           @map("profile_image") @db.VarChar
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+
+  isEmailVerified  Boolean           @default(false) @map("is_email_verified")
+  emailVerifiedAt  DateTime?         @map("email_verified_at")
+  passwordChangedAt DateTime?        @map("password_changed_at")
+  
+  role             Role              @relation(fields: [roleId], references: [id])
+  department       Department?       @relation(fields: [departmentId], references: [id])
+  notifications    Notification[]
+  registrations    Registration[]
+  attendance       Attendance[]
+  feedback         Feedback[]
+  userInterests    UserInterests[]
   categoryPreferences UserCategoryPreferences[]
-  userInterests       UserInterests[]
-  department          Department?               @relation(fields: [departmentId], references: [id])
-  role                Role                      @relation(fields: [roleId], references: [id])
+  eventOrganizers  EventOrganizers[]
+  eventWaitlist    EventWaitlist[]
+  auditLogs        AuditLogs[]
+
+  authSessions AuthSession[]
+  oneTimeTokens OneTimeToken[]
 
   @@map("users")
 }
 
 model UserCategoryPreferences {
-  id         String   @id @default(uuid()) @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
-  categoryId String   @map("category_id") @db.Uuid
-  createdAt  DateTime @default(now()) @map("created_at")
-  category   Category @relation(fields: [categoryId], references: [id])
-  user       User     @relation(fields: [userId], references: [id])
+  id String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@unique([userId, categoryId])
   @@map("user_category_preferences")
 }
 
 model AuthSession {
-  id               String    @id @default(uuid()) @db.Uuid
-  userId           String    @map("user_id") @db.Uuid
-  refreshTokenHash String    @map("refresh_token_hash") @db.VarChar
-  userAgent        String?   @map("user_agent") @db.VarChar
-  ipAddress        String?   @map("ip_address") @db.VarChar
-  isRevoked        Boolean   @default(false) @map("is_revoked")
-  expiresAt        DateTime  @map("expires_at")
-  revokedAt        DateTime? @map("revoked_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  user             User      @relation(fields: [userId], references: [id])
+  id               String   @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  refreshTokenHash String @map("refresh_token_hash") @db.VarChar
+  userAgent String? @map("user_agent") @db.VarChar
+  ipAddress String? @map("ip_address") @db.VarChar
+  isRevoked Boolean @default(false) @map("is_revoked")
+  expiresAt DateTime @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId, isRevoked])
   @@index([expiresAt])
@@ -101,14 +113,15 @@ model AuthSession {
 }
 
 model OneTimeToken {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  tokenHash String           @map("token_hash") @db.VarChar
-  type      OneTimeTokenType
-  expiresAt DateTime         @map("expires_at")
-  usedAt    DateTime?        @map("used_at")
-  createdAt DateTime         @default(now()) @map("created_at")
-  user      User             @relation(fields: [userId], references: [id])
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String  @map("token_hash") @db.VarChar
+  type OneTimeTokenType
+  expiresAt DateTime @map("expires_at")
+  usedAt DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId, type, usedAt])
   @@index([expiresAt])
@@ -125,22 +138,34 @@ model Department {
 }
 
 model EventStatus {
-  id          String  @id @default(uuid()) @db.Uuid
-  statusName  String  @map("status_name") @db.VarChar
-  description String?
+  id          String   @id @default(uuid()) @db.Uuid
+  statusName  String   @map("status_name") @db.VarChar
+  description String?  @db.Text
   events      Event[]
 
   @@map("event_status")
 }
 
 model Category {
-  id              String                    @id @default(uuid()) @db.Uuid
-  name            String                    @db.VarChar
-  description     String?
-  events          Event[]
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar
+  description String?  @db.Text
+  events      Event[]
   userPreferences UserCategoryPreferences[]
+  eventCategories EventCategory[]
 
   @@map("categories")
+}
+
+model EventCategory {
+  eventId    String @map("event_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+
+  event    Event    @relation(fields: [eventId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([eventId, categoryId])
+  @@map("event_categories")
 }
 
 model Interest {
@@ -154,7 +179,7 @@ model Interest {
 
 model Tag {
   id        String      @id @default(uuid()) @db.Uuid
-  name      String      @db.VarChar
+  name      String      @unique @db.VarChar
   eventTags EventTags[]
 
   @@map("tags")
@@ -168,47 +193,55 @@ model Venue {
   capacity    Int?
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
   events      Event[]
 
+  @@unique([name, building, roomNumber])
   @@map("venues")
 }
 
 model Event {
-  id            String            @id @default(uuid()) @db.Uuid
-  title         String            @db.VarChar
-  description   String?
-  categoryId    String            @map("category_id") @db.Uuid
-  statusId      String            @map("status_id") @db.Uuid
-  venueId       String            @map("venue_id") @db.Uuid
-  startTime     DateTime          @map("start_time")
-  endTime       DateTime          @map("end_time")
-  capacity      Int
-  createdAt     DateTime          @default(now()) @map("created_at")
-  updatedAt     DateTime          @updatedAt @map("updated_at")
-  announcements Announcements[]
-  attendance    Attendance[]
-  media         EventMedia[]
-  organizers    EventOrganizers[]
-  sessions      EventSessions[]
-  tags          EventTags[]
-  waitlist      EventWaitlist[]
-  category      Category          @relation(fields: [categoryId], references: [id])
-  status        EventStatus       @relation(fields: [statusId], references: [id])
-  venue         Venue             @relation(fields: [venueId], references: [id])
-  feedback      Feedback[]
-  registrations Registration[]
+  id               String            @id @default(uuid()) @db.Uuid
+  title            String            @db.VarChar
+  description      String?           @db.Text
+  categoryId       String            @map("category_id") @db.Uuid
+  statusId         String            @map("status_id") @db.Uuid
+  venueId          String            @map("venue_id") @db.Uuid
+  startTime        DateTime          @map("start_time")
+  endTime          DateTime          @map("end_time")
+  capacity         Int
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  category         Category          @relation(fields: [categoryId], references: [id])
+  status           EventStatus       @relation(fields: [statusId], references: [id])
+  venue            Venue             @relation(fields: [venueId], references: [id])
+  sessions         EventSessions[]
+  organizers       EventOrganizers[]
+  tags             EventTags[]
+  media            EventMedia[]
+  registrations    Registration[]
+  attendance       Attendance[]
+  feedback         Feedback[]
+  waitlist         EventWaitlist[]
+  announcements    Announcements[]
+  eventCategories  EventCategory[]
 
   @@map("events")
 }
 
 model EventSessions {
-  id         String       @id @default(uuid()) @db.Uuid
-  eventId    String       @map("event_id") @db.Uuid
-  title      String       @db.VarChar
-  startTime  DateTime     @map("start_time")
-  endTime    DateTime     @map("end_time")
+  id          String   @id @default(uuid()) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  title       String   @db.VarChar
+  description String?  @db.Text
+  sessionType String?  @map("session_type") @db.VarChar
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  location    String?  @db.VarChar
+
+  event      Event             @relation(fields: [eventId], references: [id])
   attendance Attendance[]
-  event      Event        @relation(fields: [eventId], references: [id])
 
   @@map("event_sessions")
 }
@@ -218,9 +251,11 @@ model EventOrganizers {
   eventId String  @map("event_id") @db.Uuid
   userId  String  @map("user_id") @db.Uuid
   role    String? @db.VarChar
+
   event   Event   @relation(fields: [eventId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
 
+  @@unique([eventId, userId])
   @@map("event_organizers")
 }
 
@@ -232,6 +267,7 @@ model AuditLogs {
   entityId   String?  @map("entity_id") @db.Uuid
   details    String?
   createdAt  DateTime @default(now()) @map("created_at")
+
   user       User     @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
@@ -241,8 +277,9 @@ model Announcements {
   id        String   @id @default(uuid()) @db.Uuid
   eventId   String   @map("event_id") @db.Uuid
   title     String   @db.VarChar
-  message   String
+  message   String   @db.Text
   createdAt DateTime @default(now()) @map("created_at")
+
   event     Event    @relation(fields: [eventId], references: [id])
 
   @@map("announcements")
@@ -254,18 +291,20 @@ model EventWaitlist {
   eventId  String   @map("event_id") @db.Uuid
   joinedAt DateTime @default(now()) @map("joined_at")
   position Int
-  event    Event    @relation(fields: [eventId], references: [id])
+
   user     User     @relation(fields: [userId], references: [id])
+  event    Event    @relation(fields: [eventId], references: [id])
 
   @@map("event_waitlist")
 }
 
 model UserInterests {
-  id         String   @id @default(uuid()) @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
-  interestId String   @map("interest_id") @db.Uuid
-  interest   Interest @relation(fields: [interestId], references: [id])
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @map("user_id") @db.Uuid
+  interestId String @map("interest_id") @db.Uuid
+
   user       User     @relation(fields: [userId], references: [id])
+  interest   Interest @relation(fields: [interestId], references: [id])
 
   @@map("user_interests")
 }
@@ -278,6 +317,7 @@ model Notification {
   type      String   @db.VarChar
   isRead    Boolean  @default(false) @map("is_read")
   createdAt DateTime @default(now()) @map("created_at")
+
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("notifications")
@@ -289,22 +329,24 @@ model Registration {
   eventId          String   @map("event_id") @db.Uuid
   registrationDate DateTime @default(now()) @map("registration_date")
   status           String   @db.VarChar
-  event            Event    @relation(fields: [eventId], references: [id])
+
   user             User     @relation(fields: [userId], references: [id])
+  event            Event    @relation(fields: [eventId], references: [id])
 
   @@map("registrations")
 }
 
 model Attendance {
-  id          String         @id @default(uuid()) @db.Uuid
-  userId      String         @map("user_id") @db.Uuid
-  eventId     String         @map("event_id") @db.Uuid
-  sessionId   String?        @map("session_id") @db.Uuid
-  checkInTime DateTime       @map("check_in_time")
-  qrToken     String         @map("qr_token") @db.VarChar
-  event       Event          @relation(fields: [eventId], references: [id])
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  sessionId   String?  @map("session_id") @db.Uuid
+  checkInTime DateTime @map("check_in_time")
+  qrToken     String   @map("qr_token") @db.VarChar
+
+  user        User     @relation(fields: [userId], references: [id])
+  event       Event    @relation(fields: [eventId], references: [id])
   session     EventSessions? @relation(fields: [sessionId], references: [id])
-  user        User           @relation(fields: [userId], references: [id])
 
   @@map("attendance")
 }
@@ -316,8 +358,9 @@ model Feedback {
   rating    Int
   comment   String?
   createdAt DateTime @default(now()) @map("created_at")
-  event     Event    @relation(fields: [eventId], references: [id])
+
   user      User     @relation(fields: [userId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id])
 
   @@map("feedback")
 }
@@ -328,6 +371,7 @@ model EventMedia {
   fileUrl    String   @map("file_url") @db.VarChar
   mediaType  String   @map("media_type") @db.VarChar
   uploadedAt DateTime @default(now()) @map("uploaded_at")
+
   event      Event    @relation(fields: [eventId], references: [id])
 
   @@map("event_media")
@@ -337,13 +381,9 @@ model EventTags {
   id      String @id @default(uuid()) @db.Uuid
   eventId String @map("event_id") @db.Uuid
   tagId   String @map("tag_id") @db.Uuid
-  event   Event  @relation(fields: [eventId], references: [id])
-  tag     Tag    @relation(fields: [tagId], references: [id])
+
+  event   Event @relation(fields: [eventId], references: [id])
+  tag     Tag   @relation(fields: [tagId], references: [id])
 
   @@map("event_tags")
-}
-
-enum OneTimeTokenType {
-  EMAIL_VERIFICATION
-  PASSWORD_RESET
 }
