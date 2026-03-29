@@ -26,7 +26,7 @@ export class OrganizersController {
   constructor(private readonly organizersService: OrganizersService) {}
 
   @Post('events/:eventId/organizers/invite')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Invite a user to co-organize an event (Organizer)' })
   @ApiResponse({ status: 201, description: 'Organizer invitation sent.' })
   @ApiResponse({ status: 409, description: 'User is already an organizer.' })
@@ -65,7 +65,7 @@ export class OrganizersController {
   }
 
   @Delete('organizers/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Remove an organizer (Event creator or the organizer themselves)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.organizersService.remove(id, user.id);

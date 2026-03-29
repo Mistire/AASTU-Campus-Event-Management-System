@@ -143,6 +143,20 @@ export class OrganizersService {
     });
   }
 
+  private async assertOrganizerOrCreator(eventId: string, userId: string) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: {
+        organizers: { where: { userId, status: 'ACCEPTED' } },
+      },
+    });
+    if (!event) throw new NotFoundException(`Event with ID ${eventId} not found`);
+    if (event.createdBy !== userId && event.organizers.length === 0) {
+      throw new ForbiddenException('Only event organizers can manage this event team');
+    }
+    return event;
+  }
+
   async remove(id: string, userId: string) {
     const organizer = await this.prisma.eventOrganizers.findUnique({
       where: { id },
@@ -155,10 +169,10 @@ export class OrganizersService {
       throw new BadRequestException('Cannot remove the event creator from organizers');
     }
 
-    if (organizer.event.createdBy !== userId && organizer.userId !== userId) {
-      throw new ForbiddenException(
-        'Only the event creator or the organizer themselves can remove this organizer',
-      );
+    // Allow the person themselves OR any other organizer/creator to remove them
+    const isSelf = organizer.userId === userId;
+    if (!isSelf) {
+      await this.assertOrganizerOrCreator(organizer.eventId, userId);
     }
 
     return this.prisma.eventOrganizers.delete({ where: { id } });

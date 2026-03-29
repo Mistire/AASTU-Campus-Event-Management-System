@@ -91,4 +91,28 @@ export class EmailService {
       `,
     );
   }
+
+  async sendEventLiveEmail(emails: string[], eventTitle: string) {
+    if (emails.length === 0) return;
+
+    try {
+      await this.transporter.sendMail({
+        from: `"AASTU Campus Event Management System" <${this.configService.get<string>('SMTP_FROM')}>`,
+        to: this.configService.get<string>('SMTP_FROM'), // Send to self as primary "to"
+        bcc: emails, // Use BCC for all attendees
+        subject: `Event is LIVE: ${eventTitle}`,
+        html: `
+          <h2>Get Ready!</h2>
+          <p>The event <strong>"${eventTitle}"</strong> is now LIVE!</p>
+          <p>We look forward to seeing you there. Check the app for the full schedule and session details.</p>
+        `,
+      });
+
+      this.logger.log(
+        `Bulk 'Event Live' email sent to ${emails.length} attendees for event: ${eventTitle}`,
+      );
+    } catch (err) {
+      this.logger.error(`Failed to send bulk 'Event Live' email: ${err.message}`);
+    }
+  }
 }

@@ -25,7 +25,7 @@ export class HackathonsController {
   constructor(private readonly hackathonsService: HackathonsService) {}
 
   @Post('events/:eventId/hackathon')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Create hackathon config for an event — one per event (Organizer)' })
   @ApiResponse({ status: 201, description: 'Hackathon configuration created.' })
   @ApiResponse({ status: 409, description: 'Event already has a hackathon configuration.' })
@@ -44,7 +44,7 @@ export class HackathonsController {
   }
 
   @Patch('events/:eventId/hackathon')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Update hackathon settings for an event (Organizer)' })
   update(
     @Param('eventId') eventId: string,
@@ -55,7 +55,7 @@ export class HackathonsController {
   }
 
   @Delete('events/:eventId/hackathon')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Delete hackathon configuration for an event (Organizer)' })
   remove(@Param('eventId') eventId: string, @GetUser() user: AuthUser) {
     return this.hackathonsService.remove(eventId, user.id);

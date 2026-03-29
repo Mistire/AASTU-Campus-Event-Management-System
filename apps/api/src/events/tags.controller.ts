@@ -23,8 +23,8 @@ export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Post()
-  @Roles('Admin')
-  @ApiOperation({ summary: 'Create a new tag (Admin only)' })
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Create a new tag (Admin, Organizer)' })
   @ApiResponse({ status: 201, description: 'Tag created.' })
   @ApiResponse({ status: 409, description: 'Tag with this name already exists.' })
   create(@Body() dto: CreateTagDto) {
@@ -45,7 +45,7 @@ export class TagsController {
 
   @Patch(':id')
   @Roles('Admin')
-  @ApiOperation({ summary: 'Update a tag (Admin only)' })
+  @ApiOperation({ summary: 'Update a tag name (Admin only)' })
   @ApiResponse({ status: 409, description: 'Tag with this name already exists.' })
   update(@Param('id') id: string, @Body() dto: UpdateTagDto) {
     return this.tagsService.update(id, dto);
