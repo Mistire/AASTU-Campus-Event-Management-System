@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -13,6 +14,31 @@ async function bootstrap() {
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Swagger setup
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('AASTU Campus Event Management System API')
+    .setDescription('The API documentation for the AASTU Campus Event Management System')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+        name: 'Authorization',
+        description: 'Paste access token only (without "Bearer ").',
+      },
+      'access-token',
+    )
+    .addSecurityRequirements('access-token')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   // Global pipes
   app.useGlobalPipes(
@@ -24,14 +50,14 @@ async function bootstrap() {
     }),
   );
 
+
+
+
   // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Global interceptors
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new TransformInterceptor(),
-  );
+  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
 
   // CORS
   app.enableCors();
@@ -41,4 +67,4 @@ async function bootstrap() {
 
   logger.log(`Application is running on: http://localhost:${port}/api`);
 }
-bootstrap();
+void bootstrap();
