@@ -7,6 +7,12 @@ import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import HowItWorks from "@/components/landing/HowItWorks";
+import Testimonials from "@/components/landing/Testimonials";
+import Features from "@/components/landing/Features";
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
   const { profile } = useAuthStore();
@@ -29,6 +35,12 @@ export default function Home() {
 
   return (
     <>
+      <Navbar />
+      <Hero />
+      <Features />
+      <HowItWorks />
+      <Testimonials />
+      <Footer />
       <main className="min-h-screen relative overflow-hidden bg-background px-4 md:px-0">
         {/* Background decorations */}
         <div className="absolute top-0 -left-40 w-96 h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse" />
@@ -90,3 +102,5 @@ export default function Home() {
     </>
   );
 }
+
+
