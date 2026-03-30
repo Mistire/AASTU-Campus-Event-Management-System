@@ -1,8 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AnnouncementsService } from './announcements.service';
-import { CreateAnnouncementDto, UpdateAnnouncementDto } from './dto/announcement.dto';
+import {
+  AnnouncementQueryDto,
+  CreateAnnouncementDto,
+  UpdateAnnouncementDto,
+} from './dto/announcement.dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guard';
 import { Roles, GetUser } from '../auth/decorator';
 import type { AuthUser } from '../auth/jwt.strategy';
@@ -15,7 +30,7 @@ export class AnnouncementsController {
   constructor(private readonly announcementsService: AnnouncementsService) {}
 
   @Post('events/:eventId/announcements')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({
     summary: 'Create an announcement for an event (Organizer only, event must be APPROVED/LIVE)',
   })
@@ -30,8 +45,16 @@ export class AnnouncementsController {
 
   @Get('events/:eventId/announcements')
   @ApiOperation({ summary: 'List all announcements for an event' })
-  findAllByEvent(@Param('eventId') eventId: string) {
-    return this.announcementsService.findAllByEvent(eventId);
+  findAllByEvent(@Param('eventId') eventId: string, @Query() query: AnnouncementQueryDto) {
+    return this.announcementsService.findAllByEvent(eventId, query);
+  }
+
+  @Get('announcements/my')
+  @ApiOperation({
+    summary: 'Get announcements where user is creator or event co-organizer (Organizer)',
+  })
+  getMyAnnouncements(@GetUser() user: AuthUser, @Query() query: AnnouncementQueryDto) {
+    return this.announcementsService.getMyAnnouncements(user.id, query);
   }
 
   @Get('announcements/:id')
@@ -41,16 +64,16 @@ export class AnnouncementsController {
   }
 
   @Patch('announcements/:id')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Update an announcement (creator only)' })
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Update an announcement (organizer only)' })
   update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateAnnouncementDto) {
     return this.announcementsService.update(id, user.id, dto);
   }
 
   @Delete('announcements/:id')
-  @Roles('Admin', 'Organizer')
-  @ApiOperation({ summary: 'Delete an announcement (creator or admin)' })
+  @Roles('Organizer')
+  @ApiOperation({ summary: 'Delete an announcement (organizer)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
-    return this.announcementsService.remove(id, user.id, user.role);
+    return this.announcementsService.remove(id, user.id);
   }
 }

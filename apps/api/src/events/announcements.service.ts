@@ -5,7 +5,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateAnnouncementDto, UpdateAnnouncementDto } from './dto/announcement.dto';
+import {
+  AnnouncementQueryDto,
+  CreateAnnouncementDto,
+  UpdateAnnouncementDto,
+} from './dto/announcement.dto';
 
 @Injectable()
 export class AnnouncementsService {
@@ -66,14 +70,68 @@ export class AnnouncementsService {
     return announcement;
   }
 
-  async findAllByEvent(eventId: string) {
-    return this.prisma.announcements.findMany({
-      where: { eventId },
-      include: {
-        creator: { select: { id: true, fullName: true } },
+  async findAllByEvent(eventId: string, query: AnnouncementQueryDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.announcements.findMany({
+        where: { eventId },
+        include: {
+          creator: { select: { id: true, fullName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.announcements.count({ where: { eventId } }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: 'desc' },
-    });
+    };
+  }
+
+  async getMyAnnouncements(userId: string, query: AnnouncementQueryDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const where = {
+      OR: [
+        { createdBy: userId },
+        { event: { organizers: { some: { userId, status: 'ACCEPTED' } } } },
+      ],
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.announcements.findMany({
+        where,
+        include: {
+          event: { select: { id: true, title: true } },
+          creator: { select: { id: true, fullName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.announcements.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string) {
@@ -92,9 +150,9 @@ export class AnnouncementsService {
 
   async update(id: string, userId: string, dto: UpdateAnnouncementDto) {
     const announcement = await this.findOne(id);
-    if (announcement.createdBy !== userId) {
-      throw new ForbiddenException('Only the creator can update this announcement');
-    }
+
+    // Allow any accepted organizer of the linked event to update
+    await this.assertEventOrganizer(announcement.eventId, userId);
 
     return this.prisma.announcements.update({
       where: { id },
@@ -108,13 +166,26 @@ export class AnnouncementsService {
     });
   }
 
-  async remove(id: string, userId: string, userRole: string) {
+  async remove(id: string, userId: string) {
     const announcement = await this.findOne(id);
 
-    if (userRole !== 'Admin' && announcement.createdBy !== userId) {
-      throw new ForbiddenException('Only the creator or admin can delete this announcement');
-    }
+    // Allow any accepted organizer of the linked event to delete
+    await this.assertEventOrganizer(announcement.eventId, userId);
 
     return this.prisma.announcements.delete({ where: { id } });
+  }
+
+  // Helper
+  private async assertEventOrganizer(eventId: string, userId: string) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: {
+        organizers: { where: { userId, status: 'ACCEPTED' } },
+      },
+    });
+    if (!event) throw new NotFoundException(`Event with ID ${eventId} not found`);
+    if (event.createdBy !== userId && event.organizers.length === 0) {
+      throw new ForbiddenException('You are not an organizer of this event');
+    }
   }
 }

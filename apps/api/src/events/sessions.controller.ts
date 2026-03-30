@@ -18,7 +18,7 @@ export class SessionsController {
   // ── Session CRUD ────────────────────────────────────────────────────────
 
   @Post('events/:eventId/sessions')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({
     summary:
       'Create a session for an event (Organizer). Session times must fall within event window.',
@@ -45,7 +45,7 @@ export class SessionsController {
   }
 
   @Patch('sessions/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({
     summary: 'Update a session (Organizer). Pass speakerIds to replace all speakers.',
   })
@@ -54,7 +54,7 @@ export class SessionsController {
   }
 
   @Delete('sessions/:id')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Delete a session and all its speakers/media/attendance (Organizer)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.sessionsService.remove(id, user.id);
@@ -63,7 +63,7 @@ export class SessionsController {
   // ── Session Speaker Management ──────────────────────────────────────────
 
   @Post('sessions/:sessionId/speakers/:speakerId')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Add a speaker to a session (Organizer)' })
   @ApiResponse({ status: 201, description: 'Speaker assigned to session.' })
   addSpeaker(
@@ -75,7 +75,7 @@ export class SessionsController {
   }
 
   @Delete('sessions/:sessionId/speakers/:speakerId')
-  @Roles('Admin', 'Organizer')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Remove a speaker from a session (Organizer)' })
   removeSpeaker(
     @Param('sessionId') sessionId: string,

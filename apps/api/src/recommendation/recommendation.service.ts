@@ -1,10 +1,12 @@
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import Redis from 'ioredis';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class RecommendationService {
@@ -13,13 +15,15 @@ export class RecommendationService {
   private readonly redis: Redis;
 
   constructor(
+    private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
     @InjectQueue('recommendation') private readonly recommendationQueue: Queue,
   ) {
-    this.mlServiceUrl = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+    this.mlServiceUrl = this.configService.get<string>('ML_SERVICE_URL', 'http://localhost:8000');
     this.redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      host: this.configService.get<string>('REDIS_HOST', 'localhost'),
+      port: this.configService.get<number>('REDIS_PORT', 6379),
     });
   }
 
@@ -27,20 +31,21 @@ export class RecommendationService {
     const cacheKey = `recommendations:${userId}:${n}`;
 
     try {
-      // 1. Try to get from cache
-      const cachedData = await this.redis.get(cacheKey);
-      if (cachedData) {
-        this.logger.log(`Serving recommendations from cache for user: ${userId}`);
-        return JSON.parse(cachedData);
+      // 1. Check Redis Cache
+      const cacheKey = `recommendations:user:${userId}:${n}`;
+      const cached = await this.redis.get(cacheKey);
+      if (cached) {
+        this.logger.log(`Serving recommendations from cache for user ${userId}`);
+        return JSON.parse(cached);
       }
 
-      // 2. If not in cache, fetch from ML service
-      this.logger.log(`Fetching fresh recommendations from ML service for user: ${userId}`);
+      // 2. Fetch from ML Service
+      this.logger.log(`Fetching fresh recommendations from ML service for user ${userId}`);
       const response: AxiosResponse = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/predict/${userId}?n=${n}`),
       );
 
-      // 3. Save to cache (TTL: 1 hour)
+      // 3. Cache Result (1 hour TTL)
       await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 3600);
 
       return response.data;
@@ -62,15 +67,19 @@ export class RecommendationService {
     const cacheKey = `similar_events:${eventId}:${n}`;
 
     try {
-      // Cache check
+      // 1. Check Cache
+      const cacheKey = `recommendations:similar:${eventId}:${n}`;
       const cached = await this.redis.get(cacheKey);
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        return JSON.parse(cached);
+      }
 
+      // 2. Fetch from ML Service
       const response: AxiosResponse = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/similar/${eventId}?n=${n}`),
       );
 
-      // Cache for 24 hours (event similarity changes less often)
+      // 3. Cache Result (24 hour TTL for similar events as they change less frequently)
       await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 86400);
 
       return response.data;
@@ -88,9 +97,19 @@ export class RecommendationService {
   async retrain() {
     try {
       this.logger.log('Adding model retraining task to queue');
-      const job = await this.recommendationQueue.add('retrain', {
-        timestamp: new Date().toISOString(),
-      });
+
+      // Dedicated JobId for deduplication: only one retrain job can be waiting/active
+      const jobId = 'recommendation-retrain';
+
+      const job = await this.recommendationQueue.add(
+        'retrain',
+        { timestamp: new Date().toISOString() },
+        {
+          jobId,
+          removeOnComplete: true,
+          removeOnFail: false,
+        },
+      );
 
       return {
         status: 'queued',
@@ -102,6 +121,27 @@ export class RecommendationService {
       this.logger.error(`Failed to trigger retrain: ${errorMessage}`);
       throw new HttpException('Failed to trigger model retrain', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async getJobStatus(jobId: string) {
+    const job = await this.recommendationQueue.getJob(jobId);
+
+    if (!job) {
+      throw new HttpException('Job not found', HttpStatus.NOT_FOUND);
+    }
+
+    const state = await job.getState();
+    const progress = job.progress;
+    const failedReason = job.failedReason;
+    const finishedOn = job.finishedOn;
+
+    return {
+      jobId: job.id,
+      status: state,
+      progress: progress,
+      failedReason: failedReason,
+      finishedOn: finishedOn ? new Date(finishedOn).toISOString() : null,
+    };
   }
 
   async getHealth() {
