@@ -1,15 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { HackathonsService } from './hackathons.service';
 import { CreateHackathonDto, UpdateHackathonDto } from './dto/hackathon.dto';
@@ -38,7 +27,9 @@ export class HackathonsController {
   }
 
   @Get('events/:eventId/hackathon')
-  @ApiOperation({ summary: 'Get hackathon configuration for an event (includes team/judge counts)' })
+  @ApiOperation({
+    summary: 'Get hackathon configuration for an event (includes team/judge counts)',
+  })
   findByEvent(@Param('eventId') eventId: string) {
     return this.hackathonsService.findByEvent(eventId);
   }
