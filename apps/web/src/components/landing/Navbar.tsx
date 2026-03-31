@@ -80,7 +80,7 @@ export default function Navbar() {
               Login
             </Link>
             <Link
-              href="/login"
+              href="/signup"
               className="group text-sm font-bold px-6 py-2.5 rounded-2xl bg-brand hover:bg-brand-hover text-white shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-2"
             >
               Get Started 
@@ -125,7 +125,7 @@ export default function Navbar() {
               Login to Portal
             </Link>
             <Link
-              href="/login"
+              href="/signup"
               onClick={() => setIsOpen(false)}
               className="w-full text-center py-4 bg-brand text-white font-bold rounded-2xl shadow-xl shadow-brand/20"
             >

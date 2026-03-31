@@ -151,7 +151,7 @@ export default function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
           <Link
-            href="/login"
+            href="/signup"
             className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-2xl shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
           >
             <span className="relative z-10">Get Started</span>

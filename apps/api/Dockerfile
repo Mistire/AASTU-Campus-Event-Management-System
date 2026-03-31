@@ -1,13 +1,13 @@
 # ─── Stage 1: Development ────────────────────────────────────────
-# We COPY node_modules from the host (already installed) instead of
-# running "npm install" inside Docker, which avoids any network issues.
 FROM node:20-alpine AS development
 
 WORKDIR /usr/src/app
 
-# Copy everything including node_modules from host
+# Copy dependency manifests
 COPY package*.json ./
-COPY node_modules ./node_modules
+
+# Install dependencies inside the build (Masterclass standard)
+RUN npm install
 
 # Copy source
 COPY . .

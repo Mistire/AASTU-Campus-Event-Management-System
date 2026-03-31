@@ -6,9 +6,9 @@ import { Pool } from 'pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  $transaction(arg0: any[]) {
-    throw new Error('Method not implemented.');
-  }
+  // $transaction(arg0: any[]) {
+  //   throw new Error('Method not implemented.');
+  // }
   private pool: Pool;
   // eventStatus: any;
   // event: any;
