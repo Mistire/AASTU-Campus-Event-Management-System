@@ -52,7 +52,7 @@ export default function FinalCTA() {
           className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
           <Link
-            href="/login"
+            href="/signup"
             className="group relative w-full sm:w-auto bg-white text-brand px-12 py-5 rounded-[1.8rem] shadow-2xl shadow-black/20 hover:bg-blue-50 transition-all font-brand font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 overflow-hidden"
           >
             <span className="relative z-10">GET STARTED NOW</span>

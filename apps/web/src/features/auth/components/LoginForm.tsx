@@ -3,14 +3,21 @@
 import { useState } from "react";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  ArrowRight,
+  Lock,
+  Mail,
+} from "lucide-react";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
@@ -18,13 +25,11 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Mocking an admin login with artificial delay for premium feel
     setTimeout(() => {
       setAuth("mock-token-123", "mock-refresh-token", {
         id: "usr_1",
         full_name: "AASTU Admin",
-        email: email,
+        email,
         phone: "123456789",
         role: "ADMIN",
         roles: ["ADMIN"],
@@ -32,97 +37,148 @@ export function LoginForm() {
       });
       setIsLoading(false);
       router.push("/dashboard");
-    }, 1000);
+    }, 1200);
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-8 border border-gray-100 rounded-3xl shadow-xl shadow-gray-200/50 bg-white">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-          <ShieldCheck className="w-7 h-7 text-white" />
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
+      {/* Header */}
+      <div className="mb-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/8 border border-brand/10 text-brand text-[9px] font-brand font-black uppercase tracking-widest mb-6">
+          <Lock size={10} />
+          Secure Auth Gateway
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-          AASTU <span className="text-blue-600">Events</span>
-        </h2>
-        <p className="text-gray-500 text-sm mt-2">
-          Sign in to manage campus events
+        <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 tracking-tighter mb-3">
+          Welcome back.
+        </h1>
+        <p className="text-gray-500 text-sm font-medium leading-relaxed">
+          Sign in to your CEMS portal to manage and discover campus events.
         </p>
       </div>
 
+      {/* Form */}
       <form onSubmit={handleLogin} className="space-y-5">
+        {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-gray-700 font-semibold ml-1">
-            Email or Username
-          </Label>
-          <Input
-            id="email"
-            type="text"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-            placeholder="admin@aastu.edu.et"
-            className="rounded-xl border-gray-200 focus:ring-blue-500/20"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label
-            htmlFor="password"
-            className="text-gray-700 font-semibold ml-1"
+          <label
+            htmlFor="login-email"
+            className="text-[10px] font-brand font-black uppercase tracking-widest text-gray-500"
           >
-            Password
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-            placeholder="••••••••"
-            className="rounded-xl border-gray-200 focus:ring-blue-500/20"
-            required
-          />
-        </div>
-
-        <div className="flex items-center justify-between text-sm px-1">
-          <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-            <input
-              type="checkbox"
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            Remember me
+            Email Address
           </label>
-          <a href="#" className="text-blue-600 font-medium hover:underline">
-            Forgot password?
-          </a>
+          <div className="relative">
+            <Mail
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+            />
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@aastu.edu.et"
+              required
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+            />
+          </div>
         </div>
 
-        <Button
+        {/* Password */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="login-password"
+              className="text-[10px] font-brand font-black uppercase tracking-widest text-gray-500"
+            >
+              Password
+            </label>
+            <Link
+              href="#"
+              className="text-[10px] font-brand font-black text-brand hover:text-brand-hover transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+            />
+            <input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••••"
+              required
+              className="w-full pl-11 pr-12 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Remember me */}
+        <div className="flex items-center gap-2">
+          <input
+            id="remember"
+            type="checkbox"
+            className="w-4 h-4 rounded border-gray-200 text-brand focus:ring-brand/20"
+          />
+          <label
+            htmlFor="remember"
+            className="text-xs text-gray-500 font-medium cursor-pointer"
+          >
+            Keep me signed in for 7 days
+          </label>
+        </div>
+
+        {/* Submit */}
+        <button
           type="submit"
-          className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all disabled:opacity-70"
           disabled={isLoading}
+          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-2xl shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden"
         >
+          <span className="relative z-10">
+            {isLoading ? "Authenticating..." : "Sign In to Portal"}
+          </span>
           {isLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin mr-2" />
-              Authenticating...
-            </>
+            <Loader2 size={14} className="animate-spin relative z-10" />
           ) : (
-            "Sign In"
+            <ArrowRight size={14} className="relative z-10 group-hover:translate-x-1 transition-transform" />
           )}
-        </Button>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+        </button>
       </form>
 
-      <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-        <p className="text-gray-500 text-sm">
-          Don't have an account?{" "}
-          <a href="#" className="text-blue-600 font-semibold hover:underline">
-            Contact Dean's Office
-          </a>
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t border-gray-100">
+        <p className="text-xs text-gray-400 text-center font-medium">
+          New to CEMS?{" "}
+          <Link
+            href="/signup"
+            className="text-brand font-bold hover:text-brand-hover transition-colors"
+          >
+            Create an account
+          </Link>
         </p>
       </div>
-    </div>
+
+      {/* Technical footnote */}
+      <div className="mt-6 text-center">
+        <span className="font-brand font-black text-[8px] uppercase tracking-[0.3em] text-gray-200">
+          [ AUTH-GATE v2.0 — AASTU CEMS ]
+        </span>
+      </div>
+    </motion.div>
   );
 }
