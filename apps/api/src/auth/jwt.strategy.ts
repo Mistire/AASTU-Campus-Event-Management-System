@@ -32,6 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private prisma: PrismaService,
   ) {
     const jwtSecret = config.get<string>('JWT_SECRET');
+    console.log('[JwtStrategy] Secret length:', jwtSecret?.length);
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined in configuration');
     }

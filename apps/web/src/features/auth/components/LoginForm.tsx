@@ -3,85 +3,114 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ShieldCheck, Loader2 } from 'lucide-react';
+import api from '@/lib/axios';
 
 export function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
     const { setAuth } = useAuthStore();
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
 
-        // Mocking an admin login with artificial delay for premium feel
-        setTimeout(() => {
-            setAuth('mock-token-123', 'mock-refresh-token', {
-                id: 'usr_1',
-                full_name: 'AASTU Admin',
-                email: email,
-                phone: '123456789',
-                role: 'ADMIN',
-                roles: ['ADMIN'],
-                user_roles: [{ role: { name: 'ADMIN' } }]
+        try {
+            const res = await api.post('/auth/login', {
+                email,
+                password
             });
+
+            // Handle the nested data object from NestJS interceptor
+            const { access_token, refresh_token, user } = res.data.data;
+
+            // Save to Zustand & Cookies
+            setAuth(access_token, refresh_token, {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                permissions: user.permissions || []
+            });
+
+            // Redirect based on role
+            if (user.role === 'ADMIN' || user.role === 'ORGANIZER' || user.role === 'STAFF') {
+                router.push('/dashboard');
+            } else {
+                router.push('/');
+            }
+
+        } catch (err: any) {
+            setError(err.response?.data?.message || err.message || 'Login failed. Please check your credentials.');
+        } finally {
             setIsLoading(false);
-            router.push('/dashboard');
-        }, 1000);
+        }
     };
 
     return (
-        <div className="w-full max-w-md mx-auto p-8 border border-gray-100 rounded-3xl shadow-xl shadow-gray-200/50 bg-white">
+        <div className="w-full max-w-md mx-auto p-8 rounded-3xl shadow-2xl bg-white border border-gray-50">
             <div className="flex flex-col items-center mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-                    <ShieldCheck className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center mb-6 shadow-xl">
+                    <ShieldCheck className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">AASTU <span className="text-blue-600">Events</span></h2>
-                <p className="text-gray-500 text-sm mt-2">Sign in to manage campus events</p>
+                <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Welcome Back</h2>
+                <p className="text-gray-500 text-sm mt-2">Sign in to AASTU Event Management</p>
             </div>
 
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 relative border-l-4 border-red-500 rounded-r-lg">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">Authentication Error</h3>
+                            <div className="mt-1 text-sm text-red-700">{error}</div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 font-semibold ml-1">Email or Username</Label>
-                    <Input
+                <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 ml-1">Email address</label>
+                    <input
                         id="email"
-                        type="text"
+                        type="email"
                         value={email}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                        placeholder="admin@aastu.edu.et"
-                        className="rounded-xl border-gray-200 focus:ring-blue-500/20"
+                        placeholder="john@aastu.edu.et"
+                        className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
                         required
                     />
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="password" className="text-gray-700 font-semibold ml-1">Password</Label>
-                    <Input
+                <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 ml-1">Password</label>
+                    <input
                         id="password"
                         type="password"
                         value={password}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="rounded-xl border-gray-200 focus:ring-blue-500/20"
+                        className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-colors"
                         required
                     />
                 </div>
 
-                <div className="flex items-center justify-between text-sm px-1">
+                <div className="flex items-center justify-between text-sm px-1 py-1">
                     <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                        <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
                         Remember me
                     </label>
-                    <a href="#" className="text-blue-600 font-medium hover:underline">Forgot password?</a>
+                    <a href="#" className="font-semibold text-black hover:underline">Forgot password?</a>
                 </div>
 
-                <Button
+                <button
                     type="submit"
-                    className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all disabled:opacity-70"
+                    className="group relative w-full flex justify-center items-center h-12 border border-transparent text-sm font-bold rounded-xl text-white bg-black hover:bg-gray-800 transition-all focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed mt-4 shadow-md"
                     disabled={isLoading}
                 >
                     {isLoading ? (
@@ -92,12 +121,12 @@ export function LoginForm() {
                     ) : (
                         "Sign In"
                     )}
-                </Button>
+                </button>
             </form>
 
             <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                 <p className="text-gray-500 text-sm">
-                    Don't have an account? <a href="#" className="text-blue-600 font-semibold hover:underline">Contact Dean's Office</a>
+                    Don't have an account? <a href="/signup" className="font-semibold text-black hover:underline">Sign up here</a>
                 </p>
             </div>
         </div>

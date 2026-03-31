@@ -57,4 +57,4 @@ import { HackathonsController } from './hackathons.controller';
   ],
   exports: [EventsService, VenuesService, CategoriesService, EventTypesService, TagsService],
 })
-export class EventsModule {}
+export class EventsModule { }

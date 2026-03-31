@@ -4,7 +4,7 @@ import { AssignRoleDto, ListUserQueryDto } from './dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async listUsers(query: ListUserQueryDto) {
     try {
@@ -13,21 +13,21 @@ export class AdminService {
           ...(query.roleId ? { roleId: query.roleId } : {}),
           ...(query.search
             ? {
-                OR: [
-                  {
-                    fullName: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+              OR: [
+                {
+                  fullName: {
+                    contains: query.search,
+                    mode: 'insensitive',
                   },
-                  {
-                    email: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+                },
+                {
+                  email: {
+                    contains: query.search,
+                    mode: 'insensitive',
                   },
-                ],
-              }
+                },
+              ],
+            }
             : {}),
         },
         include: {
@@ -140,6 +140,35 @@ export class AdminService {
       };
     } catch (err) {
       console.error('AdminService.getUserEffectivePermissions error:', err);
+      throw err;
+    }
+  }
+
+  async getDashboardStats() {
+    try {
+      const [totalUsers, totalStudents, activeEvents, pendingEvents] = await Promise.all([
+        this.prisma.user.count(),
+        this.prisma.user.count({
+          where: { role: { roleName: 'STUDENT' } }
+        }),
+        this.prisma.event.count({
+          where: { status: { statusName: 'Active' } }
+        }),
+        this.prisma.event.count({
+          where: { status: { statusName: 'Pending' } }
+        })
+      ]);
+
+      return {
+        totalUsers,
+        totalStudents,
+        activeEvents,
+        pendingEvents,
+        systemHealth: 'Optimal',
+        supportTickets: 0 // Placeholder until Support model is implemented
+      };
+    } catch (err) {
+      console.error('AdminService.getDashboardStats error:', err);
       throw err;
     }
   }

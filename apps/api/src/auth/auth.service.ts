@@ -38,7 +38,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
     const rawToken = randomBytes(32).toString('hex');

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore, Role } from '@/features/auth/store/useAuthStore';
 import { ROUTE_PERMISSIONS } from '../config/routes';
-import { ShieldAlert, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -15,6 +15,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // Handle public routes
         if (pathname === '/login' || pathname === '/register') {
+            if (token) {
+                // Already logged in, go to dashboard
+                router.push('/dashboard');
+                return;
+            }
             setIsAuthorized(true);
             return;
         }
@@ -25,14 +30,13 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        // Special case for dashboard root
+        // Special case for dashboard and root
         if (pathname === '/dashboard' || pathname === '/') {
             setIsAuthorized(true);
             return;
         }
 
         // Find the permission configuration for the current route
-        // We look for the most specific match (longest path prefix)
         const matchingRoutes = ROUTE_PERMISSIONS.filter(route => pathname.startsWith(route.path))
             .sort((a, b) => b.path.length - a.path.length);
 
@@ -47,8 +51,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 router.push('/unauthorized');
             }
         } else {
-            // Default policy: If not specified in all-pages.json, allow if authenticated
-            // This can be changed to restrictive by setting setIsAuthorized(false)
+            // Default: allow if authenticated
             setIsAuthorized(true);
         }
     }, [pathname, profile, token, hasAnyRole, router]);
@@ -63,7 +66,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
 
     if (isAuthorized === false) {
-        return null; // Router redirect is happening
+        return null;
     }
 
     return <>{children}</>;

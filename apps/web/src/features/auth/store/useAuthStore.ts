@@ -9,12 +9,11 @@ export type Role =
 
 interface AuthProfile {
     id: string;
-    full_name: string;
+    fullName: string;
     email: string;
-    phone: string;
+    phone?: string;
     role: Role | '';
-    roles: Role[];
-    user_roles: { role: { name: Role } }[];
+    permissions: string[];
 }
 
 interface AuthState {
@@ -23,36 +22,69 @@ interface AuthState {
     profile: AuthProfile | null;
     setAuth: (token: string, refreshToken: string, profile: AuthProfile) => void;
     clearAuth: () => void;
+    logout: () => Promise<void>;
     hasRole: (role: Role) => boolean;
     hasAnyRole: (roles: Role[]) => boolean;
+    hasPermission: (permission: string) => boolean;
 }
 
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set, get) => ({
-            token: null,
-            refreshToken: null,
-            profile: null,
+export const useAuthStore = create<AuthState>((set, get) => ({
+    token: typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null,
+    refreshToken: typeof window !== 'undefined' ? localStorage.getItem('auth-refresh-token') : null,
+    profile: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('auth-profile') || 'null') : null,
 
-            setAuth: (token, refreshToken, profile) => set({ token, refreshToken, profile }),
-
-            clearAuth: () => set({ token: null, refreshToken: null, profile: null }),
-
-            hasRole: (role: Role) => {
-                const { profile } = get();
-                if (!profile) return false;
-                if (profile.role === role) return true;
-                if (profile.roles?.includes(role)) return true;
-                if (profile.user_roles?.some(ur => ur.role.name === role)) return true;
-                return false;
-            },
-
-            hasAnyRole: (roles: Role[]) => {
-                return roles.some(role => get().hasRole(role));
-            }
-        }),
-        {
-            name: 'auth-storage',
+    setAuth: (token, refreshToken, profile) => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('auth-token', token);
+            localStorage.setItem('auth-refresh-token', refreshToken);
+            localStorage.setItem('auth-profile', JSON.stringify(profile));
+            // Access token cookie: 7 days
+            document.cookie = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+            // Refresh token cookie: 30 days
+            document.cookie = `auth-refresh-token=${refreshToken}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+            document.cookie = `profile=${encodeURIComponent(JSON.stringify(profile))}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
         }
-    )
-);
+        set({ token, refreshToken, profile });
+    },
+
+    clearAuth: () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth-token');
+            localStorage.removeItem('auth-refresh-token');
+            localStorage.removeItem('auth-profile');
+            document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            document.cookie = "profile=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+        set({ token: null, refreshToken: null, profile: null });
+    },
+
+    logout: async () => {
+        const { token, clearAuth } = get();
+        if (token) {
+            try {
+                // Import api dynamically or use it if available
+                const { default: api } = await import('@/lib/axios');
+                await api.post('/auth/logout');
+            } catch (err) {
+                console.error('Logout API call failed', err);
+            }
+        }
+        clearAuth();
+    },
+
+    hasRole: (role: Role) => {
+        const { profile } = get();
+        return profile?.role === role;
+    },
+
+    hasAnyRole: (roles: Role[]) => {
+        const { profile } = get();
+        if (!profile?.role) return false;
+        return roles.includes(profile.role as Role);
+    },
+
+    hasPermission: (permission: string) => {
+        const { profile } = get();
+        return profile?.permissions?.includes(permission) ?? false;
+    }
+}));

@@ -19,36 +19,36 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiBearerAuth('access-token')
 @Controller('role')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles('Admin')
+@Roles('ADMIN')
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) { }
 
   @Post()
-  @Permissions('role:create')
+  @Permissions('MANAGE_ROLES')
   create(@Body() dto: CreateRoleDto) {
     return this.roleService.createRole(dto);
   }
 
   @Get()
-  @Permissions('role:read')
+  @Permissions('MANAGE_ROLES')
   findAll() {
     return this.roleService.findAllRoles();
   }
 
   @Get(':id')
-  @Permissions('role:read')
+  @Permissions('MANAGE_ROLES')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.roleService.findRoleById(id);
   }
 
   @Patch(':id')
-  @Permissions('role:update')
+  @Permissions('MANAGE_ROLES')
   update(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: UpdateRoleDto) {
     return this.roleService.updateRole(id, dto);
   }
 
   @Put(':id/permissions')
-  @Permissions('role:assign-permissions')
+  @Permissions('MANAGE_ROLES')
   assignPermissions(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: AssignRolePermissionDto,
@@ -57,7 +57,7 @@ export class RoleController {
   }
 
   @Delete(':id')
-  @Permissions('role:delete')
+  @Permissions('MANAGE_ROLES')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.roleService.deleteRole(id);
   }

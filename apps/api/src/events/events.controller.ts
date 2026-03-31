@@ -25,7 +25,7 @@ import type { AuthUser } from '../auth/jwt.strategy';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
   @Post()
   @Roles('Organizer')

@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getMyProfile(userId: string) {
     try {
@@ -34,10 +34,10 @@ export class UsersService {
         email: user.email,
         phone: user.phone,
         profileImage: user.profileImage,
-        role: user.role.roleName,
+        role: user.role?.roleName || '',
         department: user.department,
-        interests: user.userInterests.map((i) => i.interest),
-        preferredCategories: user.categoryPreferences.map((c) => c.category),
+        interests: user.userInterests?.map((i) => i.interest) || [],
+        preferredCategories: user.categoryPreferences?.map((c) => c.category) || [],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };
@@ -74,7 +74,7 @@ export class UsersService {
         email: user.email,
         phone: user.phone,
         profileImage: user.profileImage,
-        role: user.role.roleName,
+        role: user.role?.roleName || '',
         department: user.department,
         updatedAt: user.updatedAt,
       };
@@ -101,7 +101,7 @@ export class UsersService {
         fullName: user.fullName,
         profileImage: user.profileImage,
         department: user.department,
-        interests: user.userInterests.map((i) => i.interest.name),
+        interests: user.userInterests?.map((i) => i.interest.name) || [],
       };
     } catch (err) {
       console.error('UserService.getPublicProfile error:', err);

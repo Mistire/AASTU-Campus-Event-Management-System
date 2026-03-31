@@ -21,7 +21,7 @@ import { Roles } from '../auth/decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('venues')
 export class VenuesController {
-  constructor(private readonly venuesService: VenuesService) {}
+  constructor(private readonly venuesService: VenuesService) { }
 
   @Post()
   @Roles('Admin')

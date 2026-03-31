@@ -6,8 +6,10 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/useAuthStore';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const { profile } = useAuthStore();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
@@ -21,17 +23,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             )}
 
             {/* Sidebar Container */}
-            <aside
-                className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-72 bg-gray-900 shadow-2xl transition-transform duration-300 ease-in-out md:translate-x-0",
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                )}
-            >
-                <Sidebar onClose={() => setIsSidebarOpen(false)} />
-            </aside>
+            {profile?.role !== 'STUDENT' && (
+                <aside
+                    className={cn(
+                        "fixed inset-y-0 left-0 z-50 w-72 bg-gray-900 shadow-2xl transition-transform duration-300 ease-in-out md:translate-x-0",
+                        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    )}
+                >
+                    <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                </aside>
+            )}
 
             {/* Main Content Area */}
-            <div className="flex flex-col flex-1 md:pl-72 min-w-0">
+            <div className={cn(
+                "flex flex-col flex-1 min-w-0 transition-all duration-300",
+                profile?.role !== 'STUDENT' ? "md:pl-72" : "md:pl-0"
+            )}>
                 <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-white/80 backdrop-blur-md px-4 md:px-8">
                     <Button
                         variant="ghost"

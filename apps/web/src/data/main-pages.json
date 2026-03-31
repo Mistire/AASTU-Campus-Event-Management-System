@@ -1,6 +1,6 @@
 [
     {
-        "icon": "fa-light fa-dashboard",
+        "icon": "Dashboard",
         "title": "Home",
         "parent": "/dashboard",
         "to": "/dashboard",
@@ -14,7 +14,7 @@
         "children": []
     },
     {
-        "icon": "fa-light fa-dashboard",
+        "icon": "Events",
         "title": "Events Control",
         "parent": "/events",
         "to": "/events",
@@ -26,7 +26,7 @@
         "children": []
     },
     {
-        "icon": "fa-light fa-person",
+        "icon": "Users",
         "title": "User Management",
         "parent": "/users",
         "to": "/users",
@@ -37,24 +37,68 @@
         "children": []
     },
     {
-        "icon": "mdi-alert-circle-outline",
-        "title": "SOS & Feedback",
-        "parent": "/support",
-        "to": "/support",
+        "icon": "Layers",
+        "title": "Categories",
+        "parent": "/categories",
+        "to": "/categories",
         "allowed": [
-            "ADMIN",
-            "STAFF"
+            "ADMIN"
         ],
         "hasBadge": false,
         "children": []
     },
     {
-        "icon": "mdi-export-variant",
-        "title": "Analytics Logs",
-        "parent": "/export-logs",
-        "to": "/export-logs",
+        "icon": "MapPin",
+        "title": "Venues",
+        "parent": "/venues",
+        "to": "/venues",
         "allowed": [
             "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Shield",
+        "title": "Roles & Permissions",
+        "parent": "/roles",
+        "to": "/roles",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Heart",
+        "title": "User Interests",
+        "parent": "/interests",
+        "to": "/interests",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "MessageSquare",
+        "title": "Feedbacks",
+        "parent": "/feedback",
+        "to": "/feedback",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "ClipboardCheck",
+        "title": "Attendance",
+        "parent": "/attendance",
+        "to": "/attendance",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER"
         ],
         "hasBadge": false,
         "children": []

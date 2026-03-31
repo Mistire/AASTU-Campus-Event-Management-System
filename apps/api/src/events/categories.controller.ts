@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
-import { JwtAuthGuard } from 'src/auth/guard';
+import { JwtAuthGuard, PermissionsGuard, RolesGuard } from 'src/auth/guard';
+import { Permissions, Roles } from 'src/auth/decorator';
 
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
@@ -9,10 +10,11 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Post()
-  @Roles('Admin')
+  @Roles('ADMIN')
+  @Permissions('MANAGE_CATEGORIES')
   create(@Body() dto: CreateCategoryDto) {
     return this.categoriesService.create(dto);
   }
@@ -28,13 +30,15 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  @Roles('Admin')
+  @Roles('ADMIN')
+  @Permissions('MANAGE_CATEGORIES')
   update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.categoriesService.update(id, dto);
   }
 
   @Delete(':id')
-  @Roles('Admin')
+  @Roles('ADMIN')
+  @Permissions('MANAGE_CATEGORIES')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorator';
+import { JwtAuthGuard } from 'src/auth/guard';
 import { AuthUser } from 'src/auth/jwt.strategy';
 import { UsersService } from './users.service';
 import {
@@ -11,10 +12,11 @@ import {
 
 type AuthenticatedRequest = { user: AuthUser };
 
+@UseGuards(JwtAuthGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiBearerAuth('access-token')
   @Get('me')

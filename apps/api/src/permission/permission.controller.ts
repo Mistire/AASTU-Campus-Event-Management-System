@@ -20,9 +20,9 @@ import { RoleService } from 'src/role/role.service';
 @ApiBearerAuth('access-token')
 @Controller('permission')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles('Admin')
+@Roles('ADMIN')
 export class PermissionController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) { }
 
   @Post()
   @Permissions('permission:create')
