@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ConflictException,
   ForbiddenException,
@@ -51,10 +46,7 @@ export class SpeakersService {
     const validEvents = await this.prisma.event.findMany({
       where: {
         id: { in: assignedEventIds },
-        OR: [
-          { createdBy: userId },
-          { organizers: { some: { userId, status: 'ACCEPTED' } } },
-        ],
+        OR: [{ createdBy: userId }, { organizers: { some: { userId, status: 'ACCEPTED' } } }],
       },
       select: { id: true },
     });

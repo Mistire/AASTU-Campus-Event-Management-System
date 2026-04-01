@@ -2,6 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query
 
+
 from app.config import settings
 from app.schemas.recommendation import (
     RecommendationResponse,
@@ -15,6 +16,13 @@ from app.services.recommendation_service import (
     get_recommendations,
     get_similar_events,
     get_state,
+)
+from app.scheduler.jobs import get_scheduler_status
+# Configure logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 @asynccontextmanager
 async def lifespan(app: FastAPI):

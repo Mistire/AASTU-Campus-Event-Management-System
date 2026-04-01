@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
@@ -18,6 +16,8 @@ import { VenuesService } from './venues.service';
 import { AuthUser } from '../auth/jwt.strategy';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EmailService } from '../auth/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -40,6 +40,7 @@ export class EventsService {
     private readonly prisma: PrismaService,
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -133,14 +134,12 @@ export class EventsService {
     const updated = await this.transitionStatus(event.id, event.statusId, 'PENDING');
 
     // 1. Notify the owner (creator)
-    await this.prisma.notification.create({
-      data: {
-        userId: event.createdBy,
-        title: 'Event Submitted',
-        message: `Your event "${event.title}" has been submitted for approval and is now pending.`,
-        type: 'EVENT_SUBMITTED_OWNER',
-      },
-    });
+    await this.notificationsService.enqueueNotification(
+      event.createdBy,
+      'Event Submitted',
+      `Your event "${event.title}" has been submitted for approval and is now pending.`,
+      NotificationType.EVENT_SUBMITTED_OWNER,
+    );
 
     // 2. Notify all Admins
     const admins = await this.prisma.user.findMany({
@@ -149,14 +148,12 @@ export class EventsService {
     });
 
     if (admins.length > 0) {
-      await this.prisma.notification.createMany({
-        data: admins.map((admin) => ({
-          userId: admin.id,
-          title: 'New Event Pending Approval',
-          message: `Event "${event.title}" has been submitted for approval.`,
-          type: 'EVENT_SUBMITTED',
-        })),
-      });
+      await this.notificationsService.enqueueBulkNotifications(
+        admins.map((admin) => admin.id),
+        'New Event Pending Approval',
+        `Event "${event.title}" has been submitted for approval.`,
+        NotificationType.EVENT_SUBMITTED,
+      );
     }
 
     return updated;
@@ -166,14 +163,12 @@ export class EventsService {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'APPROVED');
 
-    await this.prisma.notification.create({
-      data: {
-        userId: event.createdBy,
-        title: 'Event Approved',
-        message: `Your event "${event.title}" has been approved and is now ready.`,
-        type: 'EVENT_APPROVED',
-      },
-    });
+    await this.notificationsService.enqueueNotification(
+      event.createdBy,
+      'Event Approved',
+      `Your event "${event.title}" has been approved and is now ready.`,
+      NotificationType.EVENT_APPROVED,
+    );
 
     return updated;
   }
@@ -182,14 +177,12 @@ export class EventsService {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'REJECTED');
 
-    await this.prisma.notification.create({
-      data: {
-        userId: event.createdBy,
-        title: 'Event Rejected',
-        message: `Your event "${event.title}" has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
-        type: 'EVENT_REJECTED',
-      },
-    });
+    await this.notificationsService.enqueueNotification(
+      event.createdBy,
+      'Event Rejected',
+      `Your event "${event.title}" has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
+      NotificationType.EVENT_REJECTED,
+    );
 
     return updated;
   }
@@ -217,14 +210,12 @@ export class EventsService {
       const attendeeEmails = registrations.map((r) => r.user.email);
 
       // 1. In-app notifications
-      await this.prisma.notification.createMany({
-        data: attendeeIds.map((id) => ({
-          userId: id,
-          title: 'Event is LIVE!',
-          message: `The event "${event.title}" has officially started. Join now!`,
-          type: 'EVENT_LIVE',
-        })),
-      });
+      await this.notificationsService.enqueueBulkNotifications(
+        attendeeIds,
+        'Event is LIVE!',
+        `The event "${event.title}" has officially started. Join now!`,
+        NotificationType.EVENT_LIVE,
+      );
 
       // 2. Email notifications
       await this.emailService.sendEventLiveEmail(attendeeEmails, event.title);

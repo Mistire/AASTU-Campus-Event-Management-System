@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   ConflictException,
@@ -37,7 +32,9 @@ export class HackathonsService {
     // Only one hackathon config per event
     const existing = await this.prisma.hackathons.findFirst({ where: { eventId } });
     if (existing) {
-      throw new ConflictException('This event already has a hackathon configuration. Use PATCH to update it.');
+      throw new ConflictException(
+        'This event already has a hackathon configuration. Use PATCH to update it.',
+      );
     }
 
     if (dto.teamSizeMin > dto.teamSizeMax) {

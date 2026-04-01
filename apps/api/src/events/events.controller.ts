@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   Body,
   Controller,
@@ -48,7 +46,9 @@ export class EventsController {
   }
 
   @Get('my-organized')
-  @ApiOperation({ summary: 'Get events managed by the authenticated user (Creator or Co-organizer)' })
+  @ApiOperation({
+    summary: 'Get events managed by the authenticated user (Creator or Co-organizer)',
+  })
   getMyOrganized(@GetUser() user: AuthUser, @Query() query: EventQueryDto) {
     return this.eventsService.getMyOrganizedEvents(user.id, query);
   }

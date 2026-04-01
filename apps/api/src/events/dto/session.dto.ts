@@ -1,12 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateSessionDto {
   @ApiProperty({ description: 'Session title', example: 'Opening Keynote' })
@@ -38,12 +31,18 @@ export class CreateSessionDto {
   @IsNotEmpty()
   endTime: string;
 
-  @ApiPropertyOptional({ description: 'Location / room for this specific session', example: 'Room A-301' })
+  @ApiPropertyOptional({
+    description: 'Location / room for this specific session',
+    example: 'Room A-301',
+  })
   @IsString()
   @IsOptional()
   location?: string;
 
-  @ApiPropertyOptional({ description: 'Array of speaker IDs to assign to this session', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Array of speaker IDs to assign to this session',
+    type: [String],
+  })
   @IsArray()
   @IsUUID('all', { each: true })
   @IsOptional()

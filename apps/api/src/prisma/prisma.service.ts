@@ -6,7 +6,29 @@ import { Pool } from 'pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  // $transaction(arg0: any[]) {
+  //   throw new Error('Method not implemented.');
+  // }
   private pool: Pool;
+  // eventStatus: any;
+  // event: any;
+  // eventOrganizers: any;
+  // user: any;
+  // registration: any;
+  // eventTags: any;
+  // eventCategory: any;
+  // eventSessions: any;
+  // sessionSpeakers: any;
+  // sessionMedia: any;
+  // attendance: any;
+  // formFields: any;
+  // formResponses: any;
+  // eventInvites: any;
+  // announcements: any;
+  // eventAccess: any;
+  // eventMedia: any;
+  // eventWaitlist: any;
+  // hackathons: any;
   constructor(config: ConfigService) {
     const connectionString = config.get<string>('DATABASE_URL');
     const enableQueryLogs =
