@@ -82,6 +82,27 @@ services:
         condition: service_healthy
     command: npm run start:dev
 
+  # ─── Next.js Web App (Development – live reload) ──────────
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: development
+    container_name: cems-web
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost/api
+      PORT: 3001
+    volumes:
+      - ./apps/web/src:/usr/src/app/src:delegated
+      - ./apps/web/public:/usr/src/app/public:delegated
+      - /usr/src/app/node_modules
+    depends_on:
+      - api
+
   # ─── Nginx Reverse Proxy ────────────────────────────────
   nginx:
     build:
@@ -93,6 +114,7 @@ services:
       - "80:80"
     depends_on:
       - api
+      - web
 
 volumes:
   pgdata:

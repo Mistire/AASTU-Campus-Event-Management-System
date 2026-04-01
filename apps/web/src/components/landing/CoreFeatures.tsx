@@ -171,9 +171,10 @@ export default function CoreFeatures() {
             variants={item}
             className="group relative p-10 rounded-[3.5rem] bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
           >
-            <div className="flex items-center gap-6">
-              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="flex-1 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center group-hover:rotate-12 transition-transform">
                 <Lock size={22} />
+                
               </div>
               <div>
                 <h3 className="text-xl font-black text-gray-900 tracking-tight">
@@ -209,7 +210,7 @@ export default function CoreFeatures() {
             className="md:col-span-2 group relative p-10 rounded-[3.5rem] bg-linear-to-r from-gray-900 to-gray-800 text-white border border-gray-700 shadow-2xl overflow-hidden flex items-center gap-10"
           >
             <div className="flex-1 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-6 backdrop-blur-xl border border-white/5">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-6 backdrop-blur-xl border border-white/5 group-hover:rotate-12 transition-transform">
                 <QrCode size={22} />
               </div>
               <h3 className="text-2xl font-black mb-3 tracking-tight">
