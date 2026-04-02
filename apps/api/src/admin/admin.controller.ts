@@ -51,4 +51,10 @@ export class AdminController {
   getStats() {
     return this.adminService.getStats();
   }
+
+  @Get('registrations/recent')
+  @Permissions('user:read')
+  getRecentRegistrations() {
+    return this.adminService.getRecentRegistrations();
+  }
 }

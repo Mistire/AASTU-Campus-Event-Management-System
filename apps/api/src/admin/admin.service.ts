@@ -167,4 +167,33 @@ export class AdminService {
       throw err;
     }
   }
+
+  async getRecentRegistrations(limit = 10) {
+    try {
+      return await this.prisma.registration.findMany({
+        take: limit,
+        orderBy: { registrationDate: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              profileImage: true,
+            },
+          },
+          event: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+          status: true,
+        },
+      });
+    } catch (err) {
+      console.error('AdminService.getRecentRegistrations error:', err);
+      throw err;
+    }
+  }
 }
