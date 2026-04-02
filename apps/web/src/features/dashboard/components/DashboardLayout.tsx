@@ -47,7 +47,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+                <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-none w-full">
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
                         {children}
                     </div>

@@ -13,9 +13,9 @@ export async function verifyEmail(token: string) {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to verify email");
-    return data;
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message || "Failed to verify email");
+    return result.data;
 }
 
 /**
@@ -35,7 +35,7 @@ export async function verifyCampusId(token: string, qrPayload: string) {
         },
         body: JSON.stringify({ qrPayload }),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to verify Campus ID");
-    return data;
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message || "Failed to verify Campus ID");
+    return result.data;
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { Activity, Plus, Eye, Edit, Trash2 } from 'lucide-react';
 import { DataTable, ColumnTypes, BadgeConfigs } from '@/components/ui/data-table/data-table';
 import { Button } from '@/components/ui/button';
@@ -22,7 +24,7 @@ const mockEvents: Event[] = [
 
 export default function EventsPage() {
     const columns = [
-        ColumnTypes.text('title', 'Event Name', { 
+        ColumnTypes.text<Event>('title', 'Event Name', {
             render: (_val: unknown, record: Event) => (
                 <div className="flex flex-col">
                     <span className="font-semibold text-gray-900">{record.title}</span>
@@ -69,11 +71,11 @@ export default function EventsPage() {
                     Create New Event
                 </Button>
             </div>
-            
+
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <DataTable 
-                    data={mockEvents} 
-                    columns={columns} 
+                <DataTable
+                    data={mockEvents}
+                    columns={columns}
                     actions={actions}
                     pagination={{ pageSize: 10, showTotal: true }}
                     hoverable

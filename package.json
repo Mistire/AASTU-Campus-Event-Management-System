@@ -36,5 +36,8 @@
         "db:up": "docker compose up postgres -d",
         "db:rm": "docker compose rm postgres -s -f -v",
         "db:reset": "npm run db:rm && npm run db:up"
+    },
+    "dependencies": {
+        "class-validator": "^0.15.1"
     }
 }

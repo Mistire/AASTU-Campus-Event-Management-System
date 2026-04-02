@@ -1,3 +1,5 @@
+"use client";
+
 import { Users as UsersIcon, Plus, Shield } from 'lucide-react';
 import { DataTable, ColumnTypes, BadgeConfigs } from '@/components/ui/data-table/data-table';
 import { Button } from '@/components/ui/button';
@@ -21,7 +23,7 @@ const mockUsers: UserRecord[] = [
 
 export default function UsersPage() {
     const columns = [
-        ColumnTypes.text('name', 'User', {
+        ColumnTypes.text<UserRecord>('name', 'User', {
             render: (_val: unknown, record: UserRecord) => (
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-brand-subtle flex items-center justify-center text-brand text-xs font-bold ring-1 ring-brand/20">
@@ -73,9 +75,9 @@ export default function UsersPage() {
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <DataTable 
-                    data={mockUsers} 
-                    columns={columns} 
+                <DataTable
+                    data={mockUsers}
+                    columns={columns}
                     pagination={{ pageSize: 10, showTotal: true }}
                     hoverable
                 />
