@@ -15,7 +15,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // Handle public routes
         if (pathname === '/login' || pathname === '/register') {
-            setIsAuthorized(true);
+            if (token) {
+                router.push('/dashboard');
+            } else {
+                setIsAuthorized(true);
+            }
             return;
         }
 

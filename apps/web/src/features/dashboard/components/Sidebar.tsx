@@ -14,7 +14,9 @@ import {
   FileDown,
   LogOut,
   X,
-  HeartPulse,
+  GraduationCap,
+  Layers,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,8 @@ const iconMap: Record<string, React.ElementType> = {
   Headset: Headset,
   AlertTriangle: AlertTriangle,
   FileDown: FileDown,
+  Categories: Layers,
+  Venues: MapPin,
 };
 
 interface MainPage {
@@ -60,10 +64,10 @@ export function Sidebar({ onClose }: SidebarProps) {
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100 shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-brand/10">
-            <HeartPulse className="w-5 h-5 text-brand" />
+            <GraduationCap className="w-5 h-5 text-brand" />
           </div>
-          <span className="text-xl font-black tracking-tight text-brand">
-            HeartsCare
+          <span className="text-xl font-black tracking-tight text-brand uppercase">
+            AASTU CEMS
           </span>
         </div>
         {onClose && (

@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import Cookies from "js-cookie";
 
 export type Role = "ADMIN" | "ORGANIZER" | "STUDENT" | "STAFF";
 
@@ -23,6 +24,20 @@ interface AuthState {
   hasAnyRole: (roles: Role[]) => boolean;
 }
 
+// Custom storage for zustand/persist using cookies
+const cookieStorage = {
+  getItem: (name: string): string | null => {
+    return Cookies.get(name) || null;
+  },
+  setItem: (name: string, value: string): void => {
+    // Save for 7 days as requested by user in LoginForm checkbox
+    Cookies.set(name, value, { expires: 7, path: '/' });
+  },
+  removeItem: (name: string): void => {
+    Cookies.remove(name, { path: '/' });
+  },
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -33,7 +48,11 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (token, refreshToken, profile) =>
         set({ token, refreshToken, profile }),
 
-      clearAuth: () => set({ token: null, refreshToken: null, profile: null }),
+      clearAuth: () => {
+        set({ token: null, refreshToken: null, profile: null });
+        // Manually clear the cookie just in case
+        Cookies.remove("auth-storage");
+      },
 
       hasRole: (role: Role) => {
         const { profile } = get();
@@ -51,6 +70,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      storage: createJSONStorage(() => cookieStorage),
     },
   ),
 );

@@ -1,7 +1,7 @@
 [
     {
-        "icon": "fa-light fa-dashboard",
-        "title": "Home",
+        "icon": "Dashboard",
+        "title": "Dashboard",
         "parent": "/dashboard",
         "to": "/dashboard",
         "allowed": [
@@ -14,8 +14,8 @@
         "children": []
     },
     {
-        "icon": "fa-light fa-dashboard",
-        "title": "Events Control",
+        "icon": "Events",
+        "title": "Events",
         "parent": "/events",
         "to": "/events",
         "allowed": [
@@ -26,8 +26,8 @@
         "children": []
     },
     {
-        "icon": "fa-light fa-person",
-        "title": "User Management",
+        "icon": "Users",
+        "title": "Users",
         "parent": "/users",
         "to": "/users",
         "allowed": [
@@ -37,22 +37,55 @@
         "children": []
     },
     {
-        "icon": "mdi-alert-circle-outline",
-        "title": "SOS & Feedback",
-        "parent": "/support",
-        "to": "/support",
+        "icon": "Categories",
+        "title": "Categories",
+        "parent": "/categories",
+        "to": "/categories",
         "allowed": [
-            "ADMIN",
-            "STAFF"
+            "ADMIN"
         ],
         "hasBadge": false,
         "children": []
     },
     {
-        "icon": "mdi-export-variant",
-        "title": "Analytics Logs",
-        "parent": "/export-logs",
-        "to": "/export-logs",
+        "icon": "Venues",
+        "title": "Venues",
+        "parent": "/venues",
+        "to": "/venues",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Feedback",
+        "title": "Feedback",
+        "parent": "/feedback",
+        "to": "/feedback",
+        "allowed": [
+            "ADMIN"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Attendance",
+        "title": "Attendance",
+        "parent": "/attendance",
+        "to": "/attendance",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "LayoutGrid",
+        "title": "Departments",
+        "parent": "/departments",
+        "to": "/departments",
         "allowed": [
             "ADMIN"
         ],

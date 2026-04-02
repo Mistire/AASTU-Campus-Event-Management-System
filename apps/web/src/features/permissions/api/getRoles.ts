@@ -23,7 +23,8 @@ export async function fetchRoles(token: string) {
         throw new Error('Failed to fetch roles');
     }
 
-    return (await res.json()) as RoleResponse[];
+    const result = await res.json();
+    return result.data as RoleResponse[];
 }
 
 export function useRoles() {

@@ -1,3 +1,5 @@
+"use client";
+
 import { Headset, Plus, Search, MessageSquare } from 'lucide-react';
 import { DataTable, ColumnTypes, BadgeConfigs } from '@/components/ui/data-table/data-table';
 import { Button } from '@/components/ui/button';
@@ -94,9 +96,9 @@ export default function SupportPage() {
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <DataTable 
-                    data={mockTickets} 
-                    columns={columns} 
+                <DataTable
+                    data={mockTickets}
+                    columns={columns}
                     actions={actions}
                     pagination={{ pageSize: 5, showTotal: true }}
                     hoverable
