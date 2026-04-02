@@ -14,7 +14,6 @@ import {
   FileDown,
   LogOut,
   X,
-  GraduationCap,
   Layers,
   MapPin,
 } from "lucide-react";
@@ -47,10 +46,10 @@ interface SidebarProps {
 
 export function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { hasAnyRole, clearAuth, profile } = useAuthStore();
+  const { hasAnyRole, clearAuth } = useAuthStore();
 
   const allowedMenu = (mainPages as MainPage[]).filter((item) =>
-    hasAnyRole(item.allowed as Role[])
+    hasAnyRole(item.allowed as Role[]),
   );
 
   const handleLogout = () => {
@@ -62,14 +61,30 @@ export function Sidebar({ onClose }: SidebarProps) {
     <div className="flex flex-col h-full bg-white text-gray-600">
       {/* ── Sidebar Header ── */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-brand/10">
-            <GraduationCap className="w-5 h-5 text-brand" />
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="font-brand flex items-center tracking-tighter">
+            <span className="text-brand font-bold text-xl opacity-40 select-none">
+              [
+            </span>
+            <span className="mx-1 text-2xl font-black bg-linear-to-r from-brand via-blue-500 to-cyan-400 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-brand transition-all duration-500">
+              CEMS
+            </span>
+            <span className="text-brand font-bold text-xl opacity-40 select-none">
+              ]
+            </span>
+
+            {/* Pulsing Live Indicator */}
+            <div className="ml-2 flex items-center">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
+              </span>
+              <span className="ml-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand/60 hidden sm:block">
+                Live
+              </span>
+            </div>
           </div>
-          <span className="text-xl font-black tracking-tight text-brand uppercase">
-            AASTU CEMS
-          </span>
-        </div>
+        </Link>
         {onClose && (
           <Button
             variant="ghost"
@@ -105,7 +120,7 @@ export function Sidebar({ onClose }: SidebarProps) {
                   "group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-semibold",
                   isActive
                     ? "bg-brand/10 text-brand border-l-4 border-brand shadow-[inset_0px_0px_0px_#e91e63]"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-brand border-l-4 border-transparent"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-brand border-l-4 border-transparent",
                 )}
               >
                 <Icon
@@ -113,7 +128,7 @@ export function Sidebar({ onClose }: SidebarProps) {
                     "w-4 h-4 transition-colors",
                     isActive
                       ? "text-brand"
-                      : "text-gray-400 group-hover:text-brand"
+                      : "text-gray-400 group-hover:text-brand",
                   )}
                 />
                 {item.title}

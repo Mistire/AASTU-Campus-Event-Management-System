@@ -71,7 +71,7 @@ export default function FinalCTA() {
         {/* System Footer Log */}
         <div className="mt-24 pt-12 border-t border-white/10 opacity-30">
           <div className="font-brand font-black text-[9px] uppercase tracking-[0.5em] text-white">
-            [ END OF LOG — VERSION 2.0.4-L — AASTU CEMS ]
+            [ END OF LOG — VERSION 2.0.4-L — CEMS ]
           </div>
         </div>
       </div>

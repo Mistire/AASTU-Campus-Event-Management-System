@@ -188,7 +188,7 @@ export default function DashboardPage() {
 
             <div className="text-center py-4">
                 <span className="text-[10px] font-bold text-brand uppercase tracking-widest">
-                    AASTU CEMS v1.0
+                    CEMS v1.0
                 </span>
             </div>
         </div>
