@@ -13,6 +13,7 @@ import {
   Lock,
   Mail,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -26,29 +27,45 @@ export function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost";
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Invalid credentials");
+      const data = await res.json();
+      console.log("Login Response Data:", data);
+      
+      if (!res.ok) throw new Error(data.message || "Invalid credentials");
 
-      const data = result.data;
-      if (!data?.user) throw new Error("User data not found in response");
+      // Extract successful response data (which is wrapped in 'data' by the NestJS TransformInterceptor)
+      const successData = data.data;
 
-      let userRole = data.user.role || (data.user.roles && data.user.roles[0]) || "STUDENT";
-      if (userRole !== "STUDENT" && userRole !== "student") userRole = "ADMIN";
+      if (!successData || !successData.user) {
+        throw new Error("Malformed server response: User object is missing");
+      }
 
-      setAuth(data.access_token || data.token, data.refresh_token || "", {
-        ...data.user,
-        role: userRole.toUpperCase()
+      const userRole = successData.user.role || (successData.user.roles && successData.user.roles[0]) || "STUDENT";
+      const normalizedRole = typeof userRole === 'string' ? userRole.toUpperCase() : "STUDENT";
+
+      setAuth(successData.access_token || successData.token, successData.refresh_token || "", {
+        ...successData.user,
+        full_name: successData.user.fullName || successData.user.full_name,
+        role: normalizedRole,
       });
+
+      toast.success("Welcome back!", {
+        description: `Logged in as ${normalizedRole.toLowerCase()}`,
+      });
+
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Login Error:", err.message);
-      alert(err.message);
+      toast.error("Login Failed", {
+        description: err.message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -188,7 +205,7 @@ export function LoginForm() {
       {/* Technical footnote */}
       <div className="mt-6 text-center">
         <span className="font-brand font-black text-[8px] uppercase tracking-[0.3em] text-gray-200">
-          [ AUTH-GATE v2.0 — AASTU CEMS ]
+          [ AUTH-GATE v2.0 — CEMS ]
         </span>
       </div>
     </motion.div>

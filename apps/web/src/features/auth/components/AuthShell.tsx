@@ -124,7 +124,7 @@ export default function AuthShell({
         {/* Bottom: System Footer */}
         <div className="relative z-10">
           <div className="font-brand font-black text-[8px] uppercase tracking-[0.4em] text-white/20">
-            [ SYS — AASTU CEMS — AUTH GATEWAY ]
+            [ SYS — CEMS — AUTH GATEWAY ]
           </div>
         </div>
       </div>

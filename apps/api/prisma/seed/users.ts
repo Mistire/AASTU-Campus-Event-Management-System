@@ -49,6 +49,8 @@ async function main() {
       phone: '+251900000001',
       isEmailVerified: true,
       emailVerifiedAt: new Date(),
+      isCampusIdVerified: true,
+      campusIdVerifiedAt: new Date(),
     },
     {
       email: 'student@aastu.edu.et',
@@ -59,6 +61,8 @@ async function main() {
       phone: '+251900000002',
       isEmailVerified: true,
       emailVerifiedAt: new Date(),
+      isCampusIdVerified: true,
+      campusIdVerifiedAt: new Date(),
     },
     {
       email: 'organizer@aastu.edu.et',
@@ -69,6 +73,8 @@ async function main() {
       phone: '+251900000003',
       isEmailVerified: true,
       emailVerifiedAt: new Date(),
+      isCampusIdVerified: true,
+      campusIdVerifiedAt: new Date(),
     },
   ];
 

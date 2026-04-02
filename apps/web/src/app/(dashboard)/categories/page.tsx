@@ -44,6 +44,7 @@ export default function CategoriesPage() {
                         <p className="text-gray-500 text-sm">Organize events by their primary focus areas.</p>
                     </div>
                 </div>
+                
                 <Button className="rounded-xl bg-brand hover:bg-brand-hover text-white shadow-lg shadow-brand/20">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Category

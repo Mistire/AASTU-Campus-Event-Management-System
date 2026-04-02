@@ -10,9 +10,10 @@ import {
   ArrowRight,
   Lock,
   Mail,
-  User,
-  Phone,
+  User, 
+  Phone
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SignupFormData {
   fullName: string;
@@ -20,7 +21,7 @@ interface SignupFormData {
   phone: string;
   password: string;
   confirmPassword: string;
-  role: "STUDENT" | "ORGANIZER";
+  role: "Student" | "Organizer";
   agreeTerms: boolean;
 }
 
@@ -31,7 +32,7 @@ export function SignupForm() {
     phone: "",
     password: "",
     confirmPassword: "",
-    role: "STUDENT",
+    role: "Student",
     agreeTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -51,12 +52,14 @@ export function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Validation Error", {
+        description: "Passwords do not match. Please try again.",
+      });
       return;
     }
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost";
       const res = await fetch(`${apiUrl}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,10 +72,15 @@ export function SignupForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create account");
-      alert("Registration successful! Please check your email to verify.");
+      
+      toast.success("Registration Successful!", {
+        description: "Please check your email to verify your account and complete your campus ID registration.",
+      });
     } catch (err: any) {
       console.error("Signup Error:", err.message);
-      alert(err.message);
+      toast.error("Registration Failed", {
+        description: err.message,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +88,8 @@ export function SignupForm() {
 
   const roles: { value: SignupFormData["role"]; label: string; desc: string }[] =
     [
-      { value: "STUDENT", label: "Student", desc: "Discover & attend events" },
-      { value: "ORGANIZER", label: "Organizer", desc: "Create & manage events" },
+      { value: "Student", label: "Student", desc: "Discover & attend events" },
+      { value: "Organizer", label: "Organizer", desc: "Create & manage events" },
     ];
 
   return (
@@ -309,7 +317,7 @@ export function SignupForm() {
 
       <div className="mt-4 text-center">
         <span className="font-brand font-black text-[8px] uppercase tracking-[0.3em] text-gray-200">
-          [ REG-GATE v2.0 — AASTU CEMS ]
+          [ REG-GATE v2.0 — CEMS ]
         </span>
       </div>
     </motion.div>

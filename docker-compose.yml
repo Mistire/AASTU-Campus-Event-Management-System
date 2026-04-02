@@ -70,6 +70,13 @@ services:
       JWT_REFRESH_EXPIRATION: 7d
       PORT: 4000
       NODE_ENV: development
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 465
+      SMTP_USER: nasifayc11@gmail.com
+      SMTP_PASS: wkdxinxnmgzwucws
+      SMTP_FROM: nasifayc11@gmail.com
+      BACKEND_URL: http://localhost
+      FRONTEND_URL: http://localhost:3001
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
       - ./apps/api/src:/usr/src/app/src:delegated
@@ -93,9 +100,9 @@ services:
     ports:
       - "3001:3001"
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost/api
+      NEXT_PUBLIC_API_URL: http://localhost
       PORT: 3001
+      WATCHPACK_POLLING: "true"
     volumes:
       - ./apps/web/src:/usr/src/app/src:delegated
       - ./apps/web/public:/usr/src/app/public:delegated
@@ -115,6 +122,21 @@ services:
     depends_on:
       - api
       - web
+
+  # ─── Maildev (Local Email Catcher) ───────────────────────
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: cems-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080" # Web UI
+      - "1025:1025" # SMTP Port (Inside container network)
+    networks:
+      - default
+
+networks:
+  default:
+    name: aastu-campus-event-management-system_default
 
 volumes:
   pgdata:

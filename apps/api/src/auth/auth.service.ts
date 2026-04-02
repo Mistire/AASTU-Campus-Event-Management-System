@@ -390,9 +390,10 @@ export class AuthService {
   }
 
   async signUp(dto: SignUpDto, meta?: { ip?: string; userAgent?: string }) {
+    const email = dto.email.toLowerCase().trim();
     try {
       const exists = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+        where: { email },
       });
 
       if (exists) {
@@ -400,7 +401,7 @@ export class AuthService {
       }
 
       const role = await this.prisma.role.findFirst({
-        where: { roleName: dto.roleName ?? 'Student' },
+        where: { roleName: { equals: dto.roleName ?? 'Student', mode: 'insensitive' } },
       });
 
       if (!role) throw new BadRequestException('Role not found');
@@ -409,7 +410,7 @@ export class AuthService {
       const user = await this.prisma.user.create({
         data: {
           fullName: dto.fullName,
-          email: dto.email,
+          email,
           passwordHash,
           roleId: role.id,
         },
@@ -437,19 +438,23 @@ export class AuthService {
         user: this.buildUserResponse(user),
         ...tokens,
         message: verificationEmailSent
-          ? 'Signup successful. Please verify your email and campus ID QR to complete registration.'
-          : 'Signup successful, but we could not send the verification email right now. Please try again later, then complete campus ID QR verification.',
+          ? 'Signup successful. Please verify your email to complete registration.'
+          : 'Signup successful, but we could not send the verification email right now. Please try again later.',
       };
     } catch (err) {
+      if (err.code === 'P2002') {
+        throw new BadRequestException('Email already in use');
+      }
       console.error('AuthService.signUp error:', err);
       throw err;
     }
   }
 
   async login(dto: LoginDto, meta?: { ip?: string; userAgent?: string }) {
+    const email = dto.email.toLowerCase().trim();
     try {
       const user = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+        where: { email },
         include: {
           role: { include: { permissions: { include: { permission: true } } } },
         },
@@ -463,9 +468,9 @@ export class AuthService {
         throw new UnauthorizedException('Please verify your email first');
       }
 
-      if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
-        throw new UnauthorizedException('Please verify your campus ID QR first');
-      }
+      // if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
+      //   throw new UnauthorizedException('Please verify your campus ID QR first');
+      // }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
       return {
