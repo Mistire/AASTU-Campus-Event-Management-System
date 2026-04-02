@@ -41,7 +41,7 @@ export class EventsService {
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
-  ) {}
+  ) { }
 
   private async getStatusByName(name: string) {
     const status = await this.prisma.eventStatus.findUnique({
@@ -133,6 +133,10 @@ export class EventsService {
     const event = await this.assertOrganizerOrCreator(eventId, userId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'PENDING');
 
+    if (!event.createdBy) {
+      throw new BadRequestException('Event creator not found');
+    }
+
     // 1. Notify the owner (creator)
     await this.notificationsService.enqueueNotification(
       event.createdBy,
@@ -163,6 +167,10 @@ export class EventsService {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'APPROVED');
 
+    if (!event.createdBy) {
+      throw new BadRequestException('Event creator not found');
+    }
+
     await this.notificationsService.enqueueNotification(
       event.createdBy,
       'Event Approved',
@@ -176,6 +184,10 @@ export class EventsService {
   async reject(eventId: string, reason?: string) {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'REJECTED');
+
+    if (!event.createdBy) {
+      throw new BadRequestException('Event creator not found');
+    }
 
     await this.notificationsService.enqueueNotification(
       event.createdBy,
