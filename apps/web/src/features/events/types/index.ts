@@ -17,6 +17,8 @@ export interface Venue {
   name: string;
   location: string;
   capacity: number;
+  building?: string;
+  roomNumber?: string;
 }
 
 export interface Event {
@@ -32,6 +34,8 @@ export interface Event {
   _count?: {
     registrations: number;
   };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EventQuery {
@@ -40,6 +44,8 @@ export interface EventQuery {
   search?: string;
   status?: EventStatusName;
   eventType?: string;
+  venueId?: string;
+  createdById?: string;
   sortBy?: 'date' | 'popularity';
 }
 

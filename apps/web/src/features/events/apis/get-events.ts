@@ -23,6 +23,8 @@ const getEvents = async (query: EventQuery): Promise<PaginatedEventsResponse> =>
   if (query.search) searchParams.append("search", query.search);
   if (query.status) searchParams.append("status", query.status);
   if (query.eventType) searchParams.append("eventType", query.eventType);
+  if (query.venueId) searchParams.append("venueId", query.venueId);
+  if (query.createdById) searchParams.append("createdById", query.createdById);
   if (query.sortBy) searchParams.append("sortBy", query.sortBy);
 
   const res = await fetch(`${apiUrl}/api/events?${searchParams.toString()}`, {

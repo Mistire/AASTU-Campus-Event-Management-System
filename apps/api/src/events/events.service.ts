@@ -349,6 +349,8 @@ export class EventsService {
       status,
       eventType,
       tag,
+      venueId,
+      createdById,
       page = 1,
       limit = 10,
     } = query;
@@ -356,6 +358,14 @@ export class EventsService {
 
     if (status) {
       where.status = { statusName: status };
+    }
+
+    if (venueId) {
+      where.venueId = venueId;
+    }
+
+    if (createdById) {
+      where.createdBy = createdById;
     }
 
     if (eventType) {

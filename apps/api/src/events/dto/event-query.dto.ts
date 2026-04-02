@@ -44,6 +44,16 @@ export class EventQueryDto {
   @IsOptional()
   sortBy?: 'popularity' | 'date';
 
+  @ApiPropertyOptional({ description: 'Filter events by venue UUID' })
+  @IsUUID()
+  @IsOptional()
+  venueId?: string;
+
+  @ApiPropertyOptional({ description: 'Filter events by creator (User) UUID' })
+  @IsUUID()
+  @IsOptional()
+  createdById?: string;
+
   @ApiPropertyOptional({ description: 'Page number (1-indexed)', default: 1 })
   @Type(() => Number)
   @IsInt()
