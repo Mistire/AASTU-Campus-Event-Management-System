@@ -17,7 +17,8 @@ const brand = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "CEMS: Campus Event Management System",
-  description: "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
+  description:
+    "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
 };
 
 export default function RootLayout({
