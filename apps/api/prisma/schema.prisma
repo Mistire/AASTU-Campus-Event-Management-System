@@ -202,7 +202,7 @@ model Venue {
   capacity    Int?
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   events      Event[]
 
   @@unique([name, building, roomNumber])
@@ -214,9 +214,10 @@ model Event {
   title            String   @db.VarChar
   description      String?  @db.Text
   statusId         String   @map("status_id") @db.Uuid
-  eventTypeId      String   @map("event_type_id") @db.Uuid
+  eventTypeId String? @map("event_type_id") @db.Uuid
   venueId          String   @map("venue_id") @db.Uuid
-  createdBy        String   @map("created_by") @db.Uuid
+  createdBy   String? @map("created_by") @db.Uuid
+  
   startTime        DateTime @map("start_time")
   endTime          DateTime @map("end_time")
   capacity         Int
@@ -226,9 +227,9 @@ model Event {
 
   eventCategories EventCategory[]
   status          EventStatus       @relation(fields: [statusId], references: [id])
-  eventType       EventType         @relation(fields: [eventTypeId], references: [id])
+  eventType       EventType?         @relation(fields: [eventTypeId], references: [id])
   venue           Venue             @relation(fields: [venueId], references: [id])
-  creator         User              @relation("EventCreator", fields: [createdBy], references: [id])
+  creator         User?              @relation("EventCreator", fields: [createdBy], references: [id])
   sessions        EventSessions[]
   organizers      EventOrganizers[]
   tags            EventTags[]

@@ -50,9 +50,32 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
     setIsLoading(true);
-    // Placeholder — real logic will be wired up later
-    setTimeout(() => setIsLoading(false), 1500);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const res = await fetch(`${apiUrl}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          password: form.password,
+          roleName: form.role,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to create account");
+      alert("Registration successful! Please check your email to verify.");
+    } catch (err: any) {
+      console.error("Signup Error:", err.message);
+      alert(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const roles: { value: SignupFormData["role"]; label: string; desc: string }[] =
@@ -93,16 +116,14 @@ export function SignupForm() {
                 key={r.value}
                 type="button"
                 onClick={() => setForm((p) => ({ ...p, role: r.value }))}
-                className={`p-3.5 rounded-2xl border text-left transition-all ${
-                  form.role === r.value
+                className={`p-3.5 rounded-2xl border text-left transition-all ${form.role === r.value
                     ? "border-brand bg-brand/5 shadow-sm shadow-brand/10"
                     : "border-gray-100 bg-gray-50/50 hover:border-gray-200"
-                }`}
+                  }`}
               >
                 <div
-                  className={`text-xs font-brand font-black ${
-                    form.role === r.value ? "text-brand" : "text-gray-700"
-                  }`}
+                  className={`text-xs font-brand font-black ${form.role === r.value ? "text-brand" : "text-gray-700"
+                    }`}
                 >
                   {r.label}
                 </div>

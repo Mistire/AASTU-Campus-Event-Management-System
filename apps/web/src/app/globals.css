@@ -39,7 +39,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  
+
   /* Brand utilities for Tailwind v4 */
   --color-brand: var(--color-brand);
   --color-brand-hover: var(--color-brand-hover);
@@ -57,10 +57,14 @@
 
 :root {
   /* Brand colour: light blue — the one true primary */
-  --color-brand: oklch(0.68 0.155 231);          /* ~sky-400 / light blue */
-  --color-brand-hover: oklch(0.60 0.155 231);    /* slightly darker on hover */
-  --color-brand-subtle: oklch(0.95 0.04 231);    /* 1/20 tint for bg fills */
-  --color-brand-muted: oklch(0.88 0.06 231);     /* softer accent ring */
+  --color-brand: oklch(0.68 0.155 231);
+  /* ~sky-400 / light blue */
+  --color-brand-hover: oklch(0.60 0.155 231);
+  /* slightly darker on hover */
+  --color-brand-subtle: oklch(0.95 0.04 231);
+  /* 1/20 tint for bg fills */
+  --color-brand-muted: oklch(0.88 0.06 231);
+  /* softer accent ring */
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -137,14 +141,22 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
   }
+
   html {
     @apply font-sans;
     scroll-behavior: smooth;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply tracking-tight font-bold;
   }
 }
