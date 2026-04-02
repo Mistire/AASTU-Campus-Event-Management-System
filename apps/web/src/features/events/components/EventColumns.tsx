@@ -21,8 +21,8 @@ export const eventColumns: ColumnDef<Event>[] = [
     header: "Event Name",
     cell: ({ row }) => (
       <div className="flex flex-col">
-        <span className="font-semibold text-gray-900">{row.original.title}</span>
-        <span className="text-xs text-gray-500">{row.original.eventType.typeName}</span>
+        <span className="font-semibold  text-gray-900">{row.original.title}</span>
+        <span className="text-xs text-gray-500">{row.original.eventType?.name || "Uncategorized"}</span>
       </div>
     ),
   },

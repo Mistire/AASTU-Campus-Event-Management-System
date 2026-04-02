@@ -6,6 +6,9 @@ import { StatsSummary } from "./StatsSummary";
 import { ButtonController } from "@/components/controllers/ButtonController";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { InputController } from "@/components/controllers/InputController";
+import { useEffect } from "react";
+import { ToastController } from "@/components/controllers/ToastController";
 
 export const EventsList = () => {
   const [page, setPage] = useState(1);
@@ -17,6 +20,15 @@ export const EventsList = () => {
     limit,
     search,
   });
+
+  useEffect(() => {
+    if (isError && error) {
+      ToastController.error({
+        message: "Failed to load events",
+        description: error.message,
+      });
+    }
+  }, [isError, error]);
 
   const totalPages = data?.meta.totalPages || 1;
   const totalItems = data?.meta.total || 0;
@@ -35,19 +47,17 @@ export const EventsList = () => {
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-           {/* Search and Filters placeholder */}
-           <div className="flex-1 w-full md:max-w-sm">
-             <input
-               type="text"
-               placeholder="Search events..."
-               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-               value={search}
-               onChange={(e) => {
-                 setSearch(e.target.value);
-                 setPage(1); // Reset to first page on search
-               }}
-             />
-           </div>
+          {/* Search and Filters */}
+          <div className="flex-1 w-full md:max-w-sm">
+            <InputController
+              placeholder="Search events..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1); // Reset to first page on search
+              }}
+            />
+          </div>
         </div>
 
         <TableController
@@ -106,7 +116,7 @@ export const EventsList = () => {
             >
               <ChevronLeft className="h-4 w-4" />
             </ButtonController>
-            
+
             <div className="flex items-center px-4 text-sm font-medium">
               Page {page} of {totalPages}
             </div>

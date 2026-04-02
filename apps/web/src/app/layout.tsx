@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import SmoothScroll from "@/components/ui/SmoothScroll";
+import { Toaster } from "@/components/controllers/ToastController";
 
 const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <SmoothScroll>{children}</SmoothScroll>
+          <Toaster position="top-right" richColors />
         </Providers>
       </body>
     </html>

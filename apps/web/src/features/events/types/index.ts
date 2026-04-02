@@ -8,7 +8,7 @@ export interface EventStatus {
 
 export interface EventType {
   id: string;
-  typeName: string;
+  name: string;
   description?: string;
 }
 
@@ -27,7 +27,7 @@ export interface Event {
   endTime: string;
   capacity: number;
   status: EventStatus;
-  eventType: EventType;
+  eventType?: EventType | null;
   venue: Venue;
   _count?: {
     registrations: number;

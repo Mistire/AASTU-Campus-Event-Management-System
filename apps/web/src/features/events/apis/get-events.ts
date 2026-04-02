@@ -4,7 +4,18 @@ import { EventQuery, PaginatedEventsResponse } from "../types";
 
 const getEvents = async (query: EventQuery): Promise<PaginatedEventsResponse> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  const token = Cookies.get("access_token");
+  
+  // Extract token from auth-storage cookie (Zustand persist)
+  const authCookie = Cookies.get("auth-storage");
+  let token = "";
+  if (authCookie) {
+    try {
+      const parsed = JSON.parse(authCookie);
+      token = parsed.state?.token || "";
+    } catch (e) {
+      console.error("Failed to parse auth cookie", e);
+    }
+  }
 
   const searchParams = new URLSearchParams();
   if (query.page) searchParams.append("page", query.page.toString());
@@ -25,8 +36,9 @@ const getEvents = async (query: EventQuery): Promise<PaginatedEventsResponse> =>
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch events");
   
-  // The backend returns { data, meta }
-  return result;
+  // The backend's TransformInterceptor wraps the response in { statusCode, timestamp, data }
+  // We need to return the inner 'data' which contains { data, meta }
+  return result.data;
 };
 
 export const useEvents = (query: EventQuery) => {
