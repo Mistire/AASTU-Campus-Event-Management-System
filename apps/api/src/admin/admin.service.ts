@@ -4,7 +4,7 @@ import { AssignRoleDto, ListUserQueryDto } from './dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async listUsers(query: ListUserQueryDto) {
     try {
@@ -13,21 +13,21 @@ export class AdminService {
           ...(query.roleId ? { roleId: query.roleId } : {}),
           ...(query.search
             ? {
-                OR: [
-                  {
-                    fullName: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+              OR: [
+                {
+                  fullName: {
+                    contains: query.search,
+                    mode: 'insensitive',
                   },
-                  {
-                    email: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+                },
+                {
+                  email: {
+                    contains: query.search,
+                    mode: 'insensitive',
                   },
-                ],
-              }
+                },
+              ],
+            }
             : {}),
         },
         include: {
@@ -140,6 +140,30 @@ export class AdminService {
       };
     } catch (err) {
       console.error('AdminService.getUserEffectivePermissions error:', err);
+      throw err;
+    }
+  }
+
+  async getStats() {
+    try {
+      const [userCount, eventCount, registrationCount, venueCount, categoryCount] =
+        await Promise.all([
+          this.prisma.user.count(),
+          this.prisma.event.count(),
+          this.prisma.registration.count(),
+          this.prisma.venue.count(),
+          this.prisma.category.count(),
+        ]);
+
+      return {
+        users: userCount,
+        events: eventCount,
+        registrations: registrationCount,
+        venues: venueCount,
+        categories: categoryCount,
+      };
+    } catch (err) {
+      console.error('AdminService.getStats error:', err);
       throw err;
     }
   }
