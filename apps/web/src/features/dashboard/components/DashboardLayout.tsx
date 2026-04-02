@@ -11,7 +11,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="flex bg-gray-50/50 min-h-screen font-sans selection:bg-blue-100 selection:text-blue-700">
+        <div className="flex bg-gray-50 min-h-screen font-sans">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -23,7 +23,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-72 bg-gray-900 shadow-2xl transition-transform duration-300 ease-in-out md:translate-x-0",
+                    "fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 shadow-sm transition-transform duration-300 ease-in-out md:translate-x-0",
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
             {/* Main Content Area */}
             <div className="flex flex-col flex-1 md:pl-72 min-w-0">
-                <header className="sticky top-0 z-30 flex h-16 items-center border-b bg-white/80 backdrop-blur-md px-4 md:px-8">
+                <header className="sticky top-0 z-30 flex h-16 items-center bg-white border-b border-gray-200 px-4 md:px-8">
                     <Button
                         variant="ghost"
                         size="icon"

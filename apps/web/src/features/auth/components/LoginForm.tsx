@@ -25,19 +25,23 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setAuth("mock-token-123", "mock-refresh-token", {
-        id: "usr_1",
-        full_name: "AASTU Admin",
-        email,
-        phone: "123456789",
-        role: "ADMIN",
-        roles: ["ADMIN"],
-        user_roles: [{ role: { name: "ADMIN" } }],
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const res = await fetch(`${apiUrl}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-      setIsLoading(false);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid credentials");
+      let userRole = data.user.role || (data.user.roles && data.user.roles[0]) || "STUDENT";
+      if (userRole !== "STUDENT" && userRole !== "student") userRole = "ADMIN";
+      setAuth(data.access_token || data.token, data.refresh_token || "", { ...data.user, role: userRole.toUpperCase() });
       router.push("/dashboard");
-    }, 1200);
+    } catch (err: any) {
+      console.error("Login Error:", err.message);
+      alert(err.message);
+    }
   };
 
   return (

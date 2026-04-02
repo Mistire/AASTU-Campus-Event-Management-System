@@ -1,54 +1,47 @@
 "use client";
 
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { Bell, Search, User } from "lucide-react";
+import { Plus, User, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const { profile } = useAuthStore();
 
   return (
-    <div className="flex items-center justify-between w-full">
-      {/* Search Bar Placeholder (Premium touch) */}
-      <div className="hidden lg:flex items-center relative max-w-md w-full ml-4">
-        <Search className="absolute left-3 w-4 h-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search events, users, or logs..."
-          className="w-full pl-10 pr-4 py-2 bg-gray-100/50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
-        />
+    <div className="flex items-center justify-between w-full h-full bg-white">
+      {/* Logos and Title Block on Left */}
+      <div className="flex items-center gap-3 ml-4">
+        <div className="flex gap-2">
+          <img src="/aastu-logo.png" alt="" className="h-8 w-auto object-contain invisible" /* Put your actual logos here if you have them */ />
+        </div>
+        <h1 className="font-extrabold text-lg tracking-tight text-gray-900 border-l border-gray-200 pl-4">Dashboard</h1>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4 ml-auto">
+      {/* Actions Block on Right */}
+      <div className="flex items-center gap-4 ml-auto">
+        <div className="hidden lg:flex items-center gap-1 text-sm font-semibold text-gray-600 cursor-pointer hover:text-brand mr-2">
+          <Globe size={16} />
+          English
+        </div>
+
         <Button
-          variant="ghost"
-          size="icon"
-          className="relative text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+          className="hidden md:flex bg-brand hover:bg-brand-hover text-white font-bold rounded-full text-xs uppercase px-5 py-2 h-9 items-center gap-1 shadow-sm shadow-brand/20 transition-all"
         >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+          <Plus size={16} />
+          Create Booking
         </Button>
 
-        <div className="h-8 w-px bg-gray-200 mx-2 hidden md:block" />
-
-        <div className="flex items-center gap-3 pl-2">
-          <div className="hidden md:flex flex-col items-end">
-            <p className="text-sm font-semibold text-gray-900 leading-none">
-              {profile?.full_name || "Anonymous User"}
-            </p>
-            <p className="text-[11px] font-medium text-gray-500 mt-1 uppercase tracking-wider">
-              {profile?.role?.replace("_", " ") || "Guest"}
-            </p>
-          </div>
-
+        <div className="flex items-center gap-2 pl-2 border-l border-gray-200 ml-2 py-1">
           <Button
-            variant="ghost"
-            className="p-0.5 rounded-full border border-gray-200 hover:border-blue-500/50 transition-colors"
+            variant="outline"
+            className="rounded-full border-gray-200 flex items-center justify-between gap-3 p-1.5 h-10 w-44 hover:bg-gray-50"
           >
-            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-brand to-blue-400 flex items-center justify-center text-white shadow-sm">
-              <span className="text-xs font-bold uppercase">
-                {profile?.full_name?.charAt(0) || <User className="w-4 h-4" />}
-              </span>
+            <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
+              <User className="w-4 h-4 text-gray-500" />
+            </div>
+            <div className="flex flex-col items-start pr-2 overflow-hidden w-full text-left">
+              <span className="text-xs font-bold text-gray-900 truncate w-full">{profile?.full_name || "manager 4 name"}</span>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate w-full">{profile?.role || "PROVIDER_ADMIN"}</span>
             </div>
           </Button>
         </div>

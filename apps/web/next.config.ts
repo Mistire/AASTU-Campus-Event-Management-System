@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: "/home/natan/Final_project/AASTU-Campus-Event-Management-System",
+  },
+  experimental: {},
 };
 
 export default nextConfig;

@@ -3,6 +3,9 @@
     "version": "0.0.1",
     "description": "AASTU Campus Event Management System - Monorepo Root",
     "private": true,
+    "workspaces": [
+        "apps/*"
+    ],
     "scripts": {
         "dev": "npm run start:dev --prefix apps/api",
         "start": "npm run start --prefix apps/api",
