@@ -33,8 +33,11 @@ const getVenues = async (): Promise<Venue[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch venues");
   
-  // result is expected to be the array of venues due to the backend structure
+  // result is expected to be { data: { data: Venue[], meta: any } } due to pagination
   // Note: Backend might wrap this in { data: [...] } if TransformInterceptor is applied
+  if (result.data && Array.isArray(result.data.data)) {
+    return result.data.data;
+  }
   return (result.data || result) as Venue[];
 };
 

@@ -25,6 +25,8 @@ export function EventFormModal({
 }: EventFormModalProps) {
   const { data: venues } = useVenues();
   const { data: eventTypes } = useEventTypes();
+  console.log("MODAL VENUES =>", venues);
+  console.log("MODAL EVENT TYPES =>", eventTypes);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -109,7 +111,9 @@ export function EventFormModal({
                   <label className="text-xs font-medium text-gray-500">Event Type <span className="text-red-500">*</span></label>
                   <Select value={formData.eventTypeId || ""} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
                     <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm">
-                      <SelectValue placeholder="Select Type" />
+                      <SelectValue placeholder="Select Type">
+                        {eventTypes?.find(t => t.id === formData.eventTypeId)?.name || "Select Type"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {eventTypes?.map(t => (
@@ -139,7 +143,9 @@ export function EventFormModal({
                   <label className="text-xs font-medium text-gray-500">Venue <span className="text-red-500">*</span></label>
                   <Select value={formData.venueId || ""} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
                     <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm">
-                      <SelectValue placeholder="Select Venue" />
+                      <SelectValue placeholder="Select Venue">
+                        {venues?.find(v => v.id === formData.venueId)?.name || "Select Venue"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {venues?.map(v => (

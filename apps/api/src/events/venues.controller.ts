@@ -32,7 +32,6 @@ export class VenuesController {
   }
 
   @Get()
-  @Roles('Admin', 'Organizer')
   @ApiOperation({ summary: 'List & filter venues (Admin, Organizer)' })
   findAll(@Query() query: VenueQueryDto) {
     return this.venuesService.findAll(query);
