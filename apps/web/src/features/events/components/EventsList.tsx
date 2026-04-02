@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useEvents } from "../apis/get-events";
 import { useVenues } from "../apis/get-venues";
 import { useUsers } from "../apis/get-users";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../apis/mutations";
 import { TableController } from "@/components/controllers/TableController";
-import { eventColumns } from "./EventColumns";
+import { getEventColumns } from "./EventColumns";
 import { ButtonController } from "@/components/controllers/ButtonController";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +12,8 @@ import { InputController } from "@/components/controllers/InputController";
 import { useEffect } from "react";
 import { ToastController } from "@/components/controllers/ToastController";
 import { useRouter } from "next/navigation";
+import { EventFormModal } from "./EventFormModal";
+import { DeleteConfirmation } from "@/components/common/deleteConformation";
 
 const STATUS_OPTIONS = ["DRAFT", "PENDING", "APPROVED", "LIVE", "CANCELLED", "ARCHIVED", "REJECTED"];
 
@@ -22,6 +25,10 @@ export const EventsList = () => {
   const [status, setStatus] = useState<string>("");
   const [venueId, setVenueId] = useState<string>("");
   const [createdById, setCreatedById] = useState<string>("");
+
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const { data: venues } = useVenues();
   const { data: users } = useUsers();
@@ -35,6 +42,10 @@ export const EventsList = () => {
     createdById: createdById === "" ? undefined : createdById,
   });
 
+  const createEvent = useCreateEvent();
+  const updateEvent = useUpdateEvent();
+  const deleteEvent = useDeleteEvent();
+
   useEffect(() => {
     if (isError && error) {
       ToastController.error({
@@ -43,6 +54,60 @@ export const EventsList = () => {
       });
     }
   }, [isError, error]);
+
+  const handleAddEvent = () => {
+    setSelectedEvent(null);
+    setIsEventModalOpen(true);
+  };
+
+  const handleEdit = (event: any) => {
+    setSelectedEvent(event);
+    setIsEventModalOpen(true);
+  };
+
+  const handleDelete = (event: any) => {
+    setSelectedEvent(event);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleSaveEvent = (data: any) => {
+    if (selectedEvent) {
+      updateEvent.mutate({ id: selectedEvent.id, data }, {
+        onSuccess: () => {
+          setIsEventModalOpen(false);
+          ToastController.success({ message: "Event updated successfully" });
+        },
+        onError: (err) => {
+          ToastController.error({ message: "Failed to update event", description: err.message });
+        }
+      });
+    } else {
+      createEvent.mutate(data, {
+        onSuccess: () => {
+          setIsEventModalOpen(false);
+          ToastController.success({ message: "Event created successfully" });
+        },
+        onError: (err) => {
+          ToastController.error({ message: "Failed to create event", description: err.message });
+        }
+      });
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (!selectedEvent) return;
+    deleteEvent.mutate(selectedEvent.id, {
+      onSuccess: () => {
+        setIsDeleteModalOpen(false);
+        ToastController.success({ message: "Event deleted successfully" });
+      },
+      onError: (err) => {
+        ToastController.error({ message: "Failed to delete event", description: err.message });
+      }
+    });
+  };
+
+  const columns = useMemo(() => getEventColumns(handleEdit, handleDelete), []);
 
   const totalPages = eventsData?.meta?.totalPages || 1;
   const totalItems = eventsData?.meta?.total || 0;
@@ -60,7 +125,10 @@ export const EventsList = () => {
       {/* Header with Title and Add Button */}
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-2xl font-bold text-gray-800">Events</h1>
-        <ButtonController className="bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2">
+        <ButtonController 
+          onClick={handleAddEvent}
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2"
+        >
           <Plus className="h-4 w-4" />
           ADD EVENT
         </ButtonController>
@@ -138,7 +206,7 @@ export const EventsList = () => {
 
         <div className="px-1">
           <TableController
-            columns={eventColumns}
+            columns={columns}
             data={eventsData?.data || []}
             loading={isLoading}
             onRowClick={(row) => router.push(`/events/${row.id}`)}
@@ -226,6 +294,23 @@ export const EventsList = () => {
           </div>
         </div>
       </div>
+
+      <EventFormModal 
+        open={isEventModalOpen}
+        onOpenChange={setIsEventModalOpen}
+        event={selectedEvent}
+        onSave={handleSaveEvent}
+        isSaving={createEvent.isPending || updateEvent.isPending}
+      />
+
+      <DeleteConfirmation 
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        itemName={selectedEvent?.title || "Unknown Event"}
+        onConfirm={handleConfirmDelete}
+        isDeleting={deleteEvent.isPending}
+      />
     </div>
   );
 };
+
