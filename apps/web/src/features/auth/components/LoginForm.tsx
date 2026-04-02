@@ -32,11 +32,19 @@ export function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Invalid credentials");
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Invalid credentials");
+
+      const data = result.data;
+      if (!data?.user) throw new Error("User data not found in response");
+
       let userRole = data.user.role || (data.user.roles && data.user.roles[0]) || "STUDENT";
       if (userRole !== "STUDENT" && userRole !== "student") userRole = "ADMIN";
-      setAuth(data.access_token || data.token, data.refresh_token || "", { ...data.user, role: userRole.toUpperCase() });
+
+      setAuth(data.access_token || data.token, data.refresh_token || "", {
+        ...data.user,
+        role: userRole.toUpperCase()
+      });
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Login Error:", err.message);
