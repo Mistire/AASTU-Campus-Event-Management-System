@@ -16,6 +16,7 @@ import {
   X,
   Layers,
   MapPin,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const iconMap: Record<string, React.ElementType> = {
   FileDown: FileDown,
   Categories: Layers,
   Venues: MapPin,
+  Sparkles: Sparkles,
 };
 
 interface MainPage {

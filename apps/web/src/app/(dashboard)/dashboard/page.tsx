@@ -13,36 +13,47 @@ import {
 import { useRecentRegistrations } from '@/features/dashboard/api/getRecentRegistrations';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/useAuthStore';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+const MetricCard = ({
+    title,
+    value,
+    icon: Icon,
+    subValue
+}: {
+    title: string;
+    value: string | number;
+    icon: React.ElementType;
+    subValue?: string
+}) => (
+    <Card className="rounded-xl shadow-sm border-gray-100 relative overflow-hidden">
+        <CardContent className="p-4 flex flex-col items-center justify-center min-h-[110px]">
+            <div className="absolute top-3 left-3 text-gray-400">
+                <Icon size={14} />
+            </div>
+            {subValue && (
+                <div className="absolute top-2 right-2 text-[9px] text-emerald-500 font-bold uppercase">
+                    {subValue}
+                </div>
+            )}
+            <div className="text-3xl font-bold text-brand mt-4">{value}</div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">{title}</p>
+        </CardContent>
+    </Card>
+);
 
 export default function DashboardPage() {
+    const { profile } = useAuthStore();
+    const router = useRouter();
     const { data: registrations, isLoading, isError, refetch } = useRecentRegistrations();
 
-    const MetricCard = ({
-        title,
-        value,
-        icon: Icon,
-        subValue
-    }: {
-        title: string;
-        value: string | number;
-        icon: any;
-        subValue?: string
-    }) => (
-        <Card className="rounded-xl shadow-sm border-gray-100 relative overflow-hidden">
-            <CardContent className="p-4 flex flex-col items-center justify-center min-h-[110px]">
-                <div className="absolute top-3 left-3 text-gray-400">
-                    <Icon size={14} />
-                </div>
-                {subValue && (
-                    <div className="absolute top-2 right-2 text-[9px] text-emerald-500 font-bold uppercase">
-                        {subValue}
-                    </div>
-                )}
-                <div className="text-3xl font-bold text-brand mt-4">{value}</div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">{title}</p>
-            </CardContent>
-        </Card>
-    );
+    useEffect(() => {
+        if (profile && (profile.role === "STUDENT" || profile.roles?.includes("STUDENT"))) {
+            router.replace("/discovery");
+        }
+    }, [profile, router]);
 
     return (
         <div className="space-y-4 font-sans text-brand-dark">

@@ -17,31 +17,55 @@ export function middleware(request: NextRequest) {
     // Check for the auth cookie created by zustand persist
     const authCookie = request.cookies.get('auth-storage')?.value;
 
-    let hasToken = false;
+    let hasSession = false;
     if (authCookie) {
         try {
-            // js-cookie might URI encode the cookie, and zustand stores it as JSON
             const decoded = decodeURIComponent(authCookie);
             const parsed = JSON.parse(decoded);
-            if (parsed?.state?.token) {
-                hasToken = true;
+            if (parsed?.state?.token || parsed?.state?.refreshToken) {
+                hasSession = true;
             }
-        } catch (e) {
-            // Valid JSON or syntax error handling
+        } catch {
             console.error('Middleware: Error parsing auth cookie');
         }
     }
 
     const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/signup';
     const isHomePage = pathname === '/';
+    const isStudentRoute = pathname.startsWith('/discovery');
+    const isDashboardRoute = pathname.startsWith('/dashboard');
 
-    // If user is logged in, restrict access to auth pages and home, force them to dashboard
-    if (hasToken && (isAuthPage || isHomePage)) {
+    let userRole = '';
+    if (authCookie) {
+        try {
+            const decoded = decodeURIComponent(authCookie);
+            const parsed = JSON.parse(decoded);
+            userRole = parsed?.state?.profile?.role || '';
+        } catch {
+            console.error('Middleware: Error parsing role');
+        }
+    }
+
+    // Role-based Home Redirect (for logged in users hitting login or root)
+    if (hasSession && (isAuthPage || isHomePage)) {
+        if (userRole === 'STUDENT') {
+            return NextResponse.redirect(new URL('/discovery', request.url));
+        }
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    // If user is NOT logged in and tries to access dashboard, send them to login
-    if (!hasToken && pathname.startsWith('/dashboard')) {
+    // Protect Dashboard: Only allow ADMIN/ORGANIZER/STAFF
+    if (isDashboardRoute) {
+        if (!hasSession) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+        if (userRole === 'STUDENT') {
+            return NextResponse.redirect(new URL('/discovery', request.url));
+        }
+    }
+
+    // Protect Student Home: Anyone but unauthenticated users
+    if (isStudentRoute && !hasSession) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
