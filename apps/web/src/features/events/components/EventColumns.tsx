@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
-import { BadgeController } from "@/components/controllers/BadgeController";
+import { BadgeController } from "@/components/shared/BadgeController";
 import { format } from "date-fns";
 
 export const getStatusColor = (status: EventStatusName) => {

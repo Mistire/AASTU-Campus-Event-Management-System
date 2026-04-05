@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEvent } from "../apis/get-event";
-import { CardController } from "@/components/controllers/CardController";
-import { ButtonController } from "@/components/controllers/ButtonController";
-import { BadgeController } from "@/components/controllers/BadgeController";
-import { SkeletonController } from "@/components/controllers/SkeletonController";
-import { TabsController } from "@/components/controllers/TabsController";
+import { useEvent } from "../api/get-event";
+import { CardController } from "@/components/shared/CardController";
+import { ButtonController } from "@/components/shared/ButtonController";
+import { BadgeController } from "@/components/shared/BadgeController";
+import { SkeletonController } from "@/components/shared/SkeletonController";
+import { TabsController } from "@/components/shared/TabsController";
 import { getStatusColor } from "./EventColumns";
 import { format } from "date-fns";
 import {
@@ -82,7 +82,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
   const router = useRouter();
   const { data: event, isLoading, isError, error } = useEvent(eventId);
 
-  const handleBack = () => router.push("/events");
+  const handleBack = () => router.push("/dashboard/events");
 
   /* Loading */
   if (isLoading) {
