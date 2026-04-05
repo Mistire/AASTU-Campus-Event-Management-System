@@ -77,14 +77,7 @@ export default function AuthShell({
         />
 
         {/* Floating icons */}
-        <FloatingIcon Icon={Calendar}    className="top-[12%] right-[20%]"  delay={0}   duration={7}  size={28} />
-        <FloatingIcon Icon={Music}       className="top-[35%] left-[8%]"   delay={1.5} duration={9}  size={22} />
-        <FloatingIcon Icon={PartyPopper} className="top-[55%] right-[12%]" delay={0.8} duration={8}  size={26} />
-        <FloatingIcon Icon={Ticket}      className="bottom-[30%] left-[6%]" delay={2.5} duration={6}  size={20} />
-        <FloatingIcon Icon={Zap}         className="top-[70%] right-[25%]" delay={1.2} duration={10} size={18} />
-        <FloatingIcon Icon={Bell}        className="bottom-[15%] right-[8%]" delay={3}  duration={7}  size={24} />
-        <FloatingIcon Icon={Users}       className="top-[20%] left-[15%]"  delay={0.5} duration={11} size={20} />
-        <FloatingIcon Icon={MapPin}      className="bottom-[50%] right-[5%]" delay={4} duration={9}  size={18} />
+
 
         {/* Top: Brand Logo */}
         <div className="relative z-10">

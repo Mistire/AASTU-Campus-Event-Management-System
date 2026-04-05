@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import SmoothScroll from "@/components/ui/SmoothScroll";
-import { Toaster } from "@/components/controllers/ToastController";
+import { Toaster } from "@/components/shared/ToastController";
 
 const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",

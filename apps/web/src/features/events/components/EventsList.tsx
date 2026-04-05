@@ -1,19 +1,18 @@
-import { useState, useMemo } from "react";
-import { useEvents } from "../apis/get-events";
-import { useVenues } from "../apis/get-venues";
-import { useUsers } from "../apis/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../apis/mutations";
-import { TableController } from "@/components/controllers/TableController";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEvents } from "../api/get-events";
+import { useVenues } from "../api/get-venues";
+import { useUsers } from "../api/get-users";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../api/mutations";
+import { TableController } from "@/components/shared/TableController";
 import { getEventColumns } from "./EventColumns";
-import { ButtonController } from "@/components/controllers/ButtonController";
+import { ButtonController } from "@/components/shared/ButtonController";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InputController } from "@/components/controllers/InputController";
-import { useEffect } from "react";
-import { ToastController } from "@/components/controllers/ToastController";
-import { useRouter } from "next/navigation";
+import { InputController } from "@/components/shared/InputController";
+import { ToastController } from "@/components/shared/ToastController";
 import { EventFormModal } from "./EventFormModal";
-import { DeleteConfirmation } from "@/components/common/deleteConformation";
+import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
 
 const STATUS_OPTIONS = ["DRAFT", "PENDING", "APPROVED", "LIVE", "CANCELLED", "ARCHIVED", "REJECTED"];
 
@@ -209,7 +208,7 @@ export const EventsList = () => {
             columns={columns}
             data={eventsData?.data || []}
             loading={isLoading}
-            onRowClick={(row) => router.push(`/events/${row.id}`)}
+            onRowClick={(row) => router.push(`/dashboard/events/${row.id}`)}
             emptyMessage="No events found matching your criteria."
           />
         </div>

@@ -1,5 +1,5 @@
-import { CardController } from "@/components/controllers/CardController";
-import { BadgeController } from "@/components/controllers/BadgeController";
+import { CardController } from "@/components/shared/CardController";
+import { BadgeController } from "@/components/shared/BadgeController";
 import { EventStatusName } from "../types";
 import { Activity, CheckCircle, Clock, XCircle, FileEdit, Archive } from "lucide-react";
 

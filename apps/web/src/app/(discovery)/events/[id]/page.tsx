@@ -10,10 +10,10 @@ import { EventHeroHeader } from "@/features/events/components/EventHeroHeader";
 import { RegistrationSidebar } from "@/features/events/components/RegistrationSidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Share2, CalendarPlus, Info } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Share2, CalendarPlus } from "lucide-react";
 import { generateICS } from "@/lib/ics";
 import { toast } from "sonner";
+import { EventDetailSkeleton, EventErrorState } from "@/features/events/components/EventDetailUIStates";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -31,9 +31,10 @@ export default function EventDetailPage() {
       toast.success("Registration Successful", {
         description: `You are now registered for ${event.title}.`,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { message?: string };
       toast.error("Registration failed", {
-        description: err.message || "Please try again later.",
+        description: error.message || "Please try again later.",
       });
     }
   };
@@ -146,53 +147,6 @@ export default function EventDetailPage() {
           [ Event Detail — CEMS Experience ]
         </div>
       </div>
-    </div>
-  );
-}
-
-function EventDetailSkeleton() {
-  return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20">
-      <div className="flex justify-between">
-        <Skeleton className="h-10 w-32 rounded-xl" />
-        <div className="flex gap-3">
-          <Skeleton className="h-10 w-10 rounded-xl" />
-          <Skeleton className="h-10 w-10 rounded-xl" />
-        </div>
-      </div>
-      <Skeleton className="h-[400px] w-full rounded-[2.5rem]" />
-      <div className="grid grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-32 rounded-3xl" />
-        ))}
-      </div>
-      <div className="grid grid-cols-12 gap-12">
-        <div className="col-span-8 space-y-8">
-          <Skeleton className="h-8 w-64 rounded-xl" />
-          <Skeleton className="h-40 w-full rounded-2xl" />
-          <Skeleton className="h-64 w-full rounded-2xl" />
-        </div>
-        <div className="col-span-4">
-          <Skeleton className="h-[400px] w-full rounded-[2rem]" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EventErrorState({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="py-32 flex flex-col items-center justify-center text-center">
-      <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6">
-        <Info size={40} className="text-red-500" />
-      </div>
-      <h3 className="text-2xl font-black text-gray-900 mb-2">Event not found</h3>
-      <Button
-        onClick={onBack}
-        className="mt-8 rounded-2xl bg-brand text-white font-black uppercase tracking-widest text-[10px] h-12 px-10"
-      >
-        Back to Discovery
-      </Button>
     </div>
   );
 }

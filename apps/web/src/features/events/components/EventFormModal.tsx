@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { ModalHeader } from "@/components/common/modalHeader";
-import { ModalFooter } from "@/components/common/modalFooter";
-import { InputController } from "@/components/controllers/InputController";
+import { ModalHeader } from "@/components/shared/ModalHeader";
+import { ModalFooter } from "@/components/shared/ModalFooter";
+import { InputController } from "@/components/shared/InputController";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useVenues } from "../apis/get-venues";
-import { useEventTypes } from "../apis/get-event-types";
+import { useVenues } from "../api/get-venues";
+import { useEventTypes } from "../api/get-event-types";
 import { Textarea } from "@/components/ui/textarea";
 
 interface EventFormModalProps {

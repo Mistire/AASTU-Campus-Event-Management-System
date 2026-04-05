@@ -26,8 +26,8 @@
     {
         "icon": "Events",
         "title": "Events",
-        "parent": "/events",
-        "to": "/events",
+        "parent": "/dashboard/events",
+        "to": "/dashboard/events",
         "allowed": [
             "ADMIN",
             "ORGANIZER"
@@ -38,8 +38,8 @@
     {
         "icon": "Users",
         "title": "Users",
-        "parent": "/users",
-        "to": "/users",
+        "parent": "/dashboard/users",
+        "to": "/dashboard/users",
         "allowed": [
             "ADMIN"
         ],
@@ -49,8 +49,8 @@
     {
         "icon": "Categories",
         "title": "Categories",
-        "parent": "/categories",
-        "to": "/categories",
+        "parent": "/dashboard/categories",
+        "to": "/dashboard/categories",
         "allowed": [
             "ADMIN"
         ],
@@ -60,8 +60,8 @@
     {
         "icon": "Venues",
         "title": "Venues",
-        "parent": "/venues",
-        "to": "/venues",
+        "parent": "/dashboard/venues",
+        "to": "/dashboard/venues",
         "allowed": [
             "ADMIN"
         ],
@@ -71,8 +71,8 @@
     {
         "icon": "Feedback",
         "title": "Feedback",
-        "parent": "/feedback",
-        "to": "/feedback",
+        "parent": "/dashboard/feedback",
+        "to": "/dashboard/feedback",
         "allowed": [
             "ADMIN"
         ],
@@ -82,8 +82,8 @@
     {
         "icon": "Attendance",
         "title": "Attendance",
-        "parent": "/attendance",
-        "to": "/attendance",
+        "parent": "/dashboard/attendance",
+        "to": "/dashboard/attendance",
         "allowed": [
             "ADMIN",
             "ORGANIZER"
@@ -94,8 +94,8 @@
     {
         "icon": "LayoutGrid",
         "title": "Departments",
-        "parent": "/departments",
-        "to": "/departments",
+        "parent": "/dashboard/departments",
+        "to": "/dashboard/departments",
         "allowed": [
             "ADMIN"
         ],
