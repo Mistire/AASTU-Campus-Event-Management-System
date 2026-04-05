@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Logo from "@/components/ui/Logo";
 
 const links = [
   { name: "Home", href: "/" },
@@ -35,27 +36,8 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           
-          {/* ── Brand Logo: Event-Log Style ── */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="font-brand flex items-center tracking-tighter">
-              <span className="text-brand font-bold text-xl opacity-40 select-none">[</span>
-              <span className="mx-1 text-2xl font-black bg-linear-to-r from-brand via-blue-500 to-cyan-400 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-brand transition-all duration-500">
-                CEMS
-              </span>
-              <span className="text-brand font-bold text-xl opacity-40 select-none">]</span>
-              
-              {/* Pulsing Live Indicator */}
-              <div className="ml-2 flex items-center">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
-                </span>
-                <span className="ml-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand/60 hidden sm:block">
-                  Live
-                </span>
-              </div>
-            </div>
-          </Link>
+          {/* ── Brand Logo ── */}
+          <Logo />
 
           {/* ── Desktop Navigation ── */}
           <div className="hidden md:flex items-center gap-8 ml-10">

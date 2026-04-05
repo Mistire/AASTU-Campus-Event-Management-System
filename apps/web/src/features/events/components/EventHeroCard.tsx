@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { 
-  Sparkles, 
+  Star, 
   ArrowUpRight, 
   Bookmark,
   Circle 
@@ -60,7 +60,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/20 backdrop-blur-md border border-brand/30">
-              <Sparkles size={12} className="text-brand-subtle" />
+              <Star size={12} className="text-brand-subtle fill-brand-subtle" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-subtle">
                 Recommended
               </span>

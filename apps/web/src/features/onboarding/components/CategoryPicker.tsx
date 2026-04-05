@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useCategories } from "@/features/events/api/useCategories";
 import { useUserPreferences } from "@/features/events/api/useUserPreferences";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Loader2, Search, ArrowRight, Zap, Trophy, Palette, Microscope, Users2, Code2, Music2, Camera, Rocket } from "lucide-react";
+import { Check, Zap, Loader2, Search, ArrowRight, Trophy, Palette, Microscope, Users2, Code2, Music2, Camera, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -15,7 +15,7 @@ interface CategoryPickerProps {
 
 // TikTok-style category suggestions with icons
 const PREMIUM_CATEGORIES = [
-  { name: "Tech & Coding", icon: Code2, color: "from-blue-500 to-cyan-500", desc: "Workshops, Hackathons & AI" },
+  { name: "Tech & Coding", icon: Code2, color: "from-blue-500 to-cyan-500", desc: "Workshops, Hackathons & Modern Tech" },
   { name: "Social & Fun", icon: Users2, color: "from-pink-500 to-rose-500", desc: "Parties, Mixers & Hangouts" },
   { name: "Academic", icon: Microscope, color: "from-amber-500 to-orange-500", desc: "Research, Seminars & Study" },
   { name: "Sports & Fit", icon: Trophy, color: "from-emerald-500 to-teal-500", desc: "Tournaments & Athletics" },
@@ -93,7 +93,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
            className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/5 border border-brand/10 text-brand font-brand font-black uppercase tracking-[0.3em] mb-6 text-[10px]">
-            <Sparkles size={14} className="text-brand" />
+            <Zap size={14} className="text-brand" />
             Personalize Your Portal
           </div>
           <h1 className="text-5xl md:text-7xl font-brand font-black text-gray-900 tracking-tighter mb-4 leading-tight">

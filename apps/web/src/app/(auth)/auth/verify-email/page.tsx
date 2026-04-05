@@ -6,9 +6,8 @@ import { VerifyEmailContent } from "@/features/auth/components/VerifyEmailConten
 export default function VerifyEmailPage() {
   return (
     <AuthShell
-      title={<>Trust & <span>Verification</span>.</>}
+      title="Verify Your Email"
       subtitle="Complete your registration to unlock the full potential of the CEMS ecosystem."
-      badge="Security Protocol v2.4"
     >
       <Suspense fallback={
         <div className="flex flex-col items-center justify-center py-12">

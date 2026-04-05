@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
+import Logo from "@/components/ui/Logo";
 
 export default function Footer() {
   return (
@@ -8,9 +9,7 @@ export default function Footer() {
 
         {/* Brand */}
         <div className="col-span-1 md:col-span-2">
-          <h3 className="text-xl font-bold text-white mb-3">
-            <span className="text-brand">CEMS</span>
-          </h3>
+          <Logo size="lg" className="mb-6" />
           <p className="text-sm leading-relaxed max-w-sm">
             Campus Event Management System for Addis Ababa Science and Technology University. 
             Discover, organize, and participate in events that shape campus life.

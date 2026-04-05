@@ -9,7 +9,7 @@ export const metadata = {
 export default function LoginPage() {
   return (
     <AuthShell
-      badge="AUTH GATEWAY — PORTAL ACCESS"
+      badge="Welcome Back"
       title={
         <>
           The campus event

@@ -1,50 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import {
-  Calendar,
-  Music,
-  PartyPopper,
-  Ticket,
-  Zap,
-  Bell,
-  Users,
-  MapPin,
-  LucideIcon,
-} from "lucide-react";
-
-interface FloatingIconProps {
-  Icon: LucideIcon;
-  className?: string;
-  delay?: number;
-  duration?: number;
-  yOffset?: number;
-  size?: number;
-}
-
-function FloatingIcon({
-  Icon,
-  className = "",
-  delay = 0,
-  duration = 6,
-  yOffset = 12,
-  size = 24,
-}: FloatingIconProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: [0, 0.3, 0.1, 0.3],
-        y: [0, -yOffset, 0],
-        rotate: [0, 5, -5, 0],
-      }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut", delay }}
-      className={`absolute pointer-events-none text-white/20 ${className}`}
-    >
-      <Icon size={size} strokeWidth={1} />
-    </motion.div>
-  );
-}
+import Logo from "@/components/ui/Logo";
 
 export default function AuthShell({
   children,
@@ -55,7 +11,7 @@ export default function AuthShell({
   children: React.ReactNode;
   title: React.ReactNode;
   subtitle: string;
-  badge: string;
+  badge?: string;
 }) {
   return (
     <div className="min-h-screen flex">
@@ -76,36 +32,18 @@ export default function AuthShell({
           className="absolute bottom-20 right-10 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px]"
         />
 
-        {/* Floating icons */}
-
-
         {/* Top: Brand Logo */}
         <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="font-brand flex items-center tracking-tighter">
-              <span className="text-white/30 font-bold text-2xl select-none">[</span>
-              <span className="mx-1 text-3xl font-black bg-linear-to-r from-brand via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                CEMS
-              </span>
-              <span className="text-white/30 font-bold text-2xl select-none">]</span>
-              <div className="ml-3 flex items-center gap-1.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-brand" />
-                </span>
-                <span className="text-[9px] font-brand font-black uppercase tracking-[0.2em] text-brand/60">
-                  Live
-                </span>
-              </div>
-            </div>
-          </Link>
+          <Logo />
         </div>
 
         {/* Center: Hero Text */}
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
-            {badge}
-          </div>
+          {badge && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
+              {badge}
+            </div>
+          )}
           <h2 className="text-4xl xl:text-5xl font-brand font-black text-white leading-[1.1] tracking-tighter mb-6">
             {title}
           </h2>
@@ -114,28 +52,20 @@ export default function AuthShell({
           </p>
         </div>
 
-        {/* Bottom: System Footer */}
-        <div className="relative z-10">
-          <div className="font-brand font-black text-[8px] uppercase tracking-[0.4em] text-white/20">
-            [ SYS — CEMS — AUTH GATEWAY ]
-          </div>
-        </div>
+        {/* Bottom: Sidebar Footer Area (Empty for cleaner look) */}
+        <div className="relative z-10" />
       </div>
 
       {/* ── Right Panel: Form ── */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white relative overflow-hidden">
         {/* Subtle dot grid */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[40px_40px]" />
+        
         {/* Mobile logo */}
         <div className="lg:hidden mb-10 relative z-10">
-          <Link href="/" className="inline-flex items-center gap-1">
-            <span className="text-brand/30 font-brand font-bold text-xl">[</span>
-            <span className="font-brand font-black text-2xl bg-linear-to-r from-brand to-cyan-400 bg-clip-text text-transparent">
-              CEMS
-            </span>
-            <span className="text-brand/30 font-brand font-bold text-xl">]</span>
-          </Link>
+          <Logo />
         </div>
+        
         <div className="w-full max-w-md relative z-10">
           {children}
         </div>

@@ -10,7 +10,7 @@ import { FilterBar } from "@/features/events/components/FilterBar";
 import { DiscoveryHeader } from "@/features/discovery/components/DiscoveryHeader";
 import { Button } from "@/components/ui/button";
 import {
-  Sparkles,
+  Compass,
   ArrowRight,
   Loader2,
   CalendarDays,
@@ -69,7 +69,7 @@ export default function StudentHomePage() {
           <section className="space-y-6">
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-3">
-                <Sparkles className="text-brand" size={24} />
+                <Compass className="text-brand" size={24} />
                 <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
                   Recommended for You
                 </h2>

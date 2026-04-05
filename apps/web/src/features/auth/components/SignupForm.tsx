@@ -76,10 +76,11 @@ export function SignupForm() {
       toast.success("Registration Successful!", {
         description: "Please check your email to verify your account and complete your campus ID registration.",
       });
-    } catch (err: any) {
-      console.error("Signup Error:", err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Registration failed";
+      console.error("Signup Error:", errorMessage);
       toast.error("Registration Failed", {
-        description: err.message,
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -100,10 +101,7 @@ export function SignupForm() {
     >
       {/* Header */}
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/8 border border-brand/10 text-brand text-[9px] font-brand font-black uppercase tracking-widest mb-5">
-          <User size={10} />
-          New Account Registration
-        </div>
+        <div className="h-6" />
         <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 tracking-tighter mb-2">
           Join CEMS.
         </h1>
@@ -315,11 +313,7 @@ export function SignupForm() {
         </p>
       </div>
 
-      <div className="mt-4 text-center">
-        <span className="font-brand font-black text-[8px] uppercase tracking-[0.3em] text-gray-200">
-          [ REG-GATE v2.0 — CEMS ]
-        </span>
-      </div>
+        <div className="h-6" />
     </motion.div>
   );
 }

@@ -3,7 +3,7 @@
 import { useSimilarEvents } from "../api/useRecommendations";
 import { EventFeedCard } from "./EventFeedCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles } from "lucide-react";
+import { Layers } from "lucide-react";
 
 interface SimilarEventsRailProps {
   eventId: string;
@@ -17,7 +17,7 @@ export function SimilarEventsRail({ eventId }: SimilarEventsRailProps) {
   return (
     <section className="space-y-8 py-12">
       <div className="flex items-center gap-3">
-        <Sparkles className="text-brand" size={24} />
+        <Layers className="text-brand" size={24} />
         <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">Similar Events</h2>
       </div>
 

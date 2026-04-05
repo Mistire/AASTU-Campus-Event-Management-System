@@ -1,5 +1,5 @@
 "use client";
-import { CalendarPlus, Sparkles, BellRing, ScanLine } from "lucide-react";
+import { CalendarPlus, Search, BellRing, ScanLine } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 
 const steps = [
@@ -9,9 +9,9 @@ const steps = [
     desc: "Organizers build events with venues, categories, tags, and ticketing — all in one place.",
   },
   {
-    icon: Sparkles,
+    icon: Search,
     title: "Discover & RSVP",
-    desc: "Students browse upcoming events or get AI-powered recommendations tailored to their interests.",
+    desc: "Students browse upcoming events or get personalized recommendations tailored to their interests.",
   },
   {
     icon: BellRing,
@@ -86,10 +86,7 @@ export default function HowItWorks() {
            viewport={{ once: true }}
            transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 text-brand text-[10px] font-brand font-black uppercase tracking-widest mb-6">
-            <ScanLine size={14} className="fill-brand/20" />
-            The Blueprint
-          </div>
+          <div className="h-10" />
           <h2 className="text-4xl md:text-5xl font-black mb-6 text-gray-900 tracking-tighter">How CEMS Works</h2>
           <p className="text-gray-500 mb-24 max-w-2xl mx-auto text-xl font-medium leading-relaxed">
             From creation to celebration — four simple steps to master campus coordination.

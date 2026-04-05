@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Calendar, MapPin, Tag, ArrowRight, Sparkles, Clock, Users, BarChart } from "lucide-react";
+import { Calendar, MapPin, Tag, ArrowRight, Clock, Users, BarChart } from "lucide-react";
 import { motion } from "framer-motion";
 
 const events = [
@@ -103,15 +103,7 @@ export default function Features() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 text-brand text-[10px] font-brand font-black uppercase tracking-[.2em] mb-6"
-          >
-            <Sparkles size={14} className="fill-brand/20" />
-            System Live Log — 2026.Q2
-          </motion.div>
+          <div className="h-10" />
           <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter">
             Upcoming <span className="text-brand">Discovery.</span>
           </h2>

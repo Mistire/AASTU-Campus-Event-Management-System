@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, Search, ArrowRight, Sparkles } from "lucide-react";
+import { Calendar, Search, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DiscoveryNavbar } from "@/features/discovery/components/DiscoveryNavbar";
@@ -56,7 +56,7 @@ export default function MyEventsPage() {
           
           {/* Subtle decoration */}
           <div className="mt-24 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-widest">
-            <Sparkles size={14} className="text-brand" />
+            <MapPin size={14} className="text-brand" />
             AASTU Campus Discovery
           </div>
         </div>

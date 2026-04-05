@@ -209,9 +209,9 @@ export function LoginForm() {
 
       {/* Technical footnote */}
       <div className="mt-6 text-center">
-        <span className="font-brand font-black text-[8px] uppercase tracking-[0.3em] text-gray-200">
-          [ AUTH-GATE v2.0 — CEMS ]
-        </span>
+        <p className="mt-8 text-center text-xs font-brand font-black uppercase tracking-widest text-brand opacity-20">
+          Secure Portal Access
+        </p>
       </div>
     </motion.div>
   );

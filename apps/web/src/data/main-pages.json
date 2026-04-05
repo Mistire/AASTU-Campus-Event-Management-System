@@ -13,7 +13,7 @@
         "children": []
     },
     {
-        "icon": "Sparkles",
+        "icon": "Compass",
         "title": "Discover",
         "parent": "/discovery",
         "to": "/discovery",
