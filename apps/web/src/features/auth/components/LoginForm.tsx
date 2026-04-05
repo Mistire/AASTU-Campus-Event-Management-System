@@ -58,11 +58,16 @@ export function LoginForm() {
         description: `Logged in as ${normalizedRole.toLowerCase()}`,
       });
 
-      router.push("/dashboard");
-    } catch (err: any) {
-      console.error("Login Error:", err.message);
+      if (normalizedRole === "STUDENT") {
+        router.push("/discovery");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
+      console.error("Login Error:", errorMessage);
       toast.error("Login Failed", {
-        description: err.message,
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);

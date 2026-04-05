@@ -7,8 +7,18 @@
         "allowed": [
             "ADMIN",
             "ORGANIZER",
-            "STUDENT",
             "STAFF"
+        ],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Sparkles",
+        "title": "Discover",
+        "parent": "/discovery",
+        "to": "/discovery",
+        "allowed": [
+            "STUDENT"
         ],
         "hasBadge": false,
         "children": []

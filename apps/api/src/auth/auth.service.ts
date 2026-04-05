@@ -526,7 +526,11 @@ export class AuthService {
 
       return { access_token: accessToken, refresh_token: refreshToken };
     } catch (err) {
-      console.error('AuthService.refreshToken error:', err);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error(`[AuthService.refreshToken] Failure: ${message}`, {
+        tokenSnippet: dto.refreshToken.substring(0, 10) + '...',
+        error: err,
+      });
       throw err;
     }
   }

@@ -18,23 +18,29 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   profile: AuthProfile | null;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   setAuth: (token: string, refreshToken: string, profile: AuthProfile) => void;
+  setTokens: (token: string, refreshToken: string) => void;
   clearAuth: () => void;
   hasRole: (role: Role) => boolean;
   hasAnyRole: (roles: Role[]) => boolean;
 }
 
-// Custom storage for zustand/persist using cookies
-const cookieStorage = {
+const hybridStorage = {
   getItem: (name: string): string | null => {
-    return Cookies.get(name) || null;
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(name) || Cookies.get(name) || null;
   },
   setItem: (name: string, value: string): void => {
-    // Save for 7 days as requested by user in LoginForm checkbox
-    Cookies.set(name, value, { expires: 7, path: '/' });
+    if (typeof window === "undefined") return;
+    localStorage.setItem(name, value);
+    Cookies.set(name, value, { expires: 7, path: "/" });
   },
   removeItem: (name: string): void => {
-    Cookies.remove(name, { path: '/' });
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(name);
+    Cookies.remove(name, { path: "/" });
   },
 };
 
@@ -44,13 +50,17 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       refreshToken: null,
       profile: null,
+      _hasHydrated: false,
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       setAuth: (token, refreshToken, profile) =>
         set({ token, refreshToken, profile }),
 
+      setTokens: (token, refreshToken) => set({ token, refreshToken }),
+
       clearAuth: () => {
         set({ token: null, refreshToken: null, profile: null });
-        // Manually clear the cookie just in case
         Cookies.remove("auth-storage");
       },
 
@@ -70,7 +80,10 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => cookieStorage),
-    },
-  ),
+      storage: createJSONStorage(() => hybridStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    }
+  )
 );
