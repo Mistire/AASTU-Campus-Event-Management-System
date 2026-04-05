@@ -6,7 +6,6 @@ import {
   CalendarClock,
   Zap,
   ArrowRight,
-  Sparkle,
   Lock,
   Users,
 } from "lucide-react";
@@ -43,10 +42,7 @@ export default function CoreFeatures() {
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-6">
-            <Sparkle size={14} className="fill-brand" />
-            Core Capabilities
-          </div>
+          <div className="h-10" />
           <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tighter">
             Engineered for <span className="text-brand">Excellence.</span>
           </h2>
@@ -63,7 +59,7 @@ export default function CoreFeatures() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-fr"
         >
-          {/* 1. Hybrid AI Brain (Large Focus) */}
+          {/* 1. Discovery Engine (Large Focus) */}
           <motion.div
             variants={item}
             className="md:col-span-2 md:row-span-2 group relative p-12 rounded-[3.5rem] bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
@@ -79,7 +75,7 @@ export default function CoreFeatures() {
                 <Brain size={32} />
               </div>
               <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">
-                Hybrid AI Brand Engine
+                Personalized Discovery Engine
               </h3>
               <p className="text-gray-500 text-lg leading-relaxed max-w-md font-medium mb-12">
                 Our hybrid ML-service combines content-based and collaborative
@@ -87,7 +83,7 @@ export default function CoreFeatures() {
                 behavior.
               </p>
 
-              {/* Micro-UI: AI Recommendations Preview */}
+              {/* Micro-UI: Discovery Feed Preview */}
               <div className="flex flex-col gap-3 max-w-sm">
                 {[1, 2].map((i) => (
                   <div

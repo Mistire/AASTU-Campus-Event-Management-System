@@ -16,7 +16,7 @@ import {
   X,
   Layers,
   MapPin,
-  Sparkles,
+  Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ const iconMap: Record<string, React.ElementType> = {
   FileDown: FileDown,
   Categories: Layers,
   Venues: MapPin,
-  Sparkles: Sparkles,
+  Compass: Compass,
 };
 
 interface MainPage {
@@ -45,6 +45,8 @@ interface MainPage {
 interface SidebarProps {
   onClose?: () => void;
 }
+
+import Logo from "@/components/ui/Logo";
 
 export function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
@@ -63,30 +65,7 @@ export function Sidebar({ onClose }: SidebarProps) {
     <div className="flex flex-col h-full bg-white text-gray-600">
       {/* ── Sidebar Header ── */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-100 shrink-0">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="font-brand flex items-center tracking-tighter">
-            <span className="text-brand font-bold text-xl opacity-40 select-none">
-              [
-            </span>
-            <span className="mx-1 text-2xl font-black bg-linear-to-r from-brand via-blue-500 to-cyan-400 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-brand transition-all duration-500">
-              CEMS
-            </span>
-            <span className="text-brand font-bold text-xl opacity-40 select-none">
-              ]
-            </span>
-
-            {/* Pulsing Live Indicator */}
-            <div className="ml-2 flex items-center">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
-              </span>
-              <span className="ml-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-brand/60 hidden sm:block">
-                Live
-              </span>
-            </div>
-          </div>
-        </Link>
+        <Logo />
         {onClose && (
           <Button
             variant="ghost"

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function FinalCTA() {
@@ -12,15 +12,7 @@ export default function FinalCTA() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand/30 rounded-full blur-[140px] opacity-40 z-0" />
       
       <div className="max-w-5xl mx-auto text-center relative z-10">
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           whileInView={{ opacity: 1, y: 0 }}
-           viewport={{ once: true }}
-           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-brand font-black uppercase tracking-widest mb-10"
-        >
-          <Sparkles size={14} className="fill-white/20" />
-          Join the Elite Network
-        </motion.div>
+        <div className="h-10" />
 
         <motion.h2 
           initial={{ opacity: 0, y: 30 }}
@@ -68,12 +60,8 @@ export default function FinalCTA() {
           </Link>
         </motion.div>
 
-        {/* System Footer Log */}
-        <div className="mt-24 pt-12 border-t border-white/10 opacity-30">
-          <div className="font-brand font-black text-[9px] uppercase tracking-[0.5em] text-white">
-            [ END OF LOG — VERSION 2.0.4-L — CEMS ]
-          </div>
-        </div>
+        {/* Cleaner Footer Area */}
+        <div className="mt-24 pt-12" />
       </div>
     </section>
   );

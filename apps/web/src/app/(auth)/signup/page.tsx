@@ -9,7 +9,7 @@ export const metadata = {
 export default function SignupPage() {
   return (
     <AuthShell
-      badge="REGISTRATION — NEW PARTICIPANT"
+      badge="Join the Network"
       title={
         <>
           Your campus story

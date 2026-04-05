@@ -13,7 +13,6 @@ import {
   Zap,
   Coffee,
   MapPin,
-  Sparkles,
   Ticket,
   Bell,
   Users,
@@ -92,7 +91,6 @@ export default function Hero() {
       {/* Top-right cluster */}
       <FloatingIcon Icon={PartyPopper} className="top-[8%]  right-[8%]"   delay={0.4} duration={8}  yOffset={16} size={32} />
       <FloatingIcon Icon={Bell}        className="top-[28%] right-[5%]"   delay={2.2} duration={10} yOffset={12} size={26} />
-      <FloatingIcon Icon={Sparkles}    className="top-[50%] right-[9%]"   delay={1.0} duration={5}  yOffset={8}  size={22} />
 
       {/* Mid-left */}
       <FloatingIcon Icon={Zap}         className="top-[70%] left-[3%]"    delay={3.0} duration={6}  yOffset={20} size={24} />
@@ -109,20 +107,8 @@ export default function Hero() {
       {/* ── Content ── */}
       <div className="relative z-10 max-w-7xl mx-auto">
 
-        {/* Status Capsule */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-brand/10 shadow-sm mb-8"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
-          </span>
-          <span className="font-brand font-black text-[10px] uppercase tracking-[0.2em] text-brand">
-            LIVE — POWERING 12+ CAMPUS EVENTS TODAY
-          </span>
-        </motion.div>
+        {/* Space for aesthetic balance */}
+        <div className="h-20" />
 
         <motion.h1
           initial={{ opacity: 0, y: -30 }}

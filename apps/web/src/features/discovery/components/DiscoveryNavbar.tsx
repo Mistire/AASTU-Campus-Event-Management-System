@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import Logo from "@/components/ui/Logo";
+
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -26,15 +28,7 @@ export function DiscoveryNavbar() {
         
         {/* Left: Branding & Nav Links */}
         <div className="flex items-center gap-10">
-          <Link href="/discovery" className="flex items-center gap-2 group">
-             <div className="font-brand flex items-center tracking-tighter">
-                <span className="text-brand/30 font-bold text-2xl select-none">[</span>
-                <span className="mx-1 text-2xl font-black bg-linear-to-r from-brand via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  CEMS
-                </span>
-                <span className="text-brand/30 font-bold text-2xl select-none">]</span>
-             </div>
-          </Link>
+          <Logo />
 
           <div className="hidden md:flex items-center gap-1">
              <NavItem href="/discovery" label="Discovery" icon={LayoutGrid} active />
@@ -91,10 +85,10 @@ export function DiscoveryNavbar() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated as</p>
                         <p className="text-[11px] font-bold text-gray-900 truncate">{profile?.email || "student@aastu.edu.et"}</p>
                      </div>
-                     <DropdownItem icon={User} label="My Profile" />
-                     <DropdownItem icon={Settings} label="Preferences" />
+                     <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
+                     <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
-                       <DropdownItem 
+                       <ProfileItem 
                          icon={LayoutGrid} 
                          label="Go to Dashboard" 
                          onClick={() => {
@@ -103,10 +97,10 @@ export function DiscoveryNavbar() {
                        />
                      )}
                      <div className="h-px bg-gray-50 my-1" />
-                     <DropdownItem 
+                     <ProfileItem 
                         icon={LogOut} 
                         label="Sign Out" 
-                        variant="danger" 
+                        danger
                         onClick={() => {
                           clearAuth();
                           window.location.href = "/login";
@@ -123,36 +117,46 @@ export function DiscoveryNavbar() {
   );
 }
 
-function NavItem({ href, label, icon: Icon, active }: { href: string; label: string; icon: any; active?: boolean }) {
-  return (
-    <Link 
-      href={href}
-      className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-        active 
-          ? "bg-brand/5 text-brand" 
-          : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-      )}
-    >
-      <Icon size={14} />
-      {label}
-    </Link>
-  );
+interface NavItemProps {
+  href: string;
+  label: string;
+  icon: any;
+  active?: boolean;
 }
 
-function DropdownItem({ icon: Icon, label, variant, onClick }: { icon: any; label: string; variant?: "danger"; onClick?: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-xs font-bold transition-colors text-left",
-        variant === "danger" 
-          ? "text-red-500 hover:bg-red-50" 
-          : "text-gray-600 hover:bg-gray-50 hover:text-brand"
-      )}
-    >
-      <Icon size={16} />
-      {label}
-    </button>
-  );
+const NavItem = ({ href, label, icon: Icon, active }: NavItemProps) => (
+  <Link
+    href={href}
+    className={cn(
+      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300",
+      active
+        ? "bg-brand/10 text-brand shadow-sm shadow-brand/5"
+        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+    )}
+  >
+    <Icon size={18} className={active ? "text-brand" : "text-gray-400"} />
+    {label}
+  </Link>
+);
+
+interface ProfileItemProps {
+  icon: any;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
 }
+
+const ProfileItem = ({ icon: Icon, label, onClick, danger }: ProfileItemProps) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
+      danger
+        ? "text-red-500 hover:bg-red-50"
+        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+    )}
+  >
+    <Icon size={18} />
+    {label}
+  </button>
+);

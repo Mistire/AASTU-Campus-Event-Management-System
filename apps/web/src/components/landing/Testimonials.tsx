@@ -2,12 +2,11 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Users } from "lucide-react";
 
 const testimonials = [
   {
     img: "/stud1.webp",
-    quote: "CEMS made it so easy to find and join events! The AI recommendations are spot on.",
+    quote: "CEMS made it so easy to find and join events! The event suggestions are spot on.",
     name: "Hanna Tesfaye",
     role: "Software Engineering Student",
   },
@@ -62,10 +61,7 @@ export default function Testimonials() {
         transition={{ duration: 0.6 }}
         className="relative z-10 text-center mb-20 px-6"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 text-brand text-[10px] font-brand font-black uppercase tracking-widest mb-6">
-          <Users size={14} className="fill-brand/20" />
-          User Sentiment
-        </div>
+        <div className="h-10" />
         <h2 className="text-4xl md:text-6xl font-black mb-6 text-gray-900 tracking-tighter">What Students Say</h2>
         <p className="text-gray-500 max-w-2xl mx-auto text-xl font-medium leading-relaxed">
           Trusted by student organizations and thousands of students across the AASTU campus.
