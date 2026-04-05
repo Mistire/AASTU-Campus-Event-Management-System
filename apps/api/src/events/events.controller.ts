@@ -26,7 +26,7 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({ summary: 'Create a new event (Organizer). Status auto-set to DRAFT.' })
   @ApiResponse({ status: 201, description: 'Event created in DRAFT status.' })
   create(@GetUser() user: AuthUser, @Body() dto: CreateEventDto) {
@@ -60,7 +60,7 @@ export class EventsController {
   }
 
   @Patch(':id')
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({ summary: 'Update event (only DRAFT or PENDING status). Organizer/Creator only.' })
   @ApiResponse({ status: 403, description: 'Cannot edit event in current status.' })
   update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateEventDto) {
@@ -112,7 +112,7 @@ export class EventsController {
   }
 
   @Delete(':id')
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({ summary: 'Delete event (Organizer: only DRAFT)' })
   remove(@Param('id') id: string, @GetUser() user: AuthUser) {
     return this.eventsService.remove(id, user);

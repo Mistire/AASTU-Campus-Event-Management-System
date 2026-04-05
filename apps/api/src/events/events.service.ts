@@ -349,6 +349,8 @@ export class EventsService {
       status,
       eventType,
       tag,
+      venueId,
+      createdById,
       page = 1,
       limit = 10,
     } = query;
@@ -356,6 +358,14 @@ export class EventsService {
 
     if (status) {
       where.status = { statusName: status };
+    }
+
+    if (venueId) {
+      where.venueId = venueId;
+    }
+
+    if (createdById) {
+      where.createdBy = createdById;
     }
 
     if (eventType) {
@@ -392,7 +402,7 @@ export class EventsService {
     const skip = (page - 1) * limit;
     const orderBy = this.resolveOrderBy(sortBy);
 
-    const [data, total] = await Promise.all([
+    const [data, total, stats] = await Promise.all([
       this.prisma.event.findMany({
         where,
         include: {
@@ -404,7 +414,20 @@ export class EventsService {
         take: limit,
       }),
       this.prisma.event.count({ where }),
+      this.prisma.event.groupBy({
+        by: ['statusId'],
+        _count: { _all: true },
+        where: { ...where, status: undefined }, // Get global totals for the status breakdown
+      }),
     ]);
+
+    // Map status names to counts for the frontend
+    const allStatuses = await this.prisma.eventStatus.findMany();
+    const statusStats = allStatuses.reduce((acc, s) => {
+      const match = stats.find((st) => st.statusId === s.id);
+      acc[s.statusName] = match?._count._all || 0;
+      return acc;
+    }, {} as Record<string, number>);
 
     return {
       data,
@@ -413,6 +436,7 @@ export class EventsService {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        stats: statusStats,
       },
     };
   }
