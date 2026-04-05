@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorator';
 import { AuthUser } from 'src/auth/jwt.strategy';
@@ -9,14 +9,24 @@ import {
   UpdateUserInterestsDto,
 } from './dto';
 
+import { Roles } from 'src/auth/decorator';
+import { JwtAuthGuard, RolesGuard } from 'src/auth/guard';
+
 type AuthenticatedRequest = { user: AuthUser };
 
 @ApiTags('Users')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiBearerAuth('access-token')
+  @Get()
+  @Roles('Admin', 'Organizer')
+  findAll() {
+    return this.usersService.findAll();
+  }
+
   @Get('me')
   getMe(@Req() req: AuthenticatedRequest) {
     return this.usersService.getMyProfile(req.user.id);

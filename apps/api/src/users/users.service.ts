@@ -12,6 +12,22 @@ import {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAll() {
+    return this.prisma.user.findMany({
+      where: {
+        role: {
+          roleName: { in: ['Admin', 'Organizer'] },
+        },
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+      },
+      orderBy: { fullName: 'asc' },
+    });
+  }
+
   async getMyProfile(userId: string) {
     try {
       const user = await this.prisma.user.findUnique({

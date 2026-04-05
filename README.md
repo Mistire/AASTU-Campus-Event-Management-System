@@ -108,7 +108,7 @@ At AASTU, event management currently relies on:
 - Event views, RSVPs, attendance rates, feedback summaries
 - Participation trends over time
 - Organizer and admin dashboards
-- Data-driven insights for future event planning
+- Data-driven insights for future event planning.
 
 ### Feedback & Ratings
 - Post-event rating and comment submission
