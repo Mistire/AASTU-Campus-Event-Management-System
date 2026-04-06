@@ -41,7 +41,7 @@ export class EventsService {
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
-  ) { }
+  ) {}
 
   private async getStatusByName(name: string) {
     const status = await this.prisma.eventStatus.findUnique({
@@ -423,11 +423,14 @@ export class EventsService {
 
     // Map status names to counts for the frontend
     const allStatuses = await this.prisma.eventStatus.findMany();
-    const statusStats = allStatuses.reduce((acc, s) => {
-      const match = stats.find((st) => st.statusId === s.id);
-      acc[s.statusName] = match?._count._all || 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const statusStats = allStatuses.reduce(
+      (acc, s) => {
+        const match = stats.find((st) => st.statusId === s.id);
+        acc[s.statusName] = match?._count._all || 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       data,

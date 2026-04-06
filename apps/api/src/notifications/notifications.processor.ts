@@ -23,7 +23,7 @@ export class NotificationsProcessor extends WorkerHost {
 
     try {
       // 1. Persist to Database
-      const result = await this.prisma.notification.createMany({
+      await this.prisma.notification.createMany({
         data: userIds.map((userId) => ({
           userId,
           title,
@@ -32,16 +32,27 @@ export class NotificationsProcessor extends WorkerHost {
         })),
       });
 
-      this.logger.log(`Successfully persisted ${result.count} notifications for job ${job.id}`);
+      // Fetch created records to obtain their id and createdAt values
+      const created = await this.prisma.notification.findMany({
+        where: { userId: { in: userIds }, title, message, type },
+        orderBy: { createdAt: 'desc' },
+        take: userIds.length,
+        select: { id: true, userId: true, createdAt: true },
+      });
+
+      this.logger.log(`Successfully persisted ${created.length} notifications for job ${job.id}`);
 
       // 2. Real-time delivery (WebSocket)
       for (const userId of userIds) {
+        const record = created.find((n) => n.userId === userId);
+        if (!record) continue;
         this.notificationsGateway.emitToUser(userId, {
+          id: record.id,
           title,
           message,
           type,
-          createdAt: new Date(),
-        } as NotificationPayload);
+          createdAt: record.createdAt,
+        } satisfies NotificationPayload);
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

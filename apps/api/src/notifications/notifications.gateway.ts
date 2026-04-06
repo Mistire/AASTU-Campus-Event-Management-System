@@ -16,6 +16,7 @@ interface JwtPayload {
 }
 
 export interface NotificationPayload {
+  id: string;
   title: string;
   message: string;
   type: string;
@@ -33,9 +34,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   server: Server;
 
   private readonly logger = new Logger(NotificationsGateway.name);
-
-  // Map to store userId -> socketId
-  private userSocketMap = new Map<string, string>();
 
   constructor(
     private readonly jwtService: JwtService,
@@ -66,8 +64,8 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
         return;
       }
 
-      // Store mapping
-      this.userSocketMap.set(userId, client.id);
+      // Join user's private room
+      await client.join(`user:${userId}`);
       this.logger.log(`User ${userId} connected via WebSocket (socket: ${client.id})`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -77,24 +75,14 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   }
 
   handleDisconnect(client: Socket) {
-    // Find and remove mapping
-    for (const [userId, socketId] of this.userSocketMap.entries()) {
-      if (socketId === client.id) {
-        this.userSocketMap.delete(userId);
-        this.logger.log(`User ${userId} disconnected (socket: ${client.id})`);
-        break;
-      }
-    }
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   /**
-   * Emit a notification to a specific user if they are connected.
+   * Emit a notification to a specific user's private room.
    */
   emitToUser(userId: string, data: NotificationPayload) {
-    const socketId = this.userSocketMap.get(userId);
-    if (socketId) {
-      this.server.to(socketId).emit('notification', data);
-      this.logger.debug(`Emitted notification to user ${userId}`);
-    }
+    this.server.to(`user:${userId}`).emit('notification', data);
+    this.logger.debug(`Emitted notification to user ${userId}`);
   }
 }

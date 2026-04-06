@@ -25,6 +25,6 @@ import { NotificationsGateway } from './notifications.gateway';
   ],
   controllers: [NotificationsController],
   providers: [NotificationsService, NotificationsProcessor, NotificationsGateway],
-  exports: [NotificationsService],
+  exports: [NotificationsService, NotificationsGateway],
 })
 export class NotificationsModule {}

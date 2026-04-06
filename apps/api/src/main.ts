@@ -50,9 +50,6 @@ async function bootstrap() {
     }),
   );
 
-
-
-
   // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
 

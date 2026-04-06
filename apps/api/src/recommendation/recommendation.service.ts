@@ -27,21 +27,19 @@ export class RecommendationService {
     });
   }
 
-  async getRecommendations(userId: string, n: number = 10) {
-    const cacheKey = `recommendations:${userId}:${n}`;
-
+  async getRecommendations(userId: string, n: number = 10): Promise<unknown> {
     try {
       // 1. Check Redis Cache
       const cacheKey = `recommendations:user:${userId}:${n}`;
       const cached = await this.redis.get(cacheKey);
       if (cached) {
         this.logger.log(`Serving recommendations from cache for user ${userId}`);
-        return JSON.parse(cached);
+        return JSON.parse(cached) as unknown;
       }
 
       // 2. Fetch from ML Service
       this.logger.log(`Fetching fresh recommendations from ML service for user ${userId}`);
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<unknown> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/predict/${userId}?n=${n}`),
       );
 
@@ -52,30 +50,30 @@ export class RecommendationService {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get recommendations: ${errorMessage}`);
-      const axiosError = error as any;
-      if (axiosError.response?.status === 503) {
-        throw new HttpException(
-          'Recommendation service unavailable. Models not trained yet.',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 503) {
+          throw new HttpException(
+            'Recommendation service unavailable. Models not trained yet.',
+            HttpStatus.SERVICE_UNAVAILABLE,
+          );
+        }
       }
       throw new HttpException('Failed to get recommendations', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getSimilarEvents(eventId: string, n: number = 10) {
-    const cacheKey = `similar_events:${eventId}:${n}`;
-
+  async getSimilarEvents(eventId: string, n: number = 10): Promise<unknown> {
     try {
       // 1. Check Cache
       const cacheKey = `recommendations:similar:${eventId}:${n}`;
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached);
+        return JSON.parse(cached) as unknown;
       }
 
       // 2. Fetch from ML Service
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<unknown> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/similar/${eventId}?n=${n}`),
       );
 
@@ -86,9 +84,11 @@ export class RecommendationService {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get similar events: ${errorMessage}`);
-      const axiosError = error as any;
-      if (axiosError.response?.status === 404) {
-        throw new HttpException('Event not found in recommendation model', HttpStatus.NOT_FOUND);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          throw new HttpException('Event not found in recommendation model', HttpStatus.NOT_FOUND);
+        }
       }
       throw new HttpException('Failed to get similar events', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -144,9 +144,9 @@ export class RecommendationService {
     };
   }
 
-  async getHealth() {
+  async getHealth(): Promise<unknown> {
     try {
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<unknown> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/health`),
       );
       return response.data;
