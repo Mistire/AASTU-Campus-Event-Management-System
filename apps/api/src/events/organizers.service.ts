@@ -13,7 +13,7 @@ import { InviteOrganizerDto } from './dto/invitation.dto';
 
 @Injectable()
 export class OrganizersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async invite(eventId: string, inviterId: string, dto: InviteOrganizerDto) {
     const event = await this.prisma.event.findUnique({

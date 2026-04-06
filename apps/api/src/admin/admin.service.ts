@@ -4,7 +4,7 @@ import { AssignRoleDto, ListUserQueryDto } from './dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async listUsers(query: ListUserQueryDto) {
     try {
@@ -13,21 +13,21 @@ export class AdminService {
           ...(query.roleId ? { roleId: query.roleId } : {}),
           ...(query.search
             ? {
-              OR: [
-                {
-                  fullName: {
-                    contains: query.search,
-                    mode: 'insensitive',
+                OR: [
+                  {
+                    fullName: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-                {
-                  email: {
-                    contains: query.search,
-                    mode: 'insensitive',
+                  {
+                    email: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-              ],
-            }
+                ],
+              }
             : {}),
         },
         include: {

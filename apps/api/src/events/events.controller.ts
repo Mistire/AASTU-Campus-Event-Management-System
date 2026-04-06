@@ -26,7 +26,7 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @Roles('Organizer', 'Admin', 'Student')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Create a new event (Organizer). Status auto-set to DRAFT.' })
   @ApiResponse({ status: 201, description: 'Event created in DRAFT status.' })
   create(@GetUser() user: AuthUser, @Body() dto: CreateEventDto) {
