@@ -85,8 +85,7 @@
         "parent": "/dashboard/attendance",
         "to": "/dashboard/attendance",
         "allowed": [
-            "ADMIN",
-            "ORGANIZER"
+            "ADMIN"
         ],
         "hasBadge": false,
         "children": []

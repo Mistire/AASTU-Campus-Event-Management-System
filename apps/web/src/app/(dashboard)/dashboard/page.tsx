@@ -8,38 +8,53 @@ import {
     MapPin,
     Layers,
     Activity,
-    RefreshCw
+    RefreshCw,
+    CheckCircle2,
+    Clock,
+    PieChart
 } from 'lucide-react';
-import { useRecentRegistrations } from '@/features/dashboard/api/getRecentRegistrations';
+import { ColumnDef } from "@tanstack/react-table";
+import { TableController } from "@/components/shared/TableController";
+import { useRecentRegistrations, RecentRegistration } from '@/features/dashboard/api/getRecentRegistrations';
+import { useDashboardStats } from '@/features/dashboard/api/getStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const MetricCard = ({
     title,
     value,
     icon: Icon,
-    subValue
+    subValue,
+    trend
 }: {
     title: string;
     value: string | number;
     icon: React.ElementType;
-    subValue?: string
+    subValue?: string;
+    trend?: 'up' | 'down' | 'neutral'
 }) => (
-    <Card className="rounded-xl shadow-sm border-gray-100 relative overflow-hidden">
-        <CardContent className="p-4 flex flex-col items-center justify-center min-h-[110px]">
-            <div className="absolute top-3 left-3 text-gray-400">
-                <Icon size={14} />
+    <Card className="rounded-3xl shadow-2xl shadow-gray-200/50 border-none relative overflow-hidden group hover:scale-[1.02] transition-all duration-500 bg-white">
+        <CardContent className="p-8 flex flex-col items-center justify-center min-h-[140px]">
+            <div className="absolute top-6 left-6 w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center text-brand group-hover:scale-110 transition-transform">
+                <Icon size={18} />
             </div>
+            
+            <div className="text-4xl font-black text-gray-900 tracking-tighter mt-4">{value}</div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-3 group-hover:text-brand transition-colors">{title}</p>
+            
             {subValue && (
-                <div className="absolute top-2 right-2 text-[9px] text-emerald-500 font-bold uppercase">
+                <div className={cn(
+                    "mt-4 px-3 py-1 rounded-full text-[10px] font-black flex items-center gap-1",
+                    trend === 'up' ? "bg-emerald-50 text-emerald-600" : 
+                    trend === 'down' ? "bg-red-50 text-red-600" : 
+                    "bg-blue-50 text-blue-600"
+                )}>
                     {subValue}
                 </div>
             )}
-            <div className="text-3xl font-bold text-brand mt-4">{value}</div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">{title}</p>
         </CardContent>
     </Card>
 );
@@ -47,7 +62,8 @@ const MetricCard = ({
 export default function DashboardPage() {
     const { profile } = useAuthStore();
     const router = useRouter();
-    const { data: registrations, isLoading, isError, refetch } = useRecentRegistrations();
+    const { data: registrations, isLoading: isRegLoading, refetch } = useRecentRegistrations();
+    const { data: stats, isLoading: isStatsLoading } = useDashboardStats();
 
     useEffect(() => {
         if (profile && (profile.role === "STUDENT" || profile.roles?.includes("STUDENT"))) {
@@ -55,152 +71,197 @@ export default function DashboardPage() {
         }
     }, [profile, router]);
 
+    const regStats = useMemo(() => {
+        if (!registrations) return { approved: 0, pending: 0, total: 0, today: 0 };
+        
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        const approved = registrations.filter(r => r.status.name === 'APPROVED').length;
+        const pending = registrations.filter(r => r.status.name === 'PENDING').length;
+        const today = registrations.filter(r => new Date(r.registrationDate) >= startOfToday).length;
+        
+        return { approved, pending, total: registrations.length, today };
+    }, [registrations]);
+
+    const activityColumns: ColumnDef<RecentRegistration>[] = [
+        {
+            id: "index",
+            header: "No.",
+            cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
+            size: 50,
+        },
+        {
+            accessorKey: "user.fullName",
+            header: "User Profile",
+            cell: ({ row }) => {
+                const user = row.original.user;
+                return (
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center text-brand font-black text-xs border border-brand/10 shadow-sm transition-transform group-hover:scale-110">
+                            {user.fullName.charAt(0)}
+                        </div>
+                        <div>
+                            <p className="text-xs font-black text-gray-900 group-hover:text-brand transition-colors">{user.fullName}</p>
+                            <p className="text-[10px] font-medium text-gray-400 mt-0.5">{user.email}</p>
+                        </div>
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "event.title",
+            header: "Target Event",
+            cell: ({ row }) => <p className="text-xs font-bold text-gray-600 line-clamp-1">{row.original.event.title}</p>,
+        },
+        {
+            accessorKey: "status.name",
+            header: "Status",
+            cell: ({ row }) => {
+                const status = row.original.status.name;
+                return (
+                    <span className={cn(
+                        "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest inline-flex items-center gap-1.5",
+                        status === 'APPROVED' ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                        status === 'PENDING' ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                        "bg-gray-50 text-gray-500 border border-gray-100"
+                    )}>
+                        <span className={cn(
+                            "w-1.5 h-1.5 rounded-full",
+                            status === 'APPROVED' ? "bg-emerald-500" :
+                            status === 'PENDING' ? "bg-amber-500" : "bg-gray-400"
+                        )} />
+                        {status}
+                    </span>
+                );
+            },
+        },
+        {
+            accessorKey: "registrationDate",
+            header: "Date",
+            cell: ({ row }) => (
+                <p className="text-[10px] font-black text-gray-400 tracking-widest text-right">
+                    {new Date(row.original.registrationDate).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+                </p>
+            ),
+        }
+    ];
+
     return (
-        <div className="space-y-4 font-sans text-brand-dark">
-            {/* Top row metrics - Using Placeholders as requested */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 text-brand">
-                <MetricCard
-                    title="Users"
-                    value="1,248"
-                    icon={Users}
-                    subValue="+12%"
-                />
-                <MetricCard
-                    title="Events"
-                    value="42"
-                    icon={Calendar}
-                    subValue="8 Live"
-                />
-                <MetricCard
-                    title="Registrations"
-                    value="856"
-                    icon={UserPlus}
-                    subValue="+24 Today"
-                />
-                <MetricCard
-                    title="Venues"
-                    value="12"
-                    icon={MapPin}
-                />
-                <MetricCard
-                    title="Categories"
-                    value="15"
-                    icon={Layers}
-                />
+        <div className="space-y-6 font-sans text-brand-dark pb-10 animate-in fade-in duration-700">
+            {/* Top row metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                {isStatsLoading ? (
+                    [1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-[160px] rounded-3xl" />)
+                ) : (
+                    <>
+                        <MetricCard title="Users" value={stats?.users?.toLocaleString() || "0"} icon={Users} />
+                        <MetricCard title="Events" value={stats?.events || "0"} icon={Calendar} subValue={`${stats?.events || 0} Total`} trend="neutral" />
+                        <MetricCard 
+                            title="Total Reg" 
+                            value={stats?.registrations?.toLocaleString() || "0"} 
+                            icon={UserPlus} 
+                            subValue={regStats.today > 0 ? `+${regStats.today} TODAY` : "NO NEW TODAY"} 
+                            trend={regStats.today > 0 ? "up" : "neutral"} 
+                        />
+                        <MetricCard title="Venues" value={stats?.venues || "0"} icon={MapPin} />
+                        <MetricCard title="Categories" value={stats?.categories || "0"} icon={Layers} />
+                    </>
+                )}
             </div>
 
-            {/* Third Row: Map and Table */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Map Card */}
-                <Card className="rounded-xl shadow-sm border-gray-100 overflow-hidden flex flex-col h-[500px]">
-                    <CardHeader className="py-3 px-4 border-b border-gray-100 flex flex-row items-center justify-between bg-white shrink-0">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="text-brand w-4 h-4" />
-                            <CardTitle className="text-sm font-bold text-gray-800">Campus Event Heatmap</CardTitle>
-                        </div>
-                        <div className="border border-brand text-brand px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase">
-                            Live
+            {/* Content Row: Status Overview and Recent Registrations */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Status Overview Card */}
+                <Card className="lg:col-span-1 rounded-3xl shadow-2xl shadow-gray-200/50 border-none overflow-hidden flex flex-col bg-white">
+                    <CardHeader className="py-8 px-10 flex flex-row items-center justify-between border-b border-gray-50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                <PieChart size={20} />
+                            </div>
+                            <CardTitle className="text-xl font-black text-gray-900 tracking-tight">Status Insight</CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-0 flex-1 relative bg-slate-900 border-none">
-                        <div className="absolute inset-0 bg-slate-800 flex items-center justify-center p-4 text-center">
-                            <div className="text-slate-500 text-sm">
-                                Campus map integration goes here.<br />
-                                Show visual density of upcoming events.
+                    <CardContent className="p-10 flex-1 flex flex-col justify-center">
+                        <div className="space-y-8">
+                            <div className="flex justify-between items-center p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 group hover:scale-[1.05] transition-all">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-200">
+                                        <CheckCircle2 size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Approved</p>
+                                        <p className="text-2xl font-black text-gray-900">{regStats.approved}</p>
+                                    </div>
+                                </div>
+                                <div className="text-[10px] font-black text-emerald-600 bg-emerald-100/50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                    {regStats.total > 0 ? Math.round((regStats.approved/regStats.total)*100) : 0}%
+                                </div>
+                            </div>
+
+                             <div className="flex justify-between items-center p-6 rounded-2xl bg-amber-50/50 border border-amber-100/50 group hover:scale-[1.05] transition-all">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-200">
+                                        <Clock size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Pending</p>
+                                        <p className="text-2xl font-black text-gray-900">{regStats.pending}</p>
+                                    </div>
+                                </div>
+                                <div className="text-[10px] font-black text-amber-600 bg-amber-100/50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                    {regStats.total > 0 ? Math.round((regStats.pending/regStats.total)*100) : 0}%
+                                </div>
+                            </div>
+                            
+                            <div className="pt-6 border-t border-gray-50">
+                                <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                    <span>Sync Status</span>
+                                    <span className="text-emerald-500 flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        Live Data
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Recent Registrations Table - Using Real Data */}
-                <Card className="rounded-xl shadow-sm border-gray-100 flex flex-col h-[500px]">
-                    <CardHeader className="py-4 px-6 border-b border-gray-100 flex flex-row items-center justify-between shrink-0">
-                        <div className="flex items-center gap-2">
-                            <Activity className="text-brand w-5 h-5" />
-                            <CardTitle className="text-base font-bold text-gray-800">Recent Registrations</CardTitle>
+                {/* Table Card */}
+                <Card className="lg:col-span-2 rounded-3xl shadow-2xl shadow-gray-200/50 border-none flex flex-col bg-white overflow-hidden">
+                    <CardHeader className="py-8 px-10 border-b border-gray-50 flex flex-row items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
+                                <Activity size={20} />
+                            </div>
+                            <CardTitle className="text-xl font-black text-gray-900 tracking-tight">Recent Activity</CardTitle>
                         </div>
-                        <button className="text-brand text-[10px] font-bold tracking-widest uppercase hover:underline">
-                            View All &rarr;
+                        <button className="text-brand text-[10px] font-black tracking-widest uppercase hover:underline decoration-2 underline-offset-4">
+                            View Archive &rarr;
                         </button>
                     </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-y-auto">
-                        {isLoading ? (
-                            <div className="p-6 space-y-4">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <Skeleton key={i} className="h-12 w-full" />
-                                ))}
-                            </div>
-                        ) : isError ? (
-                            <div className="p-20 text-center text-gray-400 text-sm">
-                                Failed to load registrations.
-                            </div>
-                        ) : registrations?.length === 0 ? (
-                            <div className="p-20 text-center text-gray-400 text-sm italic">
-                                No registrations found.
-                            </div>
-                        ) : (
-                            <table className="w-full text-left border-collapse">
-                                <thead className="sticky top-0 bg-white z-10">
-                                    <tr className="border-b border-gray-100">
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">User</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Event</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {registrations?.map((reg) => (
-                                        <tr key={reg.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs">
-                                                        {reg.user.fullName.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-gray-800">{reg.user.fullName}</p>
-                                                        <p className="text-[10px] text-gray-400">{reg.user.email}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-6 text-xs text-gray-600 font-medium">
-                                                {reg.event.title}
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className={cn(
-                                                    "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider",
-                                                    reg.status.name === 'APPROVED' ? "bg-emerald-100 text-emerald-600" :
-                                                        reg.status.name === 'PENDING' ? "bg-amber-100 text-amber-600" :
-                                                            "bg-gray-100 text-gray-600"
-                                                )}>
-                                                    {reg.status.name}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-6 text-right text-[10px] text-gray-400 font-bold">
-                                                {new Date(reg.registrationDate).toLocaleDateString()}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
+                    <CardContent className="p-0 flex-1 overflow-hidden">
+                        <TableController 
+                            columns={activityColumns}
+                            data={registrations || []}
+                            loading={isRegLoading}
+                            emptyMessage="No recent registrations found."
+                        />
                     </CardContent>
-                    <div className="py-3 px-6 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400 font-medium shrink-0 bg-gray-50/50">
-                        <span>Updated just now</span>
+                    <div className="py-5 px-10 border-t border-gray-50 flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50/30">
+                        <div className="flex items-center gap-2">
+                             <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                             <span>Auto-Update Active</span>
+                        </div>
                         <button
                             onClick={() => refetch()}
-                            className="flex items-center gap-1 text-brand font-bold uppercase tracking-widest hover:underline"
+                            className="flex items-center gap-2 text-brand hover:underline group"
                         >
-                            <RefreshCw size={12} />
-                            Refresh
+                            <RefreshCw size={12} className="group-hover:rotate-180 transition-transform duration-700" />
+                            Refresh Dashboard
                         </button>
                     </div>
                 </Card>
-            </div>
-
-            <div className="text-center py-4">
-                <span className="text-[10px] font-bold text-brand uppercase tracking-widest">
-                    CEMS v1.0
-                </span>
             </div>
         </div>
     );

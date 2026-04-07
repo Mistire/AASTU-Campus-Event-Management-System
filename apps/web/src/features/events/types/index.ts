@@ -31,6 +31,17 @@ export interface Event {
   status: EventStatus;
   eventType?: EventType | null;
   venue: Venue;
+  createdBy: string;
+  organizers?: Array<{
+    id: string;
+    userId: string;
+    status: string;
+    user: {
+      id: string;
+      fullName: string;
+      email: string;
+    };
+  }>;
   _count?: {
     registrations: number;
   };

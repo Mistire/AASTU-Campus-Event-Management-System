@@ -16,11 +16,14 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useClickOutside } from "@/hooks/useClickOutside";
+
 import Logo from "@/components/ui/Logo";
 
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 h-16">
@@ -56,7 +59,7 @@ export function DiscoveryNavbar() {
           
           <div className="h-6 w-px bg-gray-100 mx-2" />
 
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 p-1 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
@@ -73,20 +76,20 @@ export function DiscoveryNavbar() {
 
             <AnimatePresence>
               {isProfileOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-gray-100 shadow-2xl p-2 z-50 overflow-hidden"
-                  >
-                     <div className="p-3 border-b border-gray-50 mb-1">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated as</p>
-                        <p className="text-[11px] font-bold text-gray-900 truncate">{profile?.email || "student@aastu.edu.et"}</p>
-                     </div>
-                     <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
-                     <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-gray-100 shadow-2xl p-2 z-50 overflow-hidden"
+                >
+                   <div className="p-3 border-b border-gray-50 mb-1">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated as</p>
+                      <p className="text-[11px] font-bold text-gray-900 truncate">{profile?.email || "student@aastu.edu.et"}</p>
+                   </div>
+                   <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
+                      <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
+                   </Link>
+                   <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
                        <ProfileItem 
                          icon={LayoutGrid} 
@@ -107,7 +110,6 @@ export function DiscoveryNavbar() {
                         }}
                      />
                   </motion.div>
-                </>
               )}
             </AnimatePresence>
           </div>

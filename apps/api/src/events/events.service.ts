@@ -41,7 +41,7 @@ export class EventsService {
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
-  ) { }
+  ) {}
 
   private async getStatusByName(name: string) {
     const status = await this.prisma.eventStatus.findUnique({
@@ -111,6 +111,67 @@ export class EventsService {
         ...(dto.categoryIds?.length && {
           eventCategories: {
             create: dto.categoryIds.map((categoryId) => ({ categoryId })),
+          },
+        }),
+
+        ...(dto.sessions?.length && {
+          sessions: {
+            create: dto.sessions.map((s) => ({
+              title: s.title,
+              description: s.description,
+              startTime: new Date(s.startTime),
+              endTime: new Date(s.endTime),
+              location: s.location,
+              sessionType: s.sessionType,
+              speakers: s.speakers?.length
+                ? {
+                    create: s.speakers.map((name) => ({
+                      speaker: {
+                        create: {
+                          fullName: name,
+                        },
+                      },
+                    })),
+                  }
+                : undefined,
+            })),
+          },
+        }),
+
+        ...(dto.hackathonConfig && {
+          hackathons: {
+            create: {
+              teamSizeMin: dto.hackathonConfig.teamSizeMin,
+              teamSizeMax: dto.hackathonConfig.teamSizeMax,
+              submissionDeadline: new Date(dto.hackathonConfig.submissionDeadline),
+              judgingCriteria: dto.hackathonConfig.judgingCriteria,
+            },
+          },
+        }),
+
+        access: {
+          create: {
+            accessType: dto.accessType || 'PUBLIC',
+            requiresApproval: dto.accessType === 'INVITE_ONLY' || (dto.requiresApproval ?? false),
+          },
+        },
+
+        invites: {
+          create: (dto.invites || []).map((email) => ({
+            invitedEmail: email,
+            invitedBy: user.id,
+            status: 'PENDING',
+          })),
+        },
+
+        ...(dto.thumbnailUrl && {
+          media: {
+            create: [
+              {
+                fileUrl: dto.thumbnailUrl,
+                mediaType: 'THUMBNAIL',
+              },
+            ],
           },
         }),
       },
@@ -423,11 +484,14 @@ export class EventsService {
 
     // Map status names to counts for the frontend
     const allStatuses = await this.prisma.eventStatus.findMany();
-    const statusStats = allStatuses.reduce((acc, s) => {
-      const match = stats.find((st) => st.statusId === s.id);
-      acc[s.statusName] = match?._count._all || 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const statusStats = allStatuses.reduce(
+      (acc, s) => {
+        const match = stats.find((st) => st.statusId === s.id);
+        acc[s.statusName] = match?._count._all || 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       data,

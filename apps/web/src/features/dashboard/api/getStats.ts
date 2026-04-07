@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
+import { apiFetch } from '@/lib/api-client';
 
 interface DashboardStats {
     users: number;
@@ -9,14 +10,9 @@ interface DashboardStats {
     categories: number;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-export async function fetchDashboardStats(token: string) {
-    const res = await fetch(`${API_URL}/api/admin/stats`, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
+export async function fetchDashboardStats() {
+    const res = await apiFetch(`/api/admin/stats`, {
+        method: 'GET',
     });
 
     if (!res.ok) {
@@ -36,7 +32,7 @@ export function useDashboardStats() {
 
     return useQuery({
         queryKey: ['dashboard-stats'],
-        queryFn: () => fetchDashboardStats(token!),
+        queryFn: fetchDashboardStats,
         enabled: !!token && isAdmin,
     });
 }

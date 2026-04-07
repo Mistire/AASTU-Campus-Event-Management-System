@@ -1,44 +1,49 @@
+"use client";
+
 import { Headset, Plus, Search } from 'lucide-react';
-import { DataTable } from '@/components/ui/data-table/data-table';
+import { TableController } from '@/components/shared/TableController';
 import { Button } from '@/components/ui/button';
 import { mockTickets } from '@/features/support/testing/mock-tickets';
-import { getSupportColumns, getSupportActions } from '@/features/support/components/SupportTableConfig';
-import { Ticket } from '@/features/support/types';
+import { getSupportColumns } from '@/features/support/components/SupportTableConfig';
 
 export default function SupportPage() {
     const columns = getSupportColumns();
-    const actions = getSupportActions((record: Ticket) => console.log('Reply', record));
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <Headset className="w-8 h-8 text-brand" />
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+                        <Headset className="w-8 h-8" />
+                    </div>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">SOS & Feedback</h1>
-                        <p className="text-gray-500 text-sm">Manage emergency alerts and support tickets.</p>
+                        <h1 className="text-3xl font-black tracking-tight text-gray-900">Support Center</h1>
+                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                            Manage emergency alerts and support tickets.
+                        </p>
                     </div>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" className="rounded-xl border-gray-200">
+                <div className="flex gap-3">
+                    <Button variant="outline" className="rounded-xl border-gray-200 h-12 px-6 font-black uppercase tracking-widest text-[11px] hover:bg-gray-50">
                         <Search className="w-4 h-4 mr-2" />
                         Search
                     </Button>
-                    <Button className="rounded-xl bg-brand hover:bg-brand-hover text-white shadow-lg shadow-brand/20">
+                    <Button className="rounded-xl bg-brand hover:bg-brand-hover text-white shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
                         <Plus className="w-4 h-4 mr-2" />
                         New Ticket
                     </Button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <DataTable
-                    data={mockTickets}
-                    columns={columns}
-                    actions={actions}
-                    pagination={{ pageSize: 5, showTotal: true }}
-                    hoverable
-                />
+            <div className="bg-white rounded-3xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+                <div className="p-0">
+                    <TableController
+                        data={mockTickets}
+                        columns={columns}
+                        emptyMessage="No support tickets found."
+                    />
+                </div>
             </div>
         </div>
     );

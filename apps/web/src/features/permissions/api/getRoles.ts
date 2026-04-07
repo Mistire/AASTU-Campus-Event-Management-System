@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
+import { apiFetch } from '@/lib/api-client';
 
 interface RoleResponse {
     id: string;
@@ -8,15 +9,9 @@ interface RoleResponse {
     createdAt: string;
 }
 
-// Ensure you replace this with the actual backend URL from env vars
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
-export async function fetchRoles(token: string) {
-    const res = await fetch(`${API_URL}/role`, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
+export async function fetchRoles() {
+    const res = await apiFetch(`/role`, {
+        method: 'GET',
     });
 
     if (!res.ok) {
@@ -32,7 +27,7 @@ export function useRoles() {
 
     return useQuery({
         queryKey: ['roles'],
-        queryFn: () => fetchRoles(token!),
+        queryFn: fetchRoles,
         enabled: !!token,
     });
 }

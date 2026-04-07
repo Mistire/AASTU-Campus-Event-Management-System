@@ -9,7 +9,11 @@ import {
   IsString,
   IsUUID,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type as classTransformerType } from 'class-transformer';
+import { CreateSessionDto } from './session.dto';
+import { CreateHackathonDto } from './hackathon.dto';
 
 export class CreateEventDto {
   @ApiProperty({ description: 'The title of the event', example: 'Annual Tech Summit 2026' })
@@ -70,4 +74,36 @@ export class CreateEventDto {
   @IsUUID('all', { each: true })
   @IsOptional()
   categoryIds?: string[];
+
+  @ApiPropertyOptional({ description: 'Array of sessions to create', type: [CreateSessionDto] })
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @classTransformerType(() => CreateSessionDto)
+  sessions?: CreateSessionDto[];
+
+  @ApiPropertyOptional({ description: 'Hackathon specific configuration' })
+  @IsOptional()
+  @ValidateNested()
+  @classTransformerType(() => CreateHackathonDto)
+  hackathonConfig?: CreateHackathonDto;
+
+  @ApiPropertyOptional({ description: 'Event access type', example: 'PUBLIC' })
+  @IsString()
+  @IsOptional()
+  accessType?: string;
+
+  @ApiPropertyOptional({ description: 'Array of emails to invite', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  invites?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Event thumbnail URL',
+    example: 'https://example.com/image.jpg',
+  })
+  @IsString()
+  @IsOptional()
+  thumbnailUrl?: string;
 }

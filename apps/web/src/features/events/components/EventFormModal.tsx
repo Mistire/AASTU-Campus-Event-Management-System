@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import { ModalHeader } from "@/components/shared/ModalHeader";
@@ -7,11 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useVenues } from "../api/get-venues";
 import { useEventTypes } from "../api/get-event-types";
 import { Textarea } from "@/components/ui/textarea";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Type, 
+  MapPin, 
+  Users, 
+  Calendar, 
+  Clock, 
+  AlignLeft, 
+  Tag, 
+  Info 
+} from "lucide-react";
+
+import { Event } from "../types";
 
 interface EventFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  event?: any | null; // The event to edit, null if creating
+  event?: Event | null;
   onSave: (data: any) => void;
   isSaving?: boolean;
 }
@@ -25,8 +40,6 @@ export function EventFormModal({
 }: EventFormModalProps) {
   const { data: venues } = useVenues();
   const { data: eventTypes } = useEventTypes();
-  console.log("MODAL VENUES =>", venues);
-  console.log("MODAL EVENT TYPES =>", eventTypes);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -53,7 +66,7 @@ export function EventFormModal({
       setFormData({
         title: "",
         description: "",
-        eventTypeId: "", // In a real app we'd fetch event types
+        eventTypeId: "",
         venueId: "",
         startTime: "",
         endTime: "",
@@ -63,9 +76,8 @@ export function EventFormModal({
   }, [event, open]);
 
   const handleSubmit = () => {
-    // Basic validation
     if (!formData.title || !formData.venueId || !formData.startTime || !formData.endTime) {
-      return; // Could show toast error here
+      return;
     }
     
     const payload = {
@@ -74,121 +86,161 @@ export function EventFormModal({
       endTime: new Date(formData.endTime).toISOString(),
     };
     
-    
-    if (!payload.eventTypeId) {
-      // Simple validation bypass handling or notification could be added if needed.
-    }
-    
     onSave(payload);
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="bg-black/40 backdrop-blur-sm z-50" />
+        <DialogOverlay className="bg-black/60 backdrop-blur-md z-50 animate-in fade-in duration-300" />
         <DialogContent 
           showCloseButton={false} 
-          className="p-0 border-none rounded-xl gap-0 overflow-hidden shadow-2xl bg-white max-w-2xl sm:max-w-2xl w-full z-50"
+          className="p-0 border-none rounded-[2.5rem] gap-0 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] bg-white max-w-2xl sm:max-w-2xl w-full z-50 animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[90vh] overflow-hidden"
         >
           <ModalHeader title={event ? "Edit Event" : "Create Event"} />
           
-          <div className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
-            
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-800 border-b pb-2">Event Information</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">Event Title <span className="text-red-500">*</span></label>
+          <div className="flex-1 overflow-y-auto min-h-0 p-10 space-y-10">
+            <motion.div 
+               variants={containerVariants}
+               initial="hidden"
+               animate="visible"
+               className="space-y-12"
+            >
+              {/* Section 1: Event Information */}
+              <motion.div variants={itemVariants} className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                    <Info className="text-brand" size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Discovery Info</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Title & Categorization</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InputController 
+                    label="Event Title"
+                    icon={Type}
                     value={formData.title || ""} 
                     onChange={(e) => setFormData({...formData, title: e.target.value})} 
-                    placeholder="Enter event title" 
+                    placeholder="e.g. Annual Tech Symposium" 
                   />
+                  
+                  <div className="space-y-2 group">
+                    <div className="flex items-center gap-2 px-1">
+                       <Tag size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-gray-600 transition-colors">Category</label>
+                    </div>
+                    <Select value={formData.eventTypeId || ""} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
+                      <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
+                        {eventTypes?.map(t => (
+                          <SelectItem key={t.id} value={t.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">{t.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <InputController 
+                  label="Detailed Description"
+                  icon={AlignLeft}
+                  value={formData.description || ""}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="Share the vision, goals, and what to expect..."
+                  className="h-32 pt-3 items-start"
+                />
+              </motion.div>
+
+              {/* Section 2: Location & Capacity */}
+              <motion.div variants={itemVariants} className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                    <MapPin className="text-brand" size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Venue & Space</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Location & Attendance</p>
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">Event Type <span className="text-red-500">*</span></label>
-                  <Select value={formData.eventTypeId || ""} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm">
-                      <SelectValue placeholder="Select Type">
-                        {eventTypes?.find(t => t.id === formData.eventTypeId)?.name || "Select Type"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {eventTypes?.map(t => (
-                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                 <label className="text-xs font-medium text-gray-500">Description</label>
-                 <Textarea 
-                   value={formData.description || ""}
-                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                   placeholder="Enter detailed description"
-                   className="resize-none h-24 bg-gray-50/50 border-gray-200"
-                 />
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-2">
-              <h3 className="text-sm font-bold text-gray-800 border-b pb-2">Location & Capacity</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">Venue <span className="text-red-500">*</span></label>
-                  <Select value={formData.venueId || ""} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm">
-                      <SelectValue placeholder="Select Venue">
-                        {venues?.find(v => v.id === formData.venueId)?.name || "Select Venue"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {venues?.map(v => (
-                        <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">Capacity <span className="text-red-500">*</span></label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2 group">
+                    <div className="flex items-center gap-2 px-1">
+                       <MapPin size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-gray-600 transition-colors">Physical Venue</label>
+                    </div>
+                    <Select value={formData.venueId || ""} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
+                      <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
+                        <SelectValue placeholder="Choose a Location" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
+                        {venues?.map(v => (
+                          <SelectItem key={v.id} value={v.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">{v.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
                   <InputController 
+                    label="Max Capacity"
+                    icon={Users}
                     type="number"
                     value={String(formData.capacity ?? "")} 
                     onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 0})} 
                   />
                 </div>
-              </div>
-            </div>
-            
-            <div className="space-y-4 pt-2">
-              <h3 className="text-sm font-bold text-gray-800 border-b pb-2">Schedule</h3>
+              </motion.div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">Start Time <span className="text-red-500">*</span></label>
+              {/* Section 3: Schedule */}
+              <motion.div variants={itemVariants} className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                    <Calendar className="text-brand" size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Timing</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Schedule & Duration</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InputController 
+                    label="Event Starts"
+                    icon={Clock}
                     type="datetime-local"
                     value={formData.startTime} 
                     onChange={(e) => setFormData({...formData, startTime: e.target.value})} 
+                    className="cursor-pointer"
                   />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-500">End Time <span className="text-red-500">*</span></label>
+                  
                   <InputController 
+                    label="Event Ends"
+                    icon={Clock}
                     type="datetime-local"
                     value={formData.endTime} 
                     onChange={(e) => setFormData({...formData, endTime: e.target.value})} 
+                    className="cursor-pointer"
                   />
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
             
           </div>
           
@@ -196,6 +248,7 @@ export function EventFormModal({
             onSave={handleSubmit} 
             onCancel={() => onOpenChange(false)} 
             isSubmitting={isSaving}
+            saveText={event ? "Update Event" : "Create Event"}
           />
         </DialogContent>
       </DialogPortal>

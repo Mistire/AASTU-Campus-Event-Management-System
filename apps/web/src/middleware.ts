@@ -54,19 +54,24 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    // Protect Dashboard: Only allow ADMIN/ORGANIZER/STAFF
-    if (isDashboardRoute) {
-        if (!hasSession) {
-            return NextResponse.redirect(new URL('/login', request.url));
-        }
-        if (userRole === 'STUDENT') {
+    // Role-based Access Control
+    if (hasSession) {
+        // Protect Dashboard: Only allow ADMIN/ORGANIZER/STAFF
+        if (isDashboardRoute && userRole === 'STUDENT') {
             return NextResponse.redirect(new URL('/discovery', request.url));
+        }
+
+        // Protect Discovery (Student Hub): Only allow STUDENTS
+        if (isStudentRoute && (userRole === 'ADMIN' || userRole === 'ORGANIZER' || userRole === 'STAFF')) {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
         }
     }
 
-    // Protect Student Home: Anyone but unauthenticated users
-    if (isStudentRoute && !hasSession) {
-        return NextResponse.redirect(new URL('/login', request.url));
+    // Unauthenticated protection
+    if (!hasSession) {
+        if (isDashboardRoute || isStudentRoute) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
     }
 
     return NextResponse.next();

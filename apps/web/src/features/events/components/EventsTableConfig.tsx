@@ -2,20 +2,21 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
 import { BadgeController } from "@/components/shared/BadgeController";
 import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
 
 export const getStatusColor = (status: EventStatusName) => {
   switch (status) {
-    case "LIVE": return "bg-green-100 text-green-700 border-green-200";
-    case "APPROVED": return "bg-blue-100 text-blue-700 border-blue-200";
-    case "PENDING": return "bg-yellow-100 text-yellow-700 border-yellow-200";
-    case "DRAFT": return "bg-gray-100 text-gray-700 border-gray-200";
-    case "CANCELLED": return "bg-red-100 text-red-700 border-red-200";
-    case "ARCHIVED": return "bg-purple-100 text-purple-700 border-purple-200";
-    default: return "";
+    case "LIVE": return "bg-emerald-50 text-emerald-600 border-emerald-100";
+    case "APPROVED": return "bg-blue-50 text-blue-600 border-blue-100";
+    case "PENDING": return "bg-amber-50 text-amber-600 border-amber-100";
+    case "DRAFT": return "bg-gray-50 text-gray-400 border-gray-100";
+    case "CANCELLED": return "bg-red-50 text-red-600 border-red-100";
+    case "ARCHIVED": return "bg-purple-50 text-purple-600 border-purple-100";
+    default: return "bg-gray-50 text-gray-400 border-gray-100";
   }
 };
 
-export const getEventColumns = (
+export const getEventsColumns = (
   onEdit: (event: Event) => void,
   onDelete: (event: Event) => void
 ): ColumnDef<Event>[] => [
@@ -30,18 +31,17 @@ export const getEventColumns = (
   },
   {
     accessorKey: "title",
-    header: "Event Name",
+    header: "Event",
     cell: ({ row }) => (
-      <div className="flex flex-col gap-1 max-w-[220px]">
-        <span
-          className="inline-flex items-center justify-center text-center text-[11px] font-bold text-white bg-blue-600 rounded-full px-3 py-1.5 leading-tight whitespace-normal break-words cursor-pointer hover:bg-blue-700 transition-colors"
-          style={{ maxWidth: 200 }}
-        >
+      <div className="flex flex-col gap-1 py-1">
+        <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">
           {row.original.title}
         </span>
-        <span className="text-xs text-gray-400 ml-1">
-          {row.original.eventType?.name || "Standard Event"}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2 py-0.5 bg-gray-50 rounded-md">
+            {row.original.eventType?.name || "Standard"}
+          </span>
+        </div>
       </div>
     ),
   },
@@ -49,9 +49,9 @@ export const getEventColumns = (
     accessorKey: "venue",
     header: "Venue",
     cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-gray-700">{row.original.venue.name}</span>
-        <span className="text-[10px] text-gray-400 truncate max-w-[150px]">{row.original.venue.location}</span>
+      <div className="flex flex-col py-1">
+        <span className="text-sm font-bold text-gray-700">{row.original.venue.name}</span>
+        <span className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]">{row.original.venue.location}</span>
       </div>
     ),
   },
@@ -89,7 +89,7 @@ export const getEventColumns = (
     cell: ({ row }) => {
       const statusName = row.original.status.statusName;
       return (
-        <BadgeController variant="outline" className={`${getStatusColor(statusName)} rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider`}>
+        <BadgeController variant="outline" className={`${getStatusColor(statusName)} rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest border shadow-sm`}>
           {statusName}
         </BadgeController>
       );
@@ -117,20 +117,20 @@ export const getEventColumns = (
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
          <button 
             type="button" 
             onClick={() => onEdit(row.original)}
-            className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+            <Pencil size={18} />
          </button>
          <button 
             type="button" 
             onClick={() => onDelete(row.original)}
-            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            <Trash2 size={18} />
          </button>
       </div>
     )
