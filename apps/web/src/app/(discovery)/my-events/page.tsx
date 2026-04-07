@@ -4,13 +4,10 @@ import { motion } from "framer-motion";
 import { Calendar, Search, ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { DiscoveryNavbar } from "@/features/discovery/components/DiscoveryNavbar";
 
 export default function MyEventsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <DiscoveryNavbar />
-      
       <main className="max-w-7xl mx-auto px-6 pt-32 pb-24">
         <div className="flex flex-col items-center justify-center text-center py-20">
           <motion.div

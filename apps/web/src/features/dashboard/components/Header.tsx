@@ -1,55 +1,133 @@
 "use client";
-
-import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { Plus, User, Globe } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import Link from "next/link";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import {
+  User,
+  Globe,
+  Bell,
+  ChevronDown,
+  Settings,
+  LogOut,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 export function Header() {
-  const { profile } = useAuthStore();
+  const { profile, clearAuth } = useAuthStore();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
+
+  const handleLogout = () => {
+    clearAuth();
+    window.location.href = "/login";
+  };
 
   return (
-    <div className="flex items-center justify-between w-full h-full bg-white">
-      {/* Logos and Title Block on Left */}
-      <div className="flex items-center gap-3 ml-4">
-        <div className="flex gap-2">
-          <h1 className="font-extrabold text-lg tracking-tight text-gray-900 border-l border-gray-200 pl-4">
-            Dashboard
-          </h1>
+    <div className="flex items-center justify-between w-full h-full bg-white px-2">
+      <div className="flex items-center gap-3">
+        <h1 className="font-brand font-black text-2xl tracking-tighter text-gray-900 border-l-4 border-brand pl-4 ml-4">
+          Dashboard
+        </h1>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand transition-colors cursor-pointer mr-2">
+          <Globe size={14} />
+          English
         </div>
 
-        {/* Actions Block on Right */}
-        <div className="flex items-center gap-4 ml-auto">
-          <div className="hidden lg:flex items-center gap-1 text-sm font-semibold text-gray-600 cursor-pointer hover:text-brand mr-2">
-            <Globe size={16} />
-            English
-          </div>
+        <button className="p-2 text-gray-400 hover:text-brand rounded-xl transition-colors">
+          <Bell size={20} />
+        </button>
 
-          <Button className="hidden md:flex bg-brand hover:bg-brand-hover text-white font-bold rounded-full text-xs uppercase px-5 py-2 h-9 items-center gap-1 shadow-sm shadow-brand/20 transition-all">
-            <Plus size={16} />
-            Create Booking
-          </Button>
+        <div className="h-8 w-px bg-gray-100 mx-1" />
 
-          <div className="flex items-center gap-2 pl-2 border-l border-gray-200 ml-2 py-1">
-            <Button
-              variant="outline"
-              className="rounded-full border-gray-200 flex items-center justify-between gap-3 p-1.5 h-10 w-44 hover:bg-gray-50"
-            >
-              <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
-                <User className="w-4 h-4 text-gray-500" />
-              </div>
-              <div className="flex flex-col items-start pr-2 overflow-hidden w-full text-left">
-                <span className="text-xs font-bold text-gray-900 truncate w-full">
-                  {profile?.full_name || "manager 4 name"}
-                </span>
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate w-full">
-                  {profile?.role || "PROVIDER_ADMIN"}
-                </span>
-              </div>
-            </Button>
-          </div>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center gap-2 p-1.5 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors">
+              <User className="text-brand" size={20} />
+            </div>
+            <div className="hidden sm:block text-left mr-2 min-w-[80px]">
+              <p className="text-xs font-black text-gray-900 leading-tight truncate">
+                {profile?.full_name || "Staff Member"}
+              </p>
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                {profile?.role || "ORGANIZER"}
+              </p>
+            </div>
+            <ChevronDown
+              size={14}
+              className={cn(
+                "text-gray-400 transition-transform duration-300",
+                isProfileOpen && "rotate-180"
+              )}
+            />
+          </button>
+
+          {isProfileOpen && (
+            <div className="absolute right-0 mt-3 w-60 rounded-2xl bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-2 z-50 transform origin-top-right transition-all animate-in fade-in zoom-in duration-200">
+                <div className="p-4 border-b border-gray-50 mb-1">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
+                    Authenticated As
+                  </p>
+                  <p className="text-xs font-bold text-gray-900 truncate">
+                    {profile?.email}
+                  </p>
+                </div>
+
+                <div className="py-1">
+                  <Link href="/dashboard/profile" onClick={() => setIsProfileOpen(false)}>
+                    <ProfileItem icon={User} label="Profile" onClick={() => {}} />
+                  </Link>
+                  <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
+                </div>
+                
+                <div className="h-px bg-gray-50 my-1" />
+                
+                <div className="py-1">
+                  <ProfileItem
+                    icon={LogOut}
+                    label="Sign Out"
+                    danger
+                    onClick={handleLogout}
+                  />
+                </div>
+            </div>
+          )}
         </div>
+
+
       </div>
     </div>
   );
 }
+
+const ProfileItem = ({
+  icon: Icon,
+  label,
+  onClick,
+  danger,
+}: {
+  icon: React.ElementType;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all",
+      danger
+        ? "text-red-500 hover:bg-red-50"
+        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+    )}
+  >
+    <Icon size={16} />
+    {label}
+  </button>
+);

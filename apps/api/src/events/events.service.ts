@@ -113,6 +113,67 @@ export class EventsService {
             create: dto.categoryIds.map((categoryId) => ({ categoryId })),
           },
         }),
+
+        ...(dto.sessions?.length && {
+          sessions: {
+            create: dto.sessions.map((s) => ({
+              title: s.title,
+              description: s.description,
+              startTime: new Date(s.startTime),
+              endTime: new Date(s.endTime),
+              location: s.location,
+              sessionType: s.sessionType,
+              speakers: s.speakers?.length
+                ? {
+                    create: s.speakers.map((name) => ({
+                      speaker: {
+                        create: {
+                          fullName: name,
+                        },
+                      },
+                    })),
+                  }
+                : undefined,
+            })),
+          },
+        }),
+
+        ...(dto.hackathonConfig && {
+          hackathons: {
+            create: {
+              teamSizeMin: dto.hackathonConfig.teamSizeMin,
+              teamSizeMax: dto.hackathonConfig.teamSizeMax,
+              submissionDeadline: new Date(dto.hackathonConfig.submissionDeadline),
+              judgingCriteria: dto.hackathonConfig.judgingCriteria,
+            },
+          },
+        }),
+
+        access: {
+          create: {
+            accessType: dto.accessType || 'PUBLIC',
+            requiresApproval: dto.accessType === 'INVITE_ONLY' || (dto.requiresApproval ?? false),
+          },
+        },
+
+        invites: {
+          create: (dto.invites || []).map((email) => ({
+            invitedEmail: email,
+            invitedBy: user.id,
+            status: 'PENDING',
+          })),
+        },
+
+        ...(dto.thumbnailUrl && {
+          media: {
+            create: [
+              {
+                fileUrl: dto.thumbnailUrl,
+                mediaType: 'THUMBNAIL',
+              },
+            ],
+          },
+        }),
       },
       include: this.defaultIncludes(),
     });

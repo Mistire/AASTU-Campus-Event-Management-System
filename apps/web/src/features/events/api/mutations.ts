@@ -1,32 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Cookies from "js-cookie";
-
-const getHeaders = () => {
-  const authCookie = Cookies.get("auth-storage");
-  let token = "";
-  if (authCookie) {
-    try {
-      const parsed = JSON.parse(authCookie);
-      token = parsed.state?.token || "";
-    } catch (e) {
-      console.error("Failed to parse auth cookie", e);
-    }
-  }
-  return {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-};
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { apiFetch } from "@/lib/api-client";
 
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await fetch(`${apiUrl}/api/events`, {
+    mutationFn: async (data: Record<string, unknown>) => {
+      const res = await apiFetch(`/api/events`, {
         method: "POST",
-        headers: getHeaders(),
         body: JSON.stringify(data),
       });
       const result = await res.json();
@@ -42,10 +22,9 @@ export const useCreateEvent = () => {
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await fetch(`${apiUrl}/api/events/${id}`, {
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
+      const res = await apiFetch(`/api/events/${id}`, {
         method: "PATCH",
-        headers: getHeaders(),
         body: JSON.stringify(data),
       });
       const result = await res.json();
@@ -63,9 +42,8 @@ export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`${apiUrl}/api/events/${id}`, {
+      const res = await apiFetch(`/api/events/${id}`, {
         method: "DELETE",
-        headers: getHeaders(),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Failed to delete event");
@@ -73,6 +51,25 @@ export const useDeleteEvent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
+
+export const useCheckIn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { eventId: string; sessionId?: string; qrTokenCode: string }) => {
+      const res = await apiFetch(`/api/attendance/check-in`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to check in");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["attendance", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendance-stats", eventId] });
     },
   });
 };

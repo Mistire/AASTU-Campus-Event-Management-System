@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 
 export type Role = "ADMIN" | "ORGANIZER" | "STUDENT" | "STAFF";
 
-interface AuthProfile {
+export interface AuthProfile {
   id: string;
   full_name: string;
   email: string;
