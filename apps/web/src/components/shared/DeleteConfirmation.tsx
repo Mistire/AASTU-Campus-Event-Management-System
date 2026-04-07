@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { ModalHeader } from "./modalHeader";
-import { ButtonController } from "../controllers/ButtonController";
+import { ModalHeader } from "./ModalHeader";
+import { ButtonController } from "./ButtonController";
 import { DialogClose } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
-import { InputController } from "../controllers/InputController";
+import { InputController } from "./InputController";
 
 interface DeleteConfirmationProps {
   open: boolean;

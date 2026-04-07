@@ -1,4 +1,4 @@
-import { ColumnTypes } from '@/components/ui/data-table/data-table';
+import { ColumnTypes } from '@/components/ui/data-table/data-table.utils';
 import { DepartmentRecord } from '../types';
 import { GraduationCap } from 'lucide-react';
 

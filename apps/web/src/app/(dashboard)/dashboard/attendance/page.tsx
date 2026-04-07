@@ -1,7 +1,8 @@
 "use client";
 
 import { CheckCircle, Clock, User, Calendar } from 'lucide-react';
-import { DataTable, ColumnTypes } from '@/components/ui/data-table/data-table';
+import { DataTable } from '@/components/ui/data-table/data-table';
+import { ColumnTypes } from '@/components/ui/data-table/data-table.utils';
 
 interface AttendanceRecord {
     id: string;

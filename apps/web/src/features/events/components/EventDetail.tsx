@@ -25,7 +25,15 @@ import {
   Building2,
   CalendarClock,
   TimerOff,
+  UserPlus,
+  PlusCircle,
 } from "lucide-react";
+import { useState } from "react";
+import { SpeakerFormModal } from "./SpeakerFormModal";
+import { SessionFormModal } from "./SessionFormModal";
+import { SpeakerGrid } from "./SpeakerGrid";
+import { AgendaTimeline } from "./AgendaTimeline";
+import { useSpeakers } from "../api/get-speakers";
 
 interface EventDetailProps {
   eventId: string;
@@ -81,6 +89,10 @@ const InfoRow = ({
 export const EventDetail = ({ eventId }: EventDetailProps) => {
   const router = useRouter();
   const { data: event, isLoading, isError, error } = useEvent(eventId);
+  const { data: allSpeakers, isLoading: isLoadingSpeakers } = useSpeakers();
+  
+  const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
 
   const handleBack = () => router.push("/dashboard/events");
 
@@ -135,6 +147,22 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
       ),
     },
     {
+      value: "speakers",
+      label: "SPEAKERS",
+      content: (
+        <SpeakerGrid 
+          sessions={event.sessions || []} 
+          allSpeakers={allSpeakers || []} 
+          isLoading={isLoadingSpeakers}
+        />
+      ),
+    },
+    {
+      value: "sessions",
+      label: "SESSIONS",
+      content: <AgendaTimeline sessions={event.sessions || []} />,
+    },
+    {
       value: "venue",
       label: "VENUE DETAILS",
       content: (
@@ -175,18 +203,6 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
         </div>
       ),
     },
-    {
-      value: "sessions",
-      label: "SESSIONS",
-      content: (
-        <div className="p-8 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400">
-          <CheckCircle2 className="h-10 w-10 mb-3 opacity-20" />
-          <p className="font-medium">
-            No special sessions defined for this event.
-          </p>
-        </div>
-      ),
-    },
   ];
 
   return (
@@ -207,13 +223,36 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
             <span className="text-blue-600 font-medium">Details</span>
           </div>
         </div>
-        <div className="ml-auto">
-          <ButtonController className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2">
-            <Pencil className="h-4 w-4" />
-            EDIT EVENT
+        <div className="ml-auto flex items-center gap-3">
+          <ButtonController 
+            onClick={() => setIsSpeakerModalOpen(true)}
+            className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm flex items-center gap-2"
+          >
+            <UserPlus className="h-4 w-4 text-brand" />
+            ADD SPEAKER
+          </ButtonController>
+          <ButtonController 
+            onClick={() => setIsSessionModalOpen(true)}
+            className="bg-brand hover:bg-brand-hover text-white flex items-center gap-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            ADD AGENDA
           </ButtonController>
         </div>
       </div>
+
+      <SpeakerFormModal 
+        isOpen={isSpeakerModalOpen} 
+        onClose={() => setIsSpeakerModalOpen(false)} 
+      />
+      
+      <SessionFormModal 
+        eventId={eventId}
+        eventStartTime={event.startTime}
+        eventEndTime={event.endTime}
+        isOpen={isSessionModalOpen} 
+        onClose={() => setIsSessionModalOpen(false)} 
+      />
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full">

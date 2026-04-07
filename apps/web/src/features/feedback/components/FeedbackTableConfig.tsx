@@ -1,4 +1,4 @@
-import { ColumnTypes } from '@/components/ui/data-table/data-table';
+import { ColumnTypes } from '@/components/ui/data-table/data-table.utils';
 import { FeedbackRecord } from '../types';
 import { User, Star } from 'lucide-react';
 

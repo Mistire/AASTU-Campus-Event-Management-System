@@ -1,4 +1,4 @@
-import { ColumnTypes } from '@/components/ui/data-table/data-table';
+import { ColumnTypes } from '@/components/ui/data-table/data-table.utils';
 import { VenueRecord } from '../types';
 import { Home } from 'lucide-react';
 

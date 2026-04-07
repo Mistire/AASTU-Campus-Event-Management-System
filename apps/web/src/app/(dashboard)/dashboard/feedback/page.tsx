@@ -1,3 +1,5 @@
+"use client";
+
 import { MessageSquare } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import { mockFeedback } from '@/features/feedback/testing/mock-feedback';

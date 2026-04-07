@@ -21,6 +21,29 @@ export interface Venue {
   roomNumber?: string;
 }
 
+export interface SessionSpeaker {
+  id: string;
+  speakerId: string;
+  speaker: {
+    id: string;
+    fullName: string;
+    profileImage?: string;
+    bio?: string;
+    organization?: string;
+  };
+}
+
+export interface EventSession {
+  id: string;
+  title: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  location?: string;
+  sessionType?: string;
+  speakers?: SessionSpeaker[];
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -31,6 +54,7 @@ export interface Event {
   status: EventStatus;
   eventType?: EventType | null;
   venue: Venue;
+  sessions?: EventSession[];
   _count?: {
     registrations: number;
   };

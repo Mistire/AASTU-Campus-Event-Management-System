@@ -1,4 +1,4 @@
-import { ButtonController } from "../controllers/ButtonController";
+import { ButtonController } from "./ButtonController";
 import { DialogClose } from "@/components/ui/dialog";
 
 interface ModalFooterProps {

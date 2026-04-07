@@ -8,6 +8,8 @@
     ],
     "scripts": {
         "dev": "npm run start:dev --prefix apps/api",
+        "web": "npm run dev --prefix apps/web",
+        "backend": "npm run start:dev --prefix apps/api",
         "start": "npm run start --prefix apps/api",
         "start:dev": "npm run start:dev --prefix apps/api",
         "start:debug": "npm run start:debug --prefix apps/api",
@@ -39,6 +41,7 @@
         "db:sync": "npx prisma generate && npx prisma db push && npm run script_roles && npm run script_users"
     },
     "dependencies": {
-        "class-validator": "^0.15.1"
+        "class-validator": "^0.15.1",
+        "react-hook-form": "^7.72.1"
     }
 }

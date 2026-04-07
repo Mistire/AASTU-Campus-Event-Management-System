@@ -1,3 +1,5 @@
+"use client";
+
 import { FileDown, Download, Filter, Calendar as CalendarIcon } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import { Button } from '@/components/ui/button';

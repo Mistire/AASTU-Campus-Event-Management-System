@@ -1,3 +1,5 @@
+"use client";
+
 import { Headset, Plus, Search } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import { Button } from '@/components/ui/button';

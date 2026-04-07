@@ -86,7 +86,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
-      role: user.role.roleName,
+      role: user.role.roleName.toLowerCase(),
       permissions,
       sessionId: session.id,
       isEmailVerified: user.isEmailVerified,

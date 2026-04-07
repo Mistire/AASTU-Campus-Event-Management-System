@@ -1,4 +1,4 @@
-import { ColumnTypes, CellRenderers } from '@/components/ui/data-table/data-table';
+import { ColumnTypes, CellRenderers } from '@/components/ui/data-table/data-table.utils';
 import { LogEntry } from '../types';
 import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
 

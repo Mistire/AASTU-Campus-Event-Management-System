@@ -14,7 +14,7 @@ export class SpeakersController {
   constructor(private readonly speakersService: SpeakersService) {}
 
   @Post()
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({ summary: 'Create a new speaker profile (Organizer)' })
   @ApiResponse({ status: 201, description: 'Speaker created.' })
   create(@Body() dto: CreateSpeakerDto) {
@@ -34,14 +34,14 @@ export class SpeakersController {
   }
 
   @Patch(':id')
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({ summary: 'Update speaker profile (Organizer)' })
   update(@Param('id') id: string, @GetUser() user: AuthUser, @Body() dto: UpdateSpeakerDto) {
     return this.speakersService.update(id, user.id, dto);
   }
 
   @Delete(':id')
-  @Roles('Organizer')
+  @Roles('Organizer', 'Admin', 'Student')
   @ApiOperation({
     summary: 'Delete a speaker and remove all session assignments (Organizer)',
   })

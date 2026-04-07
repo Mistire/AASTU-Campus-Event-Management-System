@@ -21,12 +21,12 @@ export interface EventCategory {
 export interface EventSession {
     id: string;
     title: string;
-    description: string;
+    description?: string;
     startTime: string;
     endTime: string;
     location?: string;
     sessionType?: string;
-    speakers: {
+    speakers?: {
         id: string;
         speaker: {
             id: string;

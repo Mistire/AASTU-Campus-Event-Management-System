@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Skip middleware for static files, API routes, and images
+    // Skip for static files, API routes, and images
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') ||
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
                 hasSession = true;
             }
         } catch {
-            console.error('Middleware: Error parsing auth cookie');
+            console.error('Proxy: Error parsing auth cookie');
         }
     }
 
@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
             const parsed = JSON.parse(decoded);
             userRole = parsed?.state?.profile?.role || '';
         } catch {
-            console.error('Middleware: Error parsing role');
+            console.error('Proxy: Error parsing role');
         }
     }
 

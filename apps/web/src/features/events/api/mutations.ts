@@ -76,3 +76,41 @@ export const useDeleteEvent = () => {
     },
   });
 };
+
+export const useCreateSession = (eventId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`${apiUrl}/api/events/${eventId}/sessions`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to create session");
+      return result.data || result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event", eventId] });
+    },
+  });
+};
+
+export const useCreateSpeaker = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch(`${apiUrl}/api/speakers`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to create speaker");
+      return result.data || result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["speakers"] });
+    },
+  });
+};

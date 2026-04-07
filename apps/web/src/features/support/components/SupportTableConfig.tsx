@@ -1,4 +1,4 @@
-import { ColumnTypes, BadgeConfigs } from '@/components/ui/data-table/data-table';
+import { ColumnTypes, BadgeConfigs } from '@/components/ui/data-table/data-table.utils';
 import { Ticket } from '../types';
 import { MessageSquare } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import { ColumnTypes } from '@/components/ui/data-table/data-table';
+import { ColumnTypes } from '@/components/ui/data-table/data-table.utils';
 import { CategoryRecord } from '../types';
 import { Tag as TagIcon } from 'lucide-react';
 
