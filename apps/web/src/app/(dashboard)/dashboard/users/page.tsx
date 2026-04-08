@@ -3,11 +3,20 @@
 import { Users as UsersIcon, Plus } from 'lucide-react';
 import { TableController } from '@/components/shared/TableController';
 import { Button } from '@/components/ui/button';
-import { mockUsers } from '@/features/users/testing/mock-users';
+import { useUsers } from '@/features/users/api/getUsers';
 import { getUsersColumns } from '@/features/users/components/UsersTableConfig';
 
 export default function UsersPage() {
+    const { data: users, isLoading, error } = useUsers();
     const columns = getUsersColumns();
+
+    if (error) {
+        return (
+            <div className="p-8 text-center bg-red-50 text-red-600 rounded-3xl border border-red-100 font-black uppercase tracking-widest text-xs animate-in slide-in-from-top-4 duration-500">
+                Error Loading Users: {error instanceof Error ? error.message : 'Unknown error'}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
@@ -33,8 +42,9 @@ export default function UsersPage() {
             <div className="bg-white rounded-3xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
                 <div className="p-0">
                     <TableController
-                        data={mockUsers}
+                        data={users || []}
                         columns={columns}
+                        loading={isLoading}
                         emptyMessage="No users found."
                     />
                 </div>

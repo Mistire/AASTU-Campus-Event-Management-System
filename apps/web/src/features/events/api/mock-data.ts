@@ -379,12 +379,12 @@ export const MOCK_EVENTS: Event[] = [
 ];
 
 export const MOCK_CATEGORIES = [
-  { id: "c-tech", name: "Technology", description: "Innovation, Coding & Engineering" },
-  { id: "c-social", name: "Social & Fun", description: "Parties, Festivals & Meetups" },
-  { id: "c-career", name: "Career", description: "Jobs, Internships & Networking" },
-  { id: "c-academic", name: "Academic", description: "Seminars, Research & Workshops" },
-  { id: "c-sports", name: "Sports & Fit", description: "Tournaments, Fitness & Athletics" },
-  { id: "c-arts", name: "Arts & Music", description: "Exhibitions, Concerts & Creative" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a1", name: "Technology", description: "Innovation, Coding & Engineering" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a2", name: "Social & Fun", description: "Parties, Festivals & Meetups" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a3", name: "Career", description: "Jobs, Internships & Networking" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a4", name: "Academic", description: "Seminars, Research & Workshops" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a5", name: "Sports & Fit", description: "Tournaments, Fitness & Athletics" },
+  { id: "e0a0a0a0-a0a0-a0a0-a0a0-d1a1a1a1a1a6", name: "Arts & Music", description: "Exhibitions, Concerts & Creative" },
 ];
 
 export const MOCK_RECOMMENDATIONS = MOCK_EVENTS.slice(0, 3);

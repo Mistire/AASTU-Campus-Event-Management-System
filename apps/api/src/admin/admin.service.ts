@@ -146,14 +146,29 @@ export class AdminService {
 
   async getStats() {
     try {
-      const [userCount, eventCount, registrationCount, venueCount, categoryCount] =
-        await Promise.all([
-          this.prisma.user.count(),
-          this.prisma.event.count(),
-          this.prisma.registration.count(),
-          this.prisma.venue.count(),
-          this.prisma.category.count(),
-        ]);
+      const [
+        userCount,
+        eventCount,
+        registrationCount,
+        venueCount,
+        categoryCount,
+        approvedRegs,
+        pendingRegs,
+        attendanceCount,
+      ] = await Promise.all([
+        this.prisma.user.count(),
+        this.prisma.event.count(),
+        this.prisma.registration.count(),
+        this.prisma.venue.count(),
+        this.prisma.category.count(),
+        this.prisma.registration.count({
+          where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
+        }),
+        this.prisma.registration.count({
+          where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
+        }),
+        this.prisma.attendance.count(),
+      ]);
 
       return {
         users: userCount,
@@ -161,6 +176,9 @@ export class AdminService {
         registrations: registrationCount,
         venues: venueCount,
         categories: categoryCount,
+        approvedRegistrations: approvedRegs,
+        pendingRegistrations: pendingRegs,
+        totalAttendance: attendanceCount,
       };
     } catch (err) {
       console.error('AdminService.getStats error:', err);

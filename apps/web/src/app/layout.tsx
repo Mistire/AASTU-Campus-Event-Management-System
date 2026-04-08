@@ -28,9 +28,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${brand.variable} h-full antialiased font-sans`}
+      className={`${sans.variable} ${brand.variable} antialiased font-sans`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex flex-col">
         <Toaster 
           position="top-right"
           toastOptions={{

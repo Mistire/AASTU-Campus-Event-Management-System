@@ -34,6 +34,11 @@ export class TagsService {
     return this.prisma.tag.findMany({
       where,
       orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: { eventTags: true },
+        },
+      },
     });
   }
 

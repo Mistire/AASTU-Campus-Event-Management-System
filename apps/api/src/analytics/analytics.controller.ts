@@ -123,4 +123,18 @@ export class AnalyticsController {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   }
+
+  // ─── Organizer Overview routes ───────────────────────────────
+
+  @Get('organizer/overview')
+  @Roles('Organizer', 'Admin')
+  getOrganizerOverview(@GetUser() user: AuthUser) {
+    return this.analyticsService.getOrganizerOverview(user.id);
+  }
+
+  @Get('organizer/registrations/recent')
+  @Roles('Organizer', 'Admin')
+  getOrganizerRecentRegistrations(@GetUser() user: AuthUser) {
+    return this.analyticsService.getOrganizerRecentRegistrations(user.id);
+  }
 }

@@ -3,15 +3,25 @@ import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { apiFetch } from '@/lib/api-client';
 
 interface DashboardStats {
-    users: number;
-    events: number;
-    registrations: number;
-    venues: number;
-    categories: number;
+    // Admin stats
+    users?: number;
+    events?: number;
+    registrations?: number;
+    venues?: number;
+    categories?: number;
+    approvedRegistrations?: number;
+    pendingRegistrations?: number;
+    // Organizer stats
+    totalEvents?: number;
+    totalRegistrations?: number;
+    pendingApprovals?: number;
+    totalAttendance?: number;
 }
 
-export async function fetchDashboardStats() {
-    const res = await apiFetch(`/api/admin/stats`, {
+export async function fetchDashboardStats(role: string) {
+    const endpoint = role === 'ADMIN' ? '/api/admin/stats' : '/api/analytics/organizer/overview';
+    
+    const res = await apiFetch(endpoint, {
         method: 'GET',
     });
 
@@ -26,13 +36,12 @@ export async function fetchDashboardStats() {
 
 export function useDashboardStats() {
     const { token, profile } = useAuthStore();
-
-    // Only fetch if admin (or according to your permission logic)
-    const isAdmin = profile?.role === 'ADMIN';
+    const role = profile?.role || 'STUDENT';
+    const isAuthorized = role === 'ADMIN' || role === 'ORGANIZER';
 
     return useQuery({
-        queryKey: ['dashboard-stats'],
-        queryFn: fetchDashboardStats,
-        enabled: !!token && isAdmin,
+        queryKey: ['dashboard-stats', role],
+        queryFn: () => fetchDashboardStats(role),
+        enabled: !!token && isAuthorized,
     });
 }
