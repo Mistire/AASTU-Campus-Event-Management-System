@@ -150,22 +150,42 @@ export default function DashboardPage() {
     return (
         <div className="space-y-6 font-sans text-brand-dark pb-10 animate-in fade-in duration-700">
             {/* Top row metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className={cn(
+                "grid grid-cols-1 sm:grid-cols-2 gap-6",
+                profile?.role === 'ADMIN' ? "lg:grid-cols-5" : "lg:grid-cols-4"
+            )}>
                 {isStatsLoading ? (
-                    [1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-[160px] rounded-3xl" />)
+                    [1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[160px] rounded-3xl" />)
                 ) : (
                     <>
-                        <MetricCard title="Users" value={stats?.users?.toLocaleString() || "0"} icon={Users} />
-                        <MetricCard title="Events" value={stats?.events || "0"} icon={Calendar} subValue={`${stats?.events || 0} Total`} trend="neutral" />
-                        <MetricCard 
-                            title="Total Reg" 
-                            value={stats?.registrations?.toLocaleString() || "0"} 
-                            icon={UserPlus} 
-                            subValue={regStats.today > 0 ? `+${regStats.today} TODAY` : "NO NEW TODAY"} 
-                            trend={regStats.today > 0 ? "up" : "neutral"} 
-                        />
-                        <MetricCard title="Venues" value={stats?.venues || "0"} icon={MapPin} />
-                        <MetricCard title="Categories" value={stats?.categories || "0"} icon={Layers} />
+                        {profile?.role === 'ADMIN' ? (
+                            <>
+                                <MetricCard title="Users" value={stats?.users?.toLocaleString() || "0"} icon={Users} />
+                                <MetricCard title="Events" value={stats?.events || "0"} icon={Calendar} subValue={`${stats?.events || 0} Total`} trend="neutral" />
+                                <MetricCard 
+                                    title="Total Reg" 
+                                    value={stats?.registrations?.toLocaleString() || "0"} 
+                                    icon={UserPlus} 
+                                    subValue={regStats.today > 0 ? `+${regStats.today} TODAY` : "NO NEW TODAY"} 
+                                    trend={regStats.today > 0 ? "up" : "neutral"} 
+                                />
+                                <MetricCard title="Venues" value={stats?.venues || "0"} icon={MapPin} />
+                                <MetricCard title="Categories" value={stats?.categories || "0"} icon={Layers} />
+                            </>
+                        ) : (
+                            <>
+                                <MetricCard title="My Events" value={stats?.totalEvents || "0"} icon={Calendar} />
+                                <MetricCard title="Registrations" value={stats?.totalRegistrations?.toLocaleString() || "0"} icon={UserPlus} />
+                                <MetricCard 
+                                    title="Pending Approvals" 
+                                    value={stats?.pendingApprovals || "0"} 
+                                    icon={Clock} 
+                                    subValue="AWAITING ACTION"
+                                    trend={Number(stats?.pendingApprovals) > 0 ? 'down' : 'neutral'}
+                                />
+                                <MetricCard title="Check-ins" value={stats?.totalAttendance?.toLocaleString() || "0"} icon={CheckCircle2} />
+                            </>
+                        )}
                     </>
                 )}
             </div>
@@ -191,11 +211,19 @@ export default function DashboardPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Approved</p>
-                                        <p className="text-2xl font-black text-gray-900">{regStats.approved}</p>
+                                        <p className="text-2xl font-black text-gray-900">
+                                            {profile?.role === 'ADMIN' ? (stats?.approvedRegistrations || 0) : regStats.approved}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="text-[10px] font-black text-emerald-600 bg-emerald-100/50 px-3 py-1 rounded-full uppercase tracking-widest">
-                                    {regStats.total > 0 ? Math.round((regStats.approved/regStats.total)*100) : 0}%
+                                    {profile?.role === 'ADMIN' ? (
+                                        stats?.registrations && stats.registrations > 0 
+                                            ? Math.round(((stats.approvedRegistrations || 0) / stats.registrations) * 100) 
+                                            : 0
+                                    ) : (
+                                        regStats.total > 0 ? Math.round((regStats.approved / regStats.total) * 100) : 0
+                                    )}%
                                 </div>
                             </div>
 
@@ -206,11 +234,19 @@ export default function DashboardPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Pending</p>
-                                        <p className="text-2xl font-black text-gray-900">{regStats.pending}</p>
+                                        <p className="text-2xl font-black text-gray-900">
+                                            {profile?.role === 'ADMIN' ? (stats?.pendingRegistrations || 0) : regStats.pending}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="text-[10px] font-black text-amber-600 bg-amber-100/50 px-3 py-1 rounded-full uppercase tracking-widest">
-                                    {regStats.total > 0 ? Math.round((regStats.pending/regStats.total)*100) : 0}%
+                                    {profile?.role === 'ADMIN' ? (
+                                        stats?.registrations && stats.registrations > 0 
+                                            ? Math.round(((stats.pendingRegistrations || 0) / stats.registrations) * 100) 
+                                            : 0
+                                    ) : (
+                                        regStats.total > 0 ? Math.round((regStats.pending / regStats.total) * 100) : 0
+                                    )}%
                                 </div>
                             </div>
                             
@@ -234,7 +270,9 @@ export default function DashboardPage() {
                             <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
                                 <Activity size={20} />
                             </div>
-                            <CardTitle className="text-xl font-black text-gray-900 tracking-tight">Recent Activity</CardTitle>
+                            <CardTitle className="text-xl font-black text-gray-900 tracking-tight">
+                                {profile?.role === 'ADMIN' ? "Recent Activity" : "My Event Activity"}
+                            </CardTitle>
                         </div>
                         <button className="text-brand text-[10px] font-black tracking-widest uppercase hover:underline decoration-2 underline-offset-4">
                             View Archive &rarr;

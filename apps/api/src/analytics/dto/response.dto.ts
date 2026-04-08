@@ -8,6 +8,15 @@ export class AdminOverviewDto {
   totalUsers: number;
   totalRegistrations: number;
   totalAttendance: number;
+  approvedRegistrations: number;
+  pendingRegistrations: number;
+}
+
+export class OrganizerOverviewDto {
+  totalEvents: number;
+  totalRegistrations: number;
+  pendingApprovals: number;
+  totalAttendance: number;
 }
 
 export class TopEventDto {

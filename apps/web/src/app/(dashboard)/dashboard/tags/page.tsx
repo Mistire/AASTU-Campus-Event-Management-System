@@ -1,10 +1,10 @@
 "use client";
 
-import { Tag, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Hash, Plus, Trash2, Loader2, Tag as TagIcon } from 'lucide-react';
 import { TableController } from '@/components/shared/TableController';
 import { Button } from '@/components/ui/button';
-import { useCategories, useCreateCategory, useDeleteCategory } from '@/features/categories/api';
-import { getCategoriesColumns } from '@/features/categories/components/CategoriesTableConfig';
+import { useTags, useCreateTag, useDeleteTag, Tag } from '@/features/tags/api';
+import { getTagsColumns } from '@/features/tags/components/TagsTableConfig';
 import { useState } from 'react';
 import { ModalHeader } from '@/components/shared/ModalHeader';
 import { ModalFooter } from '@/components/shared/ModalFooter';
@@ -12,32 +12,24 @@ import { InputController } from '@/components/shared/InputController';
 import { ToastController } from '@/components/shared/ToastController';
 import { DeleteConfirmation } from '@/components/shared/DeleteConfirmation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { CategoryRecord } from '@/features/categories/types';
 
-export default function CategoriesPage() {
-    const { data: apiCategories, isLoading } = useCategories();
-    const createMutation = useCreateCategory();
-    const deleteMutation = useDeleteCategory();
+export default function TagsPage() {
+    const { data: tags, isLoading } = useTags();
+    const createMutation = useCreateTag();
+    const deleteMutation = useDeleteTag();
     
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [deleteItem, setDeleteItem] = useState<CategoryRecord | null>(null);
-    const [formData, setFormData] = useState({ name: '', description: '' });
-
-    const categories: CategoryRecord[] = (apiCategories || []).map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        description: cat.description || '',
-        eventCount: cat._count?.eventCategories || 0
-    }));
+    const [deleteItem, setDeleteItem] = useState<Tag | null>(null);
+    const [tagName, setTagName] = useState('');
 
     const handleCreate = async () => {
         try {
-            await createMutation.mutateAsync(formData);
+            await createMutation.mutateAsync({ name: tagName });
             setIsCreateOpen(false);
-            setFormData({ name: '', description: '' });
-            ToastController.success({ message: 'Category created successfully' });
+            setTagName('');
+            ToastController.success({ message: 'Tag created successfully' });
         } catch (err) {
-            ToastController.error({ message: err instanceof Error ? err.message : 'Failed to create category' });
+            ToastController.error({ message: err instanceof Error ? err.message : 'Failed to create tag' });
         }
     };
 
@@ -46,18 +38,18 @@ export default function CategoriesPage() {
         try {
             await deleteMutation.mutateAsync(deleteItem.id);
             setDeleteItem(null);
-            ToastController.success({ message: 'Category deleted successfully' });
+            ToastController.success({ message: 'Tag deleted successfully' });
         } catch (err) {
-            ToastController.error({ message: err instanceof Error ? err.message : 'Failed to delete category' });
+            ToastController.error({ message: err instanceof Error ? err.message : 'Failed to delete tag' });
         }
     };
 
-    const columns = getCategoriesColumns();
+    const columns = getTagsColumns();
     
     const actionColumn = {
         id: "actions",
         header: "Actions",
-        cell: ({ row }: { row: { original: CategoryRecord } }) => (
+        cell: ({ row }: { row: { original: Tag } }) => (
             <Button
                 variant="ghost"
                 size="icon"
@@ -74,16 +66,17 @@ export default function CategoriesPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
+            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
-                        <Tag className="w-8 h-8" />
+                        <Hash className="w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-gray-900">Categories</h1>
+                        <h1 className="text-3xl font-black tracking-tight text-gray-900">Metadata Tags</h1>
                         <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
                              <span className="w-2 h-2 rounded-full bg-brand" />
-                             Organize and classify campus events.
+                             Manage keywords for event discovery.
                         </p>
                     </div>
                 </div>
@@ -92,32 +85,35 @@ export default function CategoriesPage() {
                     <DialogTrigger render={
                         <Button className="rounded-xl bg-brand hover:bg-brand-hover text-white shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
                             <Plus className="w-4 h-4 mr-2" />
-                            New Category
+                            New Tag
                         </Button>
                     } />
                     <DialogContent className="p-0 border-none bg-transparent shadow-none max-w-md">
                         <div className="bg-white rounded-[2rem] overflow-hidden shadow-2xl">
                             <ModalHeader 
-                                title="New Category" 
+                                title="New Tag" 
                             />
                             <div className="p-8 space-y-6">
                                 <InputController
-                                    label="Category Name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="e.g. Technology"
+                                    label="Tag Name"
+                                    value={tagName}
+                                    onChange={(e) => setTagName(e.target.value)}
+                                    placeholder="e.g. Workshop (system adds # automatically)"
                                 />
-                                <InputController
-                                    label="Description"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Brief description of this category..."
-                                />
+                                <div className="p-4 bg-brand/5 rounded-2xl border border-brand/10">
+                                    <p className="text-[10px] font-black text-brand uppercase tracking-widest mb-1 flex items-center gap-2">
+                                        <TagIcon size={12} />
+                                        Tag Preview
+                                    </p>
+                                    <p className="text-sm font-black text-gray-900 lowercase italic">
+                                        #{tagName.replace(/^#/, '') || 'tagname'}
+                                    </p>
+                                </div>
                             </div>
                             <ModalFooter 
                                 onCancel={() => setIsCreateOpen(false)}
                                 onSave={handleCreate}
-                                saveText="Create Category"
+                                saveText="Create Tag"
                                 isSubmitting={createMutation.isPending}
                             />
                         </div>
@@ -125,18 +121,19 @@ export default function CategoriesPage() {
                 </Dialog>
             </div>
 
+            {/* Table */}
             <div className="bg-white rounded-3xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
                 <div className="p-0">
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-24 gap-4">
                             <Loader2 className="w-10 h-10 text-brand animate-spin" />
-                            <p className="text-xs font-black uppercase tracking-widest text-gray-400">Fetching Categories...</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-gray-400">Fetching Tags...</p>
                         </div>
                     ) : (
                         <TableController
-                            data={categories || []}
+                            data={tags || []}
                             columns={allColumns}
-                            emptyMessage="No categories found."
+                            emptyMessage="No tags found."
                         />
                     )}
                 </div>
@@ -147,7 +144,7 @@ export default function CategoriesPage() {
                 onOpenChange={(open) => !open && setDeleteItem(null)}
                 onConfirm={handleDelete}
                 itemName={deleteItem?.name || ""}
-                title="Delete Category"
+                title="Delete Tag"
                 isDeleting={deleteMutation.isPending}
             />
         </div>

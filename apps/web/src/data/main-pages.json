@@ -4,11 +4,8 @@
         "title": "Dashboard",
         "parent": "/dashboard",
         "to": "/dashboard",
-        "allowed": [
-            "ADMIN",
-            "ORGANIZER",
-            "STAFF"
-        ],
+        "section": "Overview",
+        "allowed": ["ADMIN", "ORGANIZER", "STAFF"],
         "hasBadge": false,
         "children": []
     },
@@ -17,9 +14,8 @@
         "title": "Discover",
         "parent": "/discovery",
         "to": "/discovery",
-        "allowed": [
-            "STUDENT"
-        ],
+        "section": "Overview",
+        "allowed": ["STUDENT"],
         "hasBadge": false,
         "children": []
     },
@@ -28,10 +24,8 @@
         "title": "Events",
         "parent": "/dashboard/events",
         "to": "/dashboard/events",
-        "allowed": [
-            "ADMIN",
-            "ORGANIZER"
-        ],
+        "section": "Management",
+        "allowed": ["ADMIN", "ORGANIZER"],
         "hasBadge": false,
         "children": []
     },
@@ -40,31 +34,8 @@
         "title": "Users",
         "parent": "/dashboard/users",
         "to": "/dashboard/users",
-        "allowed": [
-            "ADMIN"
-        ],
-        "hasBadge": false,
-        "children": []
-    },
-    {
-        "icon": "Categories",
-        "title": "Categories",
-        "parent": "/dashboard/categories",
-        "to": "/dashboard/categories",
-        "allowed": [
-            "ADMIN"
-        ],
-        "hasBadge": false,
-        "children": []
-    },
-    {
-        "icon": "Venues",
-        "title": "Venues",
-        "parent": "/dashboard/venues",
-        "to": "/dashboard/venues",
-        "allowed": [
-            "ADMIN"
-        ],
+        "section": "Management",
+        "allowed": ["ADMIN"],
         "hasBadge": false,
         "children": []
     },
@@ -73,9 +44,8 @@
         "title": "Feedback",
         "parent": "/dashboard/feedback",
         "to": "/dashboard/feedback",
-        "allowed": [
-            "ADMIN"
-        ],
+        "section": "Management",
+        "allowed": ["ADMIN"],
         "hasBadge": false,
         "children": []
     },
@@ -84,9 +54,38 @@
         "title": "Attendance",
         "parent": "/dashboard/attendance",
         "to": "/dashboard/attendance",
-        "allowed": [
-            "ADMIN"
-        ],
+        "section": "Management",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Categories",
+        "title": "Categories",
+        "parent": "/dashboard/categories",
+        "to": "/dashboard/categories",
+        "section": "System Metadata",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Tags",
+        "title": "Tags",
+        "parent": "/dashboard/tags",
+        "to": "/dashboard/tags",
+        "section": "System Metadata",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
+        "icon": "Venues",
+        "title": "Venues",
+        "parent": "/dashboard/venues",
+        "to": "/dashboard/venues",
+        "section": "System Metadata",
+        "allowed": ["ADMIN"],
         "hasBadge": false,
         "children": []
     },
@@ -95,9 +94,8 @@
         "title": "Departments",
         "parent": "/dashboard/departments",
         "to": "/dashboard/departments",
-        "allowed": [
-            "ADMIN"
-        ],
+        "section": "System Metadata",
+        "allowed": ["ADMIN"],
         "hasBadge": false,
         "children": []
     }

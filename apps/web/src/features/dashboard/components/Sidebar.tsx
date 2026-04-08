@@ -17,6 +17,7 @@ import {
   Layers,
   MapPin,
   Compass,
+  Hash,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const iconMap: Record<string, React.ElementType> = {
   Categories: Layers,
   Venues: MapPin,
   Compass: Compass,
+  Tags: Hash,
 };
 
 interface MainPage {
@@ -40,6 +42,7 @@ interface MainPage {
   to: string;
   icon?: string;
   allowed: string[];
+  section?: string;
 }
 
 interface SidebarProps {
@@ -47,6 +50,15 @@ interface SidebarProps {
 }
 
 import Logo from "@/components/ui/Logo";
+import { LayoutGrid, MessageSquare, ClipboardCheck } from "lucide-react";
+
+// Update iconMap
+const extendedIconMap: Record<string, React.ElementType> = {
+  ...iconMap,
+  Departments: LayoutGrid,
+  Feedback: MessageSquare,
+  Attendance: ClipboardCheck,
+};
 
 export function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
@@ -55,6 +67,14 @@ export function Sidebar({ onClose }: SidebarProps) {
   const allowedMenu = (mainPages as MainPage[]).filter((item) =>
     hasAnyRole(item.allowed as Role[]),
   );
+
+  // Group items by section
+  const sections = allowedMenu.reduce((acc, item) => {
+    const section = item.section || "Other";
+    if (!acc[section]) acc[section] = [];
+    acc[section].push(item);
+    return acc;
+  }, {} as Record<string, MainPage[]>);
 
   const handleLogout = () => {
     clearAuth();
@@ -80,44 +100,48 @@ export function Sidebar({ onClose }: SidebarProps) {
 
       {/* ── Navigation (scrollable middle) ── */}
       <div className="flex-1 overflow-y-auto py-6 px-4 scrollbar-hide">
-        <nav className="space-y-1">
-          <p className="px-3 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-4">
-            Main
-          </p>
-          {allowedMenu.map((item) => {
-            const Icon =
-              iconMap[item.title.split(" ")[0]] ||
-              iconMap[item.icon ?? ""] ||
-              LayoutDashboard;
-            const isActive =
-              item.to === "/dashboard"
-                ? pathname === "/dashboard"
-                : pathname === item.to || pathname.startsWith(item.to + "/");
+        <nav className="space-y-8">
+          {Object.entries(sections).map(([sectionName, items]) => (
+            <div key={sectionName} className="space-y-1">
+              <p className="px-3 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">
+                {sectionName}
+              </p>
+              {items.map((item) => {
+                const Icon =
+                  extendedIconMap[item.title] ||
+                  extendedIconMap[item.icon ?? ""] ||
+                  LayoutDashboard;
+                const isActive =
+                  item.to === "/dashboard"
+                    ? pathname === "/dashboard"
+                    : pathname === item.to || pathname.startsWith(item.to + "/");
 
-            return (
-              <Link
-                key={item.title}
-                href={item.to}
-                onClick={onClose}
-                className={cn(
-                  "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-bold tracking-tight",
-                  isActive
-                    ? "bg-brand text-white shadow-lg shadow-brand/20"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-brand",
-                )}
-              >
-                <Icon
-                  className={cn(
-                    "w-4 h-4 transition-colors",
-                    isActive
-                      ? "text-white"
-                      : "text-gray-400 group-hover:text-brand",
-                  )}
-                />
-                {item.title}
-              </Link>
-            );
-          })}
+                return (
+                  <Link
+                    key={item.title}
+                    href={item.to}
+                    onClick={onClose}
+                    className={cn(
+                      "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-bold tracking-tight",
+                      isActive
+                        ? "bg-brand text-white shadow-lg shadow-brand/20"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-brand",
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 transition-colors",
+                        isActive
+                          ? "text-white"
+                          : "text-gray-400 group-hover:text-brand",
+                      )}
+                    />
+                    {item.title}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
       </div>
 

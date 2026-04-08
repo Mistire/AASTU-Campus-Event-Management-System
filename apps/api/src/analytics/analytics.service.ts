@@ -15,6 +15,7 @@ import {
   TopEventDto,
   TrendPointDto,
   UserEngagementDto,
+  OrganizerOverviewDto,
 } from './dto/response.dto';
 import { ExportQueryDto } from './dto/export-query.dto';
 import { TimeRangeDto } from './dto/time-range.dto';
@@ -263,6 +264,60 @@ export class AnalyticsService {
     await this.setCached(cacheKey, result, 300);
 
     return result;
+  }
+
+  async getOrganizerOverview(userId: string): Promise<OrganizerOverviewDto> {
+    const [totalEvents, totalRegistrations, pendingApprovals, totalAttendance] = await Promise.all([
+      this.prisma.event.count({
+        where: { createdBy: userId },
+      }),
+      this.prisma.registration.count({
+        where: { event: { createdBy: userId } },
+      }),
+      this.prisma.registration.count({
+        where: { 
+          event: { createdBy: userId },
+          status: { name: { equals: 'PENDING', mode: 'insensitive' } }
+        },
+      }),
+      this.prisma.attendance.count({
+        where: { event: { createdBy: userId } },
+      }),
+    ]);
+
+    return {
+      totalEvents,
+      totalRegistrations,
+      pendingApprovals,
+      totalAttendance,
+    };
+  }
+
+  async getOrganizerRecentRegistrations(userId: string, limit = 10) {
+    return this.prisma.registration.findMany({
+      take: limit,
+      where: {
+        event: { createdBy: userId }
+      },
+      orderBy: { registrationDate: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            profileImage: true,
+          },
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        status: true,
+      },
+    });
   }
 
   async getTopEvents(query: TimeRangeDto): Promise<TopEventDto[]> {

@@ -3,12 +3,22 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
+import { useCategories, Category } from "@/features/categories/api";
+import { useTags, Tag as TagType } from "@/features/tags/api";
+import { useVenues } from "@/features/events/api/get-venues";
+import { useEventTypes } from "@/features/events/api/get-event-types";
+import { Venue, EventType } from "@/features/events/types";
 
 interface ReviewStepProps {
   data: EventFormData;
 }
 
 export function ReviewStep({ data }: ReviewStepProps) {
+  const { data: categories } = useCategories();
+  const { data: tags } = useTags();
+  const { data: venues } = useVenues();
+  const { data: eventTypes } = useEventTypes();
+
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Not set";
     try {
@@ -16,6 +26,22 @@ export function ReviewStep({ data }: ReviewStepProps) {
     } catch {
       return dateStr;
     }
+  };
+
+  const getCategoryName = (id: string) => {
+    return categories?.find((c: Category) => c.id === id)?.name || id;
+  };
+
+  const getTagName = (id: string) => {
+    return tags?.find((t: TagType) => t.id === id)?.name || id;
+  };
+
+  const getVenueName = (id: string) => {
+    return venues?.find((v: Venue) => v.id === id)?.name || "Location TBD";
+  };
+
+  const getEventTypeName = (id: string) => {
+    return eventTypes?.find((e: EventType) => e.id === id)?.name || "Standard Event";
   };
 
   return (
@@ -41,6 +67,22 @@ export function ReviewStep({ data }: ReviewStepProps) {
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Event Title</p>
               <p className="text-sm font-black text-gray-900 mt-1">{data.title || "Untitled Event"}</p>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Event Type</p>
+                <Badge variant="outline" className="mt-1 bg-brand/5 text-brand border-brand/10 text-[9px] font-black rounded-lg py-0.5">
+                  {getEventTypeName(data.eventTypeId)}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Venue</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <MapPin size={10} className="text-brand" />
+                  <p className="text-[11px] font-bold text-gray-600 truncate">{getVenueName(data.venueId)}</p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Timing</p>
@@ -73,7 +115,9 @@ export function ReviewStep({ data }: ReviewStepProps) {
               <div className="flex flex-wrap gap-2 mt-2">
                 {data.categoryIds && data.categoryIds.length > 0 ? (
                   data.categoryIds.map((id) => (
-                    <Badge key={id} variant="secondary" className="bg-gray-100 text-gray-700 text-[10px] font-black rounded-lg">ID: {id}</Badge>
+                    <Badge key={id} variant="secondary" className="bg-brand/5 text-brand border-brand/20 text-[10px] font-black rounded-lg">
+                      {getCategoryName(id)}
+                    </Badge>
                   ))
                 ) : (
                   <p className="text-[10px] font-bold text-gray-300 uppercase">No categories</p>
@@ -85,7 +129,9 @@ export function ReviewStep({ data }: ReviewStepProps) {
               <div className="flex flex-wrap gap-2 mt-2">
                 {data.tagIds && data.tagIds.length > 0 ? (
                   data.tagIds.map((id) => (
-                    <Badge key={id} variant="outline" className="border-gray-200 text-gray-500 text-[10px] font-black rounded-lg">#{id}</Badge>
+                    <Badge key={id} variant="outline" className="border-gray-200 text-gray-500 text-[10px] font-black rounded-lg">
+                      #{getTagName(id)}
+                    </Badge>
                   ))
                 ) : (
                   <p className="text-[10px] font-bold text-gray-300 uppercase">No tags</p>

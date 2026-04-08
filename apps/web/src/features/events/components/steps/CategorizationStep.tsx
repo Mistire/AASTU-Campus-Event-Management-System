@@ -1,5 +1,6 @@
 import { Tag as TagIcon, Layers, Hash, Check } from "lucide-react";
-import { useCategories } from "../../api/useCategories";
+import { useCategories } from "@/features/categories/api";
+import { useTags } from "@/features/tags/api";
 import { cn } from "@/lib/utils";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
@@ -11,16 +12,7 @@ interface CategorizationStepProps {
 
 export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) {
   const { data: categories, isLoading: loadingCategories } = useCategories();
-  
-  // Tag selection would typically come from an API, using mock for now
-  const mockTags = [
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a1", name: "Technology" },
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a2", name: "Networking" },
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a3", name: "Workshop" },
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a4", name: "Career" },
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a5", name: "Social" },
-    { id: "e0a0a0a0-a0a0-a0a0-a0a0-e0a0a0a0a0a6", name: "Academic" },
-  ];
+  const { data: tags, isLoading: loadingTags } = useTags();
 
   const toggleCategory = (id: string) => {
     const current = data.categoryIds || [];
@@ -89,7 +81,12 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
         subtitle="Keywords for search optimization"
       >
         <div className="flex flex-wrap gap-3">
-          {mockTags.map((tag) => {
+          {loadingTags ? (
+             Array(4).fill(0).map((_, i) => (
+                <div key={i} className="h-10 w-24 rounded-xl bg-gray-50 animate-pulse" />
+             ))
+          ) : (
+            tags?.map((tag) => {
             const isSelected = data.tagIds?.includes(tag.id);
             return (
               <button
@@ -108,9 +105,10 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
                 </span>
               </button>
             );
-          })}
-        </div>
-      </WizardSection>
-    </div>
-  );
+          })
+        )}
+      </div>
+    </WizardSection>
+  </div>
+);
 }
