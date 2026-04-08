@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api-client';
 import { Category } from './useCategories';
-import { MOCK_EVENTS } from './mock-data';
 
 export interface EventTag {
     id: string;
@@ -67,16 +66,20 @@ export interface Event {
         registrations: number;
     };
     thumbnail?: string;
+    media: {
+        id: string;
+        fileUrl: string;
+        mediaType: string;
+    }[];
 }
 
 export interface EventsResponse {
     data: Event[];
     meta: {
-        totalItems: number;
-        itemCount: number;
-        itemsPerPage: number;
+        total: number;
+        page: number;
+        limit: number;
         totalPages: number;
-        currentPage: number;
     };
 }
 
@@ -107,11 +110,12 @@ export async function fetchEvents(queryParams: EventQueryParams = {}) {
     const res = await apiFetch(`/api/events?${query.toString()}`);
 
     if (!res.ok) {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to fetch events');
     }
 
-    return await res.json() as EventsResponse;
+    const result = await res.json();
+    return result.data as EventsResponse;
 }
 
 export function useEvents(queryParams: EventQueryParams = {}) {
@@ -121,38 +125,9 @@ export function useEvents(queryParams: EventQueryParams = {}) {
         retry: false,
     });
 
-    let filteredMockData = [...MOCK_EVENTS];
-    
-    if (queryParams.search) {
-        const s = queryParams.search.toLowerCase();
-        filteredMockData = filteredMockData.filter(e => 
-            e.title.toLowerCase().includes(s) || 
-            e.description.toLowerCase().includes(s)
-        );
-    }
-    
-    if (queryParams.categoryId) {
-        filteredMockData = filteredMockData.filter(e => 
-            e.eventCategories.some(ec => ec.categoryId === queryParams.categoryId)
-        );
-    }
-
-    const stableData = query.data && Array.isArray(query.data.data) 
-        ? query.data 
-        : { 
-            data: filteredMockData, 
-            meta: { 
-                totalItems: filteredMockData.length, 
-                itemCount: filteredMockData.length, 
-                itemsPerPage: 10, 
-                totalPages: 1, 
-                currentPage: 1 
-            } 
-          };
-
     return {
         ...query,
-        data: stableData,
+        data: query.data,
         isLoading: query.isLoading && !query.data
     };
 }

@@ -15,12 +15,10 @@ export function OnboardingGate({ children }: OnboardingGateProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Only students get the onboarding flow
     const shouldShow = profile !== null && 
                       (profile.role === "STUDENT" || profile.roles?.includes("STUDENT")) && 
                       localStorage.getItem("cems_onboarded") !== "true";
     
-    // Using a microtask to avoid synchronous setState trigger in render warning
     queueMicrotask(() => {
       if (shouldShow) setShowPicker(true);
       setIsReady(true);

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Event, EventStatusName } from "../types";
 import { useEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../api/mutations";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent, useApproveEvent, useRejectEvent, useSubmitEvent } from "../api/mutations";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { TableController } from "@/components/shared/TableController";
 import { getEventsColumns } from "@/features/events/components/EventsTableConfig";
 import { ButtonController } from "@/components/shared/ButtonController";
@@ -47,6 +48,11 @@ export const EventsList = () => {
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
+  const approveEvent = useApproveEvent();
+  const rejectEvent = useRejectEvent();
+  const submitEvent = useSubmitEvent();
+
+  const isAdmin = useAuthStore((state) => state.hasRole("ADMIN"));
 
   useEffect(() => {
     if (isError && error) {
@@ -61,15 +67,15 @@ export const EventsList = () => {
     router.push("/dashboard/events/create");
   };
 
-  const handleEdit = (event: Event) => {
+  const handleEdit = useCallback((event: Event) => {
     setSelectedEvent(event);
     setIsEventModalOpen(true);
-  };
+  }, []);
 
-  const handleDelete = (event: Event) => {
+  const handleDelete = useCallback((event: Event) => {
     setSelectedEvent(event);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
   const handleSaveEvent = (data: Partial<Event>) => {
     if (selectedEvent) {
@@ -108,7 +114,48 @@ export const EventsList = () => {
     });
   };
 
-  const columns = useMemo(() => getEventsColumns(handleEdit, handleDelete), []);
+  const handleApprove = useCallback((event: Event) => {
+    approveEvent.mutate(event.id, {
+      onSuccess: () => {
+        ToastController.success({ message: "Event approved successfully", description: `"${event.title}" is now approved.` });
+      },
+      onError: (err) => {
+        ToastController.error({ message: "Approval failed", description: err.message });
+      }
+    });
+  }, [approveEvent]);
+
+  const handleReject = useCallback((event: Event) => {
+    // For now, simple reject. Could add a modal for reason later.
+    rejectEvent.mutate({ id: event.id }, {
+      onSuccess: () => {
+        ToastController.success({ message: "Event rejected", description: `"${event.title}" has been rejected.` });
+      },
+      onError: (err) => {
+        ToastController.error({ message: "Rejection failed", description: err.message });
+      }
+    });
+  }, [rejectEvent]);
+
+  const handleSubmit = useCallback((event: Event) => {
+    submitEvent.mutate(event.id, {
+      onSuccess: () => {
+        ToastController.success({ message: "Event submitted", description: `"${event.title}" is now pending approval.` });
+      },
+      onError: (err) => {
+        ToastController.error({ message: "Submission failed", description: err.message });
+      }
+    });
+  }, [submitEvent]);
+
+  const columns = useMemo(() => getEventsColumns(
+    handleEdit, 
+    handleDelete,
+    handleApprove,
+    handleReject,
+    handleSubmit,
+    isAdmin
+  ), [handleEdit, handleDelete, handleApprove, handleReject, handleSubmit, isAdmin]);
 
   const totalPages = eventsData?.meta?.totalPages || 1;
   const totalItems = eventsData?.meta?.total || 0;

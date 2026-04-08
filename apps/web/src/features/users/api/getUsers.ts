@@ -20,12 +20,12 @@ export async function fetchUsers() {
     });
 
     if (!res.ok) {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to fetch users');
     }
 
     const result = await res.json();
-    const data = (result.data || result) as RawUser[];
+    const data = result.data as RawUser[];
     
     // Map backend data to UserRecord format
     return data.map((user): UserRecord => ({

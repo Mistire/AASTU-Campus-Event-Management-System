@@ -11,11 +11,13 @@ interface DashboardStats {
     categories?: number;
     approvedRegistrations?: number;
     pendingRegistrations?: number;
+    totalAttendance?: number;
+    registrationsToday?: number;
+    registrationStatusBreakdown?: { status: string; count: number }[];
     // Organizer stats
     totalEvents?: number;
     totalRegistrations?: number;
     pendingApprovals?: number;
-    totalAttendance?: number;
 }
 
 export async function fetchDashboardStats(role: string) {
@@ -36,7 +38,7 @@ export async function fetchDashboardStats(role: string) {
 
 export function useDashboardStats() {
     const { token, profile } = useAuthStore();
-    const role = profile?.role || 'STUDENT';
+    const role = (profile?.role || 'STUDENT').toUpperCase();
     const isAuthorized = role === 'ADMIN' || role === 'ORGANIZER';
 
     return useQuery({

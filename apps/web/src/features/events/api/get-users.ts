@@ -9,6 +9,7 @@ const getUsers = async (): Promise<AuthProfile[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch users");
   
+  // Handle both paginated { data, meta } and direct array responses
   return (result.data?.data || result.data) || [];
 };
 

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
+import { apiFetch } from '@/lib/api-client';
 
 export interface RecentRegistration {
     id: string;
@@ -20,18 +21,13 @@ export interface RecentRegistration {
     };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-export async function fetchRecentRegistrations(token: string, role: string) {
+export async function fetchRecentRegistrations(role: string) {
     const endpoint = role === 'ADMIN' 
-        ? `${API_URL}/api/admin/registrations/recent` 
-        : `${API_URL}/api/analytics/organizer/registrations/recent`;
+        ? '/api/admin/registrations/recent' 
+        : '/api/analytics/organizer/registrations/recent';
 
-    const res = await fetch(endpoint, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
+    const res = await apiFetch(endpoint, {
+        method: 'GET',
     });
 
     if (!res.ok) {
@@ -45,12 +41,12 @@ export async function fetchRecentRegistrations(token: string, role: string) {
 
 export function useRecentRegistrations() {
     const { token, profile } = useAuthStore();
-    const role = profile?.role || 'STUDENT';
+    const role = (profile?.role || 'STUDENT').toUpperCase();
     const isAuthorized = role === 'ADMIN' || role === 'ORGANIZER';
 
     return useQuery({
         queryKey: ['recent-registrations', role],
-        queryFn: () => fetchRecentRegistrations(token!, role),
+        queryFn: () => fetchRecentRegistrations(role),
         enabled: !!token && isAuthorized,
     });
 }

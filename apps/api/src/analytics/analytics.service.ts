@@ -247,11 +247,24 @@ export class AnalyticsService {
       if (cached) return cached;
     }
 
-    const [totalEvents, totalUsers, totalRegistrations, totalAttendance] = await Promise.all([
+    const [
+      totalEvents,
+      totalUsers,
+      totalRegistrations,
+      totalAttendance,
+      approvedRegistrations,
+      pendingRegistrations,
+    ] = await Promise.all([
       this.prisma.event.count(),
       this.prisma.user.count(),
       this.prisma.registration.count(),
       this.prisma.attendance.count(),
+      this.prisma.registration.count({
+        where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
+      }),
+      this.prisma.registration.count({
+        where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
+      }),
     ]);
 
     const result: AdminOverviewDto = {
@@ -259,6 +272,8 @@ export class AnalyticsService {
       totalUsers,
       totalRegistrations,
       totalAttendance,
+      approvedRegistrations,
+      pendingRegistrations,
     };
 
     await this.setCached(cacheKey, result, 300);
@@ -266,22 +281,36 @@ export class AnalyticsService {
     return result;
   }
 
+  private async getOrganizerEventWhereClause(userId: string) {
+    const eventIdsWhereOrganizer = await this.prisma.eventOrganizers.findMany({
+      where: { userId },
+      select: { eventId: true },
+    });
+    const organizerEventIds = eventIdsWhereOrganizer.map((eo) => eo.eventId);
+
+    return {
+      OR: [{ createdBy: userId }, { id: { in: organizerEventIds } }],
+    };
+  }
+
   async getOrganizerOverview(userId: string): Promise<OrganizerOverviewDto> {
+    const eventWhereClause = await this.getOrganizerEventWhereClause(userId);
+
     const [totalEvents, totalRegistrations, pendingApprovals, totalAttendance] = await Promise.all([
       this.prisma.event.count({
-        where: { createdBy: userId },
+        where: eventWhereClause,
       }),
       this.prisma.registration.count({
-        where: { event: { createdBy: userId } },
+        where: { event: eventWhereClause },
       }),
       this.prisma.registration.count({
-        where: { 
-          event: { createdBy: userId },
-          status: { name: { equals: 'PENDING', mode: 'insensitive' } }
+        where: {
+          event: eventWhereClause,
+          status: { name: { equals: 'PENDING', mode: 'insensitive' } },
         },
       }),
       this.prisma.attendance.count({
-        where: { event: { createdBy: userId } },
+        where: { event: eventWhereClause },
       }),
     ]);
 
@@ -294,10 +323,12 @@ export class AnalyticsService {
   }
 
   async getOrganizerRecentRegistrations(userId: string, limit = 10) {
+    const eventWhereClause = await this.getOrganizerEventWhereClause(userId);
+
     return this.prisma.registration.findMany({
       take: limit,
       where: {
-        event: { createdBy: userId }
+        event: eventWhereClause,
       },
       orderBy: { registrationDate: 'desc' },
       include: {

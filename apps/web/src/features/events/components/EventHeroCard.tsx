@@ -13,6 +13,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useState } from "react";
+import { getMediaUrl } from "@/lib/api-client";
+
 interface EventHeroCardProps {
   event: Event;
   isSaved?: boolean;
@@ -22,6 +24,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const startTime = new Date(event.startTime);
   const isLive = event.status?.statusName === "LIVE";
+  const imageUrl = getMediaUrl(event.thumbnail || event.media?.[0]?.fileUrl);
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,9 +39,9 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
     >
       {/* Background Image / Gradient */}
       <div className="absolute inset-0 z-0">
-        {event.thumbnail ? (
+        {imageUrl ? (
           <Image
-            src={event.thumbnail}
+            src={imageUrl}
             alt={event.title}
             fill
             className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"

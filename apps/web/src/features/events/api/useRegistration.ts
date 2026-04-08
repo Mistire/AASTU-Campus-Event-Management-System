@@ -8,11 +8,12 @@ export async function registerForEvent(eventId: string) {
     });
 
     if (!res.ok) {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to register for event');
     }
 
-    return await res.json();
+    const result = await res.json();
+    return result.data;
 }
 
 export function useRegistration() {

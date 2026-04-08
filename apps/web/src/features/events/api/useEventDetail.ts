@@ -18,7 +18,8 @@ export async function fetchEventDetail(id: string) {
         throw new Error(error.message || 'Failed to fetch event detail');
     }
 
-    return await res.json() as Event;
+    const result = await res.json();
+    return result.data as Event;
 }
 
 export function useEventDetail(id: string) {

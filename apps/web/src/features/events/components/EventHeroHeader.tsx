@@ -5,6 +5,7 @@ import { Circle, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Event } from "../api/useEvents";
+import { getMediaUrl } from "@/lib/api-client";
 
 interface EventHeroHeaderProps {
   event: Event;
@@ -12,12 +13,13 @@ interface EventHeroHeaderProps {
 
 export function EventHeroHeader({ event }: EventHeroHeaderProps) {
   const isLive = event.status?.statusName === "LIVE";
+  const imageUrl = getMediaUrl(event.thumbnail || event.media?.[0]?.fileUrl);
 
   return (
     <section className="relative rounded-[2.5rem] overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
-      {event.thumbnail ? (
+      {imageUrl ? (
         <Image
-          src={event.thumbnail}
+          src={imageUrl}
           alt={event.title}
           fill
           priority

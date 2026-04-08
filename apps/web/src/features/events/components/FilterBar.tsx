@@ -1,6 +1,6 @@
 "use client";
 
-import { useCategories } from "../api/useCategories";
+import { useCategories } from "@/features/categories/api"
 import { cn } from "@/lib/utils";
 import { Search, SlidersHorizontal, ChevronRight, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";

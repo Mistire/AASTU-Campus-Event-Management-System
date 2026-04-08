@@ -9,7 +9,8 @@ const getEventTypes = async (): Promise<EventType[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch event types");
 
-  return (result.data?.data || result.data) || [];
+  // Handle both paginated { data, meta } and direct array responses
+  return (result.data?.data || result.data) as EventType[];
 };
 
 export const useEventTypes = () => {

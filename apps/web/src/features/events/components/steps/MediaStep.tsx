@@ -1,6 +1,9 @@
-import { Image as ImageIcon, Upload, X, FileCode, Info } from "lucide-react";
+import { Image as ImageIcon, Upload, X, FileCode, Info, Loader2 } from "lucide-react";
+import NextImage from "next/image";
 import { cn } from "@/lib/utils";
 import { useState, useRef } from "react";
+import { ToastController } from "@/components/shared/ToastController";
+import { apiFetch } from "@/lib/api-client";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
 
@@ -11,17 +14,42 @@ interface MediaStepProps {
 
 export function MediaStep({ data, onUpdate }: MediaStepProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnail = data.thumbnailUrl;
 
-  const handleFile = (file: File) => {
-    // In a real app, we'd upload to S3/Cloudinary here
-    // For now, we'll create a local preview URL to simulate success
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      onUpdate({ thumbnailUrl: e.target?.result as string });
-    };
-    reader.readAsDataURL(file);
+  const handleFile = async (file: File) => {
+    setIsUploading(true);
+    const tid = ToastController.loading({ 
+      message: "Processing Visuals", 
+      description: "Uploading your masterpiece to the cloud..." 
+    });
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await apiFetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const result = await res.json();
+      // Correctly extract the URL from the wrapped response
+      const url = result.data?.url || result.url;
+      onUpdate({ thumbnailUrl: url });
+      
+      ToastController.dismiss(tid);
+      ToastController.success({ message: "Upload Complete", description: "Image is ready." });
+    } catch (err) {
+      ToastController.dismiss(tid);
+      ToastController.error({ message: "Upload Failed", description: "Could not upload image." });
+      console.error(err);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onDragOver = (e: React.DragEvent) => {
@@ -64,10 +92,11 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
         >
           {thumbnail ? (
             <>
-              <img 
+              <NextImage 
                 src={thumbnail} 
                 alt="Thumbnail Preview" 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
                 <button 
@@ -93,18 +122,25 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
               <div className="w-24 h-24 rounded-[2rem] bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
-                <Upload className="text-brand/40 group-hover:text-brand transition-colors" size={32} />
+                {isUploading ? (
+                  <Loader2 className="animate-spin text-brand" size={32} />
+                ) : (
+                  <Upload className="text-brand/40 group-hover:text-brand transition-colors" size={32} />
+                )}
               </div>
-              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">Drop your masterpiece here</h4>
+              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">
+                {isUploading ? "Uploading Protocol..." : "Drop your masterpiece here"}
+              </h4>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter max-w-[240px] leading-relaxed">
                 Supports High-Res PNG, JPG or WebP. <br/> Minimum 1280x720 recommended.
               </p>
               <button 
                 type="button"
+                disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-8 px-8 py-3.5 rounded-2xl bg-gray-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-brand transition-all shadow-xl shadow-gray-200 active:scale-95"
+                className="mt-8 px-8 py-3.5 rounded-2xl bg-gray-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-brand transition-all shadow-xl shadow-gray-200 active:scale-95 disabled:opacity-50"
               >
-                Browse Files
+                {isUploading ? "Uploading..." : "Browse Files"}
               </button>
             </div>
           )}

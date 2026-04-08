@@ -3,16 +3,19 @@ import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SocialProofBubble } from "../SocialProofBubble";
 import { Event } from "../../api/useEvents";
+import { getMediaUrl } from "@/lib/api-client";
 
 interface EventCardImageProps {
   event: Event;
 }
 
 export function EventCardImage({ event }: EventCardImageProps) {
+  const imageUrl = getMediaUrl(event.thumbnail || event.media?.[0]?.fileUrl);
+
   return (
     <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
       <Image 
-        src={event.thumbnail || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=800"} 
+        src={imageUrl} 
         alt={event.title}
         fill
         className="object-cover transition-transform duration-700 group-hover:scale-110"

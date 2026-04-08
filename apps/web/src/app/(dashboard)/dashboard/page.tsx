@@ -166,8 +166,8 @@ export default function DashboardPage() {
                                     title="Total Reg" 
                                     value={stats?.registrations?.toLocaleString() || "0"} 
                                     icon={UserPlus} 
-                                    subValue={regStats.today > 0 ? `+${regStats.today} TODAY` : "NO NEW TODAY"} 
-                                    trend={regStats.today > 0 ? "up" : "neutral"} 
+                                    subValue={(stats?.registrationsToday ?? 0) > 0 ? `+${stats?.registrationsToday} TODAY` : "NO NEW TODAY"} 
+                                    trend={(stats?.registrationsToday ?? 0) > 0 ? "up" : "neutral"} 
                                 />
                                 <MetricCard title="Venues" value={stats?.venues || "0"} icon={MapPin} />
                                 <MetricCard title="Categories" value={stats?.categories || "0"} icon={Layers} />

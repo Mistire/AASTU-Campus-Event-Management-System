@@ -20,9 +20,12 @@ export const useCategories = () => {
         queryKey: ['categories'],
         queryFn: async (): Promise<Category[]> => {
             const res = await apiFetch('/api/categories');
-            if (!res.ok) throw new Error('Failed to fetch categories');
-            const data = await res.json();
-            return (data.data || data) as Category[];
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.message || 'Failed to fetch categories');
+            }
+            const result = await res.json();
+            return result.data as Category[];
         },
     });
 };

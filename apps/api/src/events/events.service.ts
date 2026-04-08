@@ -711,6 +711,7 @@ export class EventsService {
       venue: true,
       tags: { include: { tag: true } },
       eventCategories: { include: { category: true } },
+      media: true,
       sessions: {
         include: {
           speakers: { include: { speaker: true } },

@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface ApiOptions extends RequestInit {
   skipAuth?: boolean;
@@ -138,4 +138,10 @@ export function scheduleProactiveRefresh(): (() => void) | null {
   }, ms);
 
   return () => clearTimeout(timerId);
+}
+
+export function getMediaUrl(url: string | null | undefined): string {
+  if (!url) return "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=800";
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+  return `${API_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }

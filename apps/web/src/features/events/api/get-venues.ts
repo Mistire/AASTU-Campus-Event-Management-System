@@ -9,7 +9,8 @@ const getVenues = async (): Promise<Venue[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch venues");
   
-  return (result.data?.data || result.data) || [];
+  // Handle both paginated { data, meta } and direct array responses
+  return (result.data?.data || result.data) as Venue[];
 };
 
 export const useVenues = () => {

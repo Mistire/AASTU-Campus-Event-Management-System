@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
 import { BadgeController } from "@/components/shared/BadgeController";
 import { format } from "date-fns";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Rocket, Check, X } from "lucide-react";
 
 export const getStatusColor = (status: EventStatusName) => {
   switch (status) {
@@ -18,7 +18,11 @@ export const getStatusColor = (status: EventStatusName) => {
 
 export const getEventsColumns = (
   onEdit: (event: Event) => void,
-  onDelete: (event: Event) => void
+  onDelete: (event: Event) => void,
+  onApprove: (event: Event) => void,
+  onReject: (event: Event) => void,
+  onSubmit: (event: Event) => void,
+  isAdmin: boolean = false
 ): ColumnDef<Event>[] => [
   {
     id: "index",
@@ -116,23 +120,60 @@ export const getEventsColumns = (
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-         <button 
-            type="button" 
-            onClick={() => onEdit(row.original)}
-            className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
-         >
-            <Pencil size={18} />
-         </button>
-         <button 
-            type="button" 
-            onClick={() => onDelete(row.original)}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-         >
-            <Trash2 size={18} />
-         </button>
-      </div>
-    )
+    cell: ({ row }) => {
+      const status = row.original.status.statusName;
+      return (
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+           {status === "DRAFT" && (
+             <button 
+                type="button" 
+                onClick={() => onSubmit(row.original)}
+                title="Submit for Approval"
+                className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
+             >
+                <Rocket size={18} />
+             </button>
+           )}
+
+           {isAdmin && status === "PENDING" && (
+             <>
+               <button 
+                  type="button" 
+                  onClick={() => onApprove(row.original)}
+                  title="Approve Event"
+                  className="p-2 text-gray-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+               >
+                  <Check size={18} />
+               </button>
+               <button 
+                  type="button" 
+                  onClick={() => onReject(row.original)}
+                  title="Reject Event"
+                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+               >
+                  <X size={18} />
+               </button>
+             </>
+           )}
+
+           <button 
+              type="button" 
+              onClick={() => onEdit(row.original)}
+              title="Edit Event"
+              className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
+           >
+              <Pencil size={18} />
+           </button>
+           <button 
+              type="button" 
+              onClick={() => onDelete(row.original)}
+              title="Delete Event"
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+           >
+              <Trash2 size={18} />
+           </button>
+        </div>
+      );
+    }
   }
 ];

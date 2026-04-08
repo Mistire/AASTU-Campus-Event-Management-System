@@ -2,28 +2,29 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { apiFetch } from '@/lib/api-client';
 import { Event } from './useEvents';
-import { MOCK_RECOMMENDATIONS, MOCK_EVENTS } from './mock-data';
 
 export async function fetchRecommendations(userId: string, n: number = 5) {
     const res = await apiFetch(`/api/recommendations/user/${userId}?n=${n}`);
 
     if (!res.ok) {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to fetch recommendations');
     }
 
-    return await res.json() as Event[];
+    const result = await res.json();
+    return result.data as Event[];
 }
 
 export async function fetchSimilarEvents(eventId: string, n: number = 5) {
     const res = await apiFetch(`/api/recommendations/similar/${eventId}?n=${n}`);
 
     if (!res.ok) {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || 'Failed to fetch similar events');
     }
 
-    return await res.json() as Event[];
+    const result = await res.json();
+    return result.data as Event[];
 }
 
 export function useRecommendations(n: number = 5) {
@@ -39,7 +40,7 @@ export function useRecommendations(n: number = 5) {
 
     return {
         ...query,
-        data: query.data && query.data.length > 0 ? query.data : MOCK_RECOMMENDATIONS,
+        data: query.data,
     };
 }
 
@@ -53,8 +54,6 @@ export function useSimilarEvents(eventId: string, n: number = 5) {
 
     return {
         ...query,
-        data: (query.data && query.data.length > 0 ? query.data : MOCK_EVENTS)
-            .filter((e) => e.id !== eventId)
-            .slice(0, n),
+        data: query.data,
     };
 }

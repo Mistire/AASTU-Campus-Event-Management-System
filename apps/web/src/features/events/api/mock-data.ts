@@ -169,7 +169,8 @@ export const MOCK_EVENTS: Event[] = [
       }
     ],
     _count: { registrations: 68 },
-    thumbnail: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800"
+    thumbnail: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800",
+    media: []
   },
   {
     id: "mock-4",

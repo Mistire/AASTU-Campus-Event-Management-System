@@ -7,7 +7,7 @@ import type { AuthUser } from '../auth/jwt.strategy';
 import { TimeRangeDto } from './dto/time-range.dto';
 import { ExportQueryDto } from './dto/export-query.dto';
 
-@Controller('api/analytics')
+@Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}

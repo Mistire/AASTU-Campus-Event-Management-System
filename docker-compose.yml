@@ -81,6 +81,7 @@ services:
       # Mount source for live-reload (node_modules stays inside container)
       - ./apps/api/src:/usr/src/app/src:delegated
       - ./apps/api/prisma:/usr/src/app/prisma:delegated
+      - ./apps/api/uploads:/usr/src/app/uploads:delegated
       - /usr/src/app/node_modules # anonymous volume keeps container node_modules
     depends_on:
       postgres:
