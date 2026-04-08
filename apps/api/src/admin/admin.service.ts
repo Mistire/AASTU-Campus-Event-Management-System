@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AssignRoleDto, ListUserQueryDto } from './dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { AdminDashboardStatsDto, AssignRoleDto, ListUserQueryDto } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -144,8 +144,11 @@ export class AdminService {
     }
   }
 
-  async getStats() {
+  async getStats(): Promise<AdminDashboardStatsDto> {
     try {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
       const [
         userCount,
         eventCount,
@@ -155,6 +158,11 @@ export class AdminService {
         approvedRegs,
         pendingRegs,
         attendanceCount,
+        registrationsToday,
+        pendingRegistrations,
+        approvedRegistrations,
+        rejectedRegistrations,
+        cancelledRegistrations,
       ] = await Promise.all([
         this.prisma.user.count(),
         this.prisma.event.count(),
@@ -168,6 +176,52 @@ export class AdminService {
           where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
         }),
         this.prisma.attendance.count(),
+          where: {
+            registrationDate: {
+              gte: startOfToday,
+            },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: {
+              name: {
+                equals: 'PENDING',
+                mode: 'insensitive',
+              },
+            },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: {
+              name: {
+                equals: 'APPROVED',
+                mode: 'insensitive',
+              },
+            },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: {
+              name: {
+                equals: 'REJECTED',
+                mode: 'insensitive',
+              },
+            },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: {
+              name: {
+                equals: 'CANCELLED',
+                mode: 'insensitive',
+              },
+            },
+          },
+        }),
       ]);
 
       return {
@@ -179,6 +233,13 @@ export class AdminService {
         approvedRegistrations: approvedRegs,
         pendingRegistrations: pendingRegs,
         totalAttendance: attendanceCount,
+        registrationsToday,
+        registrationStatusBreakdown: [
+          { status: 'PENDING', count: pendingRegistrations },
+          { status: 'APPROVED', count: approvedRegistrations },
+          { status: 'REJECTED', count: rejectedRegistrations },
+          { status: 'CANCELLED', count: cancelledRegistrations },
+        ],
       };
     } catch (err) {
       console.error('AdminService.getStats error:', err);

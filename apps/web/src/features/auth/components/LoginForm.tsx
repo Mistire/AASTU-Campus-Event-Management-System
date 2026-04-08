@@ -5,14 +5,7 @@ import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  Eye,
-  EyeOff,
-  Loader2,
-  ArrowRight,
-  Lock,
-  Mail,
-} from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 export function LoginForm() {
@@ -27,7 +20,8 @@ export function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,7 +29,7 @@ export function LoginForm() {
       });
       const data = await res.json();
       console.log("Login Response Data:", data);
-      
+
       if (!res.ok) throw new Error(data.message || "Invalid credentials");
 
       // Extract successful response data (which is wrapped in 'data' by the NestJS TransformInterceptor)
@@ -45,14 +39,22 @@ export function LoginForm() {
         throw new Error("Malformed server response: User object is missing");
       }
 
-      const userRole = successData.user.role || (successData.user.roles && successData.user.roles[0]) || "STUDENT";
-      const normalizedRole = typeof userRole === 'string' ? userRole.toUpperCase() : "STUDENT";
+      const userRole =
+        successData.user.role ||
+        (successData.user.roles && successData.user.roles[0]) ||
+        "STUDENT";
+      const normalizedRole =
+        typeof userRole === "string" ? userRole.toUpperCase() : "STUDENT";
 
-      setAuth(successData.access_token || successData.token, successData.refresh_token || "", {
-        ...successData.user,
-        full_name: successData.user.fullName || successData.user.full_name,
-        role: normalizedRole,
-      });
+      setAuth(
+        successData.access_token || successData.token,
+        successData.refresh_token || "",
+        {
+          ...successData.user,
+          full_name: successData.user.fullName || successData.user.full_name,
+          role: normalizedRole,
+        },
+      );
 
       toast.success("Welcome back!", {
         description: `Logged in as ${normalizedRole.toLowerCase()}`,
@@ -188,7 +190,10 @@ export function LoginForm() {
           {isLoading ? (
             <Loader2 size={14} className="animate-spin relative z-10" />
           ) : (
-            <ArrowRight size={14} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight
+              size={14}
+              className="relative z-10 group-hover:translate-x-1 transition-transform"
+            />
           )}
           <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
         </button>
