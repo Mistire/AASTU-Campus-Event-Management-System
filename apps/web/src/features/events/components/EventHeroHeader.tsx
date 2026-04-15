@@ -14,7 +14,7 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
   const isLive = event.status?.statusName === "LIVE";
 
   return (
-    <section className="relative rounded-[2.5rem] overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
+    <section className="relative rounded-xl overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
       {event.thumbnail ? (
         <Image
           src={event.thumbnail}

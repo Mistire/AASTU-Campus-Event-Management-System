@@ -15,11 +15,11 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-12">
       {/* Header section (Bento style) */}
-      <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
+      <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-brand/10 transition-colors duration-700" />
         
         <div className="relative group">
-          <div className="w-32 h-32 rounded-[2rem] bg-brand/5 flex items-center justify-center border-2 border-brand/10 shadow-xl overflow-hidden group-hover:border-brand/30 transition-all duration-500">
+          <div className="w-32 h-32 rounded-xl bg-brand/5 flex items-center justify-center border-2 border-brand/10 shadow-xl overflow-hidden group-hover:border-brand/30 transition-all duration-500">
              <User size={64} className="text-brand/20 group-hover:scale-110 transition-transform duration-500" />
           </div>
           <button className="absolute -bottom-2 -right-2 p-3 bg-white rounded-2xl border border-gray-100 shadow-xl text-brand hover:bg-brand hover:text-white transition-all transform hover:scale-110 active:scale-95 shadow-brand/10">
@@ -59,7 +59,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Account Status Bento Card */}
-        <div className="lg:col-span-1 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+        <div className="lg:col-span-1 bg-white p-8 rounded-xl border border-gray-100 shadow-sm space-y-6">
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-brand/5 rounded-2xl text-brand">
                     <ShieldCheck size={24} />
@@ -78,7 +78,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Essential Info Bento Card */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6 overflow-hidden relative group">
+        <div className="lg:col-span-2 bg-white p-8 rounded-xl border border-gray-100 shadow-sm space-y-6 overflow-hidden relative group">
             <div className="absolute top-0 right-0 p-8 text-brand/5 group-hover:text-brand/10 transition-colors duration-500">
                 <User size={120} strokeWidth={1} />
             </div>

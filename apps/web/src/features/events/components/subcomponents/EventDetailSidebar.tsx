@@ -1,7 +1,7 @@
 import { Calendar, Users, Tag, Hash, BarChart2, Building2, CalendarClock, TimerOff } from "lucide-react";
 import { format } from "date-fns";
 import { InfoRow } from "../InfoRow";
-import { BadgeController } from "@/components/shared/BadgeController";
+import { CemsBadge } from "@/components/cems/CemsBadge";
 import { getStatusColor } from "../EventsTableConfig";
 import { EventStatusName } from "../../types";
 
@@ -11,14 +11,14 @@ interface EventDetailSidebarProps {
 
 export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
   return (
-    <div className="bg-white rounded-[3rem] shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50 sticky top-24">
+    <div className="bg-white rounded-xl shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50 sticky top-24">
       {/* Brand Title Area */}
       <div className="bg-brand px-8 py-10 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Calendar size={120} />
         </div>
         <div className="relative flex flex-col items-center text-center gap-4">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[2rem] flex items-center justify-center border border-white/30 shadow-2xl">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-2xl">
             <Calendar className="h-10 w-10 text-white" />
           </div>
           <div>
@@ -29,11 +29,11 @@ export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
               {event.eventType?.name || "Standard Event"}
             </p>
           </div>
-          <BadgeController
+          <CemsBadge
             className={`${getStatusColor(event.status.statusName as EventStatusName)} rounded-full px-6 py-1.5 font-black text-[9px] uppercase tracking-[0.15em] border-none shadow-lg`}
           >
             {event.status.statusName}
-          </BadgeController>
+          </CemsBadge>
         </div>
       </div>
 

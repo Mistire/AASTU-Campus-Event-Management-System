@@ -14,14 +14,15 @@ export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
     {
         accessorKey: "name",
         header: "User",
+        size: 250,
         cell: ({ row }) => (
             <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-2xl bg-brand/5 flex items-center justify-center text-brand text-xs font-black border border-brand/10 shadow-sm">
-                    {row.original.name.charAt(0)}
+                    {(row.original.name || row.original.email || '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{row.original.name}</span>
-                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{row.original.email}</span>
+                    <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{row.original.name || 'Unknown User'}</span>
+                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest truncate max-w-[180px] block">{row.original.email}</span>
                 </div>
             </div>
         ),

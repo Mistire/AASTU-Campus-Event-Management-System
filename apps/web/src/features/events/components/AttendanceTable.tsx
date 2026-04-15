@@ -1,6 +1,6 @@
 import { useAttendance } from "../api/get-attendance";
 import { Users } from "lucide-react";
-import { TableController } from "@/components/shared/TableController";
+import { CemsTable } from "@/components/cems/CemsTable";
 import { attendanceColumns } from "./attendance/AttendanceTableConfig";
 
 interface AttendanceTableProps {
@@ -22,7 +22,7 @@ export function AttendanceTable({ eventId }: AttendanceTableProps) {
 
   if (!attendance || attendance.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-100 rounded-[3rem] text-gray-300">
+      <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-100 rounded-xl text-gray-300">
         <Users className="h-16 w-16 mb-4 opacity-10" />
         <p className="font-black text-sm uppercase tracking-widest text-gray-400">
           No check-ins yet
@@ -33,7 +33,7 @@ export function AttendanceTable({ eventId }: AttendanceTableProps) {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
-      <TableController columns={attendanceColumns} data={attendance} />
+      <CemsTable columns={attendanceColumns} data={attendance} enableSorting enableGlobalFilter />
     </div>
   );
 }

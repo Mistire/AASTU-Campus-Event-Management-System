@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { AttendanceRecord } from "../../types/attendance";
 import { format } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
-import { BadgeController } from "@/components/shared/BadgeController";
+import { CemsBadge } from "@/components/cems/CemsBadge";
 
 export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
   {
@@ -28,9 +28,9 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
     accessorKey: "user.studentId",
     header: "ID",
     cell: ({ row }) => (
-      <BadgeController variant="outline" className="font-bold text-[10px] bg-gray-50 border-gray-100 uppercase tracking-widest px-3 py-1">
+      <CemsBadge className="font-bold text-[10px] bg-gray-50 border-gray-100 uppercase tracking-widest px-3 py-1">
         {row.original.user.studentId || "EXTERNAL"}
-      </BadgeController>
+      </CemsBadge>
     ),
   },
   {

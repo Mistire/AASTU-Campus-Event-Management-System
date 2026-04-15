@@ -9,9 +9,10 @@ import { cn } from '@/lib/utils';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <div className="flex bg-[#FBFBFE] min-h-screen font-sans">
+        <div className="flex bg-gray-100 min-h-screen font-sans">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -23,20 +24,28 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100/50 shadow-[20px_0_40px_rgba(0,0,0,0.02)] transition-all duration-500 md:translate-x-0 outline-none",
+                    "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100/50 shadow-[20px_0_40px_rgba(0,0,0,0.02)] transition-all duration-500 md:translate-x-0 outline-none",
+                    isCollapsed ? "w-24" : "w-72",
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                <Sidebar 
+                    onClose={() => setIsSidebarOpen(false)} 
+                    isCollapsed={isCollapsed}
+                    onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+                />
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex flex-col flex-1 md:pl-72 min-w-0 transition-colors duration-500">
-                <header className="sticky top-0 z-40 flex h-20 items-center bg-white/70 backdrop-blur-xl border-b border-gray-100 px-6 md:px-10 transition-all duration-300">
+            <div className={cn(
+                "flex flex-col flex-1 min-w-0 transition-all duration-500",
+                isCollapsed ? "md:pl-24" : "md:pl-72"
+            )}>
+                <header className="sticky top-0 z-40 flex h-20 items-center bg-white border-b border-gray-100 px-6 md:px-10 transition-all duration-300">
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="mr-6 md:hidden text-gray-900 hover:bg-gray-100 rounded-2xl transition-all active:scale-95"
+                        className="mr-6 md:hidden text-gray-900 hover:bg-gray-100 rounded-xl transition-all active:scale-95"
                         onClick={() => setIsSidebarOpen(true)}
                     >
                         <Menu className="h-6 w-6" />

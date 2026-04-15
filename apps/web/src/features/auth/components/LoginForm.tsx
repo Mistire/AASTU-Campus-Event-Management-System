@@ -118,7 +118,7 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@aastu.edu.et"
               required
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••"
               required
-              className="w-full pl-11 pr-12 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
             <button
               type="button"
@@ -182,7 +182,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-2xl shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden"
+          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-xl shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden"
         >
           <span className="relative z-10">
             {isLoading ? "Authenticating..." : "Sign In to Portal"}

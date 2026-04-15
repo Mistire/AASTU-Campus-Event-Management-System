@@ -19,7 +19,7 @@ export function SpeakerChip({ fullName, title, bio, profileImage }: SpeakerChipP
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger>
           <div className="flex items-center gap-2 group cursor-help transition-all">
             <Avatar className="w-8 h-8 rounded-xl border border-gray-100 shadow-sm group-hover:scale-110 group-hover:border-brand/20 transition-all">
               {profileImage && <AvatarImage src={profileImage} alt={fullName} />}

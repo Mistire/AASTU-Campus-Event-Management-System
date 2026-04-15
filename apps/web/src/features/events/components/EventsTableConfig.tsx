@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
-import { BadgeController } from "@/components/shared/BadgeController";
-import { format } from "date-fns";
+import { CemsBadge } from "@/components/cems/CemsBadge";
+
 import { Pencil, Trash2 } from "lucide-react";
 
 export const getStatusColor = (status: EventStatusName) => {
@@ -56,62 +56,16 @@ export const getEventsColumns = (
     ),
   },
   {
-    accessorKey: "startTime",
-    header: "Start Time",
-    cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="text-sm font-semibold text-gray-700">
-          {format(new Date(row.original.startTime), "MMM d, yyyy")}
-        </span>
-        <span className="text-[11px] text-gray-400 font-medium">
-          {format(new Date(row.original.startTime), "hh:mm a")}
-        </span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "endTime",
-    header: "End Time",
-    cell: ({ row }) => (
-      <div className="flex flex-col">
-        <span className="text-sm font-semibold text-gray-700">
-          {format(new Date(row.original.endTime), "MMM d, yyyy")}
-        </span>
-        <span className="text-[11px] text-gray-400 font-medium">
-          {format(new Date(row.original.endTime), "hh:mm a")}
-        </span>
-      </div>
-    ),
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const statusName = row.original.status.statusName;
       return (
-        <BadgeController variant="outline" className={`${getStatusColor(statusName)} rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest border shadow-sm`}>
+        <CemsBadge className={`${getStatusColor(statusName)} rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest border shadow-sm`}>
           {statusName}
-        </BadgeController>
+        </CemsBadge>
       );
     },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => (
-      <span className="text-sm font-bold text-gray-900">
-        {format(new Date(row.original.createdAt), "M/d/yyyy")}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "updatedAt",
-    header: "Updated At",
-    cell: ({ row }) => (
-      <span className="text-sm font-bold text-gray-900">
-        {format(new Date(row.original.updatedAt || row.original.createdAt), "M/d/yyyy")}
-      </span>
-    ),
   },
   {
     id: "actions",

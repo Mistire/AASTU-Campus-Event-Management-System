@@ -30,7 +30,7 @@ export const getDepartmentsColumns = (): ColumnDef<DepartmentRecord>[] => [
         accessorKey: "studentCount",
         header: "Students",
         cell: ({ row }) => (
-            <div className="text-right pr-4">
+            <div>
                 <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
                     {row.original.studentCount}
                 </span>

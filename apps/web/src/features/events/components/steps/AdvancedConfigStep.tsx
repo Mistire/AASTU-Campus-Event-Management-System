@@ -30,8 +30,8 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
         subtitle="Custom configurations & rules"
       >
         {!isHackathon && (
-          <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] bg-gray-50/30">
-            <div className="w-16 h-16 rounded-3xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
+          <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/30">
+            <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
               <Settings className="text-gray-200" size={24} />
             </div>
             <p className="text-xs font-black text-gray-400 uppercase tracking-widest text-center max-w-xs">No advanced settings required for this event type</p>
@@ -42,7 +42,7 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
         {/* Conditional Hackathon Settings */}
         {isHackathon && (
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-8 bg-brand/5 rounded-[2.5rem] border border-brand/10 space-y-8">
+            <div className="p-8 bg-brand/5 rounded-xl border border-brand/10 space-y-8">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-brand flex items-center justify-center border-4 border-white shadow-lg shadow-brand/20">
                   <Target className="text-white" size={18} />

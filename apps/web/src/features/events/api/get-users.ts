@@ -14,7 +14,7 @@ const getUsers = async (): Promise<AuthProfile[]> => {
 
 export const useUsers = () => {
   return useQuery({
-    queryKey: ["users"],
+    queryKey: ["event-organizers"],
     queryFn: getUsers,
   });
 };

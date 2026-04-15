@@ -46,8 +46,8 @@ export function ReviewStep({ data }: ReviewStepProps) {
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-col items-center justify-center py-10 bg-brand/5 border border-brand/10 rounded-[2.5rem] text-center">
-        <div className="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center shadow-xl shadow-brand/20 border-4 border-brand/10 mb-6 group animate-bounce">
+      <div className="flex flex-col items-center justify-center py-10 bg-brand/5 border border-brand/10 rounded-xl text-center">
+        <div className="w-20 h-20 rounded-xl bg-white flex items-center justify-center shadow-xl shadow-brand/20 border-4 border-brand/10 mb-6 group animate-bounce">
           <CheckCircle2 className="text-brand" size={40} />
         </div>
         <h3 className="text-xl font-black text-gray-900 tracking-tight">Ready for Launch?</h3>
@@ -60,7 +60,7 @@ export function ReviewStep({ data }: ReviewStepProps) {
           icon={Info} 
           title="Discovery & Schedule" 
           subtitle="Core event details"
-          className="p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-6"
+          className="p-8 bg-white rounded-xl border border-gray-100 shadow-sm space-y-6"
         >
           <div className="space-y-4">
             <div>
@@ -107,7 +107,7 @@ export function ReviewStep({ data }: ReviewStepProps) {
           icon={Tag} 
           title="Taxonomy & Tags" 
           subtitle="Search & discoverability"
-          className="p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-6"
+          className="p-8 bg-white rounded-xl border border-gray-100 shadow-sm space-y-6"
         >
           <div className="space-y-4">
             <div>
@@ -146,7 +146,7 @@ export function ReviewStep({ data }: ReviewStepProps) {
           icon={Layers} 
           title={`Project Agenda (${data.sessions?.length || 0})`} 
           subtitle="Detailed session breakdown"
-          className="p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm space-y-6 md:col-span-2"
+          className="p-8 bg-white rounded-xl border border-gray-100 shadow-sm space-y-6 md:col-span-2"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {data.sessions?.map((session, i) => (

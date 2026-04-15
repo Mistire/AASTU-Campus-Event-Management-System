@@ -138,7 +138,7 @@ export default function Hero() {
         >
           <Link
             href="/signup"
-            className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-2xl shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
+            className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-xl shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
           >
             <span className="relative z-10">Get Started</span>
             <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -147,7 +147,7 @@ export default function Hero() {
 
           <Link
             href="#features"
-            className="px-10 py-4 rounded-2xl border border-gray-100 bg-white/50 backdrop-blur-sm hover:bg-white text-gray-600 font-brand font-black text-xs uppercase tracking-widest transition-all"
+            className="px-10 py-4 rounded-xl border border-gray-100 bg-white/50 backdrop-blur-sm hover:bg-white text-gray-600 font-brand font-black text-xs uppercase tracking-widest transition-all"
           >
             Explore Features
           </Link>
