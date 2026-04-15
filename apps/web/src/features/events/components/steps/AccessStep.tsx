@@ -93,7 +93,7 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
                 type="button"
                 onClick={() => updateAccess(option.id)}
                 className={cn(
-                  "flex flex-col items-start p-6 rounded-[2rem] border-2 transition-all duration-300 text-left group gap-4",
+                  "flex flex-col items-start p-6 rounded-xl border-2 transition-all duration-300 text-left group gap-4",
                   isSelected
                     ? "bg-white border-brand shadow-2xl shadow-brand/10 scale-[1.02]"
                     : "bg-gray-50/50 border-gray-100/50 hover:bg-white hover:border-brand/30 hover:shadow-xl hover:shadow-gray-200/40"
@@ -127,7 +127,7 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
 
       {/* Invite Only Section */}
       {accessType === "INVITE_ONLY" && (
-        <div className="space-y-8 p-10 bg-gray-50/30 rounded-[3rem] border border-gray-100/50 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="space-y-8 p-10 bg-gray-50/30 rounded-xl border border-gray-100/50 animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-gray-100 shadow-sm">

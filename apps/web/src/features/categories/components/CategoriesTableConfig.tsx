@@ -30,7 +30,7 @@ export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
         accessorKey: "eventCount",
         header: "Events",
         cell: ({ row }) => (
-            <div className="text-center pr-4">
+            <div>
                 <span className="text-[10px] font-black text-brand bg-brand/5 px-3 py-1 rounded-full border border-brand/10">
                     {row.original.eventCount}
                 </span>

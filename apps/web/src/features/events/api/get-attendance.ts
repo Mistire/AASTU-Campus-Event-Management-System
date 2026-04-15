@@ -7,6 +7,8 @@ import {
   EventParticipation 
 } from "../types/attendance";
 
+export type { AttendanceRecord, AttendanceStats, GlobalAttendanceStats, EventParticipation };
+
 export const useAttendance = (eventId: string) => {
   return useQuery<AttendanceRecord[]>({
     queryKey: ["attendance", eventId],

@@ -1,8 +1,8 @@
 "use client";
 
 import { Hash, Plus, Trash2, Loader2, Tag as TagIcon } from 'lucide-react';
-import { TableController } from '@/components/shared/TableController';
-import { Button } from '@/components/ui/button';
+import { CemsTable } from '@/components/cems/CemsTable';
+import { CemsButton } from '@/components/cems/CemsButton';
 import { useTags, useCreateTag, useDeleteTag, Tag } from '@/features/tags/api';
 import { getTagsColumns } from '@/features/tags/components/TagsTableConfig';
 import { useState } from 'react';
@@ -49,15 +49,16 @@ export default function TagsPage() {
     const actionColumn = {
         id: "actions",
         header: "Actions",
+        enableSorting: false,
         cell: ({ row }: { row: { original: Tag } }) => (
-            <Button
-                variant="ghost"
+            <CemsButton
+                cemsVariant="brand-ghost"
                 size="icon"
                 onClick={() => setDeleteItem(row.original)}
-                className="text-gray-400 hover:text-red-500 transition-colors"
+                className="text-gray-400 hover:text-red-500"
             >
                 <Trash2 className="w-4 h-4" />
-            </Button>
+            </CemsButton>
         ),
         size: 80,
     };
@@ -67,7 +68,7 @@ export default function TagsPage() {
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
                         <Hash className="w-8 h-8" />
@@ -83,13 +84,13 @@ export default function TagsPage() {
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger render={
-                        <Button className="rounded-xl bg-brand hover:bg-brand-hover text-white shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
+                        <CemsButton cemsVariant="brand" className="rounded-xl shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
                             <Plus className="w-4 h-4 mr-2" />
                             New Tag
-                        </Button>
+                        </CemsButton>
                     } />
-                    <DialogContent className="p-0 border-none bg-transparent shadow-none max-w-md">
-                        <div className="bg-white rounded-[2rem] overflow-hidden shadow-2xl">
+                    <DialogContent showCloseButton={false} className="p-0 border-none bg-transparent shadow-none max-w-md">
+                        <div className="bg-white rounded-xl overflow-hidden shadow-2xl">
                             <ModalHeader 
                                 title="New Tag" 
                             />
@@ -122,21 +123,16 @@ export default function TagsPage() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-3xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
-                <div className="p-0">
-                    {isLoading ? (
-                        <div className="flex flex-col items-center justify-center py-24 gap-4">
-                            <Loader2 className="w-10 h-10 text-brand animate-spin" />
-                            <p className="text-xs font-black uppercase tracking-widest text-gray-400">Fetching Tags...</p>
-                        </div>
-                    ) : (
-                        <TableController
-                            data={tags || []}
-                            columns={allColumns}
-                            emptyMessage="No tags found."
-                        />
-                    )}
-                </div>
+            <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+                <CemsTable
+                    data={tags || []}
+                    columns={allColumns}
+                    loading={isLoading}
+                    emptyMessage="No tags found."
+                    enableSorting
+                    enableGlobalFilter
+                    enableColumnVisibility
+                />
             </div>
 
             <DeleteConfirmation

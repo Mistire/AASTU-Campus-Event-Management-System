@@ -74,7 +74,7 @@ export function EventDetailTabs({ eventId, event, canManage }: EventDetailTabsPr
   const tabItems = allTabs.filter(tab => !tab.hidden);
 
   return (
-    <div className="bg-white rounded-[3rem] shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
       <TabsController
         tabs={tabItems}
         defaultValue="attendance"

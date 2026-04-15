@@ -30,7 +30,7 @@ export async function fetchUsers() {
     // Map backend data to UserRecord format
     return data.map((user): UserRecord => ({
         id: user.id,
-        name: user.fullName,
+        name: user.fullName || user.email?.split('@')[0] || 'Unknown',
         email: user.email,
         role: user.role?.roleName || 'STUDENT',
         status: user.isEmailVerified ? 'active' : 'pending',
@@ -43,12 +43,13 @@ export async function fetchUsers() {
 }
 
 export function useUsers() {
-    const { token, profile } = useAuthStore();
-    const isAdmin = profile?.role === 'ADMIN';
+    const { token, hasAnyRole } = useAuthStore();
+    const isAdmin = hasAnyRole(['ADMIN']);
 
     return useQuery({
-        queryKey: ['users'],
+        queryKey: ['admin-users'],
         queryFn: fetchUsers,
         enabled: !!token && isAdmin,
+        staleTime: 30_000,
     });
 }

@@ -88,7 +88,7 @@ export default function Testimonials() {
           {doubledTestimonials.map((t, i) => (
             <div
               key={i}
-              className="w-[420px] shrink-0 p-10 bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-white/40 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
+              className="w-[420px] shrink-0 p-10 bg-white/40 backdrop-blur-3xl rounded-xl border border-white/40 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
             >
               {/* Card Meta Log */}
               <div className="absolute top-0 right-0 p-8">
@@ -109,7 +109,7 @@ export default function Testimonials() {
               </div>
               
               <div className="flex items-center gap-5">
-                <div className="relative w-16 h-16 rounded-[1.25rem] overflow-hidden shadow-lg border-2 border-white ring-4 ring-brand/5">
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-white ring-4 ring-brand/5">
                   <Image
                     src={t.img}
                     alt={t.name}

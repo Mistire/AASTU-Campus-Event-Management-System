@@ -108,7 +108,7 @@ export function EventFormModal({
         <DialogOverlay className="bg-black/60 backdrop-blur-md z-50 animate-in fade-in duration-300" />
         <DialogContent 
           showCloseButton={false} 
-          className="p-0 border-none rounded-[2.5rem] gap-0 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] bg-white max-w-2xl sm:max-w-2xl w-full z-50 animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[90vh] overflow-hidden"
+          className="p-0 border-none rounded-xl gap-0 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] bg-white max-w-2xl sm:max-w-2xl w-full z-50 animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[90vh] overflow-hidden"
         >
           <ModalHeader title={event ? "Edit Event" : "Create Event"} />
           

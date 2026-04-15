@@ -62,9 +62,9 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] bg-gray-50/30"
+                className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/30"
               >
-                <div className="w-16 h-16 rounded-3xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
+                <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
                   <Layers className="text-gray-300" size={24} />
                 </div>
                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No sessions defined yet</p>
@@ -77,7 +77,7 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-8 pb-10 bg-white rounded-[2rem] border border-gray-100 shadow-sm relative group"
+                  className="p-8 pb-10 bg-white rounded-xl border border-gray-100 shadow-sm relative group"
                 >
                   <div className="absolute -top-3 left-8 bg-brand text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-tighter shadow-md">
                     Session {index + 1}

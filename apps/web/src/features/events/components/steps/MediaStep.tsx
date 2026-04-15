@@ -54,7 +54,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={cn(
-            "relative aspect-video rounded-[3rem] border-2 border-dashed transition-all duration-500 overflow-hidden group",
+            "relative aspect-video rounded-xl border-2 border-dashed transition-all duration-500 overflow-hidden group",
             thumbnail 
               ? "border-brand shadow-2xl shadow-brand/10" 
               : isDragging 
@@ -92,7 +92,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
             </>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-24 h-24 rounded-[2rem] bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-24 h-24 rounded-xl bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
                 <Upload className="text-brand/40 group-hover:text-brand transition-colors" size={32} />
               </div>
               <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">Drop your masterpiece here</h4>
@@ -122,7 +122,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
       </WizardSection>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="p-8 bg-brand/5 rounded-[2.5rem] border border-brand/10 space-y-4">
+        <div className="p-8 bg-brand/5 rounded-xl border border-brand/10 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-brand text-white flex items-center justify-center shadow-sm">
               <Info size={14} />
@@ -144,7 +144,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           </ul>
         </div>
 
-        <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 space-y-4 flex flex-col justify-center">
+        <div className="p-8 bg-gray-50/50 rounded-xl border border-gray-100 space-y-4 flex flex-col justify-center">
            <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center shadow-sm">
               <FileCode size={14} />

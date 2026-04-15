@@ -7,17 +7,23 @@ import { useEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
 import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../api/mutations";
-import { TableController } from "@/components/shared/TableController";
-import { getEventsColumns } from "@/features/events/components/EventsTableConfig";
-import { ButtonController } from "@/components/shared/ButtonController";
-import { Search, Plus, Calendar } from "lucide-react";
+import { CemsTable } from "@/components/cems/CemsTable";
+import { CemsButton } from "@/components/cems/CemsButton";
+import { CemsBadge } from "@/components/cems/CemsBadge";
+import { getEventsColumns, getStatusColor } from "@/features/events/components/EventsTableConfig";
+import {
+  Plus, Calendar, MapPin, Users, Clock, Hash, ArrowRight, X,
+} from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InputController } from "@/components/shared/InputController";
 import { ToastController } from "@/components/shared/ToastController";
 import { EventFormModal } from "./EventFormModal";
 import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { STATUS_OPTIONS } from "../constants";
+import { EventPreviewPanel } from "./EventPreviewPanel";
 
-const STATUS_OPTIONS = ["DRAFT", "PENDING", "APPROVED", "LIVE", "CANCELLED", "ARCHIVED", "REJECTED"];
+
 
 export const EventsList = () => {
   const router = useRouter();
@@ -31,6 +37,7 @@ export const EventsList = () => {
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
 
   const { data: venues } = useVenues();
   const { data: users } = useUsers();
@@ -115,7 +122,7 @@ export const EventsList = () => {
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200">
+      <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
         Error loading events: {error.message}
       </div>
     );
@@ -124,9 +131,9 @@ export const EventsList = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
+          <div className="w-14 h-14 rounded-xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
             <Calendar size={28} />
           </div>
           <div>
@@ -135,33 +142,18 @@ export const EventsList = () => {
           </div>
         </div>
         
-        <ButtonController 
+        <CemsButton 
+          cemsVariant="brand"
           onClick={handleAddEvent}
-          className="bg-brand hover:bg-brand-hover text-white rounded-2xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 border-none group"
+          className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
         >
           <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
           Create New Event
-        </ButtonController>
+        </CemsButton>
       </div>
 
-      {/* Filter Bar - Premium Bento Style */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-50">
-        <div className="md:col-span-1">
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Search Events</label>
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors" size={16} />
-            <InputController
-              className="pl-12 h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold transition-all focus:bg-white focus:border-brand/20 focus:ring-4 focus:ring-brand/5"
-              placeholder="Search by title..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-        </div>
-
+      {/* Filter Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div>
           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Organized By</label>
           <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
@@ -208,16 +200,21 @@ export const EventsList = () => {
         </div>
       </div>
 
-      {/* Main Content Table - Elevated White Card */}
-      <div className="bg-white rounded-3xl shadow-2xl shadow-gray-200/40 border border-gray-50 overflow-hidden transition-all duration-500">
-        <div className="p-0">
-          <TableController
+      {/* Master-Detail Layout */}
+      <div className="flex gap-6">
+        {/* Table */}
+        <div className={cn(
+          "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+        )}>
+          <CemsTable
             columns={columns}
             data={eventsData?.data || []}
             loading={isLoading}
             emptyMessage="No events found matching your criteria."
-            onRowClick={(event) => router.push(`/dashboard/events/${event.id}`)}
-            // Manual pagination synchronization
+            onRowClick={(event) => setPreviewEvent(event)}
+            enableSorting
+            enableGlobalFilter
+            enableColumnVisibility
             manualPagination
             pageCount={totalPages}
             pageIndex={page - 1}
@@ -230,6 +227,14 @@ export const EventsList = () => {
             }}
           />
         </div>
+
+        {/* Detail Panel */}
+        {previewEvent && (
+          <EventPreviewPanel 
+            event={previewEvent} 
+            onClose={() => setPreviewEvent(null)} 
+          />
+        )}
       </div>
 
       <EventFormModal 

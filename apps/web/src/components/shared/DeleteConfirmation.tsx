@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import { ModalHeader } from "@/components/shared/ModalHeader";
-import { ButtonController } from "@/components/shared/ButtonController";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { DialogClose } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 import { InputController } from "@/components/shared/InputController";
@@ -32,7 +32,7 @@ export function DeleteConfirmation({
         <DialogOverlay className="bg-black/40 backdrop-blur-sm z-50" />
         <DialogContent 
           showCloseButton={false} 
-          className="p-0 border-none rounded-[3rem] gap-0 overflow-hidden shadow-2xl bg-white max-w-md sm:max-w-md w-full z-50 animate-in zoom-in-95 duration-300"
+          className="p-0 border-none rounded-xl gap-0 overflow-hidden shadow-2xl bg-white max-w-md sm:max-w-md w-full z-50 animate-in zoom-in-95 duration-300"
         >
           <ModalHeader title={title} />
           
@@ -44,7 +44,7 @@ export function DeleteConfirmation({
               </h2>
             </div>
             
-            <div className="bg-red-50/50 rounded-[2rem] p-8 border border-red-100 flex flex-col items-center text-center gap-4 group">
+            <div className="bg-red-50/50 rounded-xl p-8 border border-red-100 flex flex-col items-center text-center gap-4 group">
               <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition-transform">
                 <AlertCircle size={28} />
               </div>
@@ -66,24 +66,24 @@ export function DeleteConfirmation({
             </div>
           </div>
 
-          <div className="px-10 py-8 flex items-center justify-end gap-4 bg-gray-50/50 border-t border-gray-100 shrink-0 rounded-b-[3rem] mt-auto">
+          <div className="px-10 py-8 flex items-center justify-end gap-4 bg-gray-50/50 border-t border-gray-100 shrink-0 rounded-b-xl mt-auto">
              <DialogClose render={
-               <ButtonController
+               <CemsButton
                  variant="outline"
                  disabled={isDeleting}
                  className="rounded-2xl font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-8 h-12"
                >
                  Go Back
-               </ButtonController>
+               </CemsButton>
             } />
-            <ButtonController
+            <CemsButton
               className="rounded-2xl bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest px-10 shadow-xl shadow-red-200 transition-all active:scale-95 h-12 group disabled:opacity-50"
               onClick={onConfirm}
               disabled={!isMatch || isDeleting}
               loading={isDeleting}
             >
               Confirm Delete
-            </ButtonController>
+            </CemsButton>
           </div>
         </DialogContent>
       </DialogPortal>

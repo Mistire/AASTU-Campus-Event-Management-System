@@ -35,7 +35,7 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
         accessorKey: "capacity",
         header: "Capacity",
         cell: ({ row }) => (
-            <div className="text-right pr-4">
+            <div>
                 <span className="text-sm font-black text-gray-900 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
                     {row.original.capacity}
                 </span>

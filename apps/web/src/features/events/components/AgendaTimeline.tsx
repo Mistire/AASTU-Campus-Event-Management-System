@@ -14,7 +14,7 @@ interface AgendaTimelineProps {
 export function AgendaTimeline({ sessions }: AgendaTimelineProps) {
   if (!sessions || sessions.length === 0) {
     return (
-      <div className="py-20 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl bg-gray-50/50">
+      <div className="py-20 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
          <p className="text-sm font-black uppercase tracking-widest">No agenda available yet</p>
          <p className="text-xs mt-1 italic">Check back closer to the event start date.</p>
       </div>

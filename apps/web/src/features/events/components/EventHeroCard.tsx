@@ -32,7 +32,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
   return (
     <motion.div
       whileHover={{ y: -8 }}
-      className="group relative w-[340px] sm:w-[420px] aspect-4/3 rounded-[2.5rem] overflow-hidden bg-gray-900 shadow-2xl shadow-brand/10 transition-all duration-500"
+      className="group relative w-[340px] sm:w-[420px] aspect-4/3 rounded-xl overflow-hidden bg-gray-900 shadow-2xl shadow-brand/10 transition-all duration-500"
     >
       {/* Background Image / Gradient */}
       <div className="absolute inset-0 z-0">

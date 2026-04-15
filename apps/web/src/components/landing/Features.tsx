@@ -120,7 +120,7 @@ export default function Features() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-8 group relative rounded-[3.5rem] overflow-hidden shadow-2xl h-[550px] border border-gray-100 flex flex-col justify-end p-10"
+              className="lg:col-span-8 group relative rounded-xl overflow-hidden shadow-2xl h-[550px] border border-gray-100 flex flex-col justify-end p-10"
             >
               <Image
                 src={featuredEvent.img}
@@ -139,7 +139,7 @@ export default function Features() {
               </div>
 
               <div className="relative z-10 w-full">
-                <div className="p-12 rounded-[3rem] bg-black/30 backdrop-blur-3xl border border-white/10 shadow-3xl">
+                <div className="p-12 rounded-xl bg-black/30 backdrop-blur-3xl border border-white/10 shadow-3xl">
                   <div className="flex items-center gap-4 mb-8">
                     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand text-white text-[10px] font-brand font-black uppercase tracking-widest shadow-xl shadow-brand/20">
                       <Tag className="w-3.5 h-3.5" /> Featured {featuredEvent.category}
@@ -182,7 +182,7 @@ export default function Features() {
                   </div>
                   
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <button className="group relative inline-flex items-center gap-4 bg-brand hover:bg-brand-hover text-white px-12 py-5 rounded-2xl font-brand font-black text-xs uppercase tracking-widest transition-all shadow-2xl shadow-brand/40 overflow-hidden">
+                    <button className="group relative inline-flex items-center gap-4 bg-brand hover:bg-brand-hover text-white px-12 py-5 rounded-xl font-brand font-black text-xs uppercase tracking-widest transition-all shadow-2xl shadow-brand/40 overflow-hidden">
                       <span className="relative z-10">RSVP SECURE SLOT</span>
                       <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 transition-transform" />
                       <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -219,7 +219,7 @@ export default function Features() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group relative rounded-[3rem] overflow-hidden shadow-xl h-[260px] border border-gray-100 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
+                className="group relative rounded-xl overflow-hidden shadow-xl h-[260px] border border-gray-100 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
               >
                 <Image
                   src={event.img}
@@ -264,7 +264,7 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative rounded-[2.5rem] overflow-hidden shadow-lg h-[320px] border border-gray-100 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
+              className="group relative rounded-xl overflow-hidden shadow-lg h-[320px] border border-gray-100 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
             >
               <Image
                 src={event.img}
@@ -294,7 +294,7 @@ export default function Features() {
                   </span>
                 </div>
                 
-                <button className="w-full py-3.5 bg-white/10 hover:bg-brand backdrop-blur-md border border-white/20 hover:border-brand text-white rounded-2xl text-[9px] font-brand font-black uppercase tracking-widest transition-all shadow-xl hover:shadow-brand/20 flex items-center justify-center gap-2">
+                <button className="w-full py-3.5 bg-white/10 hover:bg-brand backdrop-blur-md border border-white/20 hover:border-brand text-white rounded-xl text-[9px] font-brand font-black uppercase tracking-widest transition-all shadow-xl hover:shadow-brand/20 flex items-center justify-center gap-2">
                   <BarChart size={12} /> Book Slot
                 </button>
               </div>

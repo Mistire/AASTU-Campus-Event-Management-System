@@ -10,7 +10,7 @@ interface GlobalActivityFeedProps {
 
 export function GlobalActivityFeed({ recent, isLoading }: GlobalActivityFeedProps) {
   return (
-    <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col h-fit">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col h-fit">
       <div className="p-8 border-b border-gray-50">
         <h2 className="text-xl font-black text-gray-900 tracking-tight">Live Activity</h2>
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Latest check-ins</p>

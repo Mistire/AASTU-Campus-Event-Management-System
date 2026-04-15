@@ -26,7 +26,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
     (org: any) => org.user.id === profile?.id
   );
 
-  const canManage = isAdmin || isCreator || isOrganizer;
+  const canManage = !!(isAdmin || isCreator || isOrganizer);
 
   /* Loading */
   if (isLoading) {
@@ -58,7 +58,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
         {/* ── RIGHT COLUMN ── */}
         <div className="lg:col-span-8 space-y-8">
           {/* Description card */}
-          <div className="bg-white rounded-[3rem] shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden p-10">
+          <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden p-10">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
                 <Info size={24} />
@@ -69,7 +69,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
               </div>
             </div>
             
-            <div className="bg-gray-50/50 rounded-3xl p-8 border border-gray-100">
+            <div className="bg-gray-50/50 rounded-xl p-8 border border-gray-100">
               <p className="text-gray-600 leading-relaxed font-medium whitespace-pre-wrap">
                 {event.description || "No description provided for this event."}
               </p>

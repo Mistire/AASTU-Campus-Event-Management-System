@@ -103,7 +103,7 @@ export function VerifyEmailContent() {
 
             <Link
               href="/login"
-              className="group w-full inline-flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black py-4 rounded-2xl transition-all shadow-xl shadow-brand/20 active:scale-95 mb-6"
+              className="group w-full inline-flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black py-4 rounded-xl transition-all shadow-xl shadow-brand/20 active:scale-95 mb-6"
             >
               Enter Dashboard
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -136,7 +136,7 @@ export function VerifyEmailContent() {
             <div className="flex flex-col gap-4">
               <Link
                 href="/login"
-                className="w-full py-4 text-gray-900 font-brand font-black border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors"
+                className="w-full py-4 text-gray-900 font-brand font-black border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Back to Login
               </Link>
