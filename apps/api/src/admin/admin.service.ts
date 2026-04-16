@@ -176,6 +176,7 @@ export class AdminService {
           where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
         }),
         this.prisma.attendance.count(),
+        this.prisma.registration.count({
           where: {
             registrationDate: {
               gte: startOfToday,

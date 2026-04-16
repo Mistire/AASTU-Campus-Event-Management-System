@@ -247,11 +247,24 @@ export class AnalyticsService {
       if (cached) return cached;
     }
 
-    const [totalEvents, totalUsers, totalRegistrations, totalAttendance] = await Promise.all([
+    const [
+      totalEvents,
+      totalUsers,
+      totalRegistrations,
+      totalAttendance,
+      approvedRegistrations,
+      pendingRegistrations,
+    ] = await Promise.all([
       this.prisma.event.count(),
       this.prisma.user.count(),
       this.prisma.registration.count(),
       this.prisma.attendance.count(),
+      this.prisma.registration.count({
+        where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
+      }),
+      this.prisma.registration.count({
+        where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
+      }),
     ]);
 
     const result: AdminOverviewDto = {
@@ -259,6 +272,8 @@ export class AnalyticsService {
       totalUsers,
       totalRegistrations,
       totalAttendance,
+      approvedRegistrations,
+      pendingRegistrations,
     };
 
     await this.setCached(cacheKey, result, 300);

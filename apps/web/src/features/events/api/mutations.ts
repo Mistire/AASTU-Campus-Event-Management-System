@@ -55,6 +55,80 @@ export const useDeleteEvent = () => {
   });
 };
 
+export const useSubmitEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/submit`, {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to submit event");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useApproveEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/approve`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to approve event");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useRejectEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const res = await apiFetch(`/api/events/${id}/reject`, {
+        method: "PATCH",
+        body: JSON.stringify({ reason }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to reject event");
+      return result.data || result;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useGoLiveEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/go-live`, {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to go live");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+
 export const useCheckIn = () => {
   const queryClient = useQueryClient();
   return useMutation({

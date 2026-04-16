@@ -27,26 +27,43 @@ export class RecommendationService {
     });
   }
 
-  async getRecommendations(userId: string, n: number = 10): Promise<unknown> {
+  async getRecommendations(userId: string, n: number = 10): Promise<any> {
     try {
       // 1. Check Redis Cache
       const cacheKey = `recommendations:user:${userId}:${n}`;
       const cached = await this.redis.get(cacheKey);
       if (cached) {
         this.logger.log(`Serving recommendations from cache for user ${userId}`);
-        return JSON.parse(cached) as unknown;
+        return JSON.parse(cached);
       }
 
       // 2. Fetch from ML Service
       this.logger.log(`Fetching fresh recommendations from ML service for user ${userId}`);
-      const response: AxiosResponse<unknown> = await firstValueFrom(
+      const response: AxiosResponse<any> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/predict/${userId}?n=${n}`),
       );
 
-      // 3. Cache Result (1 hour TTL)
-      await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 3600);
+      const mlData = response.data;
+      const eventIds = mlData.recommendations.map((r: any) => r.event_id);
 
-      return response.data;
+      // 3. Fetch full event details from Prisma
+      const events = await this.prisma.event.findMany({
+        where: { id: { in: eventIds } },
+        include: {
+          ...this.defaultIncludes(),
+          _count: { select: { registrations: true } },
+        },
+      });
+
+      // 4. Preserve ML ranking order
+      const orderedEvents = eventIds
+        .map((id: string) => events.find((e: any) => e.id === id))
+        .filter(Boolean);
+
+      // 5. Cache Result (1 hour TTL)
+      await this.redis.set(cacheKey, JSON.stringify(orderedEvents), 'EX', 3600);
+
+      return orderedEvents;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get recommendations: ${errorMessage}`);
@@ -63,24 +80,41 @@ export class RecommendationService {
     }
   }
 
-  async getSimilarEvents(eventId: string, n: number = 10): Promise<unknown> {
+  async getSimilarEvents(eventId: string, n: number = 10): Promise<any> {
     try {
       // 1. Check Cache
       const cacheKey = `recommendations:similar:${eventId}:${n}`;
       const cached = await this.redis.get(cacheKey);
       if (cached) {
-        return JSON.parse(cached) as unknown;
+        return JSON.parse(cached);
       }
 
       // 2. Fetch from ML Service
-      const response: AxiosResponse<unknown> = await firstValueFrom(
+      const response: AxiosResponse<any> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/similar/${eventId}?n=${n}`),
       );
 
-      // 3. Cache Result (24 hour TTL for similar events as they change less frequently)
-      await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 86400);
+      const mlData = response.data;
+      const eventIds = mlData.similar_events.map((r: any) => r.event_id);
 
-      return response.data;
+      // 3. Fetch full event details from Prisma
+      const events = await this.prisma.event.findMany({
+        where: { id: { in: eventIds } },
+        include: {
+          ...this.defaultIncludes(),
+          _count: { select: { registrations: true } },
+        },
+      });
+
+      // 4. Preserve order
+      const orderedEvents = eventIds
+        .map((id: string) => events.find((e: any) => e.id === id))
+        .filter(Boolean);
+
+      // 5. Cache Result (24 hour TTL)
+      await this.redis.set(cacheKey, JSON.stringify(orderedEvents), 'EX', 86400);
+
+      return orderedEvents;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get similar events: ${errorMessage}`);
@@ -158,5 +192,21 @@ export class RecommendationService {
         error: errorMessage,
       };
     }
+  }
+  private defaultIncludes() {
+    return {
+      status: true,
+      eventType: true,
+      venue: true,
+      tags: { include: { tag: true } },
+      eventCategories: { include: { category: true } },
+      media: true,
+      sessions: {
+        include: {
+          speakers: { include: { speaker: true } },
+        },
+        orderBy: { startTime: 'asc' as const },
+      },
+    };
   }
 }

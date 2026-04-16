@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CategoryPicker } from "./CategoryPicker";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useUserPreferences } from "@/features/events/api/useUserPreferences";
 import { AnimatePresence } from "framer-motion";
 
 interface OnboardingGateProps {
@@ -10,33 +11,47 @@ interface OnboardingGateProps {
 }
 
 export function OnboardingGate({ children }: OnboardingGateProps) {
-  const { profile } = useAuthStore();
+  const { profile, _hasHydrated } = useAuthStore();
+  const { data: preferences, isLoading: isLoadingPrefs } = useUserPreferences();
   const [showPicker, setShowPicker] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [hasSkipped, setHasSkipped] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to hydrate before checking anything
+    if (!_hasHydrated) return;
+
     // Only students get the onboarding flow
-    const shouldShow = profile !== null && 
-                      (profile.role === "STUDENT" || profile.roles?.includes("STUDENT")) && 
-                      localStorage.getItem("cems_onboarded") !== "true";
+    const isStudent = profile !== null && (
+      profile.role?.toUpperCase() === "STUDENT" || 
+      profile.roles?.some(r => r.toUpperCase() === "STUDENT") ||
+      profile.user_roles?.some((ur: any) => ur.role?.name?.toUpperCase() === "STUDENT")
+    );
     
-    // Using a microtask to avoid synchronous setState trigger in render warning
-    queueMicrotask(() => {
-      if (shouldShow) setShowPicker(true);
-      setIsReady(true);
-    });
-  }, [profile]);
+    // Explicitly check for an empty array after loading is complete
+    // Also check that we haven't skipped it in this session
+    const hasNoInterests = !isLoadingPrefs && Array.isArray(preferences) && preferences.length === 0;
 
-  if (!isReady) return null;
+    if (isStudent && hasNoInterests && !hasSkipped) {
+      setShowPicker(true);
+    } else if (!isLoadingPrefs) {
+      // Close picker if preferences are loaded and exist, or if not a student, or if skipped
+      setShowPicker(false);
+    }
+  }, [profile, preferences, isLoadingPrefs, _hasHydrated, hasSkipped]);
 
-  return (
-    <>
+  if (!_hasHydrated || isLoadingPrefs) return null;
+
+  // If we should show the picker and haven't skipped/completed yet, block the children
+  if (showPicker) {
+    return (
       <AnimatePresence>
-        {showPicker && (
-          <CategoryPicker onComplete={() => setShowPicker(false)} />
-        )}
+        <CategoryPicker onComplete={() => {
+          setShowPicker(false);
+          setHasSkipped(true);
+        }} />
       </AnimatePresence>
-      {children}
-    </>
-  );
+    );
+  }
+
+  return <>{children}</>;
 }

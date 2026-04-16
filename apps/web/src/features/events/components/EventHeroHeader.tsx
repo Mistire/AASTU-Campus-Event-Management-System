@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Circle, MapPin, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Event } from "../api/useEvents";
+import { Event, getThumbnailUrl } from "../api/useEvents";
 
 interface EventHeroHeaderProps {
   event: Event;
@@ -12,12 +12,13 @@ interface EventHeroHeaderProps {
 
 export function EventHeroHeader({ event }: EventHeroHeaderProps) {
   const isLive = event.status?.statusName === "LIVE";
+  const thumbnailUrl = getThumbnailUrl(event);
 
   return (
     <section className="relative rounded-xl overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
-      {event.thumbnail ? (
+      {thumbnailUrl ? (
         <Image
-          src={event.thumbnail}
+          src={thumbnailUrl}
           alt={event.title}
           fill
           priority

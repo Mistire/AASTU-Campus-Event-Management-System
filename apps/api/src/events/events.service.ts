@@ -709,6 +709,7 @@ export class EventsService {
       status: true,
       eventType: true,
       venue: true,
+      media: true,
       tags: { include: { tag: true } },
       eventCategories: { include: { category: true } },
       sessions: {

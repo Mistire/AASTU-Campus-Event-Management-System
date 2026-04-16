@@ -41,6 +41,7 @@ import { RegistrationTrendChart } from "@/features/dashboard/components/charts/R
 import { CategoryDistributionChart } from "@/features/dashboard/components/charts/CategoryDistributionChart";
 import { DepartmentActivityChart } from "@/features/dashboard/components/charts/DepartmentActivityChart";
 import { TopEventsChart } from "@/features/dashboard/components/charts/TopEventsChart";
+import { RecommendationStatusCard } from "@/features/recommendations/components/RecommendationStatusCard";
 
 /* ================================================================
  *  DASHBOARD PAGE — Compact, space-efficient, chart-rich
@@ -243,6 +244,11 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+       *  AI & SYSTEM PERFORMANCE (Admin Only)
+       * ═══════════════════════════════════════════════════════════ */}
+      {isAdmin && <RecommendationStatusCard />}
 
       {/* ═══════════════════════════════════════════════════════════
        *  CHARTS — 2×2 grid

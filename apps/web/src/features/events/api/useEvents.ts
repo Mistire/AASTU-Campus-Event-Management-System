@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api-client';
 import { Category } from './useCategories';
-import { MOCK_EVENTS } from './mock-data';
+// import { MOCK_EVENTS } from './mock-data';
 
 export interface EventTag {
     id: string;
@@ -36,6 +36,11 @@ export interface EventSession {
             title?: string;
         };
     }[];
+    media?: {
+        id: string;
+        fileUrl: string;
+        mediaType: string;
+    }[];
 }
 
 export interface Event {
@@ -63,11 +68,24 @@ export interface Event {
     tags: EventTag[];
     eventCategories: EventCategory[];
     sessions: EventSession[];
+    media?: {
+        id: string;
+        fileUrl: string;
+        mediaType: string;
+    }[];
     _count: {
         registrations: number;
     };
     thumbnail?: string;
 }
+
+export const EVENT_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23f3f4f6'/%3E%3Cpath d='M400 200c-55 0-100 45-100 100s45 100 100 100 100-45 100-100-45-100-100-100zm0 150c-28 0-50-22-50-50s22-50 50-50 50 22 50 50-22 50-50 50z' fill='%23d1d5db'/%3E%3Cpath d='M250 450h300v-20c0-40-30-70-70-70h-160c-40 0-70 30-70 70v20z' fill='%23d1d5db'/%3E%3Ctext x='400' y='500' font-family='sans-serif' font-size='24' font-weight='bold' fill='%239ca3af' text-anchor='middle' uppercase='true' letter-spacing='2'%3ECEMS EVENT%3C/text%3E%3C/svg%3E";
+
+export const getThumbnailUrl = (event: Event) => {
+    if (event.thumbnail) return event.thumbnail;
+    const thumbnailMedia = event.media?.find(m => m.mediaType === 'THUMBNAIL');
+    return thumbnailMedia?.fileUrl || event.media?.[0]?.fileUrl || EVENT_PLACEHOLDER;
+};
 
 export interface EventsResponse {
     data: Event[];
@@ -111,7 +129,8 @@ export async function fetchEvents(queryParams: EventQueryParams = {}) {
         throw new Error(error.message || 'Failed to fetch events');
     }
 
-    return await res.json() as EventsResponse;
+    const result = await res.json();
+    return result.data as EventsResponse;
 }
 
 export function useEvents(queryParams: EventQueryParams = {}) {
@@ -121,31 +140,15 @@ export function useEvents(queryParams: EventQueryParams = {}) {
         retry: false,
     });
 
-    let filteredMockData = [...MOCK_EVENTS];
-    
-    if (queryParams.search) {
-        const s = queryParams.search.toLowerCase();
-        filteredMockData = filteredMockData.filter(e => 
-            e.title.toLowerCase().includes(s) || 
-            e.description.toLowerCase().includes(s)
-        );
-    }
-    
-    if (queryParams.categoryId) {
-        filteredMockData = filteredMockData.filter(e => 
-            e.eventCategories.some(ec => ec.categoryId === queryParams.categoryId)
-        );
-    }
-
     const stableData = query.data && Array.isArray(query.data.data) 
         ? query.data 
         : { 
-            data: filteredMockData, 
+            data: [], 
             meta: { 
-                totalItems: filteredMockData.length, 
-                itemCount: filteredMockData.length, 
+                totalItems: 0, 
+                itemCount: 0, 
                 itemsPerPage: 10, 
-                totalPages: 1, 
+                totalPages: 0, 
                 currentPage: 1 
             } 
           };

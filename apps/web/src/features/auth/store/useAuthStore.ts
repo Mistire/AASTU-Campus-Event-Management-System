@@ -67,9 +67,12 @@ export const useAuthStore = create<AuthState>()(
       hasRole: (role: Role) => {
         const { profile } = get();
         if (!profile) return false;
-        if (profile.role === role) return true;
-        if (profile.roles?.includes(role)) return true;
-        if (profile.user_roles?.some((ur) => ur.role.name === role))
+        const target = role.toUpperCase();
+        if (profile.role?.toUpperCase() === target) return true;
+        if (profile.roles?.some((r) => r.toUpperCase() === target)) return true;
+        if (
+          profile.user_roles?.some((ur) => ur.role.name.toUpperCase() === target)
+        )
           return true;
         return false;
       },

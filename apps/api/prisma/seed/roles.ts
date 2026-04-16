@@ -53,17 +53,17 @@ async function main() {
   // 2. Create Roles
   const roles = [
     {
-      roleName: 'Admin',
+      roleName: 'ADMIN',
       description: 'System Administrator',
       perms: allPerms.map((p) => p.name), // All permissions
     },
     {
-      roleName: 'Organizer',
+      roleName: 'ORGANIZER',
       description: 'Event Organizer',
       perms: ['event:create', 'event:read', 'event:update', 'event:register'],
     },
     {
-      roleName: 'Student',
+      roleName: 'STUDENT',
       description: 'Standard Student Participant',
       perms: ['event:read', 'event:register'],
     },

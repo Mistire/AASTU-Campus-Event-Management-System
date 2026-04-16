@@ -230,13 +230,10 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
                <div className="flex items-center gap-4">
                 <Button 
                   variant="ghost" 
-                  onClick={() => {
-                    localStorage.setItem("cems_onboarded", "true");
-                    onComplete();
-                  }}
+                  onClick={onComplete}
                   className="text-gray-400 hover:text-gray-950 font-black uppercase tracking-widest text-[10px]"
                 >
-                  Skip for now
+                  I&apos;ll do this later
                 </Button>
                 <Button
                   onClick={handleContinue}

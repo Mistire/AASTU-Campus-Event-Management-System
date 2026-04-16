@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Send, Check, X, Play } from "lucide-react";
 
 export const getStatusColor = (status: EventStatusName) => {
   switch (status) {
@@ -17,8 +17,13 @@ export const getStatusColor = (status: EventStatusName) => {
 };
 
 export const getEventsColumns = (
+  role: string,
   onEdit: (event: Event) => void,
-  onDelete: (event: Event) => void
+  onDelete: (event: Event) => void,
+  onSubmit: (event: Event) => void,
+  onApprove: (event: Event) => void,
+  onReject: (event: Event) => void,
+  onGoLive: (event: Event) => void
 ): ColumnDef<Event>[] => [
   {
     id: "index",
@@ -70,23 +75,78 @@ export const getEventsColumns = (
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-         <button 
+    cell: ({ row }) => {
+      const event = row.original;
+      const status = event.status.statusName;
+      const isAdmin = role === "ADMIN";
+      const isOrganizer = role === "ORGANIZER";
+
+      return (
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {/* Organizer: Submit Draft */}
+          {isOrganizer && status === "DRAFT" && (
+            <button 
+              type="button" 
+              onClick={() => onSubmit(event)}
+              className="p-2 text-amber-500 hover:bg-amber-50 rounded-xl transition-all"
+              title="Submit for Approval"
+            >
+              <Send size={18} />
+            </button>
+          )}
+
+          {/* Admin: Approve/Reject Pending */}
+          {isAdmin && status === "PENDING" && (
+            <>
+              <button 
+                type="button" 
+                onClick={() => onApprove(event)}
+                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                title="Approve Event"
+              >
+                <Check size={18} />
+              </button>
+              <button 
+                type="button" 
+                onClick={() => onReject(event)}
+                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                title="Reject Event"
+              >
+                <X size={18} />
+              </button>
+            </>
+          )}
+
+          {/* Organizer: Go Live Approved */}
+          {isOrganizer && status === "APPROVED" && (
+            <button 
+              type="button" 
+              onClick={() => onGoLive(event)}
+              className="p-2 text-brand hover:bg-brand/5 rounded-xl transition-all"
+              title="Go Live"
+            >
+              <Play size={18} />
+            </button>
+          )}
+
+          <button 
             type="button" 
-            onClick={() => onEdit(row.original)}
+            onClick={() => onEdit(event)}
             className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
-         >
+            title="Edit Event"
+          >
             <Pencil size={18} />
-         </button>
-         <button 
+          </button>
+          <button 
             type="button" 
-            onClick={() => onDelete(row.original)}
+            onClick={() => onDelete(event)}
             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-         >
+            title="Delete Event"
+          >
             <Trash2 size={18} />
-         </button>
-      </div>
-    )
+          </button>
+        </div>
+      );
+    }
   }
 ];
