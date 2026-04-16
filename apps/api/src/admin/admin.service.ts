@@ -155,9 +155,6 @@ export class AdminService {
         registrationCount,
         venueCount,
         categoryCount,
-        approvedRegs,
-        pendingRegs,
-        attendanceCount,
         registrationsToday,
         pendingRegistrations,
         approvedRegistrations,
@@ -170,12 +167,6 @@ export class AdminService {
         this.prisma.venue.count(),
         this.prisma.category.count(),
         this.prisma.registration.count({
-          where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
-        }),
-        this.prisma.registration.count({
-          where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
-        }),
-        this.prisma.attendance.count(),
           where: {
             registrationDate: {
               gte: startOfToday,
@@ -230,9 +221,6 @@ export class AdminService {
         registrations: registrationCount,
         venues: venueCount,
         categories: categoryCount,
-        approvedRegistrations: approvedRegs,
-        pendingRegistrations: pendingRegs,
-        totalAttendance: attendanceCount,
         registrationsToday,
         registrationStatusBreakdown: [
           { status: 'PENDING', count: pendingRegistrations },
