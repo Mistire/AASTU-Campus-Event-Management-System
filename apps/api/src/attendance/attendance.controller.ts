@@ -12,10 +12,16 @@ import { CheckInDto } from './dto/check-in.dto';
 export class AttendanceController {
   constructor(private attendanceService: AttendanceService) {}
 
+  @Get('ticket/:eventId')
+  @ApiOperation({ summary: 'Get a unique secure ticket (JWT) for a confirmed attendee' })
+  getTicket(@GetUser('id') userId: string, @Param('eventId') eventId: string) {
+    return this.attendanceService.getTicket(userId, eventId);
+  }
+
   @Post('check-in')
-  @ApiOperation({ summary: 'Check in a user to an event/session (1:N)' })
-  checkIn(@GetUser('id') userId: string, @Body() dto: CheckInDto) {
-    return this.attendanceService.checkIn(userId, dto);
+  @ApiOperation({ summary: 'Check in a user by an organizer using the attendee\'s ticketToken' })
+  checkIn(@GetUser('id') organizerId: string, @Body() dto: CheckInDto) {
+    return this.attendanceService.checkIn(organizerId, dto);
   }
 
   @Get('event/:eventId')

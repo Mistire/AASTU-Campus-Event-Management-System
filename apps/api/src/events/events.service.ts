@@ -19,6 +19,11 @@ import { EmailService } from '../auth/email.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/enums/notification-type.enum';
 
+import { TicketGeneratorUtil } from './ticket-generator.util';
+import { InviteGuestsDto } from './dto/invitation.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   DRAFT: ['PENDING', 'CANCELLED'],
@@ -41,6 +46,8 @@ export class EventsService {
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -702,6 +709,94 @@ export class EventsService {
     ]);
 
     return { message: 'Event deleted successfully' };
+  }
+
+  async inviteGuests(eventId: string, userId: string, dto: InviteGuestsDto) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    if (!event.guestLimitPerUser || event.guestLimitPerUser <= 0) {
+      throw new BadRequestException('This event does not support guest invitations.');
+    }
+
+    // Ensure the inviter is fully registered & CONFIRMED
+    const registration = await this.prisma.registration.findFirst({
+      where: {
+        userId,
+        eventId,
+        status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } },
+      },
+    });
+
+    if (!registration) {
+      throw new ForbiddenException('You must have a CONFIRMED registration to invite guests.');
+    }
+
+    // Check how many guests the user has already invited
+    const existingInvitesCount = await this.prisma.eventInvites.count({
+      where: { eventId, invitedBy: userId },
+    });
+
+    if (existingInvitesCount + dto.emails.length > event.guestLimitPerUser) {
+      throw new BadRequestException(
+        `You cannot invite more than ${event.guestLimitPerUser} guests. You have already invited ${existingInvitesCount}.`,
+      );
+    }
+
+    const createdInvites: any[] = [];
+
+    for (const email of dto.emails) {
+      // Check if email is already invited
+      const existing = await this.prisma.eventInvites.findUnique({
+        where: { eventId_invitedEmail: { eventId, invitedEmail: email } },
+      });
+
+      if (existing) {
+        continue; // Skip silently
+      }
+
+      const invite = await this.prisma.eventInvites.create({
+        data: {
+          eventId,
+          invitedEmail: email,
+          invitedBy: userId,
+          status: 'ACCEPTED', // Guest tickets are auto-accepted
+        },
+      });
+
+      // Generate Ticket Token for Guest
+      const guestPayload = { sub: invite.id, eventId, isGuest: true };
+      const ticketToken = this.jwtService.sign(guestPayload, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: '30d',
+      });
+
+      // Generate PDF
+      try {
+        const pdfBuffer = await TicketGeneratorUtil.generatePdfTicket(
+          event,
+          email,
+          ticketToken,
+        );
+
+        // Send Email
+        await this.emailService.sendGuestTicket(email, event.title, pdfBuffer);
+        
+        createdInvites.push(invite);
+      } catch (err) {
+        this.logger.error(`Failed to generate or send ticket for ${email}. err: ${err.message}`);
+      }
+    }
+
+    return {
+      message: `Successfully invited ${createdInvites.length} guests.`,
+      invites: createdInvites,
+    };
   }
 
   private defaultIncludes() {
