@@ -167,6 +167,13 @@ export class AdminService {
         this.prisma.venue.count(),
         this.prisma.category.count(),
         this.prisma.registration.count({
+          where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
+        }),
+        this.prisma.registration.count({
+          where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
+        }),
+        this.prisma.attendance.count(),
+        this.prisma.registration.count({
           where: {
             registrationDate: {
               gte: startOfToday,

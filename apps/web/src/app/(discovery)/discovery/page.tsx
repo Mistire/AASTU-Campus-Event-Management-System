@@ -24,7 +24,6 @@ export default function StudentHomePage() {
     page: 1,
     limit: 10,
     sortBy: "newest",
-    status: "APPROVED",
   });
 
   const {
@@ -88,13 +87,15 @@ export default function StudentHomePage() {
                   Array.from({ length: 3 }).map((_, i) => (
                     <Skeleton
                       key={i}
-                      className="w-[420px] aspect-4/3 rounded-xl shrink-0"
+                      className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl shrink-0"
                     />
                   ))
                 ) : recommendations && recommendations.length > 0 ? (
-                  recommendations.map((event) => (
-                    <EventHeroCard key={event.id} event={event} />
-                  ))
+                  Array.from(new Set(recommendations.map((e) => e.id)))
+                    .map((id) => recommendations.find((e) => e.id === id)!)
+                    .map((event) => (
+                      <EventHeroCard key={event.id} event={event} />
+                    ))
                 ) : (
                   <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
                     <p className="text-sm font-bold uppercase tracking-widest">
@@ -153,8 +154,8 @@ export default function StudentHomePage() {
                 </Button>
               </div>
             ) : (
-              <AnimatePresence mode="popLayout">
-                {eventsData.data.map((event) => (
+              <AnimatePresence initial={false}>
+                {Array.from(new Map(eventsData.data.map((e) => [e.id, e])).values()).map((event) => (
                   <EventFeedCard key={event.id} event={event} />
                 ))}
               </AnimatePresence>

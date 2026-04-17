@@ -185,9 +185,10 @@ def run_full_cleaning_pipeline(data: dict) -> dict:
     valid_interest_ids = set(data["interests"]["id"])
 
     cleaned = {
-        "users": data["users"],  # Users themselves aren't cleaned here
+        "users": data["users"],
         "interests": data["interests"],
         "categories": data["categories"],
+        "event_categories": data["event_categories"], # Pass through
         "events": clean_events(data["events"]),
         "registrations": clean_registrations(
             data["registrations"], valid_user_ids, valid_event_ids
@@ -216,6 +217,9 @@ def run_full_cleaning_pipeline(data: dict) -> dict:
         ]
         cleaned["attendance"] = cleaned["attendance"][
             cleaned["attendance"]["event_id"].isin(cleaned_event_ids)
+        ]
+        cleaned["event_categories"] = cleaned["event_categories"][
+            cleaned["event_categories"]["event_id"].isin(cleaned_event_ids)
         ]
 
     print(" Cleaning pipeline complete!")

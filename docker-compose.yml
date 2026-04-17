@@ -77,6 +77,7 @@ services:
       SMTP_FROM: nasifayc11@gmail.com
       BACKEND_URL: http://localhost
       FRONTEND_URL: http://localhost:3001
+      ML_SERVICE_URL: http://ml-service:8000
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
       - ./apps/api/src:/usr/src/app/src:delegated
@@ -122,6 +123,31 @@ services:
     depends_on:
       - api
       - web
+      - ml-service
+
+  # ─── ML Recommendation Service ──────────────────────────
+  ml-service:
+    build:
+      context: ./apps/ml-service
+      dockerfile: Dockerfile
+    container_name: cems-ml-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MODEL_PATH: ./trained_models
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./apps/ml-service/app:/app/app:delegated
+      - ./apps/ml-service/trained_models:/app/trained_models:delegated
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   # ─── Maildev (Local Email Catcher) ───────────────────────
   maildev:

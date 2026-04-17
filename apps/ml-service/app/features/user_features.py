@@ -23,9 +23,10 @@ class UserFeatureBuilder:
     contribute more than weaker ones (just having a matching interest).
     """
 
-    def __init__(self, event_feature_matrix, event_id_to_idx):
+    def __init__(self, event_feature_matrix, event_id_to_idx, categories_mlb=None):
         self.event_features = event_feature_matrix
         self.event_id_to_idx = event_id_to_idx
+        self.categories_mlb = categories_mlb
         self.n_features = event_feature_matrix.shape[1]
 
     def build_all_profiles(
@@ -58,13 +59,29 @@ class UserFeatureBuilder:
         att_by_user = attendance_df.groupby("user_id")["event_id"].apply(set).to_dict()
         fb_by_user = feedback_df.groupby(["user_id", "event_id"])["rating"].first().to_dict()
 
-        # Map interests to categories via events the user registered for
-        # (We use this as an additional signal)
-        interest_users = set(user_interests_df["user_id"].unique())
+        # Stated interests: user_id -> set of category_ids
+        interests_by_user = user_interests_df.groupby("user_id")["interest_id"].apply(set).to_dict()
+
+        # Map category IDs to feature indices if MLB is available
+        cat_id_to_fidx = {}
+        if self.categories_mlb is not None:
+            cat_id_to_fidx = {cat_id: i for i, cat_id in enumerate(self.categories_mlb.classes_)}
 
         for uid in user_ids:
             weighted_vectors = []
             weights = []
+
+            # Stated Interest Signal (handles Cold Start)
+            user_interest_ids = interests_by_user.get(uid, set())
+            for cid in user_interest_ids:
+                fidx = cat_id_to_fidx.get(cid)
+                if fidx is not None:
+                    # Create a synthetic vector with only this category bit set
+                    # This projects the user's interest directly into the event feature space
+                    vec = np.zeros(self.n_features)
+                    vec[fidx] = 1.0
+                    weighted_vectors.append(vec * INTERACTION_WEIGHTS["interest"])
+                    weights.append(INTERACTION_WEIGHTS["interest"])
 
             # Registration signal
             reg_events = reg_by_user.get(uid, set())
@@ -163,8 +180,8 @@ class UserFeatureBuilder:
 def build_interaction_matrix(users_df, events_df, registrations_df,
                               attendance_df, feedback_df):
 
-    user_ids = list(users_df["id"])
-    event_ids = list(events_df["id"])
+    user_ids = [str(uid) for uid in users_df["id"]]
+    event_ids = [str(eid) for eid in events_df["id"]]
     user_id_to_idx = {uid: i for i, uid in enumerate(user_ids)}
     event_id_to_idx = {eid: i for i, eid in enumerate(event_ids)}
 
@@ -174,22 +191,22 @@ def build_interaction_matrix(users_df, events_df, registrations_df,
 
     # Registrations: base score = 1.0
     for _, row in registrations_df.iterrows():
-        ui = user_id_to_idx.get(row["user_id"])
-        ei = event_id_to_idx.get(row["event_id"])
+        ui = user_id_to_idx.get(str(row["user_id"]))
+        ei = event_id_to_idx.get(str(row["event_id"]))
         if ui is not None and ei is not None:
             matrix[ui][ei] += 1.0
 
     # Attendance: bonus +2.0
     for _, row in attendance_df.iterrows():
-        ui = user_id_to_idx.get(row["user_id"])
-        ei = event_id_to_idx.get(row["event_id"])
+        ui = user_id_to_idx.get(str(row["user_id"]))
+        ei = event_id_to_idx.get(str(row["event_id"]))
         if ui is not None and ei is not None:
             matrix[ui][ei] += 2.0
 
     # Feedback: rating offset from neutral (3)
     for _, row in feedback_df.iterrows():
-        ui = user_id_to_idx.get(row["user_id"])
-        ei = event_id_to_idx.get(row["event_id"])
+        ui = user_id_to_idx.get(str(row["user_id"]))
+        ei = event_id_to_idx.get(str(row["event_id"]))
         if ui is not None and ei is not None:
             matrix[ui][ei] += (row["rating"] - 3.0)
 

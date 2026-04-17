@@ -9,6 +9,9 @@ export class AdminDashboardStatsDto {
   registrations: number;
   venues: number;
   categories: number;
+  totalAttendance: number;
+  approvedRegistrations: number;
+  pendingRegistrations: number;
   registrationsToday: number;
   registrationStatusBreakdown: RegistrationStatusCountDto[];
 }

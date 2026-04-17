@@ -17,7 +17,9 @@ export async function fetchMyCategoryPreferences() {
         throw new Error(error.message || 'Failed to fetch category preferences');
     }
 
-    return await res.json() as UserCategoryPreference[];
+    const result = await res.json();
+    // The backend returns { selectedCategories: Category[], allCategories: Category[] }
+    return (result.data?.selectedCategories || []) as Category[];
 }
 
 export async function updateMyCategoryPreferences(categoryIds: string[]) {
@@ -31,7 +33,9 @@ export async function updateMyCategoryPreferences(categoryIds: string[]) {
         throw new Error(error.message || 'Failed to update category preferences');
     }
 
-    return await res.json() as UserCategoryPreference[];
+    const result = await res.json();
+    // The backend returns { selectedCategories: Category[], allCategories: Category[] }
+    return (result.data?.selectedCategories || []) as Category[];
 }
 
 export function useUserPreferences() {

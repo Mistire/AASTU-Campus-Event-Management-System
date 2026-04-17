@@ -6,7 +6,8 @@ import { Event, EventStatusName } from "../types";
 import { useEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../api/mutations";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent } from "../api/mutations";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { CemsTable } from "@/components/cems/CemsTable";
 import { CemsButton } from "@/components/cems/CemsButton";
 import { CemsBadge } from "@/components/cems/CemsBadge";
@@ -54,6 +55,13 @@ export const EventsList = () => {
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
+  const submitEvent = useSubmitEvent();
+  const approveEvent = useApproveEvent();
+  const rejectEvent = useRejectEvent();
+  const goLiveEvent = useGoLiveEvent();
+
+  const { profile } = useAuthStore();
+  const userRole = (profile?.role || "") as string;
 
   useEffect(() => {
     if (isError && error) {
@@ -115,7 +123,39 @@ export const EventsList = () => {
     });
   };
 
-  const columns = useMemo(() => getEventsColumns(handleEdit, handleDelete), []);
+  const handleSubmit = (event: Event) => {
+    submitEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event submitted for approval" }),
+      onError: (err) => ToastController.error({ message: "Failed to submit event", description: err.message })
+    });
+  };
+
+  const handleApprove = (event: Event) => {
+    approveEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event approved successfully" }),
+      onError: (err) => ToastController.error({ message: "Failed to approve event", description: err.message })
+    });
+  };
+
+  const handleReject = (event: Event) => {
+    const reason = window.prompt("Enter rejection reason (optional):");
+    if (reason === null) return; // Cancelled
+    rejectEvent.mutate({ id: event.id, reason: reason || undefined }, {
+      onSuccess: () => ToastController.success({ message: "Event rejected" }),
+      onError: (err) => ToastController.error({ message: "Failed to reject event", description: err.message })
+    });
+  };
+
+  const handleGoLive = (event: Event) => {
+    goLiveEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event is now LIVE!" }),
+      onError: (err) => ToastController.error({ message: "Failed to set event to LIVE", description: err.message })
+    });
+  };
+
+  const columns = useMemo(() => 
+    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive), 
+  [userRole]);
 
   const totalPages = eventsData?.meta?.totalPages || 1;
   const totalItems = eventsData?.meta?.total || 0;
