@@ -41,3 +41,15 @@ export class InviteOrganizerDto {
   @IsOptional()
   role?: string;
 }
+
+// ── Guest Invitations (Graduation Events) ──────────────────────────────
+export class InviteGuestsDto {
+  @ApiProperty({
+    description: 'Array of email addresses of guests to invite',
+    example: ['family1@gmail.com', 'family2@gmail.com'],
+  })
+  @IsArray()
+  @IsEmail({}, { each: true })
+  @IsNotEmpty()
+  emails: string[];
+}

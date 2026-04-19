@@ -12,8 +12,8 @@ export class CheckInDto {
   @IsOptional()
   sessionId?: string;
 
-  @ApiProperty({ description: 'The QR token for verification' })
+  @ApiProperty({ description: 'The JWT ticket token submitted by the organizer from the attendee\'s QR code' })
   @IsString()
   @IsNotEmpty()
-  qrTokenCode: string;
+  ticketToken: string;
 }
