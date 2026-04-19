@@ -1,34 +1,80 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CheckInDto } from './dto/check-in.dto';
 
 @Injectable()
 export class AttendanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
-  async checkIn(userId: string, dto: CheckInDto) {
-    const { eventId, sessionId, qrTokenCode } = dto;
+  async getTicket(userId: string, eventId: string) {
+    // Check if user has a confirmed registration
+    const registration = await this.prisma.registration.findFirst({
+      where: {
+        userId,
+        eventId,
+        status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } },
+      },
+    });
 
-    // 1. Verify event exists
+    if (!registration) {
+      throw new ForbiddenException('User does not have a confirmed registration for this event');
+    }
+
+    const payload = { sub: userId, eventId, registrationId: registration.id };
+    const ticketToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '30d', // generous duration for the event lifecycle
+    });
+
+    return { ticketToken };
+  }
+
+  async checkIn(organizerId: string, dto: CheckInDto) {
+    const { eventId, sessionId, ticketToken } = dto;
+
+    // 1. Verify event exists and the user is an organizer
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
+      include: { organizers: true },
     });
     if (!event) {
       throw new NotFoundException('Event not found');
     }
 
-    // 2. Check if user is registered for the event
-    const registration = await this.prisma.registration.findFirst({
-      where: {
-        userId,
-        eventId,
-      },
-    });
-    if (!registration) {
-      throw new ConflictException('User is not registered for this event');
+    const isCreator = event.createdBy === organizerId;
+    const isOrganizer = event.organizers.some(
+      (org) => org.userId === organizerId && org.status === 'ACCEPTED',
+    );
+
+    if (!isCreator && !isOrganizer) {
+      throw new ForbiddenException('You are not an authorized organizer for this event');
     }
 
-    // 3. Verify sessionId if provided
+    // 2. Decode the ticketToken
+    let decoded: any;
+    try {
+      decoded = this.jwtService.verify(ticketToken, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
+    } catch (err) {
+      throw new ForbiddenException('Invalid or expired ticket token');
+    }
+
+    const attendeeId = decoded.sub;
+    const ticketEventId = decoded.eventId;
+    const isGuest = decoded.isGuest;
+
+    if (ticketEventId !== eventId) {
+      throw new ForbiddenException('Ticket is not valid for this event');
+    }
+
+    // 3. Verify session if provided
     if (sessionId) {
       const session = await this.prisma.eventSessions.findUnique({
         where: { id: sessionId },
@@ -38,31 +84,74 @@ export class AttendanceService {
       }
     }
 
-    // 4. Simple check-in logic (assuming qrTokenCode is verified or just logs check-in)
-    // In a real scenario, we'd verify the qrTokenCode against a stored one if applicable.
+    if (isGuest) {
+      // 4a. Check if guest invite is valid
+      const invite = await this.prisma.eventInvites.findUnique({
+        where: { id: attendeeId }
+      });
 
-    // Check if user already checked in (if we want to prevent duplicates for a specific session/event)
-    const existingCheckIn = await this.prisma.attendance.findFirst({
-      where: {
-        userId,
-        eventId,
-        sessionId: sessionId || null,
-      },
-    });
+      if (!invite || invite.eventId !== eventId) {
+        throw new ConflictException('Guest invite is invalid or not found');
+      }
 
-    if (existingCheckIn) {
-      return existingCheckIn; // Already checked in
+      // 5a. Check if guest already checked in
+      const existingCheckIn = await this.prisma.attendance.findFirst({
+        where: {
+          inviteId: attendeeId,
+          eventId,
+          sessionId: sessionId || null,
+        },
+      });
+
+      if (existingCheckIn) return existingCheckIn;
+
+      return this.prisma.attendance.create({
+        data: {
+          inviteId: attendeeId, // userId left null for guests
+          eventId,
+          sessionId,
+          qrToken: ticketToken,
+          checkInTime: new Date(),
+        },
+      });
+
+    } else {
+      // 4b. Check if attendee is registered and CONFIRMED
+      const registration = await this.prisma.registration.findFirst({
+        where: {
+          userId: attendeeId,
+          eventId,
+          status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } }
+        },
+      });
+
+      if (!registration) {
+        throw new ConflictException('Attendee is not confirmed for this event');
+      }
+
+      // 5b. Check if user already checked in
+      const existingCheckIn = await this.prisma.attendance.findFirst({
+        where: {
+          userId: attendeeId,
+          eventId,
+          sessionId: sessionId || null,
+        },
+      });
+
+      if (existingCheckIn) {
+        return existingCheckIn; // Already checked in
+      }
+
+      return this.prisma.attendance.create({
+        data: {
+          userId: attendeeId,
+          eventId,
+          sessionId,
+          qrToken: ticketToken,
+          checkInTime: new Date(),
+        },
+      });
     }
-
-    return this.prisma.attendance.create({
-      data: {
-        userId,
-        eventId,
-        sessionId,
-        qrToken: qrTokenCode,
-        checkInTime: new Date(),
-      },
-    });
   }
 
   async getAttendanceByEvent(eventId: string) {
@@ -77,6 +166,11 @@ export class AttendanceService {
             studentId: true,
             phone: true,
           },
+        },
+        invite: {
+          select: {
+            invitedEmail: true,
+          }
         },
         session: {
           select: {
@@ -94,7 +188,7 @@ export class AttendanceService {
       this.prisma.registration.count({ where: { eventId } }),
       this.prisma.attendance.findMany({
         where: { eventId },
-        distinct: ['userId'],
+        distinct: ['userId', 'inviteId'],
       }),
     ]);
 
@@ -159,6 +253,7 @@ export class AttendanceService {
       orderBy: { checkInTime: 'desc' },
       include: {
         user: { select: { fullName: true, email: true } },
+        invite: { select: { invitedEmail: true } },
         event: { select: { title: true } },
       },
     });

@@ -174,4 +174,33 @@ export class EmailService {
       this.logger.error(`Failed to send bulk 'Event Live' email: ${err.message}`);
     }
   }
+
+  async sendGuestTicket(email: string, eventTitle: string, ticketPdfBuffer: Buffer) {
+    const html = this.getHtmlLayout(
+      'Your Graduation Ticket',
+      `You've been invited to ${eventTitle}!`,
+      `<p>You have been formally invited to attend the graduation event <strong>"${eventTitle}"</strong>. Your secure ticket is attached to this email as a PDF document. Please download it and present its QR code at the entrance.</p>`,
+    );
+
+    try {
+      await this.transporter.sendMail({
+        from: `"AASTU Campus Event Management System" <${this.configService.get<string>('SMTP_FROM')}>`,
+        to: email,
+        subject: `Your Ticket for ${eventTitle} — CEMS`,
+        html,
+        attachments: [
+          {
+            filename: `Ticket_${eventTitle.replace(/[^z-z0-9]/gi, '_')}.pdf`,
+            content: ticketPdfBuffer,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
+
+      this.logger.log(`Guest ticket email sent to ${email} with PDF attachment.`);
+    } catch (err) {
+      this.logger.error(`Failed to send guest ticket email to ${email}: ${err.message}`);
+      throw err;
+    }
+  }
 }
