@@ -4,6 +4,7 @@ import { JwtAuthGuard, RolesGuard } from '../auth/guard';
 import { GetUser, Roles } from '../auth/decorator';
 import { AttendanceService } from './attendance.service';
 import { CheckInDto } from './dto/check-in.dto';
+import { ManualCheckInDto } from './dto/manual-check-in.dto';
 
 @ApiTags('attendance')
 @ApiBearerAuth()
@@ -19,9 +20,17 @@ export class AttendanceController {
   }
 
   @Post('check-in')
+  @Roles('Admin', 'Organizer')
   @ApiOperation({ summary: 'Check in a user by an organizer using the attendee\'s ticketToken' })
   checkIn(@GetUser('id') organizerId: string, @Body() dto: CheckInDto) {
     return this.attendanceService.checkIn(organizerId, dto);
+  }
+
+  @Post('manual-check-in')
+  @Roles('Admin', 'Organizer')
+  @ApiOperation({ summary: 'Manually check in a confirmed attendee by an organizer' })
+  manualCheckIn(@GetUser('id') organizerId: string, @Body() dto: ManualCheckInDto) {
+    return this.attendanceService.manualCheckIn(organizerId, dto.eventId, dto.userId, dto.sessionId);
   }
 
   @Get('event/:eventId')

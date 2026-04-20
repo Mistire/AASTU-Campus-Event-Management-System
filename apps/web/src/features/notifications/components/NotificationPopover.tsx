@@ -36,7 +36,7 @@ export function NotificationPopover() {
     <Popover>
       <PopoverTrigger asChild>
         <button className="relative p-2 text-gray-400 hover:text-brand rounded-xl transition-all active:scale-95 hover:bg-gray-50 group">
-          <Bell size={20} className={cn("transition-transform group-hover:rotate-12", hasUnread && "animate-pulse text-brand")} />
+          <Bell size={25} className={cn("transition-transform group-hover:rotate-12", hasUnread && "animate-pulse text-brand")} />
           {hasUnread && (
             <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-black text-white ring-2 ring-white">
               {unreadCount}

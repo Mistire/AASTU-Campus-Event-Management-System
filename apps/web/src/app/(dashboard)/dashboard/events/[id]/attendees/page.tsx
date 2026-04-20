@@ -1,14 +1,18 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import { 
   useEventRegistrations, 
 } from "@/features/events/api/useRegistrationStatus";
 import { 
   useApproveRegistration, 
   useRejectRegistration,
-  useCancelRegistration
+  useCancelRegistration,
+  useManualCheckIn
 } from "@/features/events/api/mutations";
+import { useAttendance } from "@/features/events/api/get-attendance";
+import { AttendeeScanner } from "@/features/events/components/attendance/AttendeeScanner";
 import { 
   CemsCard, 
   CemsCardHeader, 
@@ -18,15 +22,17 @@ import { CemsTable } from "@/components/cems/CemsTable";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 import { Button } from "@/components/ui/button";
 import { 
-  Users, 
-  ArrowLeft, 
-  CheckCircle2, 
-  XCircle, 
-  UserMinus,
-  Search,
-  MessageSquare,
+  ArrowLeft,
+  CheckCircle2,
   Clock,
-  ListOrdered
+  ListOrdered,
+  MessageSquare,
+  QrCode,
+  ScanLine,
+  Search,
+  UserMinus,
+  Users,
+  XCircle
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
@@ -34,6 +40,8 @@ import { useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { CemsButton } from "@/components/cems";
+import Image from "next/image";
 
 export default function EventAttendeesPage() {
   const params = useParams();
@@ -43,8 +51,12 @@ export default function EventAttendeesPage() {
   const approve = useApproveRegistration();
   const reject = useRejectRegistration();
   const cancel = useCancelRegistration();
+  const manualCheckIn = useManualCheckIn();
+  
+  const { data: attendance } = useAttendance(eventId);
   
   const [searchTerm, setSearchTerm] = useState("");
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const allAttendees = useMemo(() => {
     if (!data) return [];
@@ -76,7 +88,7 @@ export default function EventAttendeesPage() {
         <div className="flex items-center gap-3 py-1">
           <div className="w-9 h-9 rounded-xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
             {row.original.user.profileImage ? (
-              <img src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-xl" />
+              <Image src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-xl" />
             ) : (
               row.original.user.fullName.charAt(0)
             )}
@@ -113,6 +125,23 @@ export default function EventAttendeesPage() {
       },
     },
     {
+      id: "atttendance",
+      header: "Attendance",
+      cell: ({ row }) => {
+        const userId = row.original.user.id;
+        const isCheckedIn = attendance?.some(a => a.userId === userId);
+        return (
+          <div className="flex items-center gap-2">
+            {isCheckedIn ? (
+              <CemsBadge status="success" dot>PRESENT</CemsBadge>
+            ) : (
+              <CemsBadge status="neutral" dot>ABSENT</CemsBadge>
+            )}
+          </div>
+        );
+      }
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
@@ -120,6 +149,8 @@ export default function EventAttendeesPage() {
         const isPending = status === "PENDING";
         const isConfirmed = status === "CONFIRMED";
         const isWaitlisted = status === "WAITLISTED";
+        const userId = row.original.user.id;
+        const isCheckedIn = attendance?.some(a => a.userId === userId);
         
         return (
           <div className="flex items-center gap-2">
@@ -145,7 +176,18 @@ export default function EventAttendeesPage() {
               </>
             )}
             
-            {(isConfirmed) && (
+            {isConfirmed && !isCheckedIn && (
+              <CemsButton 
+                size="sm" 
+                className="h-8 rounded-lg bg-brand hover:bg-brand/90 text-white text-[10px] font-black uppercase tracking-widest gap-1.5"
+                onClick={() => handleAction(manualCheckIn, { eventId, userId }, row.original.user.fullName)}
+                disabled={manualCheckIn.isPending}
+              >
+                <CheckCircle2 size={12} /> Check In
+              </CemsButton>
+            )}
+
+            {(isConfirmed || isWaitlisted) && (
               <Button 
                 size="sm" 
                 variant="outline"
@@ -206,29 +248,25 @@ export default function EventAttendeesPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-6">
-                <div className="flex flex-col">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Total</span>
-                    <span className="text-xl font-black text-gray-900">{allAttendees.length}</span>
-                </div>
-                <div className="w-px h-8 bg-gray-50" />
-                <div className="flex flex-col">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-1">
-                        <Clock size={10} /> Pending
-                    </span>
-                    <span className="text-xl font-black text-gray-900">{pendingCount}</span>
-                </div>
-                <div className="w-px h-8 bg-gray-50" />
-                <div className="flex flex-col">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-brand flex items-center gap-1">
-                        <ListOrdered size={10} /> Waitlist
-                    </span>
-                    <span className="text-xl font-black text-gray-900">{waitlistCount}</span>
-                </div>
-            </div>
-        </div>
+        <Button 
+          onClick={() => setIsScannerOpen(true)}
+          className="h-16 px-8 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all"
+        >
+          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <ScanLine size={18} />
+          </div>
+          Scan QR & Check-in
+        </Button>
       </div>
+
+      <AnimatePresence>
+        {isScannerOpen && (
+          <AttendeeScanner 
+            eventId={eventId} 
+            onClose={() => setIsScannerOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
 
       <CemsCard className="border-none shadow-2xl shadow-brand/5 overflow-hidden">
         <CemsCardHeader 

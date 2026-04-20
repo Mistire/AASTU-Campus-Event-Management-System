@@ -147,6 +147,26 @@ export const useCheckIn = () => {
     },
   });
 };
+
+export const useManualCheckIn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { eventId: string; userId: string; sessionId?: string }) => {
+      const res = await apiFetch(`/api/attendance/manual-check-in`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to check in manually");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["attendance", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendance-stats", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["event-registrations", eventId] });
+    },
+  });
+};
 export const useCancelRegistration = () => {
   const queryClient = useQueryClient();
   return useMutation({

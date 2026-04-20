@@ -3,6 +3,7 @@
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { User, Mail, ShieldCheck, MapPin, Phone, Edit2, Camera, LogOut, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserInterests } from "@/features/users/components/UserInterests";
 
 export default function ProfilePage() {
   const { profile, clearAuth } = useAuthStore();
@@ -102,6 +103,13 @@ export default function ProfilePage() {
         </div>
 
       </div>
+
+      {/* Interests & Personalization Section */}
+      <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-16 -mt-16 blur-2xl" />
+          <UserInterests />
+      </div>
+
     </div>
   );
 }

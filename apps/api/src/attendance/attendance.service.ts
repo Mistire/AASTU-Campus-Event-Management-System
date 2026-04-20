@@ -154,6 +154,62 @@ export class AttendanceService {
     }
   }
 
+  async manualCheckIn(organizerId: string, eventId: string, userId: string, sessionId?: string) {
+    // 1. Verify event exists and the user is an organizer
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: { organizers: true },
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    const isCreator = event.createdBy === organizerId;
+    const isOrganizer = event.organizers.some(
+      (org) => org.userId === organizerId && org.status === 'ACCEPTED',
+    );
+
+    if (!isCreator && !isOrganizer) {
+      throw new ForbiddenException('You are not an authorized organizer for this event');
+    }
+
+    // 2. Check if attendee is registered and CONFIRMED
+    const registration = await this.prisma.registration.findFirst({
+      where: {
+        userId,
+        eventId,
+        status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } },
+      },
+    });
+
+    if (!registration) {
+      throw new ConflictException('Attendee is not confirmed for this event');
+    }
+
+    // 3. Check if user already checked in
+    const existingCheckIn = await this.prisma.attendance.findFirst({
+      where: {
+        userId,
+        eventId,
+        sessionId: sessionId || null,
+      },
+    });
+
+    if (existingCheckIn) {
+      return existingCheckIn;
+    }
+
+    return this.prisma.attendance.create({
+      data: {
+        userId,
+        eventId,
+        sessionId,
+        qrToken: 'MANUAL',
+        checkInTime: new Date(),
+      },
+    });
+  }
+
   async getAttendanceByEvent(eventId: string) {
     return this.prisma.attendance.findMany({
       where: { eventId },
