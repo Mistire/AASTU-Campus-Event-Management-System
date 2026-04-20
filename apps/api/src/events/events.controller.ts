@@ -43,8 +43,8 @@ export class EventsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all events with filtering and pagination' })
-  findAll(@Query() query: EventQueryDto) {
-    return this.eventsService.findAll(query);
+  findAll(@GetUser() user: AuthUser, @Query() query: EventQueryDto) {
+    return this.eventsService.findAll(query, user);
   }
 
   @Get('upcoming')

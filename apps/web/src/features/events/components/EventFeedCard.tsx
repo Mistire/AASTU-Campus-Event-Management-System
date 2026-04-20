@@ -9,6 +9,9 @@ import { EventCardDetails } from "./subcomponents/EventCardDetails";
 import { EventCardFooter } from "./subcomponents/EventCardFooter";
 import { EventCardHoverPreview } from "./subcomponents/EventCardHoverPreview";
 
+import { useRegistration } from "../api/useRegistration";
+import { toast } from "sonner";
+
 interface EventFeedCardProps {
   event: Event;
   isSaved?: boolean;
@@ -21,12 +24,30 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
   const capacityPercent = Math.min(100, Math.round((event._count.registrations / event.capacity) * 100));
   const isAlmostFull = capacityPercent > 85 && capacityPercent < 100;
   const isFull = capacityPercent >= 100;
+  const isEnded = new Date(event.endTime) < new Date();
+
+  const { mutateAsync: register, isPending: isRegistering } = useRegistration();
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsSaved(!isSaved);
     onToggleSave?.(event.id);
+  };
+
+  const handleRegister = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await register(event.id);
+      toast.success("Registration Successful", {
+        description: `You are now registered for ${event.title}`,
+      });
+    } catch (err: any) {
+      toast.error("Registration Failed", {
+        description: err.message || "Please try again later.",
+      });
+    }
   };
 
   return (
@@ -54,6 +75,9 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
             isFull={isFull}
             isAlmostFull={isAlmostFull}
             capacityPercent={capacityPercent}
+            onRegister={handleRegister}
+            isRegistering={isRegistering}
+            isEnded={isEnded}
           />
         </div>
       </div>

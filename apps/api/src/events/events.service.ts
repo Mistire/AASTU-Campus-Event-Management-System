@@ -408,7 +408,7 @@ export class EventsService {
 
   // FIND ALL — with status, type, tag and search filters + pagination
 
-  async findAll(query: EventQueryDto) {
+  async findAll(query: EventQueryDto, user: AuthUser) {
     const {
       search,
       date,
@@ -419,14 +419,65 @@ export class EventsService {
       tag,
       venueId,
       createdById,
+      upcomingOnly,
       page = 1,
       limit = 10,
     } = query;
     const where: any = {};
 
-    if (status) {
-      where.status = { statusName: status };
+    // 1. Enforce Status Visibility Logic
+    const userRole = user.role; // Student, Organizer, Admin
+
+    if (userRole === 'Admin') {
+      // Admins see whatever they specifically filter for, or everything if no filter
+      if (status) {
+        where.status = { statusName: status };
+      }
+    } else {
+      // Non-Admins: Students and Organizers
+      if (status) {
+        // If a specific status is requested, verify permission
+        if (['APPROVED', 'LIVE'].includes(status)) {
+          where.status = { statusName: status };
+        } else {
+          // Attempting to see DRAFT/PENDING: only if they are the creator or organizer
+          where.AND = [
+            { status: { statusName: status } },
+            {
+              OR: [
+                { createdBy: user.id },
+                { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+              ],
+            },
+          ];
+        }
+      } else {
+        // Default View: Show APPROVED and LIVE events
+        // PLUS show the user's own DRAFT/PENDING events if they are an organizer
+        where.OR = [
+          { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
+          {
+            AND: [
+              { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
+              {
+                OR: [
+                  { createdBy: user.id },
+                  { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+                ],
+              },
+            ],
+          },
+        ];
+      }
     }
+
+    if (upcomingOnly) {
+      where.endTime = { gte: new Date() };
+    }
+
+    // if (status) { // Removed as it is handled by the visibility logic above
+    //   where.status = { statusName: status };
+    // }
 
     if (venueId) {
       where.venueId = venueId;
@@ -461,9 +512,14 @@ export class EventsService {
     }
 
     if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+      where.AND = [
+        ...(where.AND || []),
+        {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
@@ -714,6 +770,7 @@ export class EventsService {
   async inviteGuests(eventId: string, userId: string, dto: InviteGuestsDto) {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
+      include: { venue: true, eventType: true },
     });
 
     if (!event) {
@@ -779,14 +836,15 @@ export class EventsService {
       // Generate PDF
       try {
         const pdfBuffer = await TicketGeneratorUtil.generatePdfTicket(
-          event,
+          event as any,
+          email,
           email,
           ticketToken,
         );
 
         // Send Email
-        await this.emailService.sendGuestTicket(email, event.title, pdfBuffer);
-        
+        await this.emailService.sendRegistrationTicket(email, event.title, pdfBuffer);
+
         createdInvites.push(invite);
       } catch (err) {
         this.logger.error(`Failed to generate or send ticket for ${email}. err: ${err.message}`);

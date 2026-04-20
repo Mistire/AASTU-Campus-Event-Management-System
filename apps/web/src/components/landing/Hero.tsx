@@ -4,166 +4,163 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
-  Calendar,
   ArrowRight,
-  Trophy,
-  Music,
-  Code2,
-  PartyPopper,
-  Heart,
-  Zap,
-  Coffee,
-  MapPin,
-  Ticket,
-  Bell,
-  Users,
-  LucideIcon,
 } from "lucide-react";
 
-// ─── Floating Icon Component ────────────────────────────────────────────────
-interface FloatingIconProps {
-  Icon: LucideIcon;
-  className?: string;
-  delay?: number;
-  duration?: number;
-  yOffset?: number;
-  size?: number;
-}
-
-function FloatingIcon({
-  Icon,
-  className,
-  delay = 0,
-  duration = 5,
-  yOffset = 12,
-  size = 28,
-}: FloatingIconProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.4, y: 20 }}
-      animate={{
-        opacity: [0, 0.35, 0.15, 0.35],
-        y: [0, -yOffset, 0],
-        rotate: [0, 6, -6, 0],
-        scale: [1, 1.08, 1],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay,
-      }}
-      className={cn(
-        "absolute pointer-events-none text-brand",
-        className
-      )}
-    >
-      <Icon size={size} strokeWidth={1.2} />
-    </motion.div>
-  );
-}
-
-
+// ─── Image Sets ──────────────────────────────────────────────────────────────
 const leftImages = ["/imh1.webp", "/imh2.jpg", "/imh3.jpg"];
-const centerImages = ["/imh4.avif", "/imh7.jpg", "imh6.webp"];
+const centerImages = ["/imh4.avif", "/imh7.jpg", "/imh6.webp"];
 const rightImages = ["/imh5.jpg", "/imh8.jpg", "/imh9.png"];
 
-// ─── Hero Component ────────────────────────────────────────────────────────
+// ─── Hero Component ───────────────────────────────────────────────────────────
 export default function Hero() {
-  const [index, setIndex] = useState(0);
+  const [leftIdx, setLeftIdx] = useState(0);
+  const [centerIdx, setCenterIdx] = useState(0);
+  const [rightIdx, setRightIdx] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % leftImages.length);
-    }, 3000); // change every 3 seconds
+      // Staggered "Wave" Update Logic
+      // 1. Start with Left
+      setLeftIdx((prev) => (prev + 1) % leftImages.length);
+      
+      // 2. Offset Center
+      setTimeout(() => {
+        setCenterIdx((prev) => (prev + 1) % centerImages.length);
+      }, 400);
+
+      // 3. Offset Right
+      setTimeout(() => {
+        setRightIdx((prev) => (prev + 1) % rightImages.length);
+      }, 800);
+    }, 6000); // Relaxed 6-second interval
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <section className="relative bg-gradient-to-b from-sky-100 via-white to-white pt-32 pb-24 px-6 text-center overflow-hidden">
+    <section className="relative bg-linear-to-b from-brand-subtle/50 via-white to-white pt-32 pb-24 px-6 md:px-10 text-center overflow-hidden">
 
-      {/* Floating Icons */}
-      <FloatingIcon Icon={Music} className="top-[12%] left-[6%]" />
-      <FloatingIcon Icon={Ticket} className="top-[30%] left-[4%]" />
-      <FloatingIcon Icon={PartyPopper} className="top-[8%] right-[8%]" />
-      <FloatingIcon Icon={Heart} className="bottom-[20%] right-[6%]" />
-      <FloatingIcon Icon={Calendar} className="bottom-[8%] right-[28%]" />
+      {/* ── Background: Radial Dot Grid ── */}
+      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[50px_50px]" />
 
+      {/* ── Background: Moving Blobs ── */}
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, 30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-20 -left-20 w-80 h-80 bg-brand/10 rounded-full blur-3xl opacity-60 z-0"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.3, 1], x: [0, -40, 0], y: [0, 60, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-subtle rounded-full blur-3xl opacity-40 z-0"
+      />
+
+      {/* ── Content ── */}
       <div className="relative z-10 max-w-7xl mx-auto">
 
-        {/* TITLE */}
-        <h1 className="text-5xl md:text-7xl font-black mb-6 text-gray-900">
+        {/* Space for aesthetic balance */}
+        <div className="h-10 md:h-20" />
+
+        <motion.h1
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-5xl md:text-8xl font-black mb-8 text-foreground leading-[0.9] tracking-tighter"
+        >
           Your Campus. <br />
-          <span className="text-blue-500">Your Events.</span>
-        </h1>
+          <span className="text-brand">Your Events.</span>
+        </motion.h1>
 
-        <p className="text-gray-500 mb-10 max-w-2xl mx-auto text-lg">
-          Discover, manage, and join events easily at AASTU.
-        </p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-muted-foreground mb-12 max-w-2xl mx-auto text-xl md:text-2xl font-medium leading-relaxed"
+        >
+          The intelligent platform for discovering and managing
+          extra-curricular excellence at AASTU.
+        </motion.p>
 
-        {/* BUTTONS */}
-        <div className="flex justify-center gap-4 mb-16">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
+        >
           <Link
             href="/signup"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+            className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-2xl shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
           >
-            Get Started
+            <span className="relative z-10">Get Started</span>
+            <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </Link>
 
           <Link
             href="#features"
-            className="border px-6 py-3 rounded-lg"
+            className="px-10 py-4 rounded-2xl border border-border bg-white/50 backdrop-blur-sm hover:bg-white text-muted-foreground font-brand font-black text-xs uppercase tracking-widest transition-all"
           >
-            Explore
+            Explore Features
           </Link>
-        </div>
+        </motion.div>
 
-        {/* ─── IMAGES (FIXED SHAPES + DYNAMIC) ───────────────────────── */}
-        <div className="flex justify-center items-end -space-x-6">
+        {/* IMAGES — Gate formation with Dynamic Cycling */}
+        <div className="flex justify-center items-end -space-x-4 md:-space-x-8 max-w-6xl mx-auto px-4 mt-20 relative">
 
-          {/* LEFT IMAGE */}
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={leftImages[index]}
-              src={leftImages[index]}
-              className="w-[180px] md:w-[260px] h-[260px] md:h-[360px] object-cover 
-              rounded-tl-[140px] rounded-tr-3xl rounded-b-3xl shadow-xl border-4 border-white"
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.6 }}
-            />
-          </AnimatePresence>
+          {/* Decorative rings */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 opacity-20 pointer-events-none">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-32 h-32 border-2 border-brand/20 rounded-full blur-xl" />
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-48 border-2 border-brand/10 rounded-full blur-2xl" />
+          </div>
 
-          {/* CENTER IMAGE (TOP ROUNDED ONLY ✅ FIXED) */}
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={centerImages[index]}
-              src={centerImages[index]}
-              className="w-[220px] md:w-[340px] h-[300px] md:h-[460px] object-cover 
-              rounded-t-[180px] rounded-b-3xl shadow-2xl border-4 border-white z-10 scale-105"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ duration: 0.6 }}
-            />
-          </AnimatePresence>
+          {/* LEFT IMAGE SET */}
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={leftImages[leftIdx]}
+                src={leftImages[leftIdx]}
+                alt="Campus life left"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tl-[160px] rounded-tr-3xl rounded-b-3xl shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1, rotate: -2 }}
+                exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
+          </div>
 
-          {/* RIGHT IMAGE */}
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={rightImages[index]}
-              src={rightImages[index]}
-              className="w-[180px] md:w-[260px] h-[260px] md:h-[360px] object-cover 
-              rounded-tr-[140px] rounded-tl-3xl rounded-b-3xl shadow-xl border-4 border-white"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 40 }}
-              transition={{ duration: 0.6 }}
-            />
-          </AnimatePresence>
+          {/* CENTER IMAGE SET */}
+          <div className="relative z-10 scale-110">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={centerImages[centerIdx]}
+                src={centerImages[centerIdx]}
+                alt="Campus life center"
+                className="w-[200px] md:w-[380px] h-[280px] md:h-[480px] object-cover rounded-t-full rounded-b-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] ring-12 ring-white transition-all duration-700"
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
+          </div>
 
+          {/* RIGHT IMAGE SET */}
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={rightImages[rightIdx]}
+                src={rightImages[rightIdx]}
+                alt="Campus life right"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tr-[160px] rounded-tl-3xl rounded-b-3xl shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1, rotate: 2 }}
+                exit={{ opacity: 0, x: 20, scale: 0.95 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>

@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, Registration, EventWaitlist } from '@prisma/client';
@@ -10,6 +12,11 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/enums/notification-type.enum';
 import { WaitlistService, PrismaTransactionClient } from './waitlist.service';
+import { EmailService } from '../auth/email.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TicketGeneratorUtil } from '../events/ticket-generator.util';
+import { Event } from '@prisma/client';
 
 // ─── DTOs ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +38,7 @@ export type RegistrationResult =
 
 @Injectable()
 export class RegistrationService {
+  private readonly logger = new Logger(RegistrationService.name);
   /** In-memory cache: status name → status id */
   private readonly statusCache = new Map<string, string>();
 
@@ -39,6 +47,9 @@ export class RegistrationService {
     private readonly analyticsService: AnalyticsService,
     private readonly notificationsService: NotificationsService,
     private readonly waitlistService: WaitlistService,
+    private readonly emailService: EmailService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -78,15 +89,20 @@ export class RegistrationService {
     const { userId, eventId } = dto;
 
     try {
-      return await this.prisma.$transaction(
+      const result = await this.prisma.$transaction(
         async (tx) => {
           // 1. Verify event exists
           const event = await tx.event.findUnique({
             where: { id: eventId },
-            select: { id: true, capacity: true, requiresApproval: true },
+            select: { id: true, capacity: true, requiresApproval: true, endTime: true },
           });
           if (!event) {
             throw new NotFoundException(`Event ${eventId} not found`);
+          }
+
+          // 1.1 Check if event has already ended
+          if (event.endTime < new Date()) {
+            throw new BadRequestException('This event has already ended');
           }
 
           // 2. Check for duplicate active registration
@@ -130,6 +146,18 @@ export class RegistrationService {
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
+
+      // Trigger ticket email if directly registered (confirmed)
+      if (
+        result.kind === 'registered' &&
+        result.registration.statusId === (await this.getStatusId('CONFIRMED'))
+      ) {
+        this.generateAndSendTicket(result.registration.id).catch((err) => {
+          this.logger.error(`Failed to send registration ticket: ${err.message}`);
+        });
+      }
+
+      return result;
     } catch (err) {
       this.rethrowSerializationError(err);
       throw err;
@@ -232,6 +260,12 @@ export class RegistrationService {
     );
 
     await this.analyticsService.invalidateEventCache(reg.eventId);
+
+    // Trigger ticket email after successful approval
+    this.generateAndSendTicket(updated.id).catch((err) => {
+      this.logger.error(`Failed to send registration ticket after approval: ${err.message}`);
+    });
+
     return updated;
   }
 
@@ -321,6 +355,160 @@ export class RegistrationService {
   }
 
   // ──────────────────────────────────────────────────────────────────────────
+  // Queries
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Fetches all active registrations and waitlist entries for a student.
+   */
+  async findMyRegistrations(userId: string) {
+    const [registrations, waitlist] = await Promise.all([
+      this.prisma.registration.findMany({
+        where: { userId, deletedAt: null },
+        include: {
+          event: {
+            include: {
+              venue: true,
+              status: true,
+              media: { where: { mediaType: 'THUMBNAIL' } },
+            },
+          },
+          status: true,
+        },
+        orderBy: { registrationDate: 'desc' },
+      }),
+      this.prisma.eventWaitlist.findMany({
+        where: { userId },
+        include: {
+          event: {
+            include: {
+              venue: true,
+              status: true,
+              media: { where: { mediaType: 'THUMBNAIL' } },
+            },
+          },
+        },
+        orderBy: { joinedAt: 'desc' },
+      }),
+    ]);
+
+    const confirmedId = await this.getStatusId('CONFIRMED');
+
+    const mappedRegistrations = await Promise.all(
+      registrations.map(async (reg) => {
+        if (reg.statusId === confirmedId) {
+          const token = this.jwtService.sign(
+            {
+              sub: reg.id,
+              event_id: reg.eventId,
+              user_id: reg.userId,
+              kind: 'STUDENT_TICKET',
+            },
+            {
+              secret: this.configService.get<string>('JWT_SECRET'),
+              expiresIn: '30d',
+            },
+          );
+          return { ...reg, ticketToken: token };
+        }
+        return reg;
+      }),
+    );
+
+    return { registrations: mappedRegistrations, waitlist };
+  }
+
+  /**
+   * Returns the registration status of the current user for a specific event.
+   */
+  async findStatusForEvent(userId: string, eventId: string) {
+    const [registration, waitlist] = await Promise.all([
+      this.prisma.registration.findFirst({
+        where: { userId, eventId, deletedAt: null },
+        include: { status: true },
+      }),
+      this.prisma.eventWaitlist.findFirst({
+        where: { userId, eventId },
+      }),
+    ]);
+
+    if (registration) {
+      let ticketToken: string | undefined;
+      const confirmedId = await this.getStatusId('CONFIRMED');
+
+      if (registration.statusId === confirmedId) {
+        ticketToken = this.jwtService.sign(
+          {
+            sub: registration.id,
+            event_id: registration.eventId,
+            user_id: registration.userId,
+            kind: 'STUDENT_TICKET',
+          },
+          {
+            secret: this.configService.get<string>('JWT_SECRET'),
+            expiresIn: '30d',
+          },
+        );
+      }
+      return { kind: 'registered', registration: { ...registration, ticketToken } };
+    }
+    if (waitlist) {
+      const position =
+        (await this.prisma.eventWaitlist.count({
+          where: {
+            eventId,
+            joinedAt: { lt: waitlist.joinedAt },
+          },
+        })) + 1;
+      return { kind: 'waitlisted', waitlistEntry: { ...waitlist, position } };
+    }
+    return { kind: 'none' };
+  }
+
+  /**
+   * Fetches all attendees for an event (Organizer only).
+   */
+  async findAllForEvent(eventId: string, organizerId: string) {
+    await this.assertOrganizer(eventId, organizerId);
+
+    const [registrations, waitlist] = await Promise.all([
+      this.prisma.registration.findMany({
+        where: { eventId, deletedAt: null },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              profileImage: true,
+              department: true,
+            },
+          },
+          status: true,
+        },
+        orderBy: { registrationDate: 'asc' },
+      }),
+      this.prisma.eventWaitlist.findMany({
+        where: { eventId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              profileImage: true,
+              department: true,
+            },
+          },
+        },
+        orderBy: { position: 'asc' },
+      }),
+    ]);
+
+    return { registrations, waitlist };
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
   // Legacy CRUD (kept for backward compatibility with other parts of codebase)
   // ──────────────────────────────────────────────────────────────────────────
 
@@ -382,6 +570,66 @@ export class RegistrationService {
   private rethrowSerializationError(err: unknown): void {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2034') {
       throw new ConflictException('Transaction conflict due to concurrent request. Please retry.');
+    }
+  }
+
+  /**
+   * Private helper to generate a JWT token, create a PDF ticket, and send it via email.
+   * This is called asynchronously after a registration is confirmed.
+   */
+  private async generateAndSendTicket(registrationId: string): Promise<void> {
+    try {
+      const reg = await this.prisma.registration.findUnique({
+        where: { id: registrationId },
+        include: {
+          user: { select: { email: true, fullName: true } },
+          event: {
+            include: {
+              venue: true,
+              eventType: true,
+            },
+          },
+        },
+      });
+
+      if (!reg || !reg.user?.email || !reg.event) {
+        this.logger.error(
+          `Cannot generate ticket: Registration ${registrationId} incomplete or not found`,
+        );
+        return;
+      }
+
+      // Generate secure ticket token (JWT)
+      const payload = {
+        sub: reg.id,
+        event_id: reg.eventId,
+        user_id: reg.userId,
+        kind: 'STUDENT_TICKET',
+      };
+
+      const ticketToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: '30d',
+      });
+
+      // Generate PDF
+      const pdfBuffer = await TicketGeneratorUtil.generatePdfTicket(
+        reg.event as any,
+        reg.user.fullName || reg.user.email,
+        reg.user.email,
+        ticketToken,
+      );
+
+      // Send Email
+      await this.emailService.sendRegistrationTicket(reg.user.email, reg.event.title, pdfBuffer);
+
+      this.logger.log(
+        `Ticket successfully sent to student ${reg.user.email} for registration ${reg.id}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Background ticket generation failed for registration ${registrationId}: ${error.message}`,
+      );
     }
   }
 }

@@ -25,6 +25,7 @@ export function useRegistration() {
             queryClient.invalidateQueries({ queryKey: ['event', eventId] });
             queryClient.invalidateQueries({ queryKey: ['events'] });
             queryClient.invalidateQueries({ queryKey: ['my-registrations'] });
+            queryClient.invalidateQueries({ queryKey: ['registration-status', eventId] });
         },
     });
 }

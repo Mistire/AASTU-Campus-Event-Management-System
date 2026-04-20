@@ -155,68 +155,43 @@ export class AdminService {
         registrationCount,
         venueCount,
         categoryCount,
-        registrationsToday,
+        totalAttendance,
         pendingRegistrations,
         approvedRegistrations,
         rejectedRegistrations,
         cancelledRegistrations,
+        registrationsToday,
       ] = await Promise.all([
         this.prisma.user.count(),
         this.prisma.event.count(),
         this.prisma.registration.count(),
         this.prisma.venue.count(),
         this.prisma.category.count(),
-        this.prisma.registration.count({
-          where: { status: { name: { equals: 'APPROVED', mode: 'insensitive' } } },
-        }),
-        this.prisma.registration.count({
-          where: { status: { name: { equals: 'PENDING', mode: 'insensitive' } } },
-        }),
         this.prisma.attendance.count(),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'PENDING', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'APPROVED', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'REJECTED', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'CANCELLED', mode: 'insensitive' } },
+          },
+        }),
         this.prisma.registration.count({
           where: {
             registrationDate: {
               gte: startOfToday,
-            },
-          },
-        }),
-        this.prisma.registration.count({
-          where: {
-            status: {
-              name: {
-                equals: 'PENDING',
-                mode: 'insensitive',
-              },
-            },
-          },
-        }),
-        this.prisma.registration.count({
-          where: {
-            status: {
-              name: {
-                equals: 'APPROVED',
-                mode: 'insensitive',
-              },
-            },
-          },
-        }),
-        this.prisma.registration.count({
-          where: {
-            status: {
-              name: {
-                equals: 'REJECTED',
-                mode: 'insensitive',
-              },
-            },
-          },
-        }),
-        this.prisma.registration.count({
-          where: {
-            status: {
-              name: {
-                equals: 'CANCELLED',
-                mode: 'insensitive',
-              },
             },
           },
         }),
@@ -228,6 +203,9 @@ export class AdminService {
         registrations: registrationCount,
         venues: venueCount,
         categories: categoryCount,
+        totalAttendance,
+        approvedRegistrations,
+        pendingRegistrations,
         registrationsToday,
         registrationStatusBreakdown: [
           { status: 'PENDING', count: pendingRegistrations },

@@ -130,7 +130,7 @@ export function ReviewStep({ data }: ReviewStepProps) {
                 {data.tagIds && data.tagIds.length > 0 ? (
                   data.tagIds.map((id) => (
                     <Badge key={id} variant="outline" className="border-gray-200 text-gray-500 text-[10px] font-black rounded-lg">
-                      #{getTagName(id)}
+                      {getTagName(id)}
                     </Badge>
                   ))
                 ) : (
