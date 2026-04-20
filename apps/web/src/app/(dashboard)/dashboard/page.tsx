@@ -34,7 +34,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
+import { FileDown, Table as TableIcon, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 /* ── Chart lazy-imports (only for dashboard) ───────────────────── */
 import { RegistrationTrendChart } from "@/features/dashboard/components/charts/RegistrationTrendChart";
@@ -170,6 +173,43 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-5 pb-10 animate-in fade-in duration-700">
+      {/* Dashboard Top Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight tracking-tighter uppercase">
+            System <span className="text-brand">Overview</span>
+          </h1>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+            Real-time monitoring and analytics for AASTU Campus
+          </p>
+        </div>
+
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Export Data</span>
+            <div className="flex bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
+                <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   onClick={() => exportAnalytics({ type: "admin", format: "csv" })}
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                >
+                  <TableIcon size={12} /> CSV
+                </Button>
+                <div className="w-px h-4 bg-gray-100 my-auto" />
+                <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   onClick={() => exportAnalytics({ type: "admin", format: "pdf" })}
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                >
+                  <FileText size={12} /> PDF
+                </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* ═══════════════════════════════════════════════════════════
        *  METRIC CARDS — Compact horizontal row
        * ═══════════════════════════════════════════════════════════ */}

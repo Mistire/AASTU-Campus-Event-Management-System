@@ -602,28 +602,30 @@ export class AnalyticsService {
     return Buffer.from(csvString, 'utf-8');
   }
 
-  private exportToPdf(metrics: object): Buffer {
+  private async exportToPdf(metrics: object): Promise<Buffer> {
     const doc = new PDFDocument({ margin: 50 });
     const chunks: Buffer[] = [];
 
-    doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+    return new Promise((resolve, reject) => {
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', (err) => reject(err));
 
-    doc.fontSize(20).text('Analytics Report', { align: 'center' });
-    doc.moveDown();
+      doc.fontSize(20).text('Analytics Report', { align: 'center' });
+      doc.moveDown();
 
-    const entries = Object.entries(metrics);
-    if (entries.length === 0) {
-      doc.fontSize(12).text('No data available');
-    } else {
-      doc.fontSize(12);
-      for (const [key, value] of entries) {
-        doc.text(`${key}: ${value}`);
+      const entries = Object.entries(metrics);
+      if (entries.length === 0) {
+        doc.fontSize(12).text('No data available');
+      } else {
+        doc.fontSize(12);
+        for (const [key, value] of entries) {
+          doc.text(`${key}: ${value}`);
+        }
       }
-    }
 
-    doc.end();
-
-    return Buffer.concat(chunks);
+      doc.end();
+    });
   }
 
   async exportAnalytics(
@@ -644,7 +646,7 @@ export class AnalyticsService {
       const overview = await this.getAdminOverview(query);
 
       if (format === 'pdf') {
-        buffer = this.exportToPdf(overview as unknown as object);
+        buffer = await this.exportToPdf(overview as unknown as object);
       } else {
         buffer = this.exportToCsv([overview as unknown as object]);
       }
@@ -653,7 +655,7 @@ export class AnalyticsService {
       const analytics = await this.getEventAnalytics(scope, userId, query);
 
       if (format === 'pdf') {
-        buffer = this.exportToPdf(analytics as unknown as object);
+        buffer = await this.exportToPdf(analytics as unknown as object);
       } else {
         buffer = this.exportToCsv([analytics as unknown as object]);
       }
