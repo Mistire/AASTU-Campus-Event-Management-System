@@ -7,8 +7,19 @@ import { WaitlistService } from './waitlist.service';
 import { AttendanceService } from './attendance.service';
 import { RegistrationController } from './registration.controller';
 
+import { AuthModule } from '../auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+
 @Module({
-  imports: [PrismaModule, AnalyticsModule, NotificationsModule],
+  imports: [
+    PrismaModule, 
+    AnalyticsModule, 
+    NotificationsModule,
+    AuthModule,
+    ConfigModule,
+    JwtModule.register({}),
+  ],
   controllers: [RegistrationController],
   providers: [RegistrationService, WaitlistService, AttendanceService],
   exports: [RegistrationService, WaitlistService, AttendanceService],

@@ -16,12 +16,13 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useClickOutside } from "@/hooks/useClickOutside";
-
+import { usePathname } from "next/navigation";
 import Logo from "@/components/ui/Logo";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
+  const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
 
@@ -34,13 +35,23 @@ export function DiscoveryNavbar() {
           <Logo />
 
           <div className="hidden md:flex items-center gap-1">
-             <NavItem href="/discovery" label="Discovery" icon={LayoutGrid} active />
-             <NavItem href="/my-events" label="My Events" icon={Calendar} />
+             <NavItem 
+               href="/discovery" 
+               label="Discovery" 
+               icon={LayoutGrid} 
+               active={pathname === "/discovery"} 
+             />
+             <NavItem 
+               href="/my-events" 
+               label="My Events" 
+               icon={Calendar} 
+               active={pathname === "/my-events"}
+             />
           </div>
         </div>
 
         {/* Center: Search (Visible on md+) */}
-        <div className="hidden lg:flex flex-1 max-w-md mx-8">
+        {/* <div className="hidden lg:flex flex-1 max-w-md mx-8">
            <div className="relative w-full group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors" size={16} />
               <input 
@@ -49,7 +60,7 @@ export function DiscoveryNavbar() {
                 className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-brand/20 focus:ring-4 focus:ring-brand/5 rounded-2xl py-2 pl-12 pr-4 text-sm font-medium transition-all"
               />
            </div>
-        </div>
+        </div> */}
 
         {/* Right: Actions & Profile */}
         <div className="flex items-center gap-3">

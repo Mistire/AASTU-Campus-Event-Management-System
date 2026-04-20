@@ -153,8 +153,12 @@ export const EventsList = () => {
     });
   };
 
+  const handleManageAttendees = (event: Event) => {
+    router.push(`/dashboard/events/${event.id}/attendees`);
+  };
+
   const columns = useMemo(() => 
-    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive), 
+    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleManageAttendees), 
   [userRole]);
 
   const totalPages = eventsData?.meta?.totalPages || 1;
@@ -182,14 +186,16 @@ export const EventsList = () => {
           </div>
         </div>
         
-        <CemsButton 
-          cemsVariant="brand"
-          onClick={handleAddEvent}
-          className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
-        >
-          <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-          Create New Event
-        </CemsButton>
+        {userRole !== "ADMIN" && (
+          <CemsButton 
+            cemsVariant="brand"
+            onClick={handleAddEvent}
+            className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
+          >
+            <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
+            Create New Event
+          </CemsButton>
+        )}
       </div>
 
       {/* Filter Bar */}

@@ -175,31 +175,36 @@ export class EmailService {
     }
   }
 
-  async sendGuestTicket(email: string, eventTitle: string, ticketPdfBuffer: Buffer) {
+  async sendRegistrationTicket(email: string, eventTitle: string, ticketPdfBuffer: Buffer) {
     const html = this.getHtmlLayout(
-      'Your Graduation Ticket',
-      `You've been invited to ${eventTitle}!`,
-      `<p>You have been formally invited to attend the graduation event <strong>"${eventTitle}"</strong>. Your secure ticket is attached to this email as a PDF document. Please download it and present its QR code at the entrance.</p>`,
+      'Registration Confirmed!',
+      `You're going to ${eventTitle}!`,
+      `<p>Your registration for <strong>"${eventTitle}"</strong> has been successfully confirmed. We've attached your digital ticket to this email.</p>
+       <p>Please keep this PDF handy and present the QR code at the event entrance for a smooth check-in experience. We look forward to seeing you there!</p>`,
+      {
+        text: 'View My Registrations',
+        url: (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001') + '/dashboard/my-events',
+      },
     );
 
     try {
       await this.transporter.sendMail({
         from: `"AASTU Campus Event Management System" <${this.configService.get<string>('SMTP_FROM')}>`,
         to: email,
-        subject: `Your Ticket for ${eventTitle} — CEMS`,
+        subject: `[CONFIRMED] Ticket for ${eventTitle}`,
         html,
         attachments: [
           {
-            filename: `Ticket_${eventTitle.replace(/[^z-z0-9]/gi, '_')}.pdf`,
+            filename: `Ticket_${eventTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`,
             content: ticketPdfBuffer,
             contentType: 'application/pdf',
           },
         ],
       });
 
-      this.logger.log(`Guest ticket email sent to ${email} with PDF attachment.`);
+      this.logger.log(`Registration ticket email sent to ${email} for event: ${eventTitle}`);
     } catch (err) {
-      this.logger.error(`Failed to send guest ticket email to ${email}: ${err.message}`);
+      this.logger.error(`Failed to send registration ticket email to ${email}: ${err.message}`);
       throw err;
     }
   }

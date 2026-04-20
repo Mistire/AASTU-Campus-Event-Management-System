@@ -132,7 +132,7 @@ export const useGoLiveEvent = () => {
 export const useCheckIn = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { eventId: string; sessionId?: string; qrTokenCode: string }) => {
+    mutationFn: async (data: { eventId: string; sessionId?: string; ticketToken: string }) => {
       const res = await apiFetch(`/api/attendance/check-in`, {
         method: "POST",
         body: JSON.stringify(data),
@@ -144,6 +144,57 @@ export const useCheckIn = () => {
     onSuccess: (_, { eventId }) => {
       queryClient.invalidateQueries({ queryKey: ["attendance", eventId] });
       queryClient.invalidateQueries({ queryKey: ["attendance-stats", eventId] });
+    },
+  });
+};
+export const useCancelRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to cancel registration");
+      return result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["my-registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["registration-status"] });
+    },
+  });
+};
+export const useApproveRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}/approve`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to approve registration");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-registrations"] });
+    },
+  });
+};
+
+export const useRejectRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}/reject`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to reject registration");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-registrations"] });
     },
   });
 };

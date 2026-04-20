@@ -1,16 +1,20 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import { Loader2, UserPlus, CheckCircle2 } from "lucide-react";
+import { Loader2, UserPlus, CheckCircle2, XCircle, Clock, ListOrdered } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { CemsButton } from "@/components/cems";
 
 interface RegistrationSidebarProps {
   isRegistering: boolean;
   isFull: boolean;
   capacityPercent: number;
   handleRegister: () => void;
+  handleCancel?: () => void;
+  isCancelling?: boolean;
+  status?: "none" | "confirmed" | "waitlisted" | "pending";
+  waitlistPosition?: number;
   organizerName?: string;
+  isEnded?: boolean;
 }
 
 export function RegistrationSidebar({
@@ -18,8 +22,15 @@ export function RegistrationSidebar({
   isFull,
   capacityPercent,
   handleRegister,
+  handleCancel,
+  isCancelling,
+  status = "none",
+  waitlistPosition,
   organizerName = "AASTU Events Official",
+  isEnded,
 }: RegistrationSidebarProps) {
+  const isActionDisabled = isRegistering || isCancelling || isEnded;
+
   return (
     <div className="sticky top-32 space-y-8">
       {/* Registration Card */}
@@ -30,10 +41,20 @@ export function RegistrationSidebar({
         <div className="relative z-10 space-y-6">
           <div>
             <h3 className="text-2xl font-black tracking-tight leading-none text-gray-900">
-              Register <span className="text-brand">Now</span>
+              {isEnded ? (
+                <>Event <span className="text-gray-400">Completed</span></>
+              ) : status === "none" ? (
+                <>Register <span className="text-brand">Now</span></>
+              ) : status === "confirmed" ? (
+                <><span className="text-emerald-500">You're</span> In!</>
+              ) : status === "waitlisted" ? (
+                <>On the <span className="text-amber-500">Waitlist</span></>
+              ) : (
+                <>Approval <span className="text-blue-500">Pending</span></>
+              )}
             </h3>
             <p className="text-[10px] text-gray-400 mt-2 font-black uppercase tracking-[0.2em]">
-              Limited spots available
+              {isEnded ? "This event has already taken place" : status === "none" ? "Limited spots available" : "Manage your registration below"}
             </p>
           </div>
 
@@ -56,26 +77,60 @@ export function RegistrationSidebar({
             </div>
           </div>
 
-          <Button
-            onClick={handleRegister}
-            disabled={isRegistering || isFull}
-            className={cn(
-              "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all flex items-center justify-center gap-3",
-              isFull
-                ? "bg-gray-100 text-gray-400 shadow-none hover:bg-gray-100"
-                : "bg-brand hover:bg-brand-hover text-white shadow-brand/20 active:scale-95"
-            )}
-          >
-            {isRegistering ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : isFull ? (
-              "Event is Full"
-            ) : (
-              <>
-                Register for Entry <UserPlus size={18} />
-              </>
-            )}
-          </Button>
+          {status === "none" ? (
+            <Button
+              onClick={handleRegister}
+              disabled={isActionDisabled || isFull}
+              className={cn(
+                "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all flex items-center justify-center gap-3",
+                isFull || isEnded
+                  ? "bg-gray-100 text-gray-400 shadow-none hover:bg-gray-100"
+                  : "bg-brand hover:bg-brand-hover text-white shadow-brand/20 active:scale-95"
+              )}
+            >
+              {isRegistering ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : isEnded ? (
+                "Event Ended"
+              ) : isFull ? (
+                "Event is Full"
+              ) : (
+                <>
+                  Register for Entry <UserPlus size={18} />
+                </>
+              )}
+            </Button>
+          ) : (
+            <div className="space-y-3">
+              <div
+                className={cn(
+                  "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 border-2",
+                  status === "confirmed" 
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
+                    : status === "waitlisted" 
+                      ? "bg-amber-50 border-amber-100 text-amber-600"
+                      : "bg-blue-50 border-blue-100 text-blue-600"
+                )}
+              >
+                {status === "confirmed" ? (
+                  <><CheckCircle2 size={18} /> Confirmed</>
+                ) : status === "waitlisted" ? (
+                  <><ListOrdered size={18} /> Waitlisted {waitlistPosition && `#${waitlistPosition}`}</>
+                ) : (
+                  <><Clock size={18} /> Pending Approval</>
+                )}
+              </div>
+              
+              <CemsButton
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isActionDisabled}
+                className="w-full h-12 rounded-xl border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-100 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2"
+              >
+                {isCancelling ? <Loader2 className="animate-spin" size={16} /> : <><XCircle size={16} /> Cancel Registration</>}
+              </CemsButton>
+            </div>
+          )}
 
           <p className="text-[9px] text-gray-400 text-center font-bold uppercase tracking-widest leading-relaxed">
             By registering, you agree to our <br />

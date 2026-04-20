@@ -24,6 +24,7 @@ export default function StudentHomePage() {
     page: 1,
     limit: 10,
     sortBy: "newest",
+    upcomingOnly: true,
   });
 
   const {

@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 
-import { Pencil, Trash2, Send, Check, X, Play } from "lucide-react";
+import { Pencil, Trash2, Send, Check, X, Play, Users } from "lucide-react";
 
 export const getStatusColor = (status: EventStatusName) => {
   switch (status) {
@@ -23,7 +23,8 @@ export const getEventsColumns = (
   onSubmit: (event: Event) => void,
   onApprove: (event: Event) => void,
   onReject: (event: Event) => void,
-  onGoLive: (event: Event) => void
+  onGoLive: (event: Event) => void,
+  onManageAttendees: (event: Event) => void
 ): ColumnDef<Event>[] => [
   {
     id: "index",
@@ -83,6 +84,18 @@ export const getEventsColumns = (
 
       return (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {/* Organizer: Manage Attendees (Show for processed events) */}
+          {isOrganizer && status !== "DRAFT" && (
+            <button 
+              type="button" 
+              onClick={() => onManageAttendees(event)}
+              className="p-2 text-brand hover:bg-brand/5 rounded-xl transition-all"
+              title="Manage Attendees"
+            >
+              <Users size={18} />
+            </button>
+          )}
+
           {/* Organizer: Submit Draft */}
           {isOrganizer && status === "DRAFT" && (
             <button 

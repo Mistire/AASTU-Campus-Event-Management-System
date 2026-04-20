@@ -3,6 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEventDetail } from "@/features/events/api/useEventDetail";
 import { useRegistration } from "@/features/events/api/useRegistration";
+import { useRegistrationStatus } from "@/features/events/api/useRegistrationStatus";
+import { useCancelRegistration } from "@/features/events/api/mutations";
 import { AgendaTimeline } from "@/features/events/components/AgendaTimeline";
 import { EventInfoGrid } from "@/features/events/components/EventInfoGrid";
 import { SimilarEventsRail } from "@/features/events/components/SimilarEventsRail";
@@ -14,16 +16,16 @@ import { ArrowLeft, Share2, CalendarPlus } from "lucide-react";
 import { generateICS } from "@/lib/ics";
 import { toast } from "sonner";
 import { EventDetailSkeleton, EventErrorState } from "@/features/events/components/EventDetailUIStates";
+import { useMemo } from "react";
 
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
   const { data: event, isLoading, isError } = useEventDetail(id);
+  const { data: regInfo, isLoading: statusLoading } = useRegistrationStatus(id);
   const { mutateAsync: register, isPending: isRegistering } = useRegistration();
-
-  if (isLoading) return <EventDetailSkeleton />;
-  if (isError || !event) return <EventErrorState onBack={() => router.back()} />;
+  const { mutateAsync: cancel, isPending: isCancelling } = useCancelRegistration();
 
   const handleRegister = async () => {
     try {
@@ -34,6 +36,24 @@ export default function EventDetailPage() {
     } catch (err: unknown) {
       const error = err as { message?: string };
       toast.error("Registration failed", {
+        description: error.message || "Please try again later.",
+      });
+    }
+  };
+
+  const handleCancelRegistration = async () => {
+    if (!regInfo || regInfo.kind === "none") return;
+    
+    const regId = regInfo.kind === "registered" ? regInfo.registration.id : regInfo.waitlistEntry.id;
+
+    try {
+      await cancel(regId);
+      toast.success("Registration Cancelled", {
+        description: "Your spot has been released.",
+      });
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      toast.error("Cancellation failed", {
         description: error.message || "Please try again later.",
       });
     }
@@ -52,8 +72,22 @@ export default function EventDetailPage() {
 
   const capacityPercent = Math.min(
     100,
-    Math.round((event._count.registrations / event.capacity) * 100)
+    Math.round((event?._count.registrations || 0) / (event?.capacity || 1) * 100)
   );
+
+  const regStatus = useMemo(() => {
+    if (!regInfo) return "none";
+    if (regInfo.kind === "registered") {
+      return regInfo.registration.status.name.toLowerCase() as any;
+    }
+    if (regInfo.kind === "waitlisted") return "waitlisted";
+    return "none";
+  }, [regInfo]);
+
+  const isEnded = event?.endTime ? new Date(event.endTime) < new Date() : false;
+
+  if (isLoading || statusLoading) return <EventDetailSkeleton />;
+  if (isError || !event) return <EventErrorState onBack={() => router.back()} />;
 
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
@@ -94,7 +128,7 @@ export default function EventDetailPage() {
         venueName={event.venue?.name || "Unassigned"}
         organizerName="AASTU Student Union"
         capacity={event.capacity}
-        registrations={event._count.registrations}
+        registrations={event._count?.registrations || 0}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8">
@@ -133,9 +167,14 @@ export default function EventDetailPage() {
         <div className="lg:col-span-4">
           <RegistrationSidebar
             isRegistering={isRegistering}
+            isCancelling={isCancelling}
             isFull={capacityPercent >= 100}
             capacityPercent={capacityPercent}
             handleRegister={handleRegister}
+            handleCancel={handleCancelRegistration}
+            status={regStatus}
+            waitlistPosition={regInfo?.kind === "waitlisted" ? regInfo.waitlistEntry.position : undefined}
+            isEnded={isEnded}
           />
         </div>
       </div>

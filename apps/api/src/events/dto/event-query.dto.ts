@@ -67,4 +67,9 @@ export class EventQueryDto {
   @Min(1)
   @IsOptional()
   limit?: number;
+
+  @ApiPropertyOptional({ description: 'If true, only return events that have not ended' })
+  @IsOptional()
+  @Type(() => Boolean)
+  upcomingOnly?: boolean;
 }

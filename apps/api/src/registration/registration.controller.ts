@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -28,6 +29,24 @@ export class RegistrationController {
   @ApiResponse({ status: 409, description: 'Already registered or waitlisted.' })
   register(@GetUser() user: AuthUser, @Body() dto: CreateRegistrationDto) {
     return this.registrationService.register({ userId: user.id, eventId: dto.eventId });
+  }
+
+  @Get('my')
+  @ApiOperation({ summary: 'Get all my registrations and waitlist entries' })
+  findMy(@GetUser() user: AuthUser) {
+    return this.registrationService.findMyRegistrations(user.id);
+  }
+
+  @Get('status/:eventId')
+  @ApiOperation({ summary: 'Get my registration status for a specific event' })
+  getStatus(@GetUser() user: AuthUser, @Param('eventId', ParseUUIDPipe) eventId: string) {
+    return this.registrationService.findStatusForEvent(user.id, eventId);
+  }
+
+  @Get('event/:eventId')
+  @ApiOperation({ summary: 'Get all attendees for an event (Organizer only)' })
+  findAllForEvent(@GetUser() user: AuthUser, @Param('eventId', ParseUUIDPipe) eventId: string) {
+    return this.registrationService.findAllForEvent(eventId, user.id);
   }
 
   @Delete(':id')
