@@ -13,11 +13,16 @@ import {
 import { cn } from "@/lib/utils";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { NotificationPopover } from "@/features/notifications/components/NotificationPopover";
+import { useNotificationSocket } from "@/features/notifications/hooks/useNotificationSocket";
 
 export function Header() {
   const { profile, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
+
+  // Initialize real-time notifications
+  useNotificationSocket();
 
   const handleLogout = () => {
     clearAuth();
@@ -38,9 +43,7 @@ export function Header() {
           English
         </div>
 
-        <button className="p-2 text-gray-400 hover:text-brand rounded-xl transition-colors">
-          <Bell size={20} />
-        </button>
+        <NotificationPopover />
 
         <div className="h-8 w-px bg-gray-100 mx-1" />
 
