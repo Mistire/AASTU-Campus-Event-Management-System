@@ -9,11 +9,19 @@ export interface CategoryAnalytics {
   attendanceRate: number;
 }
 
+const RANGE_TO_PRESET: Record<string, string> = {
+  '7d': 'last_7_days',
+  '30d': 'last_30_days',
+  '90d': 'last_90_days',
+};
+
 async function fetchCategoryAnalytics(range?: string): Promise<CategoryAnalytics[]> {
-  const params = range ? `?range=${range}` : '';
+  const preset = range ? RANGE_TO_PRESET[range] : undefined;
+  const params = preset ? `?preset=${preset}` : '';
   const res = await apiFetch(`/api/analytics/admin/categories${params}`);
   if (!res.ok) throw new Error('Failed to fetch category analytics');
-  return res.json();
+  const result = await res.json();
+  return result.data as CategoryAnalytics[];
 }
 
 export function useCategoryAnalytics(range = '30d') {

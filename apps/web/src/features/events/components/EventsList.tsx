@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Event, EventStatusName } from "../types";
-import { useEvents } from "../api/get-events";
+import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
 import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent } from "../api/mutations";
@@ -43,14 +43,23 @@ export const EventsList = () => {
   const { data: venues } = useVenues();
   const { data: users } = useUsers();
 
-  const { data: eventsData, isLoading, isError, error } = useEvents({
+  const { profile } = useAuthStore();
+  const userRole = (profile?.role || "") as string;
+  const isOrganizer = userRole === "ORGANIZER";
+
+  const eventQueryParams = {
     page,
     limit,
     search,
     status: status === "" ? undefined : (status as EventStatusName),
     venueId: venueId === "" ? undefined : venueId,
     createdById: createdById === "" ? undefined : createdById,
-  });
+  };
+
+  const globalEvents = useEvents(eventQueryParams, { enabled: !isOrganizer });
+  const organizedEvents = useMyOrganizedEvents(eventQueryParams, { enabled: isOrganizer });
+
+  const { data: eventsData, isLoading, isError, error } = isOrganizer ? organizedEvents : globalEvents;
 
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
@@ -59,9 +68,6 @@ export const EventsList = () => {
   const approveEvent = useApproveEvent();
   const rejectEvent = useRejectEvent();
   const goLiveEvent = useGoLiveEvent();
-
-  const { profile } = useAuthStore();
-  const userRole = (profile?.role || "") as string;
 
   useEffect(() => {
     if (isError && error) {
