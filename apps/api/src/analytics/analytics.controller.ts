@@ -7,7 +7,7 @@ import type { AuthUser } from '../auth/jwt.strategy';
 import { TimeRangeDto } from './dto/time-range.dto';
 import { ExportQueryDto } from './dto/export-query.dto';
 
-@Controller('api/analytics')
+@Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
@@ -21,27 +21,39 @@ export class AnalyticsController {
   }
 
   @Get('admin/top-events')
-  @Roles('Admin')
-  getTopEvents(@Query() query: TimeRangeDto) {
-    return this.analyticsService.getTopEvents(query);
+  @Roles('Admin', 'Organizer')
+  getTopEvents(@Query() query: TimeRangeDto, @GetUser() user: AuthUser) {
+    return this.analyticsService.getTopEvents(query, user.id, user.role.toLowerCase() === 'admin');
   }
 
   @Get('admin/categories')
-  @Roles('Admin')
-  getCategoryAnalytics(@Query() query: TimeRangeDto) {
-    return this.analyticsService.getCategoryAnalytics(query);
+  @Roles('Admin', 'Organizer')
+  getCategoryAnalytics(@Query() query: TimeRangeDto, @GetUser() user: AuthUser) {
+    return this.analyticsService.getCategoryAnalytics(
+      query,
+      user.id,
+      user.role.toLowerCase() === 'admin',
+    );
   }
 
   @Get('admin/departments')
-  @Roles('Admin')
-  getDepartmentAnalytics(@Query() query: TimeRangeDto) {
-    return this.analyticsService.getDepartmentAnalytics(query);
+  @Roles('Admin', 'Organizer')
+  getDepartmentAnalytics(@Query() query: TimeRangeDto, @GetUser() user: AuthUser) {
+    return this.analyticsService.getDepartmentAnalytics(
+      query,
+      user.id,
+      user.role.toLowerCase() === 'admin',
+    );
   }
 
   @Get('admin/trends')
-  @Roles('Admin')
-  getAdminTrends(@Query() query: TimeRangeDto) {
-    return this.analyticsService.getAdminTrends(query);
+  @Roles('Admin', 'Organizer')
+  getAdminTrends(@Query() query: TimeRangeDto, @GetUser() user: AuthUser) {
+    return this.analyticsService.getAdminTrends(
+      query,
+      user.id,
+      user.role.toLowerCase() === 'admin',
+    );
   }
 
   @Get('admin/engagement')

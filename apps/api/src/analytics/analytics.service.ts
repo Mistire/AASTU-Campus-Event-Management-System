@@ -40,6 +40,15 @@ export class AnalyticsService {
     return resolveTimeRange(dto);
   }
 
+  private getOrganizerEventFilter(userId: string) {
+    return {
+      OR: [
+        { createdBy: userId },
+        { organizers: { some: { userId, status: 'ACCEPTED' } } },
+      ],
+    };
+  }
+
   private async getCached<T>(key: string): Promise<T | null> {
     try {
       const cached = await this.redis.get(key);
@@ -282,21 +291,23 @@ export class AnalyticsService {
   }
 
   async getOrganizerOverview(userId: string): Promise<OrganizerOverviewDto> {
+    const eventFilter = this.getOrganizerEventFilter(userId);
+
     const [totalEvents, totalRegistrations, pendingApprovals, totalAttendance] = await Promise.all([
       this.prisma.event.count({
-        where: { createdBy: userId },
+        where: eventFilter,
       }),
       this.prisma.registration.count({
-        where: { event: { createdBy: userId } },
+        where: { event: eventFilter },
       }),
       this.prisma.registration.count({
-        where: { 
-          event: { createdBy: userId },
-          status: { name: { equals: 'PENDING', mode: 'insensitive' } }
+        where: {
+          event: eventFilter,
+          status: { name: { equals: 'PENDING', mode: 'insensitive' } },
         },
       }),
       this.prisma.attendance.count({
-        where: { event: { createdBy: userId } },
+        where: { event: eventFilter },
       }),
     ]);
 
@@ -309,10 +320,12 @@ export class AnalyticsService {
   }
 
   async getOrganizerRecentRegistrations(userId: string, limit = 10) {
+    const eventFilter = this.getOrganizerEventFilter(userId);
+
     return this.prisma.registration.findMany({
       take: limit,
       where: {
-        event: { createdBy: userId }
+        event: eventFilter,
       },
       orderBy: { registrationDate: 'desc' },
       include: {
@@ -335,16 +348,18 @@ export class AnalyticsService {
     });
   }
 
-  async getTopEvents(query: TimeRangeDto): Promise<TopEventDto[]> {
-    const hash = createHash('md5').update(JSON.stringify(query)).digest('hex').slice(0, 8);
-    const cacheKey = `analytics:admin:top-events:${hash}`;
+  async getTopEvents(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<TopEventDto[]> {
+    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+    const cacheKey = `analytics:top-events:${hash}`;
 
     const cached = await this.getCached<TopEventDto[]>(cacheKey);
     if (cached) return cached;
 
     const { start, end } = this.resolveTimeRange(query);
+    const eventFilter = !isAdmin && userId ? this.getOrganizerEventFilter(userId) : {};
 
     const events = await this.prisma.event.findMany({
+      where: eventFilter,
       select: {
         id: true,
         title: true,
@@ -376,20 +391,24 @@ export class AnalyticsService {
     return result;
   }
 
-  async getCategoryAnalytics(query: TimeRangeDto): Promise<CategoryAnalyticsDto[]> {
-    const hash = createHash('md5').update(JSON.stringify(query)).digest('hex').slice(0, 8);
-    const cacheKey = `analytics:admin:categories:${hash}`;
+  async getCategoryAnalytics(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<CategoryAnalyticsDto[]> {
+    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+    const cacheKey = `analytics:categories:${hash}`;
 
     const cached = await this.getCached<CategoryAnalyticsDto[]>(cacheKey);
     if (cached) return cached;
 
     const { start, end } = this.resolveTimeRange(query);
+    const eventFilter = !isAdmin && userId ? this.getOrganizerEventFilter(userId) : {};
 
     const categories = await this.prisma.category.findMany({
       select: {
         id: true,
         name: true,
         eventCategories: {
+          where: {
+            event: eventFilter,
+          },
           select: {
             event: {
               select: {
@@ -430,14 +449,15 @@ export class AnalyticsService {
     return result;
   }
 
-  async getDepartmentAnalytics(query: TimeRangeDto): Promise<DepartmentAnalyticsDto[]> {
-    const hash = createHash('md5').update(JSON.stringify(query)).digest('hex').slice(0, 8);
-    const cacheKey = `analytics:admin:departments:${hash}`;
+  async getDepartmentAnalytics(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<DepartmentAnalyticsDto[]> {
+    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+    const cacheKey = `analytics:departments:${hash}`;
 
     const cached = await this.getCached<DepartmentAnalyticsDto[]>(cacheKey);
     if (cached) return cached;
 
     const { start, end } = this.resolveTimeRange(query);
+    const eventFilter = !isAdmin && userId ? this.getOrganizerEventFilter(userId) : {};
 
     const departments = await this.prisma.department.findMany({
       select: {
@@ -446,7 +466,10 @@ export class AnalyticsService {
         users: {
           select: {
             registrations: {
-              where: { registrationDate: { gte: start, lte: end } },
+              where: {
+                registrationDate: { gte: start, lte: end },
+                event: eventFilter,
+              },
               select: { id: true },
             },
           },
@@ -464,11 +487,15 @@ export class AnalyticsService {
     return result;
   }
 
-  async getAdminTrends(query: TimeRangeDto): Promise<TrendPointDto[]> {
+  async getAdminTrends(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<TrendPointDto[]> {
     const { start, end } = this.resolveTimeRange(query);
+    const eventFilter = !isAdmin && userId ? this.getOrganizerEventFilter(userId) : {};
 
     const registrations = await this.prisma.registration.findMany({
-      where: { registrationDate: { gte: start, lte: end } },
+      where: {
+        registrationDate: { gte: start, lte: end },
+        event: eventFilter,
+      },
       select: { registrationDate: true },
     });
 

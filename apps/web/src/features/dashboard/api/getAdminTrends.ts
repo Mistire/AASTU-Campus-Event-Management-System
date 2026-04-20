@@ -7,18 +7,27 @@ export interface TrendPoint {
   count: number;
 }
 
+const RANGE_TO_PRESET: Record<string, string> = {
+  '7d': 'last_7_days',
+  '30d': 'last_30_days',
+  '90d': 'last_90_days',
+};
+
 async function fetchAdminTrends(range?: string): Promise<TrendPoint[]> {
-  const params = range ? `?range=${range}` : '';
+  const preset = range ? RANGE_TO_PRESET[range] : undefined;
+  const params = preset ? `?preset=${preset}` : '';
   const res = await apiFetch(`/api/analytics/admin/trends${params}`);
   if (!res.ok) throw new Error('Failed to fetch trends');
-  return res.json();
+  const result = await res.json();
+  return result.data as TrendPoint[];
 }
 
 export function useAdminTrends(range = '30d') {
   const { token } = useAuthStore();
+  const preset = RANGE_TO_PRESET[range] || range;
 
   return useQuery({
-    queryKey: ['admin-trends', range],
+    queryKey: ['admin-trends', preset],
     queryFn: () => fetchAdminTrends(range),
     enabled: !!token,
   });

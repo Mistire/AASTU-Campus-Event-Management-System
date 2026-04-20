@@ -24,10 +24,37 @@ const getEvents = async (query: EventQuery): Promise<PaginatedEventsResponse> =>
   return result.data;
 };
 
-export const useEvents = (query: EventQuery) => {
+const getMyOrganizedEvents = async (query: EventQuery): Promise<PaginatedEventsResponse> => {
+  const searchParams = new URLSearchParams();
+  if (query.page) searchParams.append("page", query.page.toString());
+  if (query.limit) searchParams.append("limit", query.limit.toString());
+  if (query.search) searchParams.append("search", query.search);
+  if (query.status) searchParams.append("status", query.status);
+
+  const res = await apiFetch(`/api/events/my-organized?${searchParams.toString()}`, {
+    method: "GET",
+  });
+
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to fetch events");
+  
+  return result.data;
+};
+
+export const useEvents = (query: EventQuery, options?: any) => {
   return useQuery({
     queryKey: ["events", query],
     queryFn: () => getEvents(query),
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+};
+
+export const useMyOrganizedEvents = (query: EventQuery, options?: any) => {
+  return useQuery({
+    queryKey: ["my-organized-events", query],
+    queryFn: () => getMyOrganizedEvents(query),
+    placeholderData: (previousData) => previousData,
+    ...options,
   });
 };
