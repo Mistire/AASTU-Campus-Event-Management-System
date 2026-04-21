@@ -5,6 +5,7 @@ import { GraduationCap } from 'lucide-react';
 export const getDepartmentsColumns = (): ColumnDef<DepartmentRecord>[] => [
     {
         id: "index",
+        accessorFn: (_, index) => index,
         header: "No.",
         cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
         size: 50,
