@@ -71,16 +71,18 @@ jobs:
             echo "==> Building and starting production containers..."
             docker compose -f docker-compose.prod.yml up --build -d
 
-            echo "==> Waiting for API container to be healthy..."
-            for i in {1..20}; do
-              if docker inspect -f '{{.State.Status}}' cems-api | grep -q "running"; then
-                echo "Container is running. Waiting for NestJS to bootstrap..."
-                sleep 5
+            echo "==> Ensuring Database exists..."
+            # Wait for postgres to be ready for connections
+            for i in {1..10}; do
+              if docker exec cems-postgres pg_isready -U cems; then
                 break
               fi
-              echo "Waiting... ($i/20)"
+              echo "Waiting for Postgres... ($i/10)"
               sleep 2
             done
+            
+            # Create the database if it doesn't exist (using the POSTGRES_PASSWORD from env)
+            docker exec cems-postgres sh -c "PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -U cems -tc \"SELECT 1 FROM pg_database WHERE datname = 'cems_db'\" | grep -q 1 || PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }} psql -U cems -c \"CREATE DATABASE cems_db\""
 
             echo "==> Running Prisma migrations..."
             if ! docker exec cems-api npx prisma migrate deploy; then

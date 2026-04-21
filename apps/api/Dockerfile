@@ -39,7 +39,9 @@ COPY --from=development /usr/src/app/dist ./dist
 # Copy generated Prisma client
 COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=development /usr/src/app/prisma ./prisma
+COPY start-prod.sh ./
+RUN chmod +x start-prod.sh
 
 EXPOSE 4000
 
-CMD ["node", "dist/main"]
+CMD ["./start-prod.sh"]
