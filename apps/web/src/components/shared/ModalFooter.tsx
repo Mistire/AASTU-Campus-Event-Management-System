@@ -1,4 +1,4 @@
-import { ButtonController } from "../controllers/ButtonController";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { DialogClose } from "@/components/ui/dialog";
 
 interface ModalFooterProps {
@@ -17,36 +17,36 @@ export function ModalFooter({
   isSubmitting = false,
 }: ModalFooterProps) {
   return (
-    <div className="px-6 py-4 flex items-center justify-end gap-3 bg-gray-50 border-t border-gray-100 rounded-b-xl mt-auto shrink-0">
+    <div className="px-6 py-5 flex items-center justify-end gap-3 bg-gray-50/50 border-t border-gray-100 rounded-b-xl mt-auto shrink-0">
       {onCancel ? (
-        <ButtonController
-          variant="default"
+        <CemsButton
+          variant="outline"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="bg-red-500 hover:bg-red-600 text-white rounded-md px-6 shadow-sm"
+          className="rounded-xl font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-6 h-10"
         >
           {cancelText}
-        </ButtonController>
+        </CemsButton>
       ) : (
         <DialogClose render={
-          <ButtonController
-            variant="default"
+          <CemsButton
+            variant="outline"
             disabled={isSubmitting}
-            className="bg-red-500 hover:bg-red-600 text-white rounded-md px-6 shadow-sm"
+            className="rounded-xl font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-6 h-10"
           >
             {cancelText}
-          </ButtonController>
+          </CemsButton>
         } />
       )}
-      <ButtonController
-        variant="default"
+      <CemsButton
+        cemsVariant="brand"
         onClick={onSave}
         loading={isSubmitting}
         disabled={isSubmitting}
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 shadow-sm"
+        className="rounded-xl font-black text-xs uppercase tracking-widest px-8 shadow-lg shadow-brand/20 transition-all active:scale-95 h-10"
       >
         {saveText}
-      </ButtonController>
+      </CemsButton>
     </div>
   );
 }

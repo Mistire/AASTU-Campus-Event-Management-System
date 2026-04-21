@@ -19,6 +19,11 @@ import { EmailService } from '../auth/email.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/enums/notification-type.enum';
 
+import { TicketGeneratorUtil } from './ticket-generator.util';
+import { InviteGuestsDto } from './dto/invitation.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   DRAFT: ['PENDING', 'CANCELLED'],
@@ -41,7 +46,9 @@ export class EventsService {
     private readonly venuesService: VenuesService,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
-  ) { }
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   private async getStatusByName(name: string) {
     const status = await this.prisma.eventStatus.findUnique({
@@ -111,6 +118,67 @@ export class EventsService {
         ...(dto.categoryIds?.length && {
           eventCategories: {
             create: dto.categoryIds.map((categoryId) => ({ categoryId })),
+          },
+        }),
+
+        ...(dto.sessions?.length && {
+          sessions: {
+            create: dto.sessions.map((s) => ({
+              title: s.title,
+              description: s.description,
+              startTime: new Date(s.startTime),
+              endTime: new Date(s.endTime),
+              location: s.location,
+              sessionType: s.sessionType,
+              speakers: s.speakers?.length
+                ? {
+                    create: s.speakers.map((name) => ({
+                      speaker: {
+                        create: {
+                          fullName: name,
+                        },
+                      },
+                    })),
+                  }
+                : undefined,
+            })),
+          },
+        }),
+
+        ...(dto.hackathonConfig && {
+          hackathons: {
+            create: {
+              teamSizeMin: dto.hackathonConfig.teamSizeMin,
+              teamSizeMax: dto.hackathonConfig.teamSizeMax,
+              submissionDeadline: new Date(dto.hackathonConfig.submissionDeadline),
+              judgingCriteria: dto.hackathonConfig.judgingCriteria,
+            },
+          },
+        }),
+
+        access: {
+          create: {
+            accessType: dto.accessType || 'PUBLIC',
+            requiresApproval: dto.accessType === 'INVITE_ONLY' || (dto.requiresApproval ?? false),
+          },
+        },
+
+        invites: {
+          create: (dto.invites || []).map((email) => ({
+            invitedEmail: email,
+            invitedBy: user.id,
+            status: 'PENDING',
+          })),
+        },
+
+        ...(dto.thumbnailUrl && {
+          media: {
+            create: [
+              {
+                fileUrl: dto.thumbnailUrl,
+                mediaType: 'THUMBNAIL',
+              },
+            ],
           },
         }),
       },
@@ -340,7 +408,7 @@ export class EventsService {
 
   // FIND ALL — with status, type, tag and search filters + pagination
 
-  async findAll(query: EventQueryDto) {
+  async findAll(query: EventQueryDto, user: AuthUser) {
     const {
       search,
       date,
@@ -351,14 +419,65 @@ export class EventsService {
       tag,
       venueId,
       createdById,
+      upcomingOnly,
       page = 1,
       limit = 10,
     } = query;
     const where: any = {};
 
-    if (status) {
-      where.status = { statusName: status };
+    // 1. Enforce Status Visibility Logic
+    const userRole = user.role; // Student, Organizer, Admin
+
+    if (userRole === 'Admin') {
+      // Admins see whatever they specifically filter for, or everything if no filter
+      if (status) {
+        where.status = { statusName: status };
+      }
+    } else {
+      // Non-Admins: Students and Organizers
+      if (status) {
+        // If a specific status is requested, verify permission
+        if (['APPROVED', 'LIVE'].includes(status)) {
+          where.status = { statusName: status };
+        } else {
+          // Attempting to see DRAFT/PENDING: only if they are the creator or organizer
+          where.AND = [
+            { status: { statusName: status } },
+            {
+              OR: [
+                { createdBy: user.id },
+                { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+              ],
+            },
+          ];
+        }
+      } else {
+        // Default View: Show APPROVED and LIVE events
+        // PLUS show the user's own DRAFT/PENDING events if they are an organizer
+        where.OR = [
+          { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
+          {
+            AND: [
+              { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
+              {
+                OR: [
+                  { createdBy: user.id },
+                  { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+                ],
+              },
+            ],
+          },
+        ];
+      }
     }
+
+    if (upcomingOnly) {
+      where.endTime = { gte: new Date() };
+    }
+
+    // if (status) { // Removed as it is handled by the visibility logic above
+    //   where.status = { statusName: status };
+    // }
 
     if (venueId) {
       where.venueId = venueId;
@@ -393,9 +512,14 @@ export class EventsService {
     }
 
     if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+      where.AND = [
+        ...(where.AND || []),
+        {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
 
@@ -423,11 +547,14 @@ export class EventsService {
 
     // Map status names to counts for the frontend
     const allStatuses = await this.prisma.eventStatus.findMany();
-    const statusStats = allStatuses.reduce((acc, s) => {
-      const match = stats.find((st) => st.statusId === s.id);
-      acc[s.statusName] = match?._count._all || 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const statusStats = allStatuses.reduce(
+      (acc, s) => {
+        const match = stats.find((st) => st.statusId === s.id);
+        acc[s.statusName] = match?._count._all || 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       data,
@@ -640,11 +767,102 @@ export class EventsService {
     return { message: 'Event deleted successfully' };
   }
 
+  async inviteGuests(eventId: string, userId: string, dto: InviteGuestsDto) {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+      include: { venue: true, eventType: true },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    if (!event.guestLimitPerUser || event.guestLimitPerUser <= 0) {
+      throw new BadRequestException('This event does not support guest invitations.');
+    }
+
+    // Ensure the inviter is fully registered & CONFIRMED
+    const registration = await this.prisma.registration.findFirst({
+      where: {
+        userId,
+        eventId,
+        status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } },
+      },
+    });
+
+    if (!registration) {
+      throw new ForbiddenException('You must have a CONFIRMED registration to invite guests.');
+    }
+
+    // Check how many guests the user has already invited
+    const existingInvitesCount = await this.prisma.eventInvites.count({
+      where: { eventId, invitedBy: userId },
+    });
+
+    if (existingInvitesCount + dto.emails.length > event.guestLimitPerUser) {
+      throw new BadRequestException(
+        `You cannot invite more than ${event.guestLimitPerUser} guests. You have already invited ${existingInvitesCount}.`,
+      );
+    }
+
+    const createdInvites: any[] = [];
+
+    for (const email of dto.emails) {
+      // Check if email is already invited
+      const existing = await this.prisma.eventInvites.findUnique({
+        where: { eventId_invitedEmail: { eventId, invitedEmail: email } },
+      });
+
+      if (existing) {
+        continue; // Skip silently
+      }
+
+      const invite = await this.prisma.eventInvites.create({
+        data: {
+          eventId,
+          invitedEmail: email,
+          invitedBy: userId,
+          status: 'ACCEPTED', // Guest tickets are auto-accepted
+        },
+      });
+
+      // Generate Ticket Token for Guest
+      const guestPayload = { sub: invite.id, eventId, isGuest: true };
+      const ticketToken = this.jwtService.sign(guestPayload, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn: '30d',
+      });
+
+      // Generate PDF
+      try {
+        const pdfBuffer = await TicketGeneratorUtil.generatePdfTicket(
+          event as any,
+          email,
+          email,
+          ticketToken,
+        );
+
+        // Send Email
+        await this.emailService.sendRegistrationTicket(email, event.title, pdfBuffer);
+
+        createdInvites.push(invite);
+      } catch (err) {
+        this.logger.error(`Failed to generate or send ticket for ${email}. err: ${err.message}`);
+      }
+    }
+
+    return {
+      message: `Successfully invited ${createdInvites.length} guests.`,
+      invites: createdInvites,
+    };
+  }
+
   private defaultIncludes() {
     return {
       status: true,
       eventType: true,
       venue: true,
+      media: true,
       tags: { include: { tag: true } },
       eventCategories: { include: { category: true } },
       sessions: {

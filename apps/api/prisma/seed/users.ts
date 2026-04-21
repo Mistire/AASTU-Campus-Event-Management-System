@@ -19,9 +19,9 @@ async function main() {
   console.log('Seeding Users...');
 
   // Get roles
-  const adminRole = await prisma.role.findUnique({ where: { roleName: 'Admin' } });
-  const studentRole = await prisma.role.findUnique({ where: { roleName: 'Student' } });
-  const organizerRole = await prisma.role.findUnique({ where: { roleName: 'Organizer' } });
+  const adminRole = await prisma.role.findUnique({ where: { roleName: 'ADMIN' } });
+  const studentRole = await prisma.role.findUnique({ where: { roleName: 'STUDENT' } });
+  const organizerRole = await prisma.role.findUnique({ where: { roleName: 'ORGANIZER' } });
 
   if (!adminRole || !studentRole || !organizerRole) {
     throw new Error('Roles not found. Please run `npm run script_roles` first.');

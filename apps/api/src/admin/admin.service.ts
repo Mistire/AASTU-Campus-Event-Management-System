@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AssignRoleDto, ListUserQueryDto } from './dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { AdminDashboardStatsDto, AssignRoleDto, ListUserQueryDto } from './dto';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async listUsers(query: ListUserQueryDto) {
     try {
@@ -13,21 +13,21 @@ export class AdminService {
           ...(query.roleId ? { roleId: query.roleId } : {}),
           ...(query.search
             ? {
-              OR: [
-                {
-                  fullName: {
-                    contains: query.search,
-                    mode: 'insensitive',
+                OR: [
+                  {
+                    fullName: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-                {
-                  email: {
-                    contains: query.search,
-                    mode: 'insensitive',
+                  {
+                    email: {
+                      contains: query.search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-              ],
-            }
+                ],
+              }
             : {}),
         },
         include: {
@@ -144,16 +144,58 @@ export class AdminService {
     }
   }
 
-  async getStats() {
+  async getStats(): Promise<AdminDashboardStatsDto> {
     try {
-      const [userCount, eventCount, registrationCount, venueCount, categoryCount] =
-        await Promise.all([
-          this.prisma.user.count(),
-          this.prisma.event.count(),
-          this.prisma.registration.count(),
-          this.prisma.venue.count(),
-          this.prisma.category.count(),
-        ]);
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
+      const [
+        userCount,
+        eventCount,
+        registrationCount,
+        venueCount,
+        categoryCount,
+        totalAttendance,
+        pendingRegistrations,
+        approvedRegistrations,
+        rejectedRegistrations,
+        cancelledRegistrations,
+        registrationsToday,
+      ] = await Promise.all([
+        this.prisma.user.count(),
+        this.prisma.event.count(),
+        this.prisma.registration.count(),
+        this.prisma.venue.count(),
+        this.prisma.category.count(),
+        this.prisma.attendance.count(),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'PENDING', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'APPROVED', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'REJECTED', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            status: { name: { equals: 'CANCELLED', mode: 'insensitive' } },
+          },
+        }),
+        this.prisma.registration.count({
+          where: {
+            registrationDate: {
+              gte: startOfToday,
+            },
+          },
+        }),
+      ]);
 
       return {
         users: userCount,
@@ -161,6 +203,16 @@ export class AdminService {
         registrations: registrationCount,
         venues: venueCount,
         categories: categoryCount,
+        totalAttendance,
+        approvedRegistrations,
+        pendingRegistrations,
+        registrationsToday,
+        registrationStatusBreakdown: [
+          { status: 'PENDING', count: pendingRegistrations },
+          { status: 'APPROVED', count: approvedRegistrations },
+          { status: 'REJECTED', count: rejectedRegistrations },
+          { status: 'CANCELLED', count: cancelledRegistrations },
+        ],
       };
     } catch (err) {
       console.error('AdminService.getStats error:', err);

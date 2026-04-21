@@ -1,32 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Cookies from "js-cookie";
-
-const getHeaders = () => {
-  const authCookie = Cookies.get("auth-storage");
-  let token = "";
-  if (authCookie) {
-    try {
-      const parsed = JSON.parse(authCookie);
-      token = parsed.state?.token || "";
-    } catch (e) {
-      console.error("Failed to parse auth cookie", e);
-    }
-  }
-  return {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-};
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { apiFetch } from "@/lib/api-client";
 
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: any) => {
-      const res = await fetch(`${apiUrl}/api/events`, {
+    mutationFn: async (data: Record<string, unknown>) => {
+      const res = await apiFetch(`/api/events`, {
         method: "POST",
-        headers: getHeaders(),
         body: JSON.stringify(data),
       });
       const result = await res.json();
@@ -42,10 +22,9 @@ export const useCreateEvent = () => {
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await fetch(`${apiUrl}/api/events/${id}`, {
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
+      const res = await apiFetch(`/api/events/${id}`, {
         method: "PATCH",
-        headers: getHeaders(),
         body: JSON.stringify(data),
       });
       const result = await res.json();
@@ -63,9 +42,8 @@ export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`${apiUrl}/api/events/${id}`, {
+      const res = await apiFetch(`/api/events/${id}`, {
         method: "DELETE",
-        headers: getHeaders(),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Failed to delete event");
@@ -73,6 +51,170 @@ export const useDeleteEvent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
+
+export const useSubmitEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/submit`, {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to submit event");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useApproveEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/approve`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to approve event");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useRejectEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      const res = await apiFetch(`/api/events/${id}/reject`, {
+        method: "PATCH",
+        body: JSON.stringify({ reason }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to reject event");
+      return result.data || result;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+export const useGoLiveEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/go-live`, {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to go live");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+  });
+};
+
+
+export const useCheckIn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { eventId: string; sessionId?: string; ticketToken: string }) => {
+      const res = await apiFetch(`/api/attendance/check-in`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to check in");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["attendance", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendance-stats", eventId] });
+    },
+  });
+};
+
+export const useManualCheckIn = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { eventId: string; userId: string; sessionId?: string }) => {
+      const res = await apiFetch(`/api/attendance/manual-check-in`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to check in manually");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["attendance", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendance-stats", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["event-registrations", eventId] });
+    },
+  });
+};
+export const useCancelRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to cancel registration");
+      return result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["my-registrations"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["registration-status"] });
+    },
+  });
+};
+export const useApproveRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}/approve`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to approve registration");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-registrations"] });
+    },
+  });
+};
+
+export const useRejectRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/registrations/${id}/reject`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to reject registration");
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["event-registrations"] });
     },
   });
 };

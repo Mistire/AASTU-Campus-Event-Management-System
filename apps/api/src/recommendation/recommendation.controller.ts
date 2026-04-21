@@ -8,7 +8,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { RecommendationService } from './recommendation.service';
-import { JwtAuthGuard } from 'src/auth/guard';
+import { JwtAuthGuard, RolesGuard } from 'src/auth/guard';
+import { Roles } from 'src/auth/decorator';
 import {
   RecommendationResponseDto,
   SimilarEventsResponseDto,
@@ -18,7 +19,7 @@ import {
 
 @ApiTags('Recommendations')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('recommendations')
 export class RecommendationController {
   constructor(private readonly recommendationService: RecommendationService) {}
@@ -44,11 +45,14 @@ export class RecommendationController {
   @ApiResponse({
     status: 200,
     description: 'Recommended events returned',
-    type: RecommendationResponseDto,
+    schema: {
+      type: 'array',
+      items: { type: 'object' },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized — missing or invalid JWT' })
   @ApiResponse({ status: 503, description: 'ML service unavailable or models not trained yet' })
-  getRecommendations(@Param('userId') userId: string, @Query('n') n?: number) {
+  getRecommendations(@Param('userId') userId: string, @Query('n') n?: number): Promise<any[]> {
     return this.recommendationService.getRecommendations(userId, n ? Number(n) : 10);
   }
 
@@ -72,15 +76,19 @@ export class RecommendationController {
   @ApiResponse({
     status: 200,
     description: 'Similar events returned',
-    type: SimilarEventsResponseDto,
+    schema: {
+      type: 'array',
+      items: { type: 'object' },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Event not found in recommendation model' })
-  getSimilarEvents(@Param('eventId') eventId: string, @Query('n') n?: number) {
+  getSimilarEvents(@Param('eventId') eventId: string, @Query('n') n?: number): Promise<any[]> {
     return this.recommendationService.getSimilarEvents(eventId, n ? Number(n) : 10);
   }
 
   @Post('retrain')
+  @Roles('Admin')
   @ApiOperation({
     summary: 'Trigger model retraining',
     description:

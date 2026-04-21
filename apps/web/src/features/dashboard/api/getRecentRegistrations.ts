@@ -22,8 +22,12 @@ export interface RecentRegistration {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export async function fetchRecentRegistrations(token: string) {
-    const res = await fetch(`${API_URL}/api/admin/registrations/recent`, {
+export async function fetchRecentRegistrations(token: string, role: string) {
+    const endpoint = role === 'ADMIN' 
+        ? `${API_URL}/api/admin/registrations/recent` 
+        : `${API_URL}/api/analytics/organizer/registrations/recent`;
+
+    const res = await fetch(endpoint, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -41,11 +45,12 @@ export async function fetchRecentRegistrations(token: string) {
 
 export function useRecentRegistrations() {
     const { token, profile } = useAuthStore();
-    const isAdmin = profile?.role === 'ADMIN';
+    const role = profile?.role || 'STUDENT';
+    const isAuthorized = role === 'ADMIN' || role === 'ORGANIZER';
 
     return useQuery({
-        queryKey: ['recent-registrations'],
-        queryFn: () => fetchRecentRegistrations(token!),
-        enabled: !!token && isAdmin,
+        queryKey: ['recent-registrations', role],
+        queryFn: () => fetchRecentRegistrations(token!, role),
+        enabled: !!token && isAuthorized,
     });
 }

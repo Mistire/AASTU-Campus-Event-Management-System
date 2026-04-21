@@ -3,19 +3,20 @@
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <div className="flex bg-gray-50 min-h-screen font-sans">
+        <div className="flex bg-gray-100 min-h-screen font-sans">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+                    className="fixed inset-0 bg-gray-900/40 backdrop-blur-md z-50 md:hidden transition-all duration-500 animate-in fade-in"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -23,32 +24,40 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 shadow-sm transition-transform duration-300 ease-in-out md:translate-x-0",
+                    "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100/50 shadow-[20px_0_40px_rgba(0,0,0,0.02)] transition-all duration-500 md:translate-x-0 outline-none",
+                    isCollapsed ? "w-24" : "w-72",
                     isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                <Sidebar 
+                    onClose={() => setIsSidebarOpen(false)} 
+                    isCollapsed={isCollapsed}
+                    onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+                />
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex flex-col flex-1 md:pl-72 min-w-0">
-                <header className="sticky top-0 z-30 flex h-16 items-center bg-white border-b border-gray-200 px-4 md:px-8">
+            <div className={cn(
+                "flex flex-col flex-1 min-w-0 transition-all duration-500",
+                isCollapsed ? "md:pl-24" : "md:pl-72"
+            )}>
+                <header className="sticky top-0 z-40 flex h-20 items-center bg-white border-b border-gray-100 px-6 md:px-10 transition-all duration-300">
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="mr-4 md:hidden text-gray-600 hover:bg-gray-100"
+                        className="mr-6 md:hidden text-gray-900 hover:bg-gray-100 rounded-xl transition-all active:scale-95"
                         onClick={() => setIsSidebarOpen(true)}
                     >
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Open sidebar</span>
                     </Button>
-                    <div className="flex-1">
+                    <div className="flex-1 w-full">
                         <Header />
                     </div>
                 </header>
 
-                <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-none w-full">
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+                <main className="flex-1 p-6 md:p-8 lg:p-10 w-full overflow-y-visible">
+                    <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
                         {children}
                     </div>
                 </main>

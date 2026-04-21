@@ -2,17 +2,19 @@
 
 import { motion } from "framer-motion";
 import { 
-  Star, 
   ArrowUpRight, 
   Bookmark,
-  Circle 
+  MapPin,
+  Calendar,
+  Circle
 } from "lucide-react";
 import Image from "next/image";
-import { Event } from "../api/useEvents";
+import { Event, getThumbnailUrl } from "../api/useEvents";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useState } from "react";
+
 interface EventHeroCardProps {
   event: Event;
   isSaved?: boolean;
@@ -29,110 +31,101 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
     setIsSaved(!isSaved);
   };
 
+  const thumbnailUrl = getThumbnailUrl(event);
+
   return (
     <motion.div
-      whileHover={{ y: -8 }}
-      className="group relative w-[340px] sm:w-[420px] aspect-4/3 rounded-[2.5rem] overflow-hidden bg-gray-900 shadow-2xl shadow-brand/10 transition-all duration-500"
+      whileHover={{ scale: 1.02 }}
+      className="group relative w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl overflow-hidden bg-gray-950 border border-white/10 shadow-2xl transition-all duration-300 shrink-0"
     >
-      {/* Background Image / Gradient */}
+      {/* Absolute Background Image with Clear Gradient */}
       <div className="absolute inset-0 z-0">
-        {event.thumbnail ? (
+        {thumbnailUrl ? (
           <Image
-            src={event.thumbnail}
+            src={thumbnailUrl}
             alt={event.title}
             fill
-            className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 640px) 340px, 420px"
+            className="object-cover opacity-50"
+            sizes="(max-width: 640px) 85vw, 500px"
+            priority
           />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-brand/40 to-gray-900" />
+          <div className="w-full h-full bg-linear-to-br from-brand/30 to-gray-950" />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-gray-950 via-gray-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-gray-950/60 via-transparent to-transparent" />
       </div>
-
-      {/* Glassmorphic Grains */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
 
       <Link
         href={`/events/${event.id}`}
-        className="absolute inset-0 p-8 flex flex-col justify-between text-white z-10"
+        className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-between text-white z-10"
       >
+        {/* Top: Minimal Signals */}
         <div className="flex items-start justify-between">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/20 backdrop-blur-md border border-brand/30">
-              <Star size={12} className="text-brand-subtle fill-brand-subtle" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-subtle">
-                Recommended
-              </span>
-            </div>
-            {isLive && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/20 backdrop-blur-md border border-red-500/30">
-                <Circle
-                  size={8}
-                  fill="#ef4444"
-                  className="animate-pulse text-red-500"
-                />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">
-                  Live now
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10 backdrop-blur-xl text-[8px] font-black uppercase tracking-[0.2em]">
+              {isLive ? (
+                <span className="flex items-center gap-1.5 text-red-400">
+                  <Circle size={8} fill="currentColor" className="animate-pulse" />
+                  Live Primary
                 </span>
-              </div>
+              ) : (
+                <span className="text-white/70">Spotlight</span>
+              )}
+            </div>
+            {event.eventCategories?.[0] && (
+              <span className="text-xs font-black uppercase tracking-[0.3em] text-brand-subtle">
+                {event.eventCategories[0].category.name}
+              </span>
             )}
           </div>
 
           <button
             onClick={handleSave}
             className={cn(
-              "p-3 rounded-2xl transition-all border shrink-0",
+              "p-3 rounded-2xl transition-all border shrink-0 backdrop-blur-2xl",
               isSaved
-                ? "bg-brand border-brand text-white scale-110 shadow-lg shadow-brand/20"
-                : "bg-white/10 backdrop-blur-sm border-white/20 text-white/40 hover:text-white hover:border-white/40"
+                ? "bg-brand border-brand text-white shadow-lg shadow-brand/40 scale-105"
+                : "bg-white/5 border-white/10 text-white/50 hover:text-white hover:bg-white/10"
             )}
           >
-            <Bookmark
-              size={18}
-              fill={isSaved ? "currentColor" : "none"}
-              strokeWidth={isSaved ? 0 : 2.5}
-            />
+            <Bookmark size={18} fill={isSaved ? "currentColor" : "none"} strokeWidth={isSaved ? 0 : 2} />
           </button>
         </div>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-2 text-white/50 text-[9px] font-black uppercase tracking-widest">
-              {event.eventCategories?.slice(0, 1).map((ec) => (
-                <span key={ec.id} className="text-brand-subtle">
-                  {ec.category.name}
-                </span>
-              ))}
-              <span className="opacity-20">•</span>
-              <span>{event.capacity} Capacity</span>
-            </div>
-            <h3 className="text-3xl font-black tracking-tight leading-tight group-hover:text-brand-subtle transition-colors">
+        {/* Bottom: Massive Typography */}
+        <div className="space-y-4">
+          <div className="space-y-2 max-w-lg">
+            <h3 className="text-2xl sm:text-4xl font-black tracking-tight leading-[1.1] group-hover:text-brand-subtle transition-colors drop-shadow-lg">
               {event.title}
             </h3>
+            <p className="text-white/50 text-sm sm:text-base font-medium line-clamp-2 leading-relaxed">
+              {event.description || "Be part of this exclusive campus event designed for our students."}
+            </p>
           </div>
 
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="flex flex-col">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">
-                  Start Time
-                </span>
-                <span className="text-sm font-black text-white/90">
-                  {format(startTime, "h:mm a")}
-                </span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/30 mb-1">Venue</span>
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
+                  <MapPin size={14} className="text-brand-subtle" />
+                  <span className="truncate max-w-[120px]">{event.venue?.name}</span>
+                </div>
               </div>
+              
+              <div className="w-px h-6 bg-white/10" />
+
               <div className="flex flex-col">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">
-                  Timeline
-                </span>
-                <span className="text-sm font-black text-white/90">
-                  {format(startTime, "MMM d")}
-                </span>
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/30 mb-1">Schedule</span>
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
+                  <Calendar size={14} className="text-brand-subtle" />
+                  <span>{format(startTime, "MMM d, h:mm a")}</span>
+                </div>
               </div>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl shadow-black/20 group-hover:bg-brand group-hover:text-white group-hover:rotate-12 transition-all duration-500 shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand text-white flex items-center justify-center shadow-xl shadow-brand/20 group-hover:scale-110 transition-all duration-300 shrink-0">
               <ArrowUpRight size={24} />
             </div>
           </div>

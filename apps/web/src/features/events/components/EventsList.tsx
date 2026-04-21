@@ -1,20 +1,30 @@
+"use client";
+
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEvents } from "../api/get-events";
+import { Event, EventStatusName } from "../types";
+import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent } from "../api/mutations";
-import { TableController } from "@/components/shared/TableController";
-import { getEventColumns } from "./EventColumns";
-import { ButtonController } from "@/components/shared/ButtonController";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search, Plus } from "lucide-react";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent } from "../api/mutations";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { CemsTable } from "@/components/cems/CemsTable";
+import { CemsButton } from "@/components/cems/CemsButton";
+import { CemsBadge } from "@/components/cems/CemsBadge";
+import { getEventsColumns, getStatusColor } from "@/features/events/components/EventsTableConfig";
+import {
+  Plus, Calendar, MapPin, Users, Clock, Hash, ArrowRight, X,
+} from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InputController } from "@/components/shared/InputController";
 import { ToastController } from "@/components/shared/ToastController";
 import { EventFormModal } from "./EventFormModal";
 import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { STATUS_OPTIONS } from "../constants";
+import { EventPreviewPanel } from "./EventPreviewPanel";
 
-const STATUS_OPTIONS = ["DRAFT", "PENDING", "APPROVED", "LIVE", "CANCELLED", "ARCHIVED", "REJECTED"];
+
 
 export const EventsList = () => {
   const router = useRouter();
@@ -27,23 +37,37 @@ export const EventsList = () => {
 
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
 
   const { data: venues } = useVenues();
   const { data: users } = useUsers();
 
-  const { data: eventsData, isLoading, isError, error } = useEvents({
+  const { profile } = useAuthStore();
+  const userRole = (profile?.role || "") as string;
+  const isOrganizer = userRole === "ORGANIZER";
+
+  const eventQueryParams = {
     page,
     limit,
     search,
-    status: status === "" ? undefined : (status as any),
+    status: status === "" ? undefined : (status as EventStatusName),
     venueId: venueId === "" ? undefined : venueId,
     createdById: createdById === "" ? undefined : createdById,
-  });
+  };
+
+  const globalEvents = useEvents(eventQueryParams, { enabled: !isOrganizer });
+  const organizedEvents = useMyOrganizedEvents(eventQueryParams, { enabled: isOrganizer });
+
+  const { data: eventsData, isLoading, isError, error } = isOrganizer ? organizedEvents : globalEvents;
 
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
+  const submitEvent = useSubmitEvent();
+  const approveEvent = useApproveEvent();
+  const rejectEvent = useRejectEvent();
+  const goLiveEvent = useGoLiveEvent();
 
   useEffect(() => {
     if (isError && error) {
@@ -55,21 +79,20 @@ export const EventsList = () => {
   }, [isError, error]);
 
   const handleAddEvent = () => {
-    setSelectedEvent(null);
-    setIsEventModalOpen(true);
+    router.push("/dashboard/events/create");
   };
 
-  const handleEdit = (event: any) => {
+  const handleEdit = (event: Event) => {
     setSelectedEvent(event);
     setIsEventModalOpen(true);
   };
 
-  const handleDelete = (event: any) => {
+  const handleDelete = (event: Event) => {
     setSelectedEvent(event);
     setIsDeleteModalOpen(true);
   };
 
-  const handleSaveEvent = (data: any) => {
+  const handleSaveEvent = (data: Partial<Event>) => {
     if (selectedEvent) {
       updateEvent.mutate({ id: selectedEvent.id, data }, {
         onSuccess: () => {
@@ -106,192 +129,164 @@ export const EventsList = () => {
     });
   };
 
-  const columns = useMemo(() => getEventColumns(handleEdit, handleDelete), []);
+  const handleSubmit = (event: Event) => {
+    submitEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event submitted for approval" }),
+      onError: (err) => ToastController.error({ message: "Failed to submit event", description: err.message })
+    });
+  };
+
+  const handleApprove = (event: Event) => {
+    approveEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event approved successfully" }),
+      onError: (err) => ToastController.error({ message: "Failed to approve event", description: err.message })
+    });
+  };
+
+  const handleReject = (event: Event) => {
+    const reason = window.prompt("Enter rejection reason (optional):");
+    if (reason === null) return; // Cancelled
+    rejectEvent.mutate({ id: event.id, reason: reason || undefined }, {
+      onSuccess: () => ToastController.success({ message: "Event rejected" }),
+      onError: (err) => ToastController.error({ message: "Failed to reject event", description: err.message })
+    });
+  };
+
+  const handleGoLive = (event: Event) => {
+    goLiveEvent.mutate(event.id, {
+      onSuccess: () => ToastController.success({ message: "Event is now LIVE!" }),
+      onError: (err) => ToastController.error({ message: "Failed to set event to LIVE", description: err.message })
+    });
+  };
+
+  const handleManageAttendees = (event: Event) => {
+    router.push(`/dashboard/events/${event.id}/attendees`);
+  };
+
+  const columns = useMemo(() => 
+    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleManageAttendees), 
+  [userRole]);
 
   const totalPages = eventsData?.meta?.totalPages || 1;
   const totalItems = eventsData?.meta?.total || 0;
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200">
+      <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
         Error loading events: {error.message}
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 pt-2">
-      {/* Header with Title and Add Button */}
-      <div className="flex justify-between items-center mb-2">
-        <h1 className="text-2xl font-bold text-gray-800">Events</h1>
-        <ButtonController 
-          onClick={handleAddEvent}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          ADD EVENT
-        </ButtonController>
+    <div className="space-y-6 animate-in fade-in duration-700">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
+            <Calendar size={28} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900">Events</h1>
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Create, edit and monitor campus events</p>
+          </div>
+        </div>
+        
+        {userRole !== "ADMIN" && (
+          <CemsButton 
+            cemsVariant="brand"
+            onClick={handleAddEvent}
+            className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
+          >
+            <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
+            Create New Event
+          </CemsButton>
+        )}
       </div>
 
-      {/* Filter Bar - White Card matching Stations UI */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <div className="grid grid-cols-3 gap-3">
-          {/* Creator Filter */}
-          <div>
-            <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
-              <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm text-gray-700">
-                <SelectValue placeholder="All Users" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Users</SelectItem>
-                {users?.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>{u.fullName}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Filter Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div>
+          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Organized By</label>
+          <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
+            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
+              <SelectValue placeholder="All Organizers" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+              <SelectItem value="">All Organizers</SelectItem>
+              {users?.map((u) => (
+                <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Status Filter */}
-          <div>
-            <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
-              <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm text-gray-700">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
-                {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Event Status</label>
+          <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
+            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+              <SelectItem value="">All Statuses</SelectItem>
+              {STATUS_OPTIONS.map((s) => (
+                <SelectItem key={s} value={s}>{s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Venue Filter */}
-          <div>
-            <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
-              <SelectTrigger className="h-10 bg-white border-gray-200 rounded-lg text-sm text-gray-700">
-                <SelectValue placeholder="All Venues" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Venues</SelectItem>
-                {venues?.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Venue</label>
+          <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
+            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
+              <SelectValue placeholder="All Venues" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+              <SelectItem value="">All Venues</SelectItem>
+              {venues?.map((v) => (
+                <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Main Content Table - Elevated White Card */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-        {/* Search bar inside the table card */}
-        <div className="p-4 border-b border-gray-100">
-          <div className="relative max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <InputController
-              className="pl-10 h-10 bg-gray-50/50 border-gray-200 rounded-lg text-sm transition-all focus:bg-white"
-              placeholder="Search event by name or description..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="px-1">
-          <TableController
+      {/* Master-Detail Layout */}
+      <div className="flex gap-6">
+        {/* Table */}
+        <div className={cn(
+          "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+        )}>
+          <CemsTable
             columns={columns}
             data={eventsData?.data || []}
             loading={isLoading}
-            onRowClick={(row) => router.push(`/dashboard/events/${row.id}`)}
             emptyMessage="No events found matching your criteria."
+            onRowClick={(event) => setPreviewEvent(event)}
+            enableSorting
+            enableGlobalFilter
+            enableColumnVisibility
+            manualPagination
+            pageCount={totalPages}
+            pageIndex={page - 1}
+            pageSize={limit}
+            totalItems={totalItems}
+            onPageChange={(newPageIndex) => setPage(newPageIndex + 1)}
+            onPageSizeChange={(newSize) => {
+                setLimit(newSize);
+                setPage(1);
+            }}
           />
         </div>
 
-        {/* Pagination Controls */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-6 bg-gray-50/30 border-t border-gray-100">
-          <div className="flex items-center gap-6">
-            <span className="text-sm font-medium text-gray-500">
-              Showing <span className="text-gray-900">{totalItems > 0 ? ((page - 1) * limit) + 1 : 0}</span> to{" "}
-              <span className="text-gray-900">{Math.min(page * limit, totalItems)}</span> of{" "}
-              <span className="text-gray-900">{totalItems}</span> entries
-            </span>
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400">Rows per page:</span>
-              <Select
-                value={limit.toString()}
-                onValueChange={(val) => {
-                  setLimit(Number(val));
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="w-[70px] h-9 border-none bg-transparent shadow-none focus:ring-0 text-gray-700 font-semibold">
-                  <SelectValue placeholder={limit} />
-                </SelectTrigger>
-                <SelectContent>
-                  {[5, 10, 20, 50, 100].map((size) => (
-                    <SelectItem key={size} value={size.toString()}>
-                      {size}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <ButtonController
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(1)}
-              disabled={page === 1}
-              className="px-3 h-9 rounded-lg border-gray-200"
-            >
-              <ChevronsLeft className="h-4 w-4 text-gray-600" />
-            </ButtonController>
-            <ButtonController
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 h-9 rounded-lg border-gray-200"
-            >
-              <ChevronLeft className="h-4 w-4 text-gray-600" />
-            </ButtonController>
-
-            <div className="flex items-center gap-1.5 px-1">
-              <span className="text-sm font-semibold text-blue-600 px-3 py-1 bg-blue-50 rounded-md">
-                {page}
-              </span>
-              <span className="text-sm text-gray-400 font-medium">of {totalPages}</span>
-            </div>
-
-            <ButtonController
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-3 h-9 rounded-lg border-gray-200"
-            >
-              <ChevronRight className="h-4 w-4 text-gray-600" />
-            </ButtonController>
-            <ButtonController
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(totalPages)}
-              disabled={page === totalPages}
-              className="px-3 h-9 rounded-lg border-gray-200"
-            >
-              <ChevronsRight className="h-4 w-4 text-gray-600" />
-            </ButtonController>
-          </div>
-        </div>
+        {/* Detail Panel */}
+        {previewEvent && (
+          <EventPreviewPanel 
+            event={previewEvent} 
+            onClose={() => setPreviewEvent(null)} 
+          />
+        )}
       </div>
 
       <EventFormModal 
@@ -312,4 +307,3 @@ export const EventsList = () => {
     </div>
   );
 };
-

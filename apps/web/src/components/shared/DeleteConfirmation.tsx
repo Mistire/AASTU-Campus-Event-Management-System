@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { ModalHeader } from "./modalHeader";
-import { ButtonController } from "../controllers/ButtonController";
+import { ModalHeader } from "@/components/shared/ModalHeader";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { DialogClose } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
-import { InputController } from "../controllers/InputController";
+import { InputController } from "@/components/shared/InputController";
 
 interface DeleteConfirmationProps {
   open: boolean;
@@ -32,52 +32,58 @@ export function DeleteConfirmation({
         <DialogOverlay className="bg-black/40 backdrop-blur-sm z-50" />
         <DialogContent 
           showCloseButton={false} 
-          className="p-0 border-none rounded-xl gap-0 overflow-hidden shadow-2xl bg-white max-w-md sm:max-w-md w-full z-50"
+          className="p-0 border-none rounded-xl gap-0 overflow-hidden shadow-2xl bg-white max-w-md sm:max-w-md w-full z-50 animate-in zoom-in-95 duration-300"
         >
-          {/* Custom Header (Magenta/Red flavor commonly used for destructive actions, but user requested standard blue if it matches others, wait, the screenshot showed magenta for the delete modal Header but user said "header color which is the standard blue" "use the standard blue". So let's use ModalHeader which is blue.) */}
           <ModalHeader title={title} />
           
-          <div className="p-6 space-y-4">
-            <p className="text-gray-700 font-medium">Are you sure you want to delete this Event?</p>
-            
-            <p className="font-bold text-gray-900">{itemName}</p>
-            
+          <div className="p-10 space-y-8">
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Type "{itemName}" to confirm the delete operation:
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest text-center">Destructive Action</p>
+              <h2 className="text-xl font-black text-gray-900 text-center tracking-tight px-4">
+                Confirm deletion of <span className="text-red-500 underline decoration-2 underline-offset-4">{itemName}</span>?
+              </h2>
+            </div>
+            
+            <div className="bg-red-50/50 rounded-xl p-8 border border-red-100 flex flex-col items-center text-center gap-4 group">
+              <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition-transform">
+                <AlertCircle size={28} />
+              </div>
+              <p className="text-xs font-bold text-red-700 leading-relaxed uppercase tracking-wider">
+                This action is irreversible. All associated data will be permanently removed from our systems.
               </p>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2 block text-center">
+                Type &quot;<span className="text-gray-900">{itemName}</span>&quot; to confirm
+              </label>
               <InputController 
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
-                placeholder=""
-                className="w-full"
+                placeholder="Type here..."
+                className="w-full h-14 rounded-2xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all text-center font-black tracking-widest uppercase text-xs"
               />
-            </div>
-            
-            <div className="flex items-center gap-2 text-red-500 text-sm font-medium pt-2">
-              <AlertCircle className="h-4 w-4" />
-              <p>This action is irreversible. Please make sure you are deleting permanently.</p>
             </div>
           </div>
 
-          <div className="px-6 py-4 flex items-center justify-end gap-3 bg-gray-50 border-t border-gray-100 shrink-0 rounded-b-xl">
+          <div className="px-10 py-8 flex items-center justify-end gap-4 bg-gray-50/50 border-t border-gray-100 shrink-0 rounded-b-xl mt-auto">
              <DialogClose render={
-               <ButtonController
+               <CemsButton
                  variant="outline"
                  disabled={isDeleting}
-                 className="px-6 border-gray-200 text-gray-600 rounded-md bg-white hover:bg-gray-100"
+                 className="rounded-2xl font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-8 h-12"
                >
-                 Cancel
-               </ButtonController>
+                 Go Back
+               </CemsButton>
             } />
-            <ButtonController
-              className="bg-[#b0125a] hover:bg-[#900e4a] text-white px-6 rounded-md shadow-sm"
+            <CemsButton
+              className="rounded-2xl bg-red-500 hover:bg-red-600 text-white font-black text-xs uppercase tracking-widest px-10 shadow-xl shadow-red-200 transition-all active:scale-95 h-12 group disabled:opacity-50"
               onClick={onConfirm}
               disabled={!isMatch || isDeleting}
               loading={isDeleting}
             >
-              Delete
-            </ButtonController>
+              Confirm Delete
+            </CemsButton>
           </div>
         </DialogContent>
       </DialogPortal>

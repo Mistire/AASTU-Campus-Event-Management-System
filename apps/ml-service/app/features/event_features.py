@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
 
 
 class EventFeatureBuilder:
@@ -14,11 +14,11 @@ class EventFeatureBuilder:
             stop_words="english",
             ngram_range=(1, 2),
         )
-        self.ohe = OneHotEncoder(sparse_output=True, handle_unknown="ignore")
+        self.mlb = MultiLabelBinarizer(sparse_output=True)
         self.scaler = MinMaxScaler()
         self.is_fitted = False
 
-    def fit_transform(self, events_df, registrations_df, feedback_df, categories_df):
+    def fit_transform(self, events_df, registrations_df, feedback_df, categories_df, event_categories_df):
 
         events = events_df.copy()
         self.event_id_to_idx = {eid: i for i, eid in enumerate(events["id"])}
@@ -29,9 +29,11 @@ class EventFeatureBuilder:
         descriptions = events[desc_col].fillna("")
         tfidf_matrix = self.tfidf.fit_transform(descriptions)
 
-        # 2. One-hot encode categories
-        cat_ids = events[["category_id"]].copy()
-        cat_matrix = self.ohe.fit_transform(cat_ids)
+        # 2. Multi-hot encode categories
+        # Group category IDs by event ID
+        cat_map = event_categories_df.groupby("event_id")["category_id"].apply(list).to_dict()
+        event_cats = [cat_map.get(eid, []) for eid in events["id"]]
+        cat_matrix = self.mlb.fit_transform(event_cats)
 
         # 3. Numeric features: popularity + avg rating
         popularity = registrations_df.groupby("event_id").size().reindex(
@@ -59,16 +61,19 @@ class EventFeatureBuilder:
 
     def get_feature_names(self):
         """Return human-readable feature names for debugging."""
-        cat_names = [f"cat_{c}" for c in self.ohe.categories_[0]]
+        cat_names = [f"cat_{c}" for c in self.mlb.classes_]
         tfidf_names = [f"tfidf_{w}" for w in self.tfidf.get_feature_names_out()]
         numeric_names = ["popularity", "avg_rating"]
         return cat_names + tfidf_names + numeric_names
 
-    def transform_single_event(self, event_row, n_registrations=0, avg_rating=3.0):
+    def transform_single_event(self, event_row, category_ids=None, n_registrations=0, avg_rating=3.0):
         """Transform a single new event (for real-time inference)."""
         desc_col = "description_clean" if "description_clean" in event_row else "description"
         desc = event_row.get(desc_col, "")
         tfidf_vec = self.tfidf.transform([desc])
-        cat_vec = self.ohe.transform([[event_row["category_id"]]])
+        
+        cats = category_ids if category_ids is not None else []
+        cat_vec = self.mlb.transform([cats])
+        
         numeric = self.scaler.transform([[n_registrations, avg_rating]])
         return sp.hstack([cat_vec, tfidf_vec, sp.csr_matrix(numeric)])

@@ -14,10 +14,10 @@ export function EventDetailSkeleton() {
           <Skeleton className="h-10 w-10 rounded-xl" />
         </div>
       </div>
-      <Skeleton className="h-[400px] w-full rounded-[2.5rem]" />
+      <Skeleton className="h-[400px] w-full rounded-xl" />
       <div className="grid grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-32 rounded-3xl" />
+          <Skeleton key={i} className="h-32 rounded-xl" />
         ))}
       </div>
       <div className="grid grid-cols-12 gap-12">
@@ -27,7 +27,7 @@ export function EventDetailSkeleton() {
           <Skeleton className="h-64 w-full rounded-2xl" />
         </div>
         <div className="col-span-4">
-          <Skeleton className="h-[400px] w-full rounded-[2rem]" />
+          <Skeleton className="h-[400px] w-full rounded-xl" />
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventQueryDto } from './dto/event-query.dto';
+import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guard';
 import { Roles, GetUser } from '../auth/decorator';
 import type { AuthUser } from '../auth/jwt.strategy';
@@ -26,17 +27,24 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  @Roles('Organizer', 'Admin', 'Student')
+  @Roles('Organizer')
   @ApiOperation({ summary: 'Create a new event (Organizer). Status auto-set to DRAFT.' })
   @ApiResponse({ status: 201, description: 'Event created in DRAFT status.' })
   create(@GetUser() user: AuthUser, @Body() dto: CreateEventDto) {
     return this.eventsService.create(user, dto);
   }
 
+  @Post(':id/invites/guests')
+  @ApiOperation({ summary: 'Graduation Events: Send PDF Tickets to Guests (Limit Restricted)' })
+  @ApiResponse({ status: 201, description: 'Tickets successfully sent' })
+  inviteGuests(@Param('id') eventId: string, @GetUser('id') userId: string, @Body() dto: InviteGuestsDto) {
+    return this.eventsService.inviteGuests(eventId, userId, dto);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all events with filtering and pagination' })
-  findAll(@Query() query: EventQueryDto) {
-    return this.eventsService.findAll(query);
+  findAll(@GetUser() user: AuthUser, @Query() query: EventQueryDto) {
+    return this.eventsService.findAll(query, user);
   }
 
   @Get('upcoming')

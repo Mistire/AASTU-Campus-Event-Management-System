@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -28,7 +30,7 @@ import { HackathonsService } from './hackathons.service';
 import { HackathonsController } from './hackathons.controller';
 
 @Module({
-  imports: [PrismaModule, AuthModule, NotificationsModule],
+  imports: [ConfigModule, JwtModule.register({}), PrismaModule, AuthModule, NotificationsModule],
   controllers: [
     EventsController,
     VenuesController,

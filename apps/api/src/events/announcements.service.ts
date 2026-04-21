@@ -1,5 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/enums/notification-type.enum';
 import {
   AnnouncementQueryDto,
   CreateAnnouncementDto,
@@ -8,7 +10,10 @@ import {
 
 @Injectable()
 export class AnnouncementsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(eventId: string, userId: string, dto: CreateAnnouncementDto) {
     const event = await this.prisma.event.findUnique({
@@ -45,22 +50,22 @@ export class AnnouncementsService {
       },
     });
 
-    // Notify all registered attendees
+    // Notify CONFIRMED and PENDING registrants
     const registrations = await this.prisma.registration.findMany({
-      where: { eventId },
+      where: {
+        eventId,
+        status: { name: { in: ['CONFIRMED', 'PENDING'] } },
+      },
       select: { userId: true },
     });
 
-    if (registrations.length > 0) {
-      await this.prisma.notification.createMany({
-        data: registrations.map((reg) => ({
-          userId: reg.userId,
-          title: `Announcement: ${dto.title}`,
-          message: dto.message,
-          type: 'EVENT_ANNOUNCEMENT',
-        })),
-      });
-    }
+    const userIds = registrations.map((r) => r.userId);
+    await this.notificationsService.enqueueBulkNotifications(
+      userIds,
+      `Announcement: ${dto.title}`,
+      dto.message,
+      NotificationType.ANNOUNCEMENT,
+    );
 
     return announcement;
   }

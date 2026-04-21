@@ -127,7 +127,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {isLoadingCategories ? (
                Array.from({ length: 8 }).map((_, i) => (
-                 <div key={i} className="h-32 bg-white/5 rounded-3xl animate-pulse" />
+                 <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse" />
                ))
             ) : filteredCategories.length === 0 ? (
                <div className="col-span-full py-20 text-center text-gray-300 font-black uppercase tracking-widest">
@@ -150,7 +150,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
-                      "group relative h-40 p-6 rounded-[2.5rem] border-2 transition-all duration-500 overflow-hidden text-left",
+                      "group relative h-40 p-6 rounded-xl border-2 transition-all duration-500 overflow-hidden text-left",
                       isSelected 
                         ? "border-brand bg-brand/10 shadow-2xl shadow-brand/20 ring-4 ring-brand/10"
                         : "border-gray-100 bg-white hover:bg-gray-50 hover:border-gray-200"
@@ -230,19 +230,16 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
                <div className="flex items-center gap-4">
                 <Button 
                   variant="ghost" 
-                  onClick={() => {
-                    localStorage.setItem("cems_onboarded", "true");
-                    onComplete();
-                  }}
+                  onClick={onComplete}
                   className="text-gray-400 hover:text-gray-950 font-black uppercase tracking-widest text-[10px]"
                 >
-                  Skip for now
+                  I&apos;ll do this later
                 </Button>
                 <Button
                   onClick={handleContinue}
                   disabled={isUpdating || selectedIds.length < 3}
                   className={cn(
-                    "h-16 px-10 rounded-[2rem] font-brand font-black uppercase tracking-[0.2em] text-xs flex items-center gap-4 transition-all duration-500",
+                    "h-16 px-10 rounded-xl font-brand font-black uppercase tracking-[0.2em] text-xs flex items-center gap-4 transition-all duration-500",
                     selectedIds.length >= 3 
                       ? "bg-brand text-white shadow-xl shadow-brand/20 hover:scale-105 active:scale-95" 
                       : "bg-gray-100 text-gray-300 border border-gray-200"

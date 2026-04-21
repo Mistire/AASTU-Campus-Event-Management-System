@@ -47,6 +47,15 @@ export class CreateSessionDto {
   @IsUUID('all', { each: true })
   @IsOptional()
   speakerIds?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Array of speaker names to create and assign',
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  speakers?: string[];
 }
 
 export class UpdateSessionDto {

@@ -1,207 +1,384 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CemsMetricCard } from "@/components/cems/CemsMetricCard";
 import {
-    Users,
-    Calendar,
-    UserPlus,
-    MapPin,
-    Layers,
-    Activity,
-    RefreshCw
-} from 'lucide-react';
-import { useRecentRegistrations } from '@/features/dashboard/api/getRecentRegistrations';
-import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/features/auth/store/useAuthStore';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+  CemsCard,
+  CemsCardHeader,
+  CemsCardContent,
+  CemsCardFooter,
+} from "@/components/cems/CemsCard";
+import { CemsTable } from "@/components/cems/CemsTable";
+import { CemsBadge } from "@/components/cems/CemsBadge";
+import {
+  Users,
+  Calendar,
+  UserPlus,
+  MapPin,
+  Layers,
+  Activity,
+  RefreshCw,
+  CheckCircle2,
+  Clock,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  Trophy,
+} from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  useRecentRegistrations,
+  RecentRegistration,
+} from "@/features/dashboard/api/getRecentRegistrations";
+import { useDashboardStats } from "@/features/dashboard/api/getStats";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
+import { FileDown, Table as TableIcon, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const MetricCard = ({
-    title,
-    value,
-    icon: Icon,
-    subValue
-}: {
-    title: string;
-    value: string | number;
-    icon: React.ElementType;
-    subValue?: string
-}) => (
-    <Card className="rounded-xl shadow-sm border-gray-100 relative overflow-hidden">
-        <CardContent className="p-4 flex flex-col items-center justify-center min-h-[110px]">
-            <div className="absolute top-3 left-3 text-gray-400">
-                <Icon size={14} />
-            </div>
-            {subValue && (
-                <div className="absolute top-2 right-2 text-[9px] text-emerald-500 font-bold uppercase">
-                    {subValue}
-                </div>
-            )}
-            <div className="text-3xl font-bold text-brand mt-4">{value}</div>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">{title}</p>
-        </CardContent>
-    </Card>
-);
+/* ── Chart lazy-imports (only for dashboard) ───────────────────── */
+import { RegistrationTrendChart } from "@/features/dashboard/components/charts/RegistrationTrendChart";
+import { CategoryDistributionChart } from "@/features/dashboard/components/charts/CategoryDistributionChart";
+import { DepartmentActivityChart } from "@/features/dashboard/components/charts/DepartmentActivityChart";
+import { TopEventsChart } from "@/features/dashboard/components/charts/TopEventsChart";
+import { RecommendationStatusCard } from "@/features/recommendations/components/RecommendationStatusCard";
+
+/* ================================================================
+ *  DASHBOARD PAGE — Compact, space-efficient, chart-rich
+ * ================================================================ */
 
 export default function DashboardPage() {
-    const { profile } = useAuthStore();
-    const router = useRouter();
-    const { data: registrations, isLoading, isError, refetch } = useRecentRegistrations();
+  const { profile } = useAuthStore();
+  const router = useRouter();
+  const {
+    data: registrations,
+    isLoading: isRegLoading,
+    refetch,
+  } = useRecentRegistrations();
+  const { data: stats, isLoading: isStatsLoading } = useDashboardStats();
 
-    useEffect(() => {
-        if (profile && (profile.role === "STUDENT" || profile.roles?.includes("STUDENT"))) {
-            router.replace("/discovery");
-        }
-    }, [profile, router]);
+  useEffect(() => {
+    if (
+      profile &&
+      (profile.role === "STUDENT" || profile.roles?.includes("STUDENT"))
+    ) {
+      router.replace("/discovery");
+    }
+  }, [profile, router]);
 
-    return (
-        <div className="space-y-4 font-sans text-brand-dark">
-            {/* Top row metrics - Using Placeholders as requested */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 text-brand">
-                <MetricCard
-                    title="Users"
-                    value="1,248"
-                    icon={Users}
-                    subValue="+12%"
-                />
-                <MetricCard
-                    title="Events"
-                    value="42"
-                    icon={Calendar}
-                    subValue="8 Live"
-                />
-                <MetricCard
-                    title="Registrations"
-                    value="856"
-                    icon={UserPlus}
-                    subValue="+24 Today"
-                />
-                <MetricCard
-                    title="Venues"
-                    value="12"
-                    icon={MapPin}
-                />
-                <MetricCard
-                    title="Categories"
-                    value="15"
-                    icon={Layers}
-                />
-            </div>
+  const regStats = useMemo(() => {
+    if (!registrations)
+      return { approved: 0, pending: 0, total: 0, today: 0 };
 
-            {/* Third Row: Map and Table */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Map Card */}
-                <Card className="rounded-xl shadow-sm border-gray-100 overflow-hidden flex flex-col h-[500px]">
-                    <CardHeader className="py-3 px-4 border-b border-gray-100 flex flex-row items-center justify-between bg-white shrink-0">
-                        <div className="flex items-center gap-2">
-                            <MapPin className="text-brand w-4 h-4" />
-                            <CardTitle className="text-sm font-bold text-gray-800">Campus Event Heatmap</CardTitle>
-                        </div>
-                        <div className="border border-brand text-brand px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase">
-                            Live
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-0 flex-1 relative bg-slate-900 border-none">
-                        <div className="absolute inset-0 bg-slate-800 flex items-center justify-center p-4 text-center">
-                            <div className="text-slate-500 text-sm">
-                                Campus map integration goes here.<br />
-                                Show visual density of upcoming events.
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Recent Registrations Table - Using Real Data */}
-                <Card className="rounded-xl shadow-sm border-gray-100 flex flex-col h-[500px]">
-                    <CardHeader className="py-4 px-6 border-b border-gray-100 flex flex-row items-center justify-between shrink-0">
-                        <div className="flex items-center gap-2">
-                            <Activity className="text-brand w-5 h-5" />
-                            <CardTitle className="text-base font-bold text-gray-800">Recent Registrations</CardTitle>
-                        </div>
-                        <button className="text-brand text-[10px] font-bold tracking-widest uppercase hover:underline">
-                            View All &rarr;
-                        </button>
-                    </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-y-auto">
-                        {isLoading ? (
-                            <div className="p-6 space-y-4">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <Skeleton key={i} className="h-12 w-full" />
-                                ))}
-                            </div>
-                        ) : isError ? (
-                            <div className="p-20 text-center text-gray-400 text-sm">
-                                Failed to load registrations.
-                            </div>
-                        ) : registrations?.length === 0 ? (
-                            <div className="p-20 text-center text-gray-400 text-sm italic">
-                                No registrations found.
-                            </div>
-                        ) : (
-                            <table className="w-full text-left border-collapse">
-                                <thead className="sticky top-0 bg-white z-10">
-                                    <tr className="border-b border-gray-100">
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">User</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Event</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                        <th className="py-3 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {registrations?.map((reg) => (
-                                        <tr key={reg.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs">
-                                                        {reg.user.fullName.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-gray-800">{reg.user.fullName}</p>
-                                                        <p className="text-[10px] text-gray-400">{reg.user.email}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-6 text-xs text-gray-600 font-medium">
-                                                {reg.event.title}
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className={cn(
-                                                    "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider",
-                                                    reg.status.name === 'APPROVED' ? "bg-emerald-100 text-emerald-600" :
-                                                        reg.status.name === 'PENDING' ? "bg-amber-100 text-amber-600" :
-                                                            "bg-gray-100 text-gray-600"
-                                                )}>
-                                                    {reg.status.name}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-6 text-right text-[10px] text-gray-400 font-bold">
-                                                {new Date(reg.registrationDate).toLocaleDateString()}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
-                    </CardContent>
-                    <div className="py-3 px-6 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400 font-medium shrink-0 bg-gray-50/50">
-                        <span>Updated just now</span>
-                        <button
-                            onClick={() => refetch()}
-                            className="flex items-center gap-1 text-brand font-bold uppercase tracking-widest hover:underline"
-                        >
-                            <RefreshCw size={12} />
-                            Refresh
-                        </button>
-                    </div>
-                </Card>
-            </div>
-
-            <div className="text-center py-4">
-                <span className="text-[10px] font-bold text-brand uppercase tracking-widest">
-                    CEMS v1.0
-                </span>
-            </div>
-        </div>
+    const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
     );
+
+    const approved = registrations.filter(
+      (r) => r.status.name === "APPROVED",
+    ).length;
+    const pending = registrations.filter(
+      (r) => r.status.name === "PENDING",
+    ).length;
+    const today = registrations.filter(
+      (r) => new Date(r.registrationDate) >= startOfToday,
+    ).length;
+
+    return { approved, pending, total: registrations.length, today };
+  }, [registrations]);
+
+  const isAdmin = profile?.role === "ADMIN";
+
+  /* ── Table Columns ───────────────────────────────────────────── */
+  const activityColumns: ColumnDef<RecentRegistration>[] = [
+    {
+      id: "index",
+      header: "#",
+      cell: ({ row }) => (
+        <span className="text-gray-400 font-medium text-xs">
+          {row.index + 1}
+        </span>
+      ),
+      size: 40,
+      enableSorting: false,
+    },
+    {
+      accessorKey: "user.fullName",
+      header: "User",
+      cell: ({ row }) => {
+        const user = row.original.user;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center text-brand font-bold text-xs shrink-0">
+              {user.fullName.charAt(0)}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-gray-900 truncate">
+                {user.fullName}
+              </p>
+              <p className="text-[10px] text-gray-400 truncate">
+                {user.email}
+              </p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "event.title",
+      header: "Event",
+      cell: ({ row }) => (
+        <p className="text-xs font-medium text-gray-600 line-clamp-1 max-w-[180px]">
+          {row.original.event.title}
+        </p>
+      ),
+    },
+    {
+      accessorKey: "status.name",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status.name;
+        const variant =
+          status === "APPROVED"
+            ? "success"
+            : status === "PENDING"
+              ? "warning"
+              : ("neutral" as const);
+        return (
+          <CemsBadge status={variant} dot>
+            {status}
+          </CemsBadge>
+        );
+      },
+    },
+    {
+      accessorKey: "registrationDate",
+      header: "Date",
+      cell: ({ row }) => (
+        <span className="text-[10px] font-semibold text-gray-400">
+          {new Date(row.original.registrationDate).toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+          })}
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-5 pb-10 animate-in fade-in duration-700">
+      {/* Dashboard Top Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight tracking-tighter uppercase">
+            System <span className="text-brand">Overview</span>
+          </h1>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+            Real-time monitoring and analytics for AASTU Campus
+          </p>
+        </div>
+
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Export Data</span>
+            <div className="flex bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
+                <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   onClick={() => exportAnalytics({ type: "admin", format: "csv" })}
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                >
+                  <TableIcon size={12} /> CSV
+                </Button>
+                <div className="w-px h-4 bg-gray-100 my-auto" />
+                <Button 
+                   variant="ghost" 
+                   size="sm" 
+                   onClick={() => exportAnalytics({ type: "admin", format: "pdf" })}
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                >
+                  <FileText size={12} /> PDF
+                </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+       *  METRIC CARDS — Compact horizontal row
+       * ═══════════════════════════════════════════════════════════ */}
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3",
+          isAdmin ? "sm:grid-cols-3 lg:grid-cols-5" : "sm:grid-cols-2 lg:grid-cols-4",
+        )}
+      >
+        {isStatsLoading ? (
+          Array.from({ length: isAdmin ? 5 : 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[72px] rounded-2xl" />
+          ))
+        ) : isAdmin ? (
+          <>
+            <CemsMetricCard
+              title="Users"
+              value={stats?.users?.toLocaleString() || "0"}
+              icon={Users}
+            />
+            <CemsMetricCard
+              title="Events"
+              value={stats?.events || "0"}
+              icon={Calendar}
+            />
+            <CemsMetricCard
+              title="Registrations"
+              value={stats?.registrations?.toLocaleString() || "0"}
+              icon={UserPlus}
+              subValue={
+                regStats.today > 0 ? `+${regStats.today} today` : "—"
+              }
+              trend={regStats.today > 0 ? "up" : "neutral"}
+            />
+            <CemsMetricCard
+              title="Venues"
+              value={stats?.venues || "0"}
+              icon={MapPin}
+            />
+            <CemsMetricCard
+              title="Categories"
+              value={stats?.categories || "0"}
+              icon={Layers}
+            />
+          </>
+        ) : (
+          <>
+            <CemsMetricCard
+              title="My Events"
+              value={stats?.totalEvents || "0"}
+              icon={Calendar}
+            />
+            <CemsMetricCard
+              title="Registrations"
+              value={stats?.totalRegistrations?.toLocaleString() || "0"}
+              icon={UserPlus}
+            />
+            <CemsMetricCard
+              title="Pending"
+              value={stats?.pendingApprovals || "0"}
+              icon={Clock}
+              subValue={
+                Number(stats?.pendingApprovals) > 0 ? "Action needed" : "—"
+              }
+              trend={Number(stats?.pendingApprovals) > 0 ? "down" : "neutral"}
+            />
+            <CemsMetricCard
+              title="Check-ins"
+              value={stats?.totalAttendance?.toLocaleString() || "0"}
+              icon={CheckCircle2}
+            />
+          </>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+       *  AI & SYSTEM PERFORMANCE (Admin Only)
+       * ═══════════════════════════════════════════════════════════ */}
+      {isAdmin && <RecommendationStatusCard />}
+
+      {/* ═══════════════════════════════════════════════════════════
+       *  CHARTS — 2×2 grid
+       * ═══════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Registration Trends */}
+        <CemsCard>
+          <CemsCardHeader
+            icon={<TrendingUp />}
+            title="Registration Trends"
+            description="Last 30 days"
+            bordered
+          />
+          <CemsCardContent className="pt-2">
+            <RegistrationTrendChart />
+          </CemsCardContent>
+        </CemsCard>
+
+        {/* Category Distribution */}
+        <CemsCard>
+          <CemsCardHeader
+            icon={<PieChart />}
+            title="Events by Category"
+            description="Distribution by registrations"
+            bordered
+          />
+          <CemsCardContent className="pt-2">
+            <CategoryDistributionChart />
+          </CemsCardContent>
+        </CemsCard>
+
+        {/* Department Activity */}
+        <CemsCard>
+          <CemsCardHeader
+            icon={<BarChart3 />}
+            title="Department Activity"
+            description="Registrations by department"
+            bordered
+          />
+          <CemsCardContent className="pt-2">
+            <DepartmentActivityChart />
+          </CemsCardContent>
+        </CemsCard>
+
+        {/* Top Events */}
+        <CemsCard>
+          <CemsCardHeader
+            icon={<Trophy />}
+            title="Top Events"
+            description="Most popular by registrations"
+            bordered
+          />
+          <CemsCardContent className="pt-2">
+            <TopEventsChart />
+          </CemsCardContent>
+        </CemsCard>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+       *  RECENT REGISTRATIONS — Full-width table
+       * ═══════════════════════════════════════════════════════════ */}
+      <CemsCard>
+        <CemsCardHeader
+          icon={<Activity />}
+          title={isAdmin ? "Recent Activity" : "My Event Activity"}
+          bordered
+          action={
+            <button
+              onClick={() => refetch()}
+              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand hover:underline decoration-2 underline-offset-4 group"
+            >
+              <RefreshCw
+                size={12}
+                className="group-hover:rotate-180 transition-transform duration-700"
+              />
+              Refresh
+            </button>
+          }
+        />
+        <CemsTable
+          columns={activityColumns}
+          data={registrations || []}
+          loading={isRegLoading}
+          emptyMessage="No recent registrations found."
+          enableSorting
+          enableGlobalFilter
+          enableColumnVisibility
+          pageSize={10}
+        />
+      </CemsCard>
+    </div>
+  );
 }

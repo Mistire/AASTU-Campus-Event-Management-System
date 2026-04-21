@@ -100,11 +100,12 @@ def retrain():
         eb = EventFeatureBuilder(max_tfidf_features=100)
         ef, eid2idx, idx2eid = eb.fit_transform(
             cleaned["events"], cleaned["registrations"],
-            cleaned["feedback"], cleaned["categories"]
+            cleaned["feedback"], cleaned["categories"],
+            cleaned["event_categories"]
         )
 
         # 5. Build user profiles
-        ub = UserFeatureBuilder(ef, eid2idx)
+        ub = UserFeatureBuilder(ef, eid2idx, eb.mlb)
         profiles, uid2idx, idx2uid, counts = ub.build_all_profiles(
             cleaned["users"], cleaned["registrations"],
             cleaned["attendance"], cleaned["feedback"],
@@ -137,14 +138,16 @@ def retrain():
         joblib.dump(counts, os.path.join(temp_dir, "user_interaction_counts.pkl"))
         joblib.dump(eb, os.path.join(temp_dir, "event_feature_builder.pkl"))
 
-        # 9. Atomic Swap
-        # Remove old dir if exists, then rename temp to production
-        if os.path.exists(model_dir):
-            shutil.rmtree(model_dir)
-        os.rename(temp_dir, model_dir)
-        logger.info(f"Atomic model swap complete: {model_dir}")
-
-        # 10. Reload into memory
+        # 9. Commit all artifacts: copy from temp to target (to avoid volume move errors)
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir, exist_ok=True)
+            
+        for filename in os.listdir(temp_dir):
+            shutil.copy2(os.path.join(temp_dir, filename), os.path.join(model_dir, filename))
+        
+        # Cleanup temp
+        shutil.rmtree(temp_dir)
+        logger.info(f"Model update complete: {model_dir}")
         load_models()
 
         stats = {

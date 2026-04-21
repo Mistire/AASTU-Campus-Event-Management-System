@@ -11,7 +11,13 @@ export class CategoriesService {
   }
 
   async findAll() {
-    return this.prisma.category.findMany();
+    return this.prisma.category.findMany({
+      include: {
+        _count: {
+          select: { eventCategories: true },
+        },
+      },
+    });
   }
 
   async findOne(id: string) {

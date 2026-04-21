@@ -17,7 +17,8 @@ const brand = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "CEMS: Campus Event Management System",
-  description: "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
+  description:
+    "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
 };
 
 export default function RootLayout({
@@ -28,9 +29,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${brand.variable} h-full antialiased font-sans`}
+      className={`${sans.variable} ${brand.variable} antialiased font-sans`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex flex-col">
         <Toaster 
           position="top-right"
           toastOptions={{

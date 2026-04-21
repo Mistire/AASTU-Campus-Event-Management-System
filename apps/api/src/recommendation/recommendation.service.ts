@@ -27,9 +27,7 @@ export class RecommendationService {
     });
   }
 
-  async getRecommendations(userId: string, n: number = 10) {
-    const cacheKey = `recommendations:${userId}:${n}`;
-
+  async getRecommendations(userId: string, n: number = 10): Promise<any> {
     try {
       // 1. Check Redis Cache
       const cacheKey = `recommendations:user:${userId}:${n}`;
@@ -41,31 +39,48 @@ export class RecommendationService {
 
       // 2. Fetch from ML Service
       this.logger.log(`Fetching fresh recommendations from ML service for user ${userId}`);
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<any> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/predict/${userId}?n=${n}`),
       );
 
-      // 3. Cache Result (1 hour TTL)
-      await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 3600);
+      const mlData = response.data;
+      const eventIds = mlData.recommendations.map((r: any) => r.event_id);
 
-      return response.data;
+      // 3. Fetch full event details from Prisma
+      const events = await this.prisma.event.findMany({
+        where: { id: { in: eventIds } },
+        include: {
+          ...this.defaultIncludes(),
+          _count: { select: { registrations: true } },
+        },
+      });
+
+      // 4. Preserve ML ranking order
+      const orderedEvents = eventIds
+        .map((id: string) => events.find((e: any) => e.id === id))
+        .filter(Boolean);
+
+      // 5. Cache Result (1 hour TTL)
+      await this.redis.set(cacheKey, JSON.stringify(orderedEvents), 'EX', 3600);
+
+      return orderedEvents;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get recommendations: ${errorMessage}`);
-      const axiosError = error as any;
-      if (axiosError.response?.status === 503) {
-        throw new HttpException(
-          'Recommendation service unavailable. Models not trained yet.',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 503) {
+          throw new HttpException(
+            'Recommendation service unavailable. Models not trained yet.',
+            HttpStatus.SERVICE_UNAVAILABLE,
+          );
+        }
       }
       throw new HttpException('Failed to get recommendations', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getSimilarEvents(eventId: string, n: number = 10) {
-    const cacheKey = `similar_events:${eventId}:${n}`;
-
+  async getSimilarEvents(eventId: string, n: number = 10): Promise<any> {
     try {
       // 1. Check Cache
       const cacheKey = `recommendations:similar:${eventId}:${n}`;
@@ -75,20 +90,39 @@ export class RecommendationService {
       }
 
       // 2. Fetch from ML Service
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<any> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/similar/${eventId}?n=${n}`),
       );
 
-      // 3. Cache Result (24 hour TTL for similar events as they change less frequently)
-      await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 86400);
+      const mlData = response.data;
+      const eventIds = mlData.similar_events.map((r: any) => r.event_id);
 
-      return response.data;
+      // 3. Fetch full event details from Prisma
+      const events = await this.prisma.event.findMany({
+        where: { id: { in: eventIds } },
+        include: {
+          ...this.defaultIncludes(),
+          _count: { select: { registrations: true } },
+        },
+      });
+
+      // 4. Preserve order
+      const orderedEvents = eventIds
+        .map((id: string) => events.find((e: any) => e.id === id))
+        .filter(Boolean);
+
+      // 5. Cache Result (24 hour TTL)
+      await this.redis.set(cacheKey, JSON.stringify(orderedEvents), 'EX', 86400);
+
+      return orderedEvents;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to get similar events: ${errorMessage}`);
-      const axiosError = error as any;
-      if (axiosError.response?.status === 404) {
-        throw new HttpException('Event not found in recommendation model', HttpStatus.NOT_FOUND);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 404) {
+          throw new HttpException('Event not found in recommendation model', HttpStatus.NOT_FOUND);
+        }
       }
       throw new HttpException('Failed to get similar events', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -144,9 +178,9 @@ export class RecommendationService {
     };
   }
 
-  async getHealth() {
+  async getHealth(): Promise<unknown> {
     try {
-      const response: AxiosResponse = await firstValueFrom(
+      const response: AxiosResponse<unknown> = await firstValueFrom(
         this.httpService.get(`${this.mlServiceUrl}/health`),
       );
       return response.data;
@@ -158,5 +192,21 @@ export class RecommendationService {
         error: errorMessage,
       };
     }
+  }
+  private defaultIncludes() {
+    return {
+      status: true,
+      eventType: true,
+      venue: true,
+      tags: { include: { tag: true } },
+      eventCategories: { include: { category: true } },
+      media: true,
+      sessions: {
+        include: {
+          speakers: { include: { speaker: true } },
+        },
+        orderBy: { startTime: 'asc' as const },
+      },
+    };
   }
 }

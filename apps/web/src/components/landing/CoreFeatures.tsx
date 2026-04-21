@@ -62,7 +62,7 @@ export default function CoreFeatures() {
           {/* 1. Discovery Engine (Large Focus) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-[3.5rem] bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-xl bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-xs tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -109,7 +109,7 @@ export default function CoreFeatures() {
           {/* 2. Full Hackathon Lifecycle (Vertical Spotlight) */}
           <motion.div
             variants={item}
-            className="md:row-span-2 group relative p-10 rounded-[3.5rem] bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="md:row-span-2 group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-[10px] tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -165,7 +165,7 @@ export default function CoreFeatures() {
           {/* 3. Event Access Types */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-[3.5rem] bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="flex-1 relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center group-hover:rotate-12 transition-transform">
@@ -203,7 +203,7 @@ export default function CoreFeatures() {
           {/* 4. Digital Entry Ecosystem (QR Focus) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 group relative p-10 rounded-[3.5rem] bg-linear-to-r from-gray-900 to-gray-800 text-white border border-gray-700 shadow-2xl overflow-hidden flex items-center gap-10"
+            className="md:col-span-2 group relative p-10 rounded-xl bg-linear-to-r from-gray-900 to-gray-800 text-white border border-gray-700 shadow-2xl overflow-hidden flex items-center gap-10"
           >
             <div className="flex-1 relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-6 backdrop-blur-xl border border-white/5 group-hover:rotate-12 transition-transform">
@@ -232,7 +232,7 @@ export default function CoreFeatures() {
           {/* 5. Smart Scheduling Engine */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-[3.5rem] bg-white border border-gray-100 shadow-xl overflow-hidden"
+            className="group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden"
           >
             <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
               <CalendarClock size={22} />
@@ -254,7 +254,7 @@ export default function CoreFeatures() {
           {/* 6. Live Engagement Analytics (Wide Bottom) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 group relative p-10 rounded-[3.5rem] bg-linear-to-br from-brand via-brand-hover to-blue-700 text-white border border-white/20 shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 group relative p-10 rounded-xl bg-linear-to-br from-brand via-brand-hover to-blue-700 text-white border border-white/20 shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <Users size={100} className="text-white/5 -mr-10 -mt-10" />
