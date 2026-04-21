@@ -1,6 +1,6 @@
-import { VenueRecord } from "../types";
+import { Venue } from "../types";
 
-export const mockVenues: VenueRecord[] = [
+export const mockVenues: Venue[] = [
     { id: '1', name: 'Main Auditorium', building: 'Building 1', roomNumber: '101', capacity: 500 },
     { id: '2', name: 'Senate Hall', building: 'Block 24', roomNumber: 'G01', capacity: 200 },
     { id: '3', name: 'Innovation Center', building: 'ICT Building', roomNumber: 'Lab 1', capacity: 50 },

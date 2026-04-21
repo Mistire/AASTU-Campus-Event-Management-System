@@ -1,16 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api-client';
+import { Venue } from '../types';
 
-export interface Venue {
-  id: string;
-  name: string;
-  building?: string;
-  roomNumber?: string;
-  capacity?: number;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface CreateVenueDto {
   name: string;

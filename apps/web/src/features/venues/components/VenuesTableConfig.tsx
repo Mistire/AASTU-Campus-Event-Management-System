@@ -1,8 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { VenueRecord } from '../types';
+import { Venue } from '../types';
 import { Home } from 'lucide-react';
 
-export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
+export const getVenuesColumns = (): ColumnDef<Venue>[] => [
     {
         id: "index",
         header: "No.",

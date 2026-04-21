@@ -1,14 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api-client';
+import { Department } from '../types';
 
-export interface Department {
-  id: string;
-  name: string;
-  faculty?: string;
-  _count?: {
-    users: number;
-  };
-}
 
 export interface CreateDepartmentDto {
   name: string;

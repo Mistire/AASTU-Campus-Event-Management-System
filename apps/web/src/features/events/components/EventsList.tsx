@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Event, EventStatusName } from "../types";
+import { Event, EventStatusName, PaginatedEventsResponse } from "../types";
 import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
@@ -59,7 +59,9 @@ export const EventsList = () => {
   const globalEvents = useEvents(eventQueryParams, { enabled: !isOrganizer });
   const organizedEvents = useMyOrganizedEvents(eventQueryParams, { enabled: isOrganizer });
 
-  const { data: eventsData, isLoading, isError, error } = isOrganizer ? organizedEvents : globalEvents;
+  const result = isOrganizer ? organizedEvents : globalEvents;
+  const eventsData = result.data as PaginatedEventsResponse | undefined;
+  const { isLoading, isError, error } = result;
 
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();

@@ -31,7 +31,7 @@ export default function EventDetailPage() {
     try {
       await register(id);
       toast.success("Registration Successful", {
-        description: `You are now registered for ${event.title}.`,
+        description: `You are now registered for ${event?.title}.`,
       });
     } catch (err: unknown) {
       const error = err as { message?: string };
@@ -61,18 +61,18 @@ export default function EventDetailPage() {
 
   const handleAddToCalendar = () => {
     generateICS({
-      title: event.title,
-      description: event.description || "",
-      startTime: event.startTime,
-      endTime: event.endTime,
-      location: event.venue?.name || "AASTU Campus",
+      title: event?.title || "Event",
+      description: event?.description || "",
+      startTime: event?.startTime || "",
+      endTime: event?.endTime || "",
+      location: event?.venue?.name || "AASTU Campus",
     });
     toast.success("Calendar file generated");
   };
 
   const capacityPercent = Math.min(
     100,
-    Math.round((event?._count.registrations || 0) / (event?.capacity || 1) * 100)
+    Math.round((event?._count?.registrations || 0) / (event?.capacity || 1) * 100)
   );
 
   const regStatus = useMemo(() => {
