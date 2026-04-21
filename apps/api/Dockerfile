@@ -17,6 +17,7 @@ RUN npx prisma generate
 
 # Build the NestJS app
 RUN npm run build
+RUN ls -R dist
 
 # Default dev command (overridden by docker-compose command: field)
 CMD ["npm", "run", "start:dev"]
