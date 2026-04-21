@@ -1,35 +1,58 @@
-FROM node:20-slim AS development
+# ─── Stage 1: Dependencies ────────────────────────────────────────
+FROM node:20-alpine AS deps
 
 WORKDIR /usr/src/app
 
-# Copy dependency manifests
 COPY package*.json ./
+RUN npm ci --prefer-offline
 
-# Install dependencies inside the build (Masterclass standard)
-# This prevents host/container dependency drift
-RUN npm install
+# ─── Stage 2: Builder ─────────────────────────────────────────────
+FROM node:20-alpine AS builder
 
-# Copy source
+WORKDIR /usr/src/app
+
+COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
-# Default dev command (overridden by docker-compose)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+# Build the Next.js app (output: standalone is set in next.config.ts)
+RUN npm run build
+
+# ─── Stage 3: Development (live-reload) ───────────────────────────
+FROM node:20-alpine AS development
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
 CMD ["npm", "run", "dev"]
 
-# ─── Stage 2: Production ──────────────────────────────────────────
-FROM node:20-slim AS production
+# ─── Stage 4: Production (minimal standalone) ─────────────────────
+FROM node:20-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+ENV PORT=3001
+ENV HOSTNAME=0.0.0.0
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-# Copy only the built output from development stage
-COPY --from=development /usr/src/app/next.config.ts ./
-COPY --from=development /usr/src/app/public ./public
-COPY --from=development /usr/src/app/.next ./.next
-COPY --from=development /usr/src/app/node_modules ./node_modules
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser  --system --uid 1001 nextjs
 
-EXPOSE 3000
+# Copy only the standalone output (no node_modules needed at runtime)
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/public ./public
 
-CMD ["npm", "run", "start"]
+USER nextjs
+
+EXPOSE 3001
+
+CMD ["node", "server.js"]
