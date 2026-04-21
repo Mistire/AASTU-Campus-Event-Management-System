@@ -4,7 +4,7 @@ FROM node:20-alpine AS deps
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci --prefer-offline
+RUN npm install
 
 # ─── Stage 2: Builder ─────────────────────────────────────────────
 FROM node:20-alpine AS builder
