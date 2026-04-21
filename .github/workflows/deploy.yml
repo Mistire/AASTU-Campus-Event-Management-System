@@ -42,8 +42,9 @@ jobs:
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            JWT_EXPIRATION=15m
-            JWT_REFRESH_EXPIRATION=7d
+            JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+            JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
+            JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}
             SMTP_HOST=${{ secrets.SMTP_HOST }}
             SMTP_PORT=${{ secrets.SMTP_PORT }}
             SMTP_USER=${{ secrets.SMTP_USER }}
@@ -52,6 +53,16 @@ jobs:
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             BACKEND_URL=${{ secrets.BACKEND_URL }}
             FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            EMAIL_VERIFICATION_TOKEN_TTL=${{ secrets.EMAIL_VERIFICATION_TOKEN_TTL }}
+            RESET_TOKEN_TTL_MINUTES=${{ secrets.RESET_TOKEN_TTL_MINUTES }}
+            SEED_SUPERUSER_EMAIL=${{ secrets.SEED_SUPERUSER_EMAIL }}
+            SEED_SUPERUSER_PASSWORD=${{ secrets.SEED_SUPERUSER_PASSWORD }}
+            SEED_SUPERUSER_FULL_NAME=${{ secrets.SEED_SUPERUSER_FULL_NAME }}
+            NODE_ENV=production
+            PORT=4000
+            PRISMA_LOG_QUERIES=false
+            REDIS_HOST=redis
+            REDIS_PORT=6379
             ENVEOF
 
             echo "==> Pruning unused Docker resources to free disk space..."
