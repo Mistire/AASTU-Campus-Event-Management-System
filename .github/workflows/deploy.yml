@@ -3,7 +3,8 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - dev   # triggers on every push to dev
+      - dev                  # triggers on merge to dev
+      - feat/aws-deployment  # triggers on direct push (current demo branch)
 
 jobs:
   deploy:
@@ -30,10 +31,11 @@ jobs:
 
             APP_DIR="/app/cems"
 
-            echo "==> Pulling latest code from dev branch..."
+            echo "==> Pulling latest code from ${{ github.ref_name }} branch..."
             cd $APP_DIR
             git fetch origin
-            git reset --hard origin/dev
+            git checkout ${{ github.ref_name }} || git checkout -b ${{ github.ref_name }} origin/${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
 
             echo "==> Writing .env file from GitHub Secrets..."
             cat > .env << 'ENVEOF'
