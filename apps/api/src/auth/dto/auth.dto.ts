@@ -14,6 +14,14 @@ export class SignUpDto {
   @IsOptional()
   @IsString()
   roleName?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
 }
 
 export class LoginDto {

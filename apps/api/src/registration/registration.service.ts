@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { Prisma, Registration, EventWaitlist } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -37,7 +38,7 @@ export type RegistrationResult =
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 @Injectable()
-export class RegistrationService {
+export class RegistrationService implements OnModuleInit {
   private readonly logger = new Logger(RegistrationService.name);
   /** In-memory cache: status name → status id */
   private readonly statusCache = new Map<string, string>();
@@ -51,6 +52,32 @@ export class RegistrationService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  async onModuleInit() {
+    await this.bootstrapStatuses();
+  }
+
+  /**
+   * Ensures that the required registration statuses exist in the database.
+   * This provides a permanent fix for cases where the database seed hasn't been run.
+   */
+  private async bootstrapStatuses() {
+    const statuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'REJECTED', 'APPROVED'];
+    this.logger.log('Bootstrapping registration statuses...');
+
+    for (const name of statuses) {
+      try {
+        await this.prisma.registrationStatus.upsert({
+          where: { name },
+          update: {},
+          create: { name },
+        });
+      } catch (error) {
+        this.logger.error(`Failed to bootstrap status ${name}: ${error.message}`);
+      }
+    }
+    this.logger.log('Registration statuses bootstrapped successfully.');
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Status id cache

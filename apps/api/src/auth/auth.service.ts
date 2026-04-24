@@ -405,12 +405,19 @@ export class AuthService {
       if (!role) throw new BadRequestException('Role not found');
 
       const passwordHash = await argon.hash(dto.password);
+
+      // Ensure departmentId is a valid UUID or null (empty strings cause Prisma errors)
+      const sanitizedDepartmentId =
+        dto.departmentId && dto.departmentId.trim() !== '' ? dto.departmentId : null;
+
       const user = await this.prisma.user.create({
         data: {
           fullName: dto.fullName,
           email,
           passwordHash,
+          phone: dto.phone,
           roleId: role.id,
+          departmentId: sanitizedDepartmentId,
         },
         include: {
           role: {
@@ -431,21 +438,25 @@ export class AuthService {
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
 
-      await this.auditLogsService.createLog({
-        userId: user.id,
-        action: 'SIGNUP',
-        entityType: 'USER',
-        outcome: 'SUCCESS',
-        details: `New user signed up: ${user.email}`,
-        ipAddress: meta?.ip,
-        userAgent: meta?.userAgent,
-        role: user.role.roleName,
-        afterState: {
-          email: user.email,
-          fullName: user.fullName,
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'SIGNUP',
+          entityType: 'USER',
+          outcome: 'SUCCESS',
+          details: `New user signed up: ${user.email}`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
           role: user.role.roleName,
-        }
-      });
+          afterState: {
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role.roleName,
+          },
+        });
+      } catch (logError) {
+        console.error('Non-critical error: Audit log creation failed during signup:', logError);
+      }
 
       return {
         user: this.buildUserResponse(user),
@@ -455,10 +466,25 @@ export class AuthService {
           : 'Signup successful, but we could not send the verification email right now. Please try again later.',
       };
     } catch (err) {
-      if (err.code === 'P2002') {
+      console.error('AuthService.signUp failed:', {
+        email: dto.email,
+        error: err instanceof Error ? err.message : err,
+        code: (err as any).code,
+        stack: err instanceof Error ? err.stack : undefined
+      });
+
+      if ((err as any).code === 'P2002') {
         throw new BadRequestException('Email already in use');
       }
-      console.error('AuthService.signUp error:', err);
+      
+      if ((err as any).code === 'P2003') {
+        throw new BadRequestException('Invalid department or role selection');
+      }
+
+      if ((err as any).code === 'P2007') {
+        throw new BadRequestException('Invalid data format provided');
+      }
+
       throw err;
     }
   }
@@ -497,7 +523,7 @@ export class AuthService {
       }
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
-      
+
       await this.auditLogsService.createLog({
         userId: user.id,
         action: 'LOGIN',

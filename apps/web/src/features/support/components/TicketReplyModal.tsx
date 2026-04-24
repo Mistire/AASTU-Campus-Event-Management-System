@@ -8,8 +8,8 @@ import {
   CemsDialogHeader, 
   CemsDialogTitle, 
   CemsDialogDescription,
-  CemsDialogFooter
 } from '@/components/cems/CemsDialog';
+import { ModalFooter } from '@/components/shared/ModalFooter';
 import { CemsButton } from '@/components/cems/CemsButton';
 import { useTicketDetails, useReplyTicket } from '../api';
 import { ToastController } from '@/components/shared/ToastController';
@@ -119,15 +119,11 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                     </div>
                 </form>
 
-                <CemsDialogFooter>
-                    <CemsButton cemsVariant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl">
-                        Close
-                    </CemsButton>
-                    <CemsButton cemsVariant="brand" className="rounded-xl px-6">
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Mark as Resolved
-                    </CemsButton>
-                </CemsDialogFooter>
+                <ModalFooter 
+                    onCancel={() => onOpenChange(false)}
+                    onSave={() => {/* Handle resolve logic if needed, or just close */ onOpenChange(false)}}
+                    saveText="Mark as Resolved"
+                />
             </CemsDialogContent>
         </CemsDialog>
     );

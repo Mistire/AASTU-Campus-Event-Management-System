@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -239,7 +236,9 @@ async function main() {
 
       if (organizer) {
         const liveStatus = await prisma.eventStatus.findUnique({ where: { statusName: 'LIVE' } });
-        const approvedStatus = await prisma.eventStatus.findUnique({ where: { statusName: 'APPROVED' } });
+        const approvedStatus = await prisma.eventStatus.findUnique({
+          where: { statusName: 'APPROVED' },
+        });
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 7);
         const dayAfter = new Date(tomorrow);
@@ -293,16 +292,16 @@ async function main() {
           },
         });
 
-        console.log('✅ Sample Events seeded.');
+        console.log('Sample Events seeded.');
       } else {
-        console.log('⚠️  No organizer user found. Run script_users first to seed users.');
+        console.log('No organizer user found. Run script_users first to seed users.');
       }
     } else {
-      console.log('ℹ️  Sample events already exist, skipping.');
+      console.log('Sample events already exist, skipping.');
     }
   }
 
-  console.log('\n🎉 Events module data seeding complete!');
+  console.log('\nEvents module data seeding complete!');
 }
 
 main()
