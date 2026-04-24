@@ -3,6 +3,7 @@ import { Event, EventStatusName } from "../types";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 
 import { Pencil, Trash2, Send, Check, X, Play, Users } from "lucide-react";
+import { truncate } from "@/lib/utils";
 
 export const getStatusColor = (status: EventStatusName) => {
   switch (status) {
@@ -41,7 +42,7 @@ export const getEventsColumns = (
     cell: ({ row }) => (
       <div className="flex flex-col gap-1 py-1">
         <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">
-          {row.original.title}
+          {truncate(row.original.title, 25)}
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2 py-0.5 bg-gray-50 rounded-md">
@@ -56,8 +57,8 @@ export const getEventsColumns = (
     header: "Venue",
     cell: ({ row }) => (
       <div className="flex flex-col py-1">
-        <span className="text-sm font-bold text-gray-700">{row.original.venue.name}</span>
-        <span className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]">{row.original.venue.location}</span>
+        <span className="text-sm font-bold text-gray-700">{truncate(row.original.venue.name, 25)}</span>
+        <span className="text-[10px] text-gray-400 font-medium">{truncate(row.original.venue.location || "", 25)}</span>
       </div>
     ),
   },

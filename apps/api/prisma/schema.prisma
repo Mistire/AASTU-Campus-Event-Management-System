@@ -72,6 +72,7 @@ model User {
   oneTimeTokens       OneTimeToken[]
   registrations       Registration[]
   supportTickets      SupportTicket[]
+  supportMessages     SupportMessage[]
   teamMembers         TeamMembers[]
   ledTeams            Teams[]
   categoryPreferences UserCategoryPreferences[]
@@ -573,17 +574,32 @@ model Scores {
 }
 
 model SupportTicket {
-  id        String         @id @default(uuid()) @db.Uuid
-  userId    String         @map("user_id") @db.Uuid
-  subject   String         @db.VarChar
-  category  TicketCategory
-  priority  TicketPriority
-  status    TicketStatus   @default(OPEN)
-  createdAt DateTime       @default(now()) @map("created_at")
-  updatedAt DateTime       @updatedAt @map("updated_at")
-  user      User           @relation(fields: [userId], references: [id])
+  id          String           @id @default(uuid()) @db.Uuid
+  userId      String           @map("user_id") @db.Uuid
+  subject     String           @db.VarChar
+  description String?          @db.Text
+  category    TicketCategory
+  priority    TicketPriority
+  status      TicketStatus     @default(OPEN)
+  targetRole  String?          @map("target_role") @db.VarChar
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  messages    SupportMessage[]
+  user        User             @relation(fields: [userId], references: [id])
 
   @@map("support_tickets")
+}
+
+model SupportMessage {
+  id        String        @id @default(uuid()) @db.Uuid
+  ticketId  String        @map("ticket_id") @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  message   String        @db.Text
+  createdAt DateTime      @default(now()) @map("created_at")
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id])
+
+  @@map("support_messages")
 }
 
 enum TicketCategory {

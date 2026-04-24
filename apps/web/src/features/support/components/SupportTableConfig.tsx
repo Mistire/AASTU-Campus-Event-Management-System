@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Ticket } from '../types';
 import { MessageSquare } from 'lucide-react';
 import { BadgeConfigs } from '@/components/ui/data-table/data-table';
-import { cn } from "@/lib/utils";
+import { cn, truncate } from "@/lib/utils";
 
 export const getSupportColumns = (): ColumnDef<Ticket>[] => [
     {
@@ -16,8 +16,8 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
         header: "Subject",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{row.original.subject}</span>
-                <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{row.original.user.fullName}</span>
+                <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{truncate(row.original.subject, 25)}</span>
+                <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{truncate(row.original.user.fullName, 25)}</span>
             </div>
         ),
     },

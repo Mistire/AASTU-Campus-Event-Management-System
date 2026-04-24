@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { FeedbackRecord } from '../types';
 import { User, Star } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
     {
@@ -14,7 +15,7 @@ export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
         header: "User",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{row.original.user.fullName}</span>
+                <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{truncate(row.original.user.fullName, 25)}</span>
                 <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{row.original.user.email}</span>
             </div>
         ),
@@ -22,7 +23,7 @@ export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
     {
         accessorKey: "event",
         header: "Event",
-        cell: ({ row }) => <span className="text-sm font-black text-gray-900">{row.original.event.title}</span>,
+        cell: ({ row }) => <span className="text-sm font-black text-gray-900">{truncate(row.original.event.title, 25)}</span>,
     },
     {
         accessorKey: "rating",

@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { UserRecord } from '../types';
 import { Shield } from 'lucide-react';
 import { BadgeConfigs } from '@/components/ui/data-table/data-table';
-import { cn } from "@/lib/utils";
+import { cn, truncate } from "@/lib/utils";
 
 export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
     {
@@ -21,8 +21,8 @@ export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
                     {(row.original.name || row.original.email || '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{row.original.name || 'Unknown User'}</span>
-                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest truncate max-w-[180px] block">{row.original.email}</span>
+                    <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{truncate(row.original.name || 'Unknown User', 25)}</span>
+                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest block">{truncate(row.original.email, 25)}</span>
                 </div>
             </div>
         ),

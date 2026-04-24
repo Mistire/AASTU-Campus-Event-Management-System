@@ -21,6 +21,7 @@
     "script_roles": "ts-node prisma/seed/roles.ts",
     "script_users": "ts-node prisma/seed/users.ts",
     "script_events": "ts-node prisma/seed/events.ts",
+    "script_support": "ts-node prisma/seed/support.ts",
     "script_seed": "ts-node prisma/seed/index.ts",
     "start": "nest start",
     "start:dev": "nest start --watch",
