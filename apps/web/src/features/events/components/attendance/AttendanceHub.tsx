@@ -2,7 +2,7 @@ import { ClipboardCheck, Camera, Maximize2, FileDown, Table as TableIcon, FileTe
 import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
 import { AttendanceStats } from "../AttendanceStats";
 import { AttendanceTable } from "../AttendanceTable";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { AttendeeScanner } from "./AttendeeScanner";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";

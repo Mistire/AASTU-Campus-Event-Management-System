@@ -472,7 +472,7 @@ model SessionMedia {
 
 model RegistrationStatus {
   id            String         @id @default(uuid()) @db.Uuid
-  name          String         @db.VarChar
+  name          String         @unique @db.VarChar
   registrations Registration[]
 
   @@map("registration_status")
