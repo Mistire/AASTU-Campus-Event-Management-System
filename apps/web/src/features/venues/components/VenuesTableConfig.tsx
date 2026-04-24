@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Venue } from '../api';
 import { Home } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getVenuesColumns = (): ColumnDef<Venue>[] => [
     {
@@ -16,7 +17,7 @@ export const getVenuesColumns = (): ColumnDef<Venue>[] => [
             <div className="flex items-center gap-2">
                 <Home className="w-4 h-4 text-brand" />
                 <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors">
-                    {row.original.name}
+                    {truncate(row.original.name, 25)}
                 </span>
             </div>
         ),
@@ -24,7 +25,7 @@ export const getVenuesColumns = (): ColumnDef<Venue>[] => [
     {
         accessorKey: "building",
         header: "Building",
-        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.building || 'N/A'}</span>,
+        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{truncate(row.original.building || 'N/A', 25)}</span>,
     },
     {
         accessorKey: "roomNumber",

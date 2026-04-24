@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
 };
 
+import { SupportFAB } from "@/features/support/components/SupportFAB";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,6 +52,7 @@ export default function RootLayout({
         />
         <Providers>
           <SmoothScroll>{children}</SmoothScroll>
+          <SupportFAB />
         </Providers>
       </body>
     </html>
