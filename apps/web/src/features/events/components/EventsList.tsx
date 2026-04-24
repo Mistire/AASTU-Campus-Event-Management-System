@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Event, EventStatusName } from "../types";
+import { Event, EventStatusName, PaginatedEventsResponse } from "../types";
 import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
@@ -167,8 +167,8 @@ export const EventsList = () => {
     getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleManageAttendees), 
   [userRole]);
 
-  const totalPages = eventsData?.meta?.totalPages || 1;
-  const totalItems = eventsData?.meta?.total || 0;
+  const totalPages = (eventsData as PaginatedEventsResponse)?.meta?.totalPages || 1;
+  const totalItems = (eventsData as PaginatedEventsResponse)?.meta?.total || 0;
 
   if (isError) {
     return (
@@ -260,7 +260,7 @@ export const EventsList = () => {
         )}>
           <CemsTable
             columns={columns}
-            data={eventsData?.data || []}
+            data={(eventsData as PaginatedEventsResponse)?.data || []}
             loading={isLoading}
             emptyMessage="No events found matching your criteria."
             onRowClick={(event) => setPreviewEvent(event)}

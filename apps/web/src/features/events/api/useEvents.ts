@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { Category } from "./useCategories";
-// import { MOCK_EVENTS } from './mock-data';
 
 export interface EventTag {
   id: string;

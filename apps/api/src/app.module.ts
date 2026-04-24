@@ -18,6 +18,9 @@ import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { SupportModule } from './support/support.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
   imports: [
@@ -48,6 +51,9 @@ import { DepartmentsModule } from './departments/departments.module';
     PermissionModule,
     AttendanceModule,
     DepartmentsModule,
+    AuditLogsModule,
+    SupportModule,
+    FeedbackModule,
   ],
 })
 export class AppModule {}

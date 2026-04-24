@@ -28,6 +28,7 @@ export default function EventDetailPage() {
   const { mutateAsync: cancel, isPending: isCancelling } = useCancelRegistration();
 
   const handleRegister = async () => {
+    if (!event) return;
     try {
       await register(id);
       toast.success("Registration Successful", {
@@ -60,6 +61,7 @@ export default function EventDetailPage() {
   };
 
   const handleAddToCalendar = () => {
+    if (!event) return;
     generateICS({
       title: event.title,
       description: event.description || "",

@@ -71,7 +71,7 @@ export default function EventAttendeesPage() {
     a.user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAction = async (action: any, id: string, name: string) => {
+  const handleAction = async (action: any, id: any, name: string) => {
     try {
       await action.mutateAsync(id);
       toast.success(`Action successful for ${name}`);

@@ -76,7 +76,7 @@
         ]
     },
     {
-        "name": "export-logs",
+        "name": "activity",
         "allowed": [
             "ADMIN"
         ]

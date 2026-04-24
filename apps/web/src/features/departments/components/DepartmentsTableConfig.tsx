@@ -1,8 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { DepartmentRecord } from '../types';
+import { Department } from '../api';
 import { GraduationCap } from 'lucide-react';
 
-export const getDepartmentsColumns = (): ColumnDef<DepartmentRecord>[] => [
+export const getDepartmentsColumns = (): ColumnDef<Department>[] => [
     {
         id: "index",
         header: "No.",
@@ -24,7 +24,7 @@ export const getDepartmentsColumns = (): ColumnDef<DepartmentRecord>[] => [
     {
         accessorKey: "faculty",
         header: "Faculty",
-        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.faculty}</span>,
+        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.faculty || 'N/A'}</span>,
     },
     {
         accessorKey: "studentCount",
@@ -32,7 +32,7 @@ export const getDepartmentsColumns = (): ColumnDef<DepartmentRecord>[] => [
         cell: ({ row }) => (
             <div>
                 <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                    {row.original.studentCount}
+                    {row.original._count?.users || 0}
                 </span>
             </div>
         ),
