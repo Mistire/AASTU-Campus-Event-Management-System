@@ -35,9 +35,9 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
-import { FileDown, Table as TableIcon, FileText } from "lucide-react";
+import { Table as TableIcon, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
 
 /* ── Chart lazy-imports (only for dashboard) ───────────────────── */
 import { RegistrationTrendChart } from "@/features/dashboard/components/charts/RegistrationTrendChart";

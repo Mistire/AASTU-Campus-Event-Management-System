@@ -3,11 +3,12 @@
 import { Headset, Plus } from 'lucide-react';
 import { CemsTable } from '@/components/cems/CemsTable';
 import { CemsButton } from '@/components/cems/CemsButton';
-import { mockTickets } from '@/features/support/testing/mock-tickets';
+import { useTickets } from '@/features/support/api';
 import { getSupportColumns } from '@/features/support/components/SupportTableConfig';
 
 export default function SupportPage() {
     const columns = getSupportColumns();
+    const { data: tickets, isLoading } = useTickets();
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
@@ -32,7 +33,7 @@ export default function SupportPage() {
 
             <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
                 <CemsTable
-                    data={mockTickets}
+                    data={tickets || []}
                     columns={columns}
                     emptyMessage="No support tickets found."
                     enableSorting

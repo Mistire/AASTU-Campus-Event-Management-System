@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/store/useAuthStore';
 import { apiFetch } from '@/lib/api-client';
 import { Event } from './useEvents';
-// import { MOCK_RECOMMENDATIONS, MOCK_EVENTS } from './mock-data';
 
 export async function fetchRecommendations(userId: string, n: number = 5) {
     const res = await apiFetch(`/api/recommendations/user/${userId}?n=${n}`);

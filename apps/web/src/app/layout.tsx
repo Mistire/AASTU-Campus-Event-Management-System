@@ -35,6 +35,7 @@ export default function RootLayout({
       <body className="flex flex-col">
         <Toaster 
           position="top-right"
+          richColors
           toastOptions={{
             style: {
               background: 'rgba(255, 255, 255, 0.8)',
@@ -49,7 +50,6 @@ export default function RootLayout({
         />
         <Providers>
           <SmoothScroll>{children}</SmoothScroll>
-          <Toaster position="top-right" richColors />
         </Providers>
       </body>
     </html>

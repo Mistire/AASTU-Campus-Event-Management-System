@@ -1,8 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { VenueRecord } from '../types';
+import { Venue } from '../api';
 import { Home } from 'lucide-react';
 
-export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
+export const getVenuesColumns = (): ColumnDef<Venue>[] => [
     {
         id: "index",
         header: "No.",
@@ -24,12 +24,12 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
     {
         accessorKey: "building",
         header: "Building",
-        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.building}</span>,
+        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.building || 'N/A'}</span>,
     },
     {
         accessorKey: "roomNumber",
         header: "Room",
-        cell: ({ row }) => <span className="text-sm font-semibold text-gray-600">{row.original.roomNumber}</span>,
+        cell: ({ row }) => <span className="text-sm font-semibold text-gray-600">{row.original.roomNumber || 'N/A'}</span>,
     },
     {
         accessorKey: "capacity",
@@ -37,7 +37,7 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
         cell: ({ row }) => (
             <div>
                 <span className="text-sm font-black text-gray-900 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
-                    {row.original.capacity}
+                    {row.original.capacity || 0}
                 </span>
             </div>
         ),

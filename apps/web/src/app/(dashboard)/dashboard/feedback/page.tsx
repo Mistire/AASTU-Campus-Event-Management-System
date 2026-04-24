@@ -2,11 +2,12 @@
 
 import { MessageSquare, Star } from 'lucide-react';
 import { CemsTable } from '@/components/cems/CemsTable';
-import { mockFeedback } from '@/features/feedback/testing/mock-feedback';
+import { useFeedback } from '@/features/feedback/api';
 import { getFeedbackColumns } from '@/features/feedback/components/FeedbackTableConfig';
 
 export default function FeedbackPage() {
     const columns = getFeedbackColumns();
+    const { data: feedback, isLoading } = useFeedback();
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
@@ -31,7 +32,7 @@ export default function FeedbackPage() {
 
             <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
                 <CemsTable
-                    data={mockFeedback}
+                    data={feedback || []}
                     columns={columns}
                     emptyMessage="No feedback records found."
                     enableSorting

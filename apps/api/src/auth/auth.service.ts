@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +14,7 @@ import {
 } from './dto';
 import { EmailService } from './email.service';
 import { randomBytes } from 'crypto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 type JwtPayload = {
   sub: string;
@@ -38,6 +35,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
@@ -433,7 +431,22 @@ export class AuthService {
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
 
-      console.log('Session and tokens created for:', user.email);
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'SIGNUP',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `New user signed up: ${user.email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+        afterState: {
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role.roleName,
+        }
+      });
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,
@@ -460,19 +473,42 @@ export class AuthService {
         },
       });
 
-      if (!user) throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        // Cannot log: no valid userId (FK constraint). Just reject.
+        throw new UnauthorizedException('Invalid credentials');
+      }
       const pwMatches = await argon.verify(user.passwordHash, dto.password);
-      if (!pwMatches) throw new UnauthorizedException('Invalid credentials');
+      if (!pwMatches) {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'LOGIN',
+          entityType: 'USER',
+          outcome: 'FAILURE',
+          details: `Failed login attempt for email: ${email} (Invalid password)`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
+          role: user.role.roleName,
+        });
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Please verify your email first');
       }
 
-      // if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
-      //   throw new UnauthorizedException('Please verify your campus ID QR first');
-      // }
-
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+      
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'LOGIN',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `User logged in successfully: ${email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+      });
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,

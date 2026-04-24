@@ -9,9 +9,10 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailService } from './email.service';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
-  imports: [ConfigModule, PrismaModule, PassportModule, JwtModule.register({})],
+  imports: [ConfigModule, PrismaModule, PassportModule, JwtModule.register({}), AuditLogsModule],
   providers: [
     AuthService,
     JwtStrategy,

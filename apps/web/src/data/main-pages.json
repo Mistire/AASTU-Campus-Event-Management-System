@@ -60,6 +60,16 @@
         "children": []
     },
     {
+        "icon": "Activity",
+        "title": "Activity",
+        "parent": "/dashboard/activity",
+        "to": "/dashboard/activity",
+        "section": "Management",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
         "icon": "Categories",
         "title": "Categories",
         "parent": "/dashboard/categories",

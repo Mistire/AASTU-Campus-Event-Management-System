@@ -71,6 +71,7 @@ model User {
   notifications       Notification[]
   oneTimeTokens       OneTimeToken[]
   registrations       Registration[]
+  supportTickets      SupportTicket[]
   teamMembers         TeamMembers[]
   ledTeams            Teams[]
   categoryPreferences UserCategoryPreferences[]
@@ -268,14 +269,21 @@ model EventOrganizers {
 }
 
 model AuditLogs {
-  id         String   @id @default(uuid()) @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
-  action     String   @db.VarChar
-  entityType String   @map("entity_type") @db.VarChar
-  entityId   String?  @map("entity_id") @db.Uuid
-  details    String?
-  createdAt  DateTime @default(now()) @map("created_at")
-  user       User     @relation(fields: [userId], references: [id])
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  action      String   @db.VarChar
+  entityType  String   @map("entity_type") @db.VarChar
+  entityId    String?  @map("entity_id") @db.Uuid
+  role        String?  @db.VarChar
+  ipAddress   String?  @map("ip_address") @db.VarChar
+  userAgent   String?  @map("user_agent") @db.VarChar
+  outcome     String   @default("SUCCESS") @db.VarChar
+  beforeState Json?    @map("before_state")
+  afterState  Json?    @map("after_state")
+  details     String?
+  environment String?  @db.VarChar
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
 }
@@ -562,6 +570,42 @@ model Scores {
   submission   Submissions @relation(fields: [submissionId], references: [id])
 
   @@map("scores")
+}
+
+model SupportTicket {
+  id        String         @id @default(uuid()) @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  subject   String         @db.VarChar
+  category  TicketCategory
+  priority  TicketPriority
+  status    TicketStatus   @default(OPEN)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  user      User           @relation(fields: [userId], references: [id])
+
+  @@map("support_tickets")
+}
+
+enum TicketCategory {
+  TECHNICAL
+  ACCOUNT
+  EVENT_ISSUE
+  EMERGENCY
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
 
 enum OneTimeTokenType {
