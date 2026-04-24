@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Tag } from '../api';
 import { Hash } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getTagsColumns = (): ColumnDef<Tag>[] => [
     {
@@ -16,7 +17,7 @@ export const getTagsColumns = (): ColumnDef<Tag>[] => [
             <div className="flex items-center gap-2">
                 <Hash className="w-4 h-4 text-brand" />
                 <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors lowercase">
-                    {row.original.name}
+                    {truncate(row.original.name, 25)}
                 </span>
             </div>
         ),

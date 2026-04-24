@@ -70,6 +70,16 @@
         "children": []
     },
     {
+        "icon": "Headset",
+        "title": "Support",
+        "parent": "/dashboard/support",
+        "to": "/dashboard/support",
+        "section": "Management",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
         "icon": "Categories",
         "title": "Categories",
         "parent": "/dashboard/categories",

@@ -215,7 +215,7 @@ export class EventsService {
 
     // 2. Notify all Admins
     const admins = await this.prisma.user.findMany({
-      where: { role: { roleName: 'Admin' } },
+      where: { role: { roleName: 'ADMIN' } },
       select: { id: true },
     });
 
@@ -428,7 +428,7 @@ export class EventsService {
     // 1. Enforce Status Visibility Logic
     const userRole = user.role; // Student, Organizer, Admin
 
-    if (userRole === 'Admin') {
+    if (userRole === 'ADMIN') {
       // Admins see whatever they specifically filter for, or everything if no filter
       if (status) {
         where.status = { statusName: status };

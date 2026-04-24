@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { LogEntry } from '../types';
 import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { cn, truncate } from "@/lib/utils";
 
 export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
     {
@@ -42,7 +42,7 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
         header: "Action",
         cell: ({ row }) => (
             <div className="font-bold text-xs text-gray-900">
-                {row.original.action}
+                {truncate(row.original.action, 25)}
             </div>
         ),
     },
@@ -51,7 +51,7 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
         header: "Actor",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{row.original.user.fullName}</span>
+                <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{truncate(row.original.user.fullName, 25)}</span>
                 <span className="text-[8px] font-medium text-gray-400">{row.original.role || 'User'}</span>
             </div>
         ),

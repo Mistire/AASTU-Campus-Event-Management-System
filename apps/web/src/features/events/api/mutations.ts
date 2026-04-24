@@ -15,6 +15,7 @@ export const useCreateEvent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
     },
   });
 };
@@ -33,6 +34,7 @@ export const useUpdateEvent = () => {
     },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
       queryClient.invalidateQueries({ queryKey: ["event", id] });
     },
   });
@@ -51,6 +53,7 @@ export const useDeleteEvent = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
     },
   });
 };
@@ -68,6 +71,7 @@ export const useSubmitEvent = () => {
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
       queryClient.invalidateQueries({ queryKey: ["event", id] });
     },
   });
@@ -86,6 +90,7 @@ export const useApproveEvent = () => {
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
       queryClient.invalidateQueries({ queryKey: ["event", id] });
     },
   });
@@ -105,6 +110,7 @@ export const useRejectEvent = () => {
     },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
       queryClient.invalidateQueries({ queryKey: ["event", id] });
     },
   });
