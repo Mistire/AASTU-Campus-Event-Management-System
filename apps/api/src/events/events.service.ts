@@ -408,7 +408,7 @@ export class EventsService {
 
   // FIND ALL — with status, type, tag and search filters + pagination
 
-  async findAll(query: EventQueryDto, user: AuthUser) {
+  async findAll(query: EventQueryDto, user?: AuthUser) {
     const {
       search,
       date,
@@ -426,7 +426,7 @@ export class EventsService {
     const where: any = {};
 
     // 1. Enforce Status Visibility Logic
-    const userRole = user.role; // Student, Organizer, Admin
+    const userRole = user?.role; // Student, Organizer, Admin
 
     if (userRole === 'ADMIN') {
       // Admins see whatever they specifically filter for, or everything if no filter
@@ -434,12 +434,12 @@ export class EventsService {
         where.status = { statusName: status };
       }
     } else {
-      // Non-Admins: Students and Organizers
+      // Non-Admins: Students, Organizers, or Guests (undefined user)
       if (status) {
         // If a specific status is requested, verify permission
         if (['APPROVED', 'LIVE'].includes(status)) {
           where.status = { statusName: status };
-        } else {
+        } else if (user) {
           // Attempting to see DRAFT/PENDING: only if they are the creator or organizer
           where.AND = [
             { status: { statusName: status } },
@@ -450,24 +450,32 @@ export class EventsService {
               ],
             },
           ];
+        } else {
+          // Guest cannot see non-public statuses
+          where.status = { statusName: { in: ['APPROVED', 'LIVE'] } };
         }
       } else {
         // Default View: Show APPROVED and LIVE events
-        // PLUS show the user's own DRAFT/PENDING events if they are an organizer
-        where.OR = [
-          { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
-          {
-            AND: [
-              { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
-              {
-                OR: [
-                  { createdBy: user.id },
-                  { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
-                ],
-              },
-            ],
-          },
-        ];
+        if (user) {
+          // PLUS show the user's own DRAFT/PENDING events if they are an organizer
+          where.OR = [
+            { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
+            {
+              AND: [
+                { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
+                {
+                  OR: [
+                    { createdBy: user.id },
+                    { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+                  ],
+                },
+              ],
+            },
+          ];
+        } else {
+          // Guest only sees public events
+          where.status = { statusName: { in: ['APPROVED', 'LIVE'] } };
+        }
       }
     }
 
