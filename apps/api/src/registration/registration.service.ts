@@ -18,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TicketGeneratorUtil } from '../events/ticket-generator.util';
 import { Event } from '@prisma/client';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 // ─── DTOs ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +52,7 @@ export class RegistrationService implements OnModuleInit {
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   async onModuleInit() {
@@ -67,11 +69,15 @@ export class RegistrationService implements OnModuleInit {
 
     for (const name of statuses) {
       try {
-        await this.prisma.registrationStatus.upsert({
+        const existing = await this.prisma.registrationStatus.findFirst({
           where: { name },
-          update: {},
-          create: { name },
         });
+
+        if (!existing) {
+          await this.prisma.registrationStatus.create({
+            data: { name },
+          });
+        }
       } catch (error) {
         this.logger.error(`Failed to bootstrap status ${name}: ${error.message}`);
       }
@@ -184,6 +190,24 @@ export class RegistrationService implements OnModuleInit {
         });
       }
 
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId,
+          action: result.kind === 'registered' ? 'EVENT_REGISTRATION' : 'EVENT_WAITLIST_JOIN',
+          entityType: 'EVENT',
+          entityId: eventId,
+          outcome: 'SUCCESS',
+          details:
+            result.kind === 'registered'
+              ? `User registered for event. Status: ${dto.userId === userId ? 'Direct' : 'Admin Action'}`
+              : `User joined event waitlist`,
+          afterState: result,
+        });
+      } catch (e) {
+        this.logger.error(`Failed to create audit log: ${e.message}`);
+      }
+
       return result;
     } catch (err) {
       this.rethrowSerializationError(err);
@@ -233,6 +257,23 @@ export class RegistrationService implements OnModuleInit {
           }
 
           await this.analyticsService.invalidateEventCache(reg.eventId);
+
+          // Audit Log
+          try {
+            await this.auditLogsService.createLog({
+              userId: studentId,
+              action: 'EVENT_REGISTRATION_CANCEL',
+              entityType: 'EVENT',
+              entityId: reg.eventId,
+              outcome: 'SUCCESS',
+              details: `User cancelled their registration for event`,
+              beforeState: reg,
+              afterState: updated,
+            });
+          } catch (e) {
+            this.logger.error(`Failed to create audit log: ${e.message}`);
+          }
+
           return updated;
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -247,10 +288,6 @@ export class RegistrationService implements OnModuleInit {
   // Organizer actions
   // ──────────────────────────────────────────────────────────────────────────
 
-  /**
-   * Organizer approves a PENDING registration.
-   * Requirements: 4.1, 4.2, 4.5, 4.6
-   */
   async approveByOrganizer(dto: OrganizerActionDto): Promise<Registration> {
     const { registrationId, organizerId } = dto;
 

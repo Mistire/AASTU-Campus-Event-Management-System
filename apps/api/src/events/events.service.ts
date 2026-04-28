@@ -23,6 +23,7 @@ import { TicketGeneratorUtil } from './ticket-generator.util';
 import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -48,6 +49,7 @@ export class EventsService {
     private readonly notificationsService: NotificationsService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -194,6 +196,21 @@ export class EventsService {
       },
     });
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'CREATE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event created: "${event.title}"`,
+        afterState: event,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return event;
   }
 
@@ -228,10 +245,24 @@ export class EventsService {
       );
     }
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'SUBMIT_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event submitted for approval: "${event.title}"`,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
-  async approve(eventId: string) {
+  async approve(eventId: string, adminId?: string) {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'APPROVED');
 
@@ -246,10 +277,24 @@ export class EventsService {
       NotificationType.EVENT_APPROVED,
     );
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: adminId || event.createdBy, 
+        action: 'APPROVE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event approved: "${event.title}"${adminId ? ` by admin ${adminId}` : ''}`,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
-  async reject(eventId: string, reason?: string) {
+  async reject(eventId: string, adminId?: string, reason?: string) {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'REJECTED');
 
@@ -263,6 +308,20 @@ export class EventsService {
       `Your event "${event.title}" has been rejected.${reason ? ` Reason: ${reason}` : ''}`,
       NotificationType.EVENT_REJECTED,
     );
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: adminId || event.createdBy,
+        action: 'REJECT_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event rejected: "${event.title}"${reason ? `. Reason: ${reason}` : ''}${adminId ? ` by admin ${adminId}` : ''}`,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
 
     return updated;
   }
@@ -390,7 +449,7 @@ export class EventsService {
       }
     }
 
-    return this.prisma.event.update({
+    const updatedEvent = await this.prisma.event.update({
       where: { id: eventId },
       data: {
         ...(dto.title && { title: dto.title }),
@@ -404,6 +463,24 @@ export class EventsService {
       },
       include: this.defaultIncludes(),
     });
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'UPDATE_EVENT',
+        entityType: 'EVENT',
+        entityId: eventId,
+        outcome: 'SUCCESS',
+        details: `Event updated: "${updatedEvent.title}"`,
+        beforeState: event,
+        afterState: updatedEvent,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updatedEvent;
   }
 
   // FIND ALL — with status, type, tag and search filters + pagination

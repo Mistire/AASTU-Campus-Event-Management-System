@@ -1,14 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api-client';
 
-export const useLogs = () => {
+export const useLogs = (query: { page?: number; limit?: number; search?: string } = {}) => {
     return useQuery({
-        queryKey: ['admin-audit-logs'],
+        queryKey: ['admin-audit-logs', query],
         queryFn: async () => {
-            const res = await apiFetch('/api/audit-logs');
+            const params = new URLSearchParams();
+            if (query.page) params.append('page', query.page.toString());
+            if (query.limit) params.append('limit', query.limit.toString());
+            if (query.search) params.append('search', query.search);
+
+            const queryString = params.toString() ? `?${params.toString()}` : '';
+            const res = await apiFetch(`/api/audit-logs${queryString}`);
             if (!res.ok) throw new Error('Failed to fetch logs');
+            
             const result = await res.json();
-            return result.data || result;
+            // This hook now returns the full paginated object { data: [...], meta: ... }
+            return result.data !== undefined ? result.data : result;
         },
     });
 };

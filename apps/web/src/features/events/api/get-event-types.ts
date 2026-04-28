@@ -9,7 +9,7 @@ const getEventTypes = async (): Promise<EventType[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch event types");
 
-  return (result.data?.data || result.data) || [];
+  return result.data?.data || result.data || result || [];
 };
 
 export const useEventTypes = () => {

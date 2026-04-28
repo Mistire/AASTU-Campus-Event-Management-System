@@ -94,15 +94,15 @@ export class EventsController {
   @Patch(':id/approve')
   @Roles('Admin')
   @ApiOperation({ summary: 'Approve event (PENDING → APPROVED). Admin only.' })
-  approve(@Param('id') id: string) {
-    return this.eventsService.approve(id);
+  approve(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.approve(id, user.id);
   }
 
   @Patch(':id/reject')
   @Roles('Admin')
   @ApiOperation({ summary: 'Reject event (PENDING → REJECTED). Admin only.' })
-  reject(@Param('id') id: string, @Body('reason') reason?: string) {
-    return this.eventsService.reject(id, reason);
+  reject(@Param('id') id: string, @GetUser() user: AuthUser, @Body('reason') reason?: string) {
+    return this.eventsService.reject(id, user.id, reason);
   }
 
   @Patch(':id/cancel')

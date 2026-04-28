@@ -26,8 +26,8 @@ export const useVenues = () => {
     queryFn: async (): Promise<Venue[]> => {
       const res = await apiFetch('/api/venues');
       if (!res.ok) throw new Error('Failed to fetch venues');
-      const data = await res.json();
-      return (data.data || data) as Venue[];
+      const result = await res.json();
+      return (result.data?.data || result.data || result || []) as Venue[];
     },
   });
 };

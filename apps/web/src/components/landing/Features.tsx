@@ -96,6 +96,7 @@ export default function Features() {
                 src={getEventImage(featuredEvent.id, 0)}
                 alt={featuredEvent.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 800px"
                 className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                 priority
               />
@@ -200,6 +201,7 @@ export default function Features() {
                   src={getEventImage(event.id, i + 1)}
                   alt={event.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-transparent z-1" />
@@ -248,6 +250,7 @@ export default function Features() {
                 src={getEventImage(event.id, i + 3)}
                 alt={event.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-transparent z-1" />

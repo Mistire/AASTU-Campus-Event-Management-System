@@ -5,21 +5,55 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AuditLogsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async listLogs() {
-    return this.prisma.auditLogs.findMany({
-      include: {
-        user: {
-          select: {
-            fullName: true,
-            email: true,
-            role: true,
+  async listLogs(query: any) {
+    const { page = 1, limit = 20, search, action, outcome, entityType } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { action: { contains: search, mode: 'insensitive' } },
+        { entityType: { contains: search, mode: 'insensitive' } },
+        { details: { contains: search, mode: 'insensitive' } },
+        { user: { fullName: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    if (action) where.action = action;
+    if (outcome) where.outcome = outcome;
+    if (entityType) where.entityType = entityType;
+
+    const [data, total] = await Promise.all([
+      this.prisma.auditLogs.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
           },
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prisma.auditLogs.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    };
   }
 
   async findOne(id: string) {

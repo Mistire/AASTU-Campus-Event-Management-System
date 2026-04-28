@@ -4,10 +4,10 @@ import { CemsButton } from "@/components/cems/CemsButton";
 interface EventDetailHeaderProps {
   title: string;
   onBack: () => void;
-  canManage: boolean;
+  canEdit: boolean;
 }
 
-export function EventDetailHeader({ title, onBack, canManage }: EventDetailHeaderProps) {
+export function EventDetailHeader({ title, onBack, canEdit }: EventDetailHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/50 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
       <div className="flex items-center gap-5">
@@ -26,7 +26,7 @@ export function EventDetailHeader({ title, onBack, canManage }: EventDetailHeade
           <h1 className="text-3xl font-black tracking-tighter text-gray-900">{title}</h1>
         </div>
       </div>
-      {canManage && (
+      {canEdit && (
         <div className="flex items-center gap-3">
           <CemsButton cemsVariant="brand" className="font-black rounded-2xl text-xs uppercase tracking-widest px-8 py-4 h-auto items-center gap-2 shadow-xl shadow-brand/20 transition-all active:scale-95 group">
             <Pencil size={16} className="group-hover:rotate-12 transition-transform" />
