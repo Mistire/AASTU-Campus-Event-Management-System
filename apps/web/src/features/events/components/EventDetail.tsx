@@ -44,7 +44,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
       <EventDetailHeader 
         title={event.title} 
         onBack={handleBack} 
-        canManage={canManage} 
+        canEdit={isCreator || isOrganizer} 
       />
 
       {/* Main grid */}
@@ -80,7 +80,8 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
           <EventDetailTabs 
             eventId={eventId} 
             event={event} 
-            canManage={canManage} 
+            canManage={canManage}
+            canEdit={isCreator || isOrganizer}
           />
         </div>
       </div>

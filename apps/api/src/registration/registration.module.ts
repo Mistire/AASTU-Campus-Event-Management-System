@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { RegistrationService } from './registration.service';
 import { WaitlistService } from './waitlist.service';
 import { AttendanceService } from './attendance.service';
@@ -19,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
     ConfigModule,
     JwtModule.register({}),
+    AuditLogsModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationService, WaitlistService, AttendanceService],

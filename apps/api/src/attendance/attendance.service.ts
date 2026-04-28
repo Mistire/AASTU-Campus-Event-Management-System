@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CheckInDto } from './dto/check-in.dto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class AttendanceService {
@@ -10,6 +11,7 @@ export class AttendanceService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private auditLogsService: AuditLogsService,
   ) {}
 
   async getTicket(userId: string, eventId: string) {
@@ -105,7 +107,7 @@ export class AttendanceService {
 
       if (existingCheckIn) return existingCheckIn;
 
-      return this.prisma.attendance.create({
+      const checkin = await this.prisma.attendance.create({
         data: {
           inviteId: attendeeId, // userId left null for guests
           eventId,
@@ -114,6 +116,22 @@ export class AttendanceService {
           checkInTime: new Date(),
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: organizerId,
+          action: 'EVENT_CHECKIN',
+          entityType: 'ATTENDANCE',
+          entityId: checkin.id,
+          outcome: 'SUCCESS',
+          details: `Guest check-in for event: "${event.title}"`,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+
+      return checkin;
 
     } else {
       // 4b. Check if attendee is registered and CONFIRMED
@@ -142,7 +160,7 @@ export class AttendanceService {
         return existingCheckIn; // Already checked in
       }
 
-      return this.prisma.attendance.create({
+      const checkin = await this.prisma.attendance.create({
         data: {
           userId: attendeeId,
           eventId,
@@ -151,6 +169,22 @@ export class AttendanceService {
           checkInTime: new Date(),
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: organizerId,
+          action: 'EVENT_CHECKIN',
+          entityType: 'ATTENDANCE',
+          entityId: checkin.id,
+          outcome: 'SUCCESS',
+          details: `Student check-in for event: "${event.title}"`,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+
+      return checkin;
     }
   }
 
@@ -199,7 +233,7 @@ export class AttendanceService {
       return existingCheckIn;
     }
 
-    return this.prisma.attendance.create({
+    const checkin = await this.prisma.attendance.create({
       data: {
         userId,
         eventId,
@@ -208,6 +242,22 @@ export class AttendanceService {
         checkInTime: new Date(),
       },
     });
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: organizerId,
+        action: 'EVENT_CHECKIN_MANUAL',
+        entityType: 'ATTENDANCE',
+        entityId: checkin.id,
+        outcome: 'SUCCESS',
+        details: `Manual check-in for event: "${event.title}"`,
+      });
+    } catch (e) {
+      console.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return checkin;
   }
 
   async getAttendanceByEvent(eventId: string) {

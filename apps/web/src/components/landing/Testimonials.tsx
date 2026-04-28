@@ -114,6 +114,7 @@ export default function Testimonials() {
                     src={t.img}
                     alt={t.name}
                     fill
+                    sizes="64px"
                     className="object-cover group-hover/card:scale-110 transition-transform duration-700"
                   />
                 </div>

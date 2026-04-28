@@ -177,7 +177,16 @@ function LogPreviewPanel({ id, onClose }: { id: string | null; onClose: () => vo
 }
 
 export default function ActivityPage() {
-    const { data: logs, isLoading, refetch } = useLogs();
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(15);
+    const { data: logsData, isLoading, refetch } = useLogs({ 
+        page: page + 1, 
+        limit: pageSize 
+    });
+    
+    const logs = logsData?.data || [];
+    const meta = logsData?.meta;
+
     const columns = getLogsColumns();
     const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
 
@@ -187,8 +196,9 @@ export default function ActivityPage() {
         return () => window.removeEventListener('view-log-detail', handler as EventListener);
     }, []);
 
-    const totalLogs = (logs as LogEntry[] | undefined)?.length ?? 0;
-    const failures = (logs as LogEntry[] | undefined)?.filter(l => l.outcome === 'FAILURE').length ?? 0;
+    const totalLogs = meta?.total ?? 0;
+    // Note: failures count from meta stats if available, otherwise just from current page
+    const failures = meta?.stats?.FAILURE ?? logs.filter((l: any) => l.outcome === 'FAILURE').length;
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
@@ -236,7 +246,7 @@ export default function ActivityPage() {
                     "bg-white rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.05)] border border-gray-100 flex-1 min-w-0 transition-all duration-500",
                 )}>
                     <CemsTable
-                        data={(logs as LogEntry[]) || []}
+                        data={logs}
                         columns={columns}
                         loading={isLoading}
                         emptyMessage="No activity logs found."
@@ -244,7 +254,15 @@ export default function ActivityPage() {
                         enableSorting
                         enableGlobalFilter
                         enableColumnVisibility
-                        pageSize={15}
+                        
+                        // Server-side pagination props
+                        manualPagination
+                        pageCount={meta?.totalPages || 0}
+                        pageIndex={page}
+                        pageSize={pageSize}
+                        totalItems={totalLogs}
+                        onPageChange={setPage}
+                        onPageSizeChange={setPageSize}
                     />
                 </div>
 

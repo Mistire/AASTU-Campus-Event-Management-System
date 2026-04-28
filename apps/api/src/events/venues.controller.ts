@@ -14,7 +14,8 @@ import { VenuesService } from './venues.service';
 import { CreateVenueDto, UpdateVenueDto } from './dto/venue.dto';
 import { VenueQueryDto, VenueAvailabilityQueryDto } from './dto/venue-query.dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guard';
-import { Roles } from '../auth/decorator';
+import { Roles, GetUser } from '../auth/decorator';
+import type { AuthUser } from '../auth/jwt.strategy';
 
 @ApiTags('Venues')
 @ApiBearerAuth()
@@ -27,8 +28,8 @@ export class VenuesController {
   @Roles('Admin')
   @ApiOperation({ summary: 'Create a new venue (Admin only)' })
   @ApiResponse({ status: 201, description: 'Venue created.' })
-  create(@Body() dto: CreateVenueDto) {
-    return this.venuesService.create(dto);
+  create(@Body() dto: CreateVenueDto, @GetUser() user: AuthUser) {
+    return this.venuesService.create(dto, user.id);
   }
 
   @Get()
@@ -69,15 +70,15 @@ export class VenuesController {
   @Patch(':id')
   @Roles('Admin')
   @ApiOperation({ summary: 'Update a venue (Admin only)' })
-  update(@Param('id') id: string, @Body() dto: UpdateVenueDto) {
-    return this.venuesService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateVenueDto, @GetUser() user: AuthUser) {
+    return this.venuesService.update(id, dto, user.id);
   }
 
   @Delete(':id')
   @Roles('Admin')
   @ApiOperation({ summary: 'Delete a venue (Admin only) - checks for upcoming events first' })
   @ApiResponse({ status: 400, description: 'Cannot delete - upcoming events booked.' })
-  remove(@Param('id') id: string) {
-    return this.venuesService.remove(id);
+  remove(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.venuesService.remove(id, user.id);
   }
 }

@@ -6,16 +6,17 @@ interface EventDetailTabsProps {
   eventId: string;
   event: any;
   canManage: boolean;
+  canEdit: boolean;
 }
 
-export function EventDetailTabs({ eventId, event, canManage }: EventDetailTabsProps) {
+export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDetailTabsProps) {
   const allTabs = [
     {
       value: "attendance",
       label: "Attendance Hub",
       icon: <Users className="w-full h-full" />,
       hidden: !canManage,
-      content: <AttendanceHub eventId={eventId} />,
+      content: <AttendanceHub eventId={eventId} canEdit={canEdit} />,
     },
     {
       value: "venue",

@@ -110,6 +110,16 @@
         "children": []
     },
     {
+        "icon": "Categories",
+        "title": "Event Types",
+        "parent": "/dashboard/event-types",
+        "to": "/dashboard/event-types",
+        "section": "System Metadata",
+        "allowed": ["ADMIN"],
+        "hasBadge": false,
+        "children": []
+    },
+    {
         "icon": "LayoutGrid",
         "title": "Departments",
         "parent": "/dashboard/departments",
