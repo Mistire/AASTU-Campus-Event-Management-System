@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PendingInvitationsModal } from '@/features/events/components/organizers/PendingInvitationsModal';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,6 +62,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                         {children}
                     </div>
                 </main>
+                <PendingInvitationsModal />
             </div>
         </div>
     );

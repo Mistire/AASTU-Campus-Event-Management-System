@@ -80,5 +80,13 @@
         "allowed": [
             "ADMIN"
         ]
+    },
+    {
+        "name": "invitations",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STAFF"
+        ]
     }
 ]

@@ -120,17 +120,23 @@ export class VenuesService {
     });
   }
 
-  async checkAvailability(venueId: string, startTime: Date, endTime: Date): Promise<boolean> {
+  async checkAvailability(
+    venueId: string,
+    startTime: Date,
+    endTime: Date,
+    excludeEventId?: string,
+  ): Promise<boolean> {
     await this.findOne(venueId);
 
     const conflict = await this.prisma.event.findFirst({
       where: {
         venueId,
         status: {
-          statusName: { in: ['APPROVED', 'LIVE'] },
+          statusName: { in: ['APPROVED', 'LIVE', 'PENDING'] },
         },
         startTime: { lt: endTime },
         endTime: { gt: startTime },
+        ...(excludeEventId && { id: { not: excludeEventId } }),
       },
     });
 

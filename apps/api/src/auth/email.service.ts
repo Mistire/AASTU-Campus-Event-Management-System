@@ -183,7 +183,9 @@ export class EmailService {
        <p>Please keep this PDF handy and present the QR code at the event entrance for a smooth check-in experience. We look forward to seeing you there!</p>`,
       {
         text: 'View My Registrations',
-        url: (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001') + '/dashboard/my-events',
+        url:
+          (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001') +
+          '/dashboard/my-events',
       },
     );
 
@@ -207,5 +209,36 @@ export class EmailService {
       this.logger.error(`Failed to send registration ticket email to ${email}: ${err.message}`);
       throw err;
     }
+  }
+
+  async sendOrganizerInvitationEmail(email: string, inviterName: string, eventTitle: string) {
+    const frontendBaseUrl =
+      this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
+    const invitationsUrl = `${frontendBaseUrl}/dashboard/invitations`;
+
+    const html = this.getHtmlLayout(
+      'Organizer Invitation.',
+      `Collaborate on ${eventTitle}`,
+      `<p><strong>${inviterName}</strong> has invited you to join the organizing team for the event <strong>"${eventTitle}"</strong>.</p>
+       <p>As a co-organizer, you'll be able to manage registrations, track attendance, and help ensure the event's success.</p>`,
+      { text: 'View Invitation', url: invitationsUrl },
+    );
+
+    await this.sendMail(email, `[INVITATION] Join the team for ${eventTitle}`, html);
+  }
+
+  async sendOrganizerResponseEmail(
+    email: string,
+    inviteeName: string,
+    eventTitle: string,
+    status: string,
+  ) {
+    const html = this.getHtmlLayout(
+      'Organizer Response.',
+      `Update for ${eventTitle}`,
+      `<p><strong>${inviteeName}</strong> has <strong>${status.toLowerCase()}</strong> your invitation to help organize <strong>"${eventTitle}"</strong>.</p>`,
+    );
+
+    await this.sendMail(email, `[RESPONSE] Organizer Invitation: ${eventTitle}`, html);
   }
 }

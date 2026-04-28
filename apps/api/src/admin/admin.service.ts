@@ -8,44 +8,64 @@ export class AdminService {
 
   async listUsers(query: ListUserQueryDto) {
     try {
-      return this.prisma.user.findMany({
-        where: {
-          ...(query.roleId ? { roleId: query.roleId } : {}),
-          ...(query.search
-            ? {
-                OR: [
-                  {
-                    fullName: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+      const { page = 1, limit = 10, search, roleId } = query;
+      const skip = (page - 1) * limit;
+
+      const where = {
+        ...(roleId ? { roleId } : {}),
+        ...(search
+          ? {
+              OR: [
+                {
+                  fullName: {
+                    contains: search,
+                    mode: 'insensitive' as const,
                   },
-                  {
-                    email: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: 'insensitive' as const,
                   },
-                ],
-              }
-            : {}),
-        },
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true,
+                },
+              ],
+            }
+          : {}),
+      };
+
+      const [data, total] = await Promise.all([
+        this.prisma.user.findMany({
+          where,
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
                 },
               },
             },
+            department: true,
           },
-          department: true,
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip,
+          take: limit,
+        }),
+        this.prisma.user.count({ where }),
+      ]);
+
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
+      };
     } catch (err) {
       console.error('AdminService.listUsers error:', err);
       throw err;
