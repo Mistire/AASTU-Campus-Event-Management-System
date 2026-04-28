@@ -10,9 +10,21 @@ import { UserRecord } from '@/features/users/types';
 import { UserPreviewPanel } from '@/features/users/components/UserPreviewPanel';
 
 export default function UsersPage() {
-    const { data: users, isLoading, error } = useUsers();
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [search, setSearch] = useState("");
+
+    const { data: usersData, isLoading, error } = useUsers({
+        page,
+        limit,
+        search
+    });
+
     const columns = getUsersColumns();
     const [previewUser, setPreviewUser] = useState<UserRecord | null>(null);
+
+    const totalPages = usersData?.meta?.totalPages || 1;
+    const totalItems = usersData?.meta?.total || 0;
 
     if (error) {
         return (
@@ -48,7 +60,7 @@ export default function UsersPage() {
                 {/* Table */}
                 <div className="bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm border border-gray-200 flex-1 min-w-0">
                     <CemsTable
-                        data={users || []}
+                        data={usersData?.data || []}
                         columns={columns}
                         loading={isLoading}
                         emptyMessage="No users found."
@@ -57,6 +69,18 @@ export default function UsersPage() {
                         enableColumnVisibility
                         enableRowSelection
                         onRowClick={(user) => setPreviewUser(user)}
+                        
+                        // Server-side pagination props
+                        manualPagination
+                        pageCount={totalPages}
+                        pageIndex={page - 1}
+                        pageSize={limit}
+                        totalItems={totalItems}
+                        onPageChange={(newPageIndex) => setPage(newPageIndex + 1)}
+                        onPageSizeChange={(newSize) => {
+                            setLimit(newSize);
+                            setPage(1);
+                        }}
                     />
                 </div>
 

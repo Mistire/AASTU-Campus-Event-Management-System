@@ -106,4 +106,13 @@ export class CreateEventDto {
   @IsString()
   @IsOptional()
   thumbnailUrl?: string;
+
+  @ApiPropertyOptional({
+    description: 'Number of guests allowed per registered student',
+    example: 2,
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  guestLimitPerUser?: number;
 }

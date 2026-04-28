@@ -1,6 +1,7 @@
-import { Building2, Hash, MapPin, CheckCircle2, Users, Layers } from "lucide-react";
+import { Building2, Hash, MapPin, CheckCircle2, Users, Layers, Shield } from "lucide-react";
 import { CemsTab } from "@/components/cems/CemsTab";
 import { AttendanceHub } from "../attendance/AttendanceHub";
+import { EventOrganizers } from "../organizers/EventOrganizers";
 
 interface EventDetailTabsProps {
   eventId: string;
@@ -17,6 +18,13 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
       icon: <Users className="w-full h-full" />,
       hidden: !canManage,
       content: <AttendanceHub eventId={eventId} canEdit={canEdit} />,
+    },
+    {
+      value: "team",
+      label: "Management Team",
+      icon: <Shield className="w-full h-full" />,
+      hidden: !canManage,
+      content: <EventOrganizers eventId={eventId} canEdit={canEdit} eventCreatorId={event?.createdBy} />,
     },
     {
       value: "venue",

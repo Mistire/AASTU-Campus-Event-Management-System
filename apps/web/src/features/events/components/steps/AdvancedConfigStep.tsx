@@ -1,4 +1,4 @@
-import { Settings, Users, Target, Info, Calendar } from "lucide-react";
+import { Settings, Users, Target, Info, Calendar, GraduationCap, UserPlus } from "lucide-react";
 import { InputController } from "@/components/shared/InputController";
 import { useEventTypes } from "../../api/get-event-types";
 import { EventFormData } from "../EventCreateWizard";
@@ -13,7 +13,9 @@ interface AdvancedConfigStepProps {
 export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) {
   const { data: eventTypes } = useEventTypes();
   const selectedType = (eventTypes as EventType[])?.find((t) => t.id === data.eventTypeId);
-  const isHackathon = selectedType?.name?.toUpperCase() === "HACKATHON";
+  const typeName = selectedType?.name?.toUpperCase() || "";
+  const isHackathon = typeName === "HACKATHON";
+  const isGraduation = typeName === "GRADUATION";
 
   const handleUpdate = (field: keyof EventFormData["hackathonConfig"], value: string | number) => {
     onUpdate({ 
@@ -29,7 +31,7 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
         title="Global Overrides" 
         subtitle="Custom configurations & rules"
       >
-        {!isHackathon && (
+        {!isHackathon && !isGraduation && (
           <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/30">
             <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
               <Settings className="text-gray-200" size={24} />
@@ -88,6 +90,42 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
                 placeholder="How will projects be evaluated?"
                 className="h-32 pt-3 items-start bg-white"
               />
+            </div>
+          </div>
+        )}
+
+        {/* Conditional Graduation Settings */}
+        {isGraduation && (
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-8 bg-brand/5 rounded-xl border border-brand/10 space-y-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-brand flex items-center justify-center border-4 border-white shadow-lg shadow-brand/20">
+                  <GraduationCap className="text-white" size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Graduation Ceremony</h3>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Manage student guest invitations</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <InputController
+                  label="Guest Limit Per Student"
+                  icon={UserPlus}
+                  type="number"
+                  value={data.guestLimitPerUser ?? 2}
+                  onChange={(e) => onUpdate({ guestLimitPerUser: parseInt(e.target.value) || 0 })}
+                  placeholder="e.g. 2"
+                />
+                <div className="bg-white/50 p-4 rounded-xl border border-brand/5 flex items-center gap-3">
+                  <div className="p-2 bg-brand/10 rounded-lg text-brand">
+                    <Info size={16} />
+                  </div>
+                  <p className="text-[10px] font-medium text-gray-500 leading-tight">
+                    Registered students will be allowed to invite this many guests. Each guest will receive a unique digital ticket via email.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

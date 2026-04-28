@@ -423,7 +423,12 @@ export class EventsService {
       const startTime = dto.startTime ? new Date(dto.startTime) : event.startTime;
       const endTime = dto.endTime ? new Date(dto.endTime) : event.endTime;
 
-      const isAvailable = await this.venuesService.checkAvailability(venueId, startTime, endTime);
+      const isAvailable = await this.venuesService.checkAvailability(
+        venueId,
+        startTime,
+        endTime,
+        eventId,
+      );
       if (!isAvailable) {
         throw new BadRequestException('The venue is already booked for this time range');
       }
@@ -503,7 +508,7 @@ export class EventsService {
     const where: any = {};
 
     // 1. Enforce Status Visibility Logic
-    const userRole = user?.role; // Student, Organizer, Admin
+    const userRole = user?.role?.toUpperCase();
 
     if (userRole === 'ADMIN') {
       // Admins see whatever they specifically filter for, or everything if no filter

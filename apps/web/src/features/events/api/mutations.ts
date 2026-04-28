@@ -224,3 +224,57 @@ export const useRejectRegistration = () => {
     },
   });
 };
+
+export const useInviteOrganizer = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ eventId, userId, role }: { eventId: string; userId: string; role?: string }) => {
+      const res = await apiFetch(`/api/events/${eventId}/organizers/invite`, {
+        method: "POST",
+        body: JSON.stringify({ userId, role }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to invite organizer");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["event-organizers", eventId] });
+    },
+  });
+};
+
+export const useRemoveOrganizer = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, eventId }: { id: string; eventId: string }) => {
+      const res = await apiFetch(`/api/organizers/${id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to remove organizer");
+      return result.data || result;
+    },
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["event-organizers", eventId] });
+    },
+  });
+};
+
+export const useRespondToOrganizerInvitation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, accept }: { id: string; accept: boolean }) => {
+      const res = await apiFetch(`/api/organizers/${id}/respond`, {
+        method: "PATCH",
+        body: JSON.stringify({ accept }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to respond to invitation");
+      return result.data || result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-organizer-invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["event-organizers"] });
+    },
+  });
+};

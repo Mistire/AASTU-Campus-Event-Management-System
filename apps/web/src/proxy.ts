@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
   // Skip Proxy for static files, API routes, and images
   if (
@@ -74,7 +74,9 @@ export function proxy(request: NextRequest) {
   // Unauthenticated protection
   if (!hasSession) {
     if (isDashboardRoute || isStudentRoute) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirectTo", pathname + search);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
@@ -89,6 +91,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder
      */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],

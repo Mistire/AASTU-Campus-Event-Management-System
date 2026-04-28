@@ -70,6 +70,7 @@ export interface EventFormData {
   accessType: string;
   invites: string[];
   thumbnailUrl: string;
+  guestLimitPerUser?: number;
 }
 
 export function EventCreateWizard() {
@@ -95,6 +96,7 @@ export function EventCreateWizard() {
     accessType: "PUBLIC",
     invites: [],
     thumbnailUrl: "",
+    guestLimitPerUser: 0,
   });
 
   const router = useRouter();
@@ -152,9 +154,11 @@ export function EventCreateWizard() {
     });
 
     try {
-      // Find selected event type to check if it's a hackathon
+      // Find selected event type
       const selectedType = eventTypes?.find(t => t.id === formData.eventTypeId);
-      const isHackathon = selectedType?.name?.toUpperCase() === "HACKATHON";
+      const typeName = selectedType?.name?.toUpperCase() || "";
+      const isHackathon = typeName === "HACKATHON";
+      const isGraduation = typeName === "GRADUATION";
 
       // Prepare payload
       const payload = {
@@ -174,6 +178,8 @@ export function EventCreateWizard() {
         })),
         // Only include hackathon config if it's a hackathon
         hackathonConfig: isHackathon ? formData.hackathonConfig : undefined,
+        // Only include guest limit if it's graduation (or explicitly set)
+        guestLimitPerUser: (isGraduation || (formData.guestLimitPerUser ?? 0) > 0) ? Number(formData.guestLimitPerUser) : undefined,
         accessType: formData.accessType,
         invites: formData.invites
       };

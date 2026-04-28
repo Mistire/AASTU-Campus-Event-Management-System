@@ -53,10 +53,10 @@ model User {
   emailVerifiedAt     DateTime?                 @map("email_verified_at")
   isEmailVerified     Boolean                   @default(false) @map("is_email_verified")
   passwordChangedAt   DateTime?                 @map("password_changed_at")
-  academicProgram     String?                   @map("academic_program") @db.VarChar
-  campusIdVerifiedAt  DateTime?                 @map("campus_id_verified_at")
-  isCampusIdVerified  Boolean                   @default(false) @map("is_campus_id_verified")
   studentId           String?                   @unique @map("student_id") @db.VarChar
+  academicProgram     String?                   @map("academic_program") @db.VarChar
+  isCampusIdVerified  Boolean                   @default(false) @map("is_campus_id_verified")
+  campusIdVerifiedAt  DateTime?                 @map("campus_id_verified_at")
   announcements       Announcements[]
   attendance          Attendance[]
   auditLogs           AuditLogs[]
@@ -71,8 +71,8 @@ model User {
   notifications       Notification[]
   oneTimeTokens       OneTimeToken[]
   registrations       Registration[]
-  supportTickets      SupportTicket[]
   supportMessages     SupportMessage[]
+  supportTickets      SupportTicket[]
   teamMembers         TeamMembers[]
   ledTeams            Teams[]
   categoryPreferences UserCategoryPreferences[]
@@ -275,15 +275,15 @@ model AuditLogs {
   action      String   @db.VarChar
   entityType  String   @map("entity_type") @db.VarChar
   entityId    String?  @map("entity_id") @db.Uuid
-  role        String?  @db.VarChar
-  ipAddress   String?  @map("ip_address") @db.VarChar
-  userAgent   String?  @map("user_agent") @db.VarChar
-  outcome     String   @default("SUCCESS") @db.VarChar
-  beforeState Json?    @map("before_state")
-  afterState  Json?    @map("after_state")
   details     String?
-  environment String?  @db.VarChar
   createdAt   DateTime @default(now()) @map("created_at")
+  afterState  Json?    @map("after_state")
+  beforeState Json?    @map("before_state")
+  environment String?  @db.VarChar
+  ipAddress   String?  @map("ip_address") @db.VarChar
+  outcome     String   @default("SUCCESS") @db.VarChar
+  role        String?  @db.VarChar
+  userAgent   String?  @map("user_agent") @db.VarChar
   user        User     @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
@@ -355,15 +355,15 @@ model Registration {
 model Attendance {
   id          String         @id @default(uuid()) @db.Uuid
   userId      String?        @map("user_id") @db.Uuid
-  inviteId    String?        @map("invite_id") @db.Uuid
   eventId     String         @map("event_id") @db.Uuid
   sessionId   String?        @map("session_id") @db.Uuid
   checkInTime DateTime       @map("check_in_time")
   qrToken     String         @map("qr_token") @db.VarChar
+  inviteId    String?        @map("invite_id") @db.Uuid
   event       Event          @relation(fields: [eventId], references: [id])
+  invite      EventInvites?  @relation(fields: [inviteId], references: [id])
   session     EventSessions? @relation(fields: [sessionId], references: [id])
   user        User?          @relation(fields: [userId], references: [id])
-  invite      EventInvites?  @relation(fields: [inviteId], references: [id])
 
   @@map("attendance")
 }
@@ -426,14 +426,14 @@ model EventInvites {
   eventId      String       @map("event_id") @db.Uuid
   userId       String?      @map("user_id") @db.Uuid
   invitedEmail String       @map("invited_email") @db.VarChar
-  invitedBy    String       @map("invited_by") @db.Uuid
   status       String       @default("PENDING") @db.VarChar
   createdAt    DateTime     @default(now()) @map("created_at")
+  invitedBy    String       @map("invited_by") @db.Uuid
   respondedAt  DateTime?    @map("responded_at")
+  attendance   Attendance[]
   event        Event        @relation(fields: [eventId], references: [id])
   inviter      User         @relation("InviterUser", fields: [invitedBy], references: [id])
   user         User?        @relation("InvitedUser", fields: [userId], references: [id])
-  attendance   Attendance[]
 
   @@unique([eventId, invitedEmail])
   @@map("event_invites")
@@ -577,7 +577,7 @@ model SupportTicket {
   id          String           @id @default(uuid()) @db.Uuid
   userId      String           @map("user_id") @db.Uuid
   subject     String           @db.VarChar
-  description String?          @db.Text
+  description String?
   category    TicketCategory
   priority    TicketPriority
   status      TicketStatus     @default(OPEN)
@@ -594,7 +594,7 @@ model SupportMessage {
   id        String        @id @default(uuid()) @db.Uuid
   ticketId  String        @map("ticket_id") @db.Uuid
   userId    String        @map("user_id") @db.Uuid
-  message   String        @db.Text
+  message   String
   createdAt DateTime      @default(now()) @map("created_at")
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   user      User          @relation(fields: [userId], references: [id])
