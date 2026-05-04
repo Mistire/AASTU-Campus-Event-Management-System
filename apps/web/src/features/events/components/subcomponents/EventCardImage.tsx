@@ -24,11 +24,11 @@ export function EventCardImage({ event }: EventCardImageProps) {
       
       <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
         <Badge className="bg-white/90 backdrop-blur-md text-gray-900 border-none font-black text-[9px] uppercase tracking-widest px-3 py-1 shadow-xl w-fit">
-          {event.eventType.name}
+          {event.eventType?.name || "Event"}
         </Badge>
         <SocialProofBubble 
-          count={event._count.registrations} 
-          type={event._count.registrations > 200 ? "trending" : "popular"} 
+          count={event._count?.registrations || 0} 
+          type={(event._count?.registrations || 0) > 200 ? "trending" : "popular"} 
         />
       </div>
 

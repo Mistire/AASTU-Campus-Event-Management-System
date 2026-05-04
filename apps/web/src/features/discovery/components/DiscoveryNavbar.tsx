@@ -30,23 +30,20 @@ export function DiscoveryNavbar() {
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 h-16">
       <div className="max-w-[1400px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         
-        {/* Left: Branding & Nav Links */}
         <div className="flex items-center gap-10">
           <Logo />
 
-          <div className="hidden md:flex items-center gap-1">
-             <NavItem 
-               href="/discovery" 
-               label="Discovery" 
-               icon={LayoutGrid} 
-               active={pathname === "/discovery"} 
-             />
-             <NavItem 
-               href="/my-events" 
-               label="My Events" 
-               icon={Calendar} 
-               active={pathname === "/my-events"}
-             />
+          <div className="h-8 w-px bg-gray-100 hidden md:block" />
+
+          <div className="hidden md:flex flex-col">
+             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mb-1">Current View</p>
+             <h2 className="text-sm font-black text-gray-900 uppercase tracking-tight">
+                {pathname === "/discovery" ? "Event Discovery" : 
+                 pathname === "/my-events" ? "My Schedule" : 
+                 pathname === "/my-events/past" ? "Event History" :
+                 pathname === "/my-events/bookmarks" ? "Saved Events" :
+                 pathname === "/profile" ? "User Profile" : "Campus Events"}
+             </h2>
           </div>
         </div>
 
@@ -130,27 +127,6 @@ export function DiscoveryNavbar() {
   );
 }
 
-interface NavItemProps {
-  href: string;
-  label: string;
-  icon: any;
-  active?: boolean;
-}
-
-const NavItem = ({ href, label, icon: Icon, active }: NavItemProps) => (
-  <Link
-    href={href}
-    className={cn(
-      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300",
-      active
-        ? "bg-brand/10 text-brand shadow-sm shadow-brand/5"
-        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-    )}
-  >
-    <Icon size={18} className={active ? "text-brand" : "text-gray-400"} />
-    {label}
-  </Link>
-);
 
 interface ProfileItemProps {
   icon: any;

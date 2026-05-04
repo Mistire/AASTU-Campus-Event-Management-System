@@ -185,7 +185,7 @@ export default function EventDetailPage() {
 
       <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 mt-20">
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">
-          [ Event Detail — CEMS Experience ]
+
         </div>
       </div>
     </div>
