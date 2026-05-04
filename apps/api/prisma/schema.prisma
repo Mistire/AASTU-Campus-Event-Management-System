@@ -77,6 +77,7 @@ model User {
   ledTeams            Teams[]
   categoryPreferences UserCategoryPreferences[]
   userInterests       UserInterests[]
+  bookmarks           EventBookmark[]
   department          Department?               @relation(fields: [departmentId], references: [id])
   role                Role                      @relation(fields: [roleId], references: [id])
 
@@ -233,8 +234,21 @@ model Event {
   judges            Judges[]
   registrations     Registration[]
   teams             Teams[]
+  bookmarks         EventBookmark[]
 
   @@map("events")
+}
+
+model EventBookmark {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@map("event_bookmarks")
 }
 
 model EventSessions {

@@ -16,7 +16,7 @@ import {
   User,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 
 interface TicketModalProps {
   open: boolean;

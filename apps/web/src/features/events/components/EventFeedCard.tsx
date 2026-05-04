@@ -10,6 +10,7 @@ import { EventCardFooter } from "./subcomponents/EventCardFooter";
 import { EventCardHoverPreview } from "./subcomponents/EventCardHoverPreview";
 
 import { useRegistration } from "../api/useRegistration";
+import { useBookmarkStatus, useToggleBookmark } from "../api/useBookmarks";
 import { toast } from "sonner";
 
 interface EventFeedCardProps {
@@ -19,9 +20,10 @@ interface EventFeedCardProps {
 }
 
 export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: EventFeedCardProps) {
-  const [isSaved, setIsSaved] = useState(initialIsSaved);
-  
-  const capacityPercent = Math.min(100, Math.round((event._count.registrations / event.capacity) * 100));
+  const { data: isBookmarkedStatus } = useBookmarkStatus(event.id);
+  const { mutate: toggleBookmark } = useToggleBookmark();
+
+  const capacityPercent = Math.min(100, Math.round(((event._count?.registrations || 0) / event.capacity) * 100));
   const isAlmostFull = capacityPercent > 85 && capacityPercent < 100;
   const isFull = capacityPercent >= 100;
   const isEnded = new Date(event.endTime) < new Date();
@@ -31,8 +33,7 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsSaved(!isSaved);
-    onToggleSave?.(event.id);
+    toggleBookmark({ eventId: event.id, isBookmarked: !!isBookmarkedStatus });
   };
 
   const handleRegister = async (e: React.MouseEvent) => {
@@ -64,13 +65,13 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
       <div className="p-6">
         <EventCardDetails 
           event={event} 
-          isSaved={!!isSaved} 
+          isSaved={!!isBookmarkedStatus} 
           onToggleSave={handleSave} 
         />
 
         <div className="mt-4">
           <EventCardFooter 
-            registrationsCount={event._count.registrations}
+            registrationsCount={event._count?.registrations || 0}
             capacity={event.capacity}
             isFull={isFull}
             isAlmostFull={isAlmostFull}
