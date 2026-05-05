@@ -84,7 +84,7 @@ export class AuthService {
   }
 
   private buildUserResponse(user: any) {
-    return {
+    const response = {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
@@ -94,7 +94,11 @@ export class AuthService {
       isCampusIdVerified: user.isCampusIdVerified,
       studentId: user.studentId,
       academicProgram: user.academicProgram,
+      profileImage: user.profileImage,
+      phone: user.phone,
     };
+    console.log('[AuthService] Built user response:', response);
+    return response;
   }
 
   private normalizeFullName(value: string) {

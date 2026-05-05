@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/ui/Logo";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import Image from "next/image";
 
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
@@ -60,8 +61,12 @@ export function DiscoveryNavbar() {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 p-1 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
             >
-              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10">
-                 <User className="text-brand" size={16} />
+              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
+                 {profile?.profileImage ? (
+                   <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+                 ) : (
+                   <User className="text-brand" size={16} />
+                 )}
               </div>
               <div className="hidden sm:block text-left">
                  <p className="text-xs font-black text-gray-900 leading-none truncate max-w-[100px]">{profile?.full_name}</p>

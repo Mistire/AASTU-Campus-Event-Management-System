@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useUpdateMyProfile } from "../api/profile";
 import { 
@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { User, Phone, Loader2, Save, Camera, Edit2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -36,6 +37,18 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(profile?.profileImage as string || null);
 
+  // Sync state when profile changes or modal opens
+  useEffect(() => {
+    if (isOpen && profile) {
+      setFormData({
+        fullName: profile.full_name || "",
+        phone: profile.phone || "",
+      });
+      setPreviewUrl(profile.profileImage as string || null);
+      setSelectedFile(null);
+    }
+  }, [isOpen, profile]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -49,17 +62,22 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
     e.preventDefault();
     
     try {
-      // Note: In a real scenario with Cloudinary, you would upload the 'selectedFile' first
-      // and then send the resulting URL to updateProfile.
-      // For now, we just pass the text fields.
+      let uploadedUrl = profile?.profileImage as string;
+
+      if (selectedFile) {
+        toast.loading("Uploading image to Cloudinary...", { id: "profile-update" });
+        uploadedUrl = await uploadToCloudinary(selectedFile);
+      }
+
       await updateProfile.mutateAsync({
         ...formData,
-        // profileImage: uploadedUrl // This would be the result from Cloudinary
+        profileImage: uploadedUrl
       });
-      toast.success("Profile updated successfully");
+      
+      toast.success("Profile updated successfully", { id: "profile-update" });
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || "Failed to update profile", { id: "profile-update" });
     }
   };
 

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 // Icon Map for string identifiers in MAIN_MENU
 const iconMap: Record<string, React.ElementType> = {
@@ -182,8 +183,12 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
           "group relative flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500",
           isCollapsed && "p-0 h-14 w-14 mx-auto justify-center"
         )}>
-          <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors shrink-0">
-            <Users className="text-brand w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors shrink-0 overflow-hidden relative">
+            {profile?.profileImage ? (
+              <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+            ) : (
+              <Users className="text-brand w-5 h-5" />
+            )}
           </div>
           
           {!isCollapsed && (
