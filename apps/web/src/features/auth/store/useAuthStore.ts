@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 export type Role = "ADMIN" | "ORGANIZER" | "STUDENT" | "STAFF";
 
 export interface AuthProfile {
+  profileImage: string | Blob | undefined;
   id: string;
   full_name: string;
   email: string;

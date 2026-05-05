@@ -16,7 +16,7 @@ export default function AuthShell({
   return (
     <div className="min-h-screen flex">
       {/* ── Left Panel: Brand Visual ── */}
-      <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-brand/20 flex-col justify-between p-16">
+      <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-[#111827] flex-col justify-between p-16">
         {/* Dot grid */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[40px_40px]" />
 

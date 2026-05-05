@@ -65,7 +65,7 @@ export function DiscoverySidebar() {
                     "group relative flex items-center gap-4 px-4 py-4 rounded-[1.75rem] transition-all duration-500",
                     isActive 
                       ? "bg-brand text-white shadow-xl shadow-brand/20 scale-[1.02]" 
-                      : "text-gray-500 hover:bg-white hover:shadow-md hover:shadow-gray-200/50 hover:text-gray-900"
+                      : "text-gray-500 hover:bg-white hover:shadow-lg hover:text-brand"
                   )}
                 >
                   <div className={cn(

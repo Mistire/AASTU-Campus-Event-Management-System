@@ -47,18 +47,6 @@ export function DiscoveryNavbar() {
           </div>
         </div>
 
-        {/* Center: Search (Visible on md+) */}
-        {/* <div className="hidden lg:flex flex-1 max-w-md mx-8">
-           <div className="relative w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search events, organizers, or tags..."
-                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-brand/20 focus:ring-4 focus:ring-brand/5 rounded-2xl py-2 pl-12 pr-4 text-sm font-medium transition-all"
-              />
-           </div>
-        </div> */}
-
         {/* Right: Actions & Profile */}
         <div className="flex items-center gap-3">
           <button className="p-2 text-gray-400 hover:text-brand rounded-xl">
@@ -97,7 +85,6 @@ export function DiscoveryNavbar() {
                    <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
                       <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
                    </Link>
-                   <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
                        <ProfileItem 
                          icon={LayoutGrid} 

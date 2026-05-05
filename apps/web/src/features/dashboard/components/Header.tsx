@@ -87,7 +87,6 @@ export function Header() {
                   <Link href="/dashboard/profile" onClick={() => setIsProfileOpen(false)}>
                     <ProfileItem icon={User} label="Profile" onClick={() => {}} />
                   </Link>
-                  <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                 </div>
                 
                 <div className="h-px bg-gray-50 my-1" />
