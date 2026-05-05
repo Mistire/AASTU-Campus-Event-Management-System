@@ -25,6 +25,7 @@ import { EditProfileModal } from "./EditProfileModal";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export function ProfileView() {
   const { profile, clearAuth } = useAuthStore();
@@ -40,15 +41,13 @@ export function ProfileView() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        toast.loading("Uploading image...", { id: "profile-upload" });
+        toast.loading("Uploading to Cloudinary...", { id: "profile-upload" });
         
-        // Mocking Cloudinary upload for now
-        // const uploadedUrl = await uploadToCloudinary(file);
+        const uploadedUrl = await uploadToCloudinary(file);
         
-        // await updateProfile.mutateAsync({ profileImage: uploadedUrl });
+        await updateProfile.mutateAsync({ profileImage: uploadedUrl });
         
-        toast.success("Profile image updated (Cloudinary integration pending)", { id: "profile-upload" });
-        console.log("File ready for Cloudinary:", file);
+        toast.success("Profile image updated successfully", { id: "profile-upload" });
       } catch (error: any) {
         toast.error(error.message || "Failed to upload image", { id: "profile-upload" });
       }

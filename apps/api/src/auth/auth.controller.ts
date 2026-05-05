@@ -141,6 +141,8 @@ export class AuthController {
       sessionId: user.sessionId,
       isEmailVerified: user.isEmailVerified,
       isCampusIdVerified: user.isCampusIdVerified,
+      profileImage: user.profileImage,
+      phone: user.phone,
     };
   }
 }

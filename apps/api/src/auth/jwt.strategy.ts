@@ -19,6 +19,8 @@ export type AuthUser = {
   sessionId: string;
   isEmailVerified: boolean;
   isCampusIdVerified: boolean;
+  profileImage?: string;
+  phone?: string;
 };
 
 @Injectable()
@@ -91,6 +93,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       sessionId: session.id,
       isEmailVerified: user.isEmailVerified,
       isCampusIdVerified: user.isCampusIdVerified,
+      profileImage: user.profileImage,
+      phone: user.phone,
     };
   }
 }

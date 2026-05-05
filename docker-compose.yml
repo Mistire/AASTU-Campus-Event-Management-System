@@ -103,6 +103,8 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: http://localhost
       NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:-your_cloud_name}
+      NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: ${NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:-your_upload_preset}
       PORT: 3001
       WATCHPACK_POLLING: "true"
     volumes:
