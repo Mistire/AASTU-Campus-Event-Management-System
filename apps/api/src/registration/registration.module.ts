@@ -11,11 +11,13 @@ import { RegistrationController } from './registration.controller';
 import { AuthModule } from '../auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
-    PrismaModule, 
-    AnalyticsModule, 
+    PrismaModule,
+    EventsModule,
+    AnalyticsModule,
     NotificationsModule,
     AuthModule,
     ConfigModule,

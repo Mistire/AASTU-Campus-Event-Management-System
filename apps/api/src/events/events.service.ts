@@ -254,6 +254,8 @@ export class EventsService {
         entityId: event.id,
         outcome: 'SUCCESS',
         details: `Event submitted for approval: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
       });
     } catch (e) {
       this.logger.error(`Failed to create audit log: ${e.message}`);
@@ -280,12 +282,14 @@ export class EventsService {
     // Audit Log
     try {
       await this.auditLogsService.createLog({
-        userId: adminId || event.createdBy, 
+        userId: adminId || event.createdBy || 'SYSTEM', 
         action: 'APPROVE_EVENT',
         entityType: 'EVENT',
         entityId: event.id,
         outcome: 'SUCCESS',
         details: `Event approved: "${event.title}"${adminId ? ` by admin ${adminId}` : ''}`,
+        beforeState: { ...event },
+        afterState: { ...updated },
       });
     } catch (e) {
       this.logger.error(`Failed to create audit log: ${e.message}`);
@@ -312,12 +316,14 @@ export class EventsService {
     // Audit Log
     try {
       await this.auditLogsService.createLog({
-        userId: adminId || event.createdBy,
+        userId: adminId || event.createdBy || 'SYSTEM',
         action: 'REJECT_EVENT',
         entityType: 'EVENT',
         entityId: event.id,
         outcome: 'SUCCESS',
         details: `Event rejected: "${event.title}"${reason ? `. Reason: ${reason}` : ''}${adminId ? ` by admin ${adminId}` : ''}`,
+        beforeState: { ...event },
+        afterState: { ...updated },
       });
     } catch (e) {
       this.logger.error(`Failed to create audit log: ${e.message}`);
@@ -328,7 +334,25 @@ export class EventsService {
 
   async cancel(eventId: string, userId: string) {
     const event = await this.assertOrganizerOrCreator(eventId, userId);
-    return this.transitionStatus(event.id, event.statusId, 'CANCELLED');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'CANCELLED');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'CANCEL_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event cancelled: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updated;
   }
 
   async goLive(eventId: string, userId?: string) {
@@ -337,6 +361,22 @@ export class EventsService {
     }
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'LIVE');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: userId || event.createdBy || 'SYSTEM',
+        action: 'GO_LIVE',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event went live: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
 
     // Notify all registered attendees
     const registrations = await this.prisma.registration.findMany({
@@ -389,7 +429,25 @@ export class EventsService {
   async archive(eventId: string, userId: string) {
     await this.assertOrganizerOrCreator(eventId, userId);
     const event = await this.findOneRaw(eventId);
-    return this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'ARCHIVE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event archived: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updated;
   }
 
   async remove(eventId: string, user: AuthUser) {

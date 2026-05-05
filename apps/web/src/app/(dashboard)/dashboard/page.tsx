@@ -105,7 +105,7 @@ export default function DashboardPage() {
           {row.index + 1}
         </span>
       ),
-      size: 40,
+      size: 32,
       enableSorting: false,
     },
     {

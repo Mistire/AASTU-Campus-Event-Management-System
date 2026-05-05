@@ -69,3 +69,16 @@ export class FeedbackAnalyticsDto {
   totalFeedback: number;
   distribution: { score: number; count: number }[];
 }
+
+export class ArchivedEventDto {
+  id: string;
+  title: string;
+  startTime: Date;
+  endTime: Date;
+  status: string;
+  totalRegistrations: number;
+  attendanceCount: number;
+  attendanceRate: number;
+  averageRating: number;
+  organizerName?: string;
+}

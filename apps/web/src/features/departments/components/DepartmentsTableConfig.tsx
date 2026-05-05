@@ -8,7 +8,7 @@ export const getDepartmentsColumns = (): ColumnDef<Department>[] => [
         id: "index",
         header: "No.",
         cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
+        size: 32,
     },
     {
         accessorKey: "name",

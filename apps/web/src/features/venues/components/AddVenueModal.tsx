@@ -2,17 +2,13 @@
 
 import { useState } from "react";
 import { MapPin, Building2, Users, Info, Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useCreateVenue } from "../api";
 import { ToastController } from "@/components/shared/ToastController";
 import { ModalHeader } from "@/components/shared/ModalHeader";
 import { ModalFooter } from "@/components/shared/ModalFooter";
 import { InputController } from "@/components/shared/InputController";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 
 interface AddVenueModalProps {
   open: boolean;
@@ -21,7 +17,7 @@ interface AddVenueModalProps {
 
 export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
   const createVenue = useCreateVenue();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     building: "",
@@ -53,7 +49,7 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
         capacity: parseInt(formData.capacity),
         description: formData.description,
       });
-      
+
       ToastController.success({ message: "Venue created successfully" });
       setFormData({
         name: "",
@@ -64,17 +60,19 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
       });
       onOpenChange(false);
     } catch (error: any) {
-      ToastController.error({ 
-        message: error.message || "Failed to create venue" 
+      ToastController.error({
+        message: error.message || "Failed to create venue",
       });
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const next = { ...prev };
         delete next[name];
         return next;
@@ -84,10 +82,13 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="p-0 border-none bg-transparent shadow-none max-w-lg">
+      <DialogContent
+        showCloseButton={false}
+        className="p-0 border-none bg-transparent shadow-none max-w-lg"
+      >
         <div className="bg-white rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
           <ModalHeader title="Add New Venue" />
-          
+
           <div className="p-8 space-y-6 overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Name */}
@@ -137,7 +138,10 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
               {/* Description */}
               <div className="md:col-span-2 space-y-2 group">
                 <div className="flex items-center gap-2 px-1">
-                  <Info size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                  <Info
+                    size={12}
+                    className="text-brand/50 group-focus-within:text-brand transition-colors"
+                  />
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-gray-600 transition-colors">
                     Description
                   </label>
@@ -153,7 +157,7 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
             </div>
           </div>
 
-          <ModalFooter 
+          <ModalFooter
             onCancel={() => onOpenChange(false)}
             onSave={handleSubmit}
             saveText="Create Venue"

@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminDashboardStatsDto, AssignRoleDto, ListUserQueryDto } from './dto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   async listUsers(query: ListUserQueryDto) {
     try {
@@ -107,7 +111,7 @@ export class AdminService {
         throw new NotFoundException('Role not found');
       }
 
-      return this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id: userId },
         data: { roleId: dto.roleId },
         include: {
@@ -123,6 +127,24 @@ export class AdminService {
           department: true,
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: 'ADMIN', // The admin performing the action (should ideally pass from controller)
+          action: 'ASSIGN_ROLE',
+          entityType: 'USER',
+          entityId: userId,
+          outcome: 'SUCCESS',
+          details: `Role updated for user: ${user.email}`,
+          beforeState: { ...user },
+          afterState: { ...updatedUser },
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+
+      return updatedUser;
     } catch (err) {
       console.error('AdminService.assignRoleToUser error:', err);
       throw err;
