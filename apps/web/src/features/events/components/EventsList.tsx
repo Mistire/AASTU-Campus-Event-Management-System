@@ -204,53 +204,7 @@ export const EventsList = () => {
         )}
       </div>
 
-      {/* Filter Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Organized By</label>
-          <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Organizers" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Organizers</SelectItem>
-              {users?.map((u) => (
-                <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
 
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Event Status</label>
-          <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Statuses</SelectItem>
-              {STATUS_OPTIONS.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Venue</label>
-          <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Venues" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Venues</SelectItem>
-              {venues?.map((v) => (
-                <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
       {/* Master-Detail Layout */}
       <div className="flex gap-6">
@@ -277,16 +231,54 @@ export const EventsList = () => {
                 setLimit(newSize);
                 setPage(1);
             }}
+            renderToolbarActions={() => (
+              <div className="flex items-center gap-2">
+                <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
+                  <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                    <SelectValue placeholder="Organizer" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                    <SelectItem value="">All Organizers</SelectItem>
+                    {users?.map((u) => (
+                      <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
+                  <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                    <SelectItem value="">All Statuses</SelectItem>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
+                  <SelectTrigger className="h-8 min-w-[130px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                    <SelectValue placeholder="Venue" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                    <SelectItem value="">All Venues</SelectItem>
+                    {venues?.map((v) => (
+                      <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
           />
         </div>
 
-        {/* Detail Panel */}
-        {previewEvent && (
-          <EventPreviewPanel 
-            event={previewEvent} 
-            onClose={() => setPreviewEvent(null)} 
-          />
-        )}
+        {/* Detail Panel Overlay */}
+        <EventPreviewPanel 
+          event={previewEvent} 
+          onClose={() => setPreviewEvent(null)} 
+        />
       </div>
 
       <EventFormModal 

@@ -35,6 +35,7 @@ export const getEventsColumns = (
         {row.index + 1}
       </span>
     ),
+    size: 32,
   },
   {
     accessorKey: "title",

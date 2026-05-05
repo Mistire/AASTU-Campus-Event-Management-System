@@ -229,7 +229,7 @@ export class RegistrationService implements OnModuleInit {
         async (tx) => {
           const reg = await tx.registration.findUnique({
             where: { id: registrationId },
-            include: { status: true },
+            include: { status: true, event: true },
           });
           if (!reg) {
             throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -266,9 +266,9 @@ export class RegistrationService implements OnModuleInit {
               entityType: 'EVENT',
               entityId: reg.eventId,
               outcome: 'SUCCESS',
-              details: `User cancelled their registration for event`,
-              beforeState: reg,
-              afterState: updated,
+              details: `Student cancelled registration for event: "${reg.event?.title}"`,
+              beforeState: { ...reg },
+              afterState: { ...updated },
             });
           } catch (e) {
             this.logger.error(`Failed to create audit log: ${e.message}`);
@@ -330,6 +330,22 @@ export class RegistrationService implements OnModuleInit {
       this.logger.error(`Failed to send registration ticket after approval: ${err.message}`);
     });
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: organizerId,
+        action: 'EVENT_REGISTRATION_APPROVE',
+        entityType: 'EVENT',
+        entityId: reg.eventId,
+        outcome: 'SUCCESS',
+        details: `Organizer approved registration for student`,
+        beforeState: { ...reg },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
@@ -342,7 +358,7 @@ export class RegistrationService implements OnModuleInit {
 
     const reg = await this.prisma.registration.findUnique({
       where: { id: registrationId },
-      include: { status: true },
+      include: { status: true, event: true },
     });
     if (!reg) {
       throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -365,6 +381,23 @@ export class RegistrationService implements OnModuleInit {
     );
 
     await this.analyticsService.invalidateEventCache(reg.eventId);
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: organizerId,
+        action: 'EVENT_REGISTRATION_REJECT',
+        entityType: 'EVENT',
+        entityId: reg.eventId,
+        outcome: 'SUCCESS',
+        details: `Organizer rejected registration for student`,
+        beforeState: { ...reg },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
@@ -380,7 +413,7 @@ export class RegistrationService implements OnModuleInit {
         async (tx) => {
           const reg = await tx.registration.findUnique({
             where: { id: registrationId },
-            include: { status: true },
+            include: { status: true, event: true },
           });
           if (!reg) {
             throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -408,6 +441,23 @@ export class RegistrationService implements OnModuleInit {
           );
 
           await this.analyticsService.invalidateEventCache(reg.eventId);
+
+          // Audit Log
+          try {
+            await this.auditLogsService.createLog({
+              userId: organizerId,
+              action: 'EVENT_REGISTRATION_REMOVE',
+              entityType: 'EVENT',
+              entityId: reg.eventId,
+              outcome: 'SUCCESS',
+              details: `Organizer removed registration for student`,
+              beforeState: { ...reg },
+              afterState: { ...updated },
+            });
+          } catch (e) {
+            this.logger.error(`Failed to create audit log: ${e.message}`);
+          }
+
           return updated;
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },

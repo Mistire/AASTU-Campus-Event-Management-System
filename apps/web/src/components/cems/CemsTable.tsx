@@ -69,6 +69,9 @@ interface CemsTableProps<TData> {
   /** External table instance (advanced usage) */
   tableInstance?: TableInstance<TData>;
 
+  /** Render additional items in the toolbar */
+  renderToolbarActions?: (table: TableInstance<TData>) => React.ReactNode;
+  
   /** Hide the toolbar */
   hideToolbar?: boolean;
 
@@ -99,6 +102,7 @@ export function CemsTable<TData>({
   onSelectionChange,
   tableInstance: providedTable,
   hideToolbar = false,
+  renderToolbarActions,
   className,
 }: CemsTableProps<TData>) {
   /* ── Local state ────────────────────────────────────────────── */
@@ -228,6 +232,13 @@ export function CemsTable<TData>({
               />
             </div>
           )}
+          
+          {renderToolbarActions && (
+             <div className="flex items-center gap-2">
+                {renderToolbarActions(table)}
+             </div>
+          )}
+
           <div className="flex-1" />
           {enableColumnVisibility && (
             <ColumnVisibilityPopover columns={visibleColumns} />
@@ -245,7 +256,7 @@ export function CemsTable<TData>({
                   <TableHead
                     key={header.id}
                     className={cn(
-                      "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 px-5",
+                      "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 px-2 first:pl-5 first:pr-1 last:pr-5",
                       header.column.getCanSort() && "cursor-pointer select-none hover:text-gray-800 transition-colors"
                     )}
                     style={header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined}
@@ -270,10 +281,10 @@ export function CemsTable<TData>({
                 <TableRow
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
-                  className={cn("border-b border-gray-100 hover:bg-brand/[0.06] transition-colors duration-150", onRowClick && "cursor-pointer")}
+                  className={cn("border-b border-gray-100 hover:bg-brand/6 transition-colors duration-150", onRowClick && "cursor-pointer")}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-5 py-3 text-sm text-gray-700 whitespace-nowrap">
+                    <TableCell key={cell.id} className="px-2 py-3 text-sm text-gray-700 whitespace-nowrap first:pl-5 first:pr-1 last:pr-5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

@@ -28,6 +28,7 @@ export interface UserQuery {
     page?: number;
     limit?: number;
     search?: string;
+    roleId?: string;
 }
 
 export async function fetchUsers(query: UserQuery) {
@@ -35,6 +36,7 @@ export async function fetchUsers(query: UserQuery) {
     if (query.page) searchParams.append('page', query.page.toString());
     if (query.limit) searchParams.append('limit', query.limit.toString());
     if (query.search) searchParams.append('search', query.search);
+    if (query.roleId) searchParams.append('roleId', query.roleId);
 
     const res = await apiFetch(`/api/admin/users?${searchParams.toString()}`, {
         method: 'GET',

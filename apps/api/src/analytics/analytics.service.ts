@@ -16,6 +16,7 @@ import {
   TrendPointDto,
   UserEngagementDto,
   OrganizerOverviewDto,
+  ArchivedEventDto,
 } from './dto/response.dto';
 import { ExportQueryDto } from './dto/export-query.dto';
 import { TimeRangeDto } from './dto/time-range.dto';
@@ -42,10 +43,7 @@ export class AnalyticsService {
 
   private getOrganizerEventFilter(userId: string) {
     return {
-      OR: [
-        { createdBy: userId },
-        { organizers: { some: { userId, status: 'ACCEPTED' } } },
-      ],
+      OR: [{ createdBy: userId }, { organizers: { some: { userId, status: 'ACCEPTED' } } }],
     };
   }
 
@@ -348,8 +346,137 @@ export class AnalyticsService {
     });
   }
 
-  async getTopEvents(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<TopEventDto[]> {
-    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+  async getAdminArchive(): Promise<ArchivedEventDto[]> {
+    const now = new Date();
+
+    const events = await this.prisma.event.findMany({
+      where: {
+        OR: [
+          { endTime: { lt: now } },
+          { status: { statusName: { in: ['COMPLETED', 'CANCELLED'], mode: 'insensitive' } } },
+        ],
+      },
+      include: {
+        status: true,
+        creator: {
+          select: {
+            fullName: true,
+          },
+        },
+        registrations: {
+          select: { status: { select: { name: true } } },
+        },
+        attendance: {
+          where: { sessionId: null },
+          select: { id: true },
+        },
+        feedback: {
+          select: { rating: true },
+        },
+      },
+      orderBy: { endTime: 'desc' },
+    });
+
+    return events.map((event) => {
+      const totalRegistrations = event.registrations.length;
+      const confirmedRegistrations = event.registrations.filter(
+        (r) => r.status.name.toUpperCase() === 'CONFIRMED',
+      ).length;
+      const attendanceCount = event.attendance.length;
+      const attendanceRate =
+        confirmedRegistrations > 0 ? (attendanceCount / confirmedRegistrations) * 100 : 0;
+
+      const totalFeedback = event.feedback.length;
+      const averageRating =
+        totalFeedback > 0
+          ? event.feedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback
+          : 0;
+
+      return {
+        id: event.id,
+        title: event.title,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        status: event.status.statusName,
+        organizerName: event.creator?.fullName || 'System Admin',
+        totalRegistrations,
+        attendanceCount,
+        attendanceRate,
+        averageRating,
+      };
+    });
+  }
+
+  async getOrganizerArchive(userId: string): Promise<ArchivedEventDto[]> {
+    const eventFilter = this.getOrganizerEventFilter(userId);
+    const now = new Date();
+
+    const events = await this.prisma.event.findMany({
+      where: {
+        AND: [
+          eventFilter,
+          {
+            OR: [
+              { endTime: { lt: now } },
+              { status: { statusName: { equals: 'CANCELLED', mode: 'insensitive' } } },
+            ],
+          },
+        ],
+      },
+      include: {
+        status: true,
+        registrations: {
+          select: { status: { select: { name: true } } },
+        },
+        attendance: {
+          where: { sessionId: null },
+          select: { id: true },
+        },
+        feedback: {
+          select: { rating: true },
+        },
+      },
+      orderBy: { endTime: 'desc' },
+    });
+
+    return events.map((event) => {
+      const totalRegistrations = event.registrations.length;
+      const confirmedRegistrations = event.registrations.filter(
+        (r) => r.status.name.toUpperCase() === 'CONFIRMED',
+      ).length;
+      const attendanceCount = event.attendance.length;
+      const attendanceRate =
+        confirmedRegistrations > 0 ? (attendanceCount / confirmedRegistrations) * 100 : 0;
+
+      const totalFeedback = event.feedback.length;
+      const averageRating =
+        totalFeedback > 0
+          ? event.feedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback
+          : 0;
+
+      return {
+        id: event.id,
+        title: event.title,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        status: event.status.statusName,
+        totalRegistrations,
+        attendanceCount,
+        attendanceRate,
+        averageRating,
+      };
+    });
+  }
+
+  async getTopEvents(
+    query: TimeRangeDto,
+    userId?: string,
+    isAdmin?: boolean,
+  ): Promise<TopEventDto[]> {
+    const hash = createHash('md5')
+      .update(JSON.stringify({ query, userId, isAdmin }))
+      .digest('hex')
+      .slice(0, 8);
     const cacheKey = `analytics:top-events:${hash}`;
 
     const cached = await this.getCached<TopEventDto[]>(cacheKey);
@@ -391,8 +518,15 @@ export class AnalyticsService {
     return result;
   }
 
-  async getCategoryAnalytics(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<CategoryAnalyticsDto[]> {
-    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+  async getCategoryAnalytics(
+    query: TimeRangeDto,
+    userId?: string,
+    isAdmin?: boolean,
+  ): Promise<CategoryAnalyticsDto[]> {
+    const hash = createHash('md5')
+      .update(JSON.stringify({ query, userId, isAdmin }))
+      .digest('hex')
+      .slice(0, 8);
     const cacheKey = `analytics:categories:${hash}`;
 
     const cached = await this.getCached<CategoryAnalyticsDto[]>(cacheKey);
@@ -449,8 +583,15 @@ export class AnalyticsService {
     return result;
   }
 
-  async getDepartmentAnalytics(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<DepartmentAnalyticsDto[]> {
-    const hash = createHash('md5').update(JSON.stringify({ query, userId, isAdmin })).digest('hex').slice(0, 8);
+  async getDepartmentAnalytics(
+    query: TimeRangeDto,
+    userId?: string,
+    isAdmin?: boolean,
+  ): Promise<DepartmentAnalyticsDto[]> {
+    const hash = createHash('md5')
+      .update(JSON.stringify({ query, userId, isAdmin }))
+      .digest('hex')
+      .slice(0, 8);
     const cacheKey = `analytics:departments:${hash}`;
 
     const cached = await this.getCached<DepartmentAnalyticsDto[]>(cacheKey);
@@ -487,7 +628,11 @@ export class AnalyticsService {
     return result;
   }
 
-  async getAdminTrends(query: TimeRangeDto, userId?: string, isAdmin?: boolean): Promise<TrendPointDto[]> {
+  async getAdminTrends(
+    query: TimeRangeDto,
+    userId?: string,
+    isAdmin?: boolean,
+  ): Promise<TrendPointDto[]> {
     const { start, end } = this.resolveTimeRange(query);
     const eventFilter = !isAdmin && userId ? this.getOrganizerEventFilter(userId) : {};
 

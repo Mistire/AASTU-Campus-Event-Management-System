@@ -126,6 +126,7 @@ export class AttendanceService {
           entityId: checkin.id,
           outcome: 'SUCCESS',
           details: `Guest check-in for event: "${event.title}"`,
+          afterState: checkin,
         });
       } catch (e) {
         console.error(`Failed to create audit log: ${e.message}`);
@@ -179,6 +180,7 @@ export class AttendanceService {
           entityId: checkin.id,
           outcome: 'SUCCESS',
           details: `Student check-in for event: "${event.title}"`,
+          afterState: checkin,
         });
       } catch (e) {
         console.error(`Failed to create audit log: ${e.message}`);
@@ -252,6 +254,7 @@ export class AttendanceService {
         entityId: checkin.id,
         outcome: 'SUCCESS',
         details: `Manual check-in for event: "${event.title}"`,
+        afterState: checkin,
       });
     } catch (e) {
       console.error(`Failed to create audit log: ${e.message}`);

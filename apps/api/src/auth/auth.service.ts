@@ -225,7 +225,8 @@ export class AuthService {
       const token = await this.consumeOneTimeToken('EMAIL_VERIFICATION', dto.token);
       if (!token) throw new BadRequestException('Invalid or expired token');
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: { isEmailVerified: true, emailVerifiedAt: new Date() },
@@ -236,6 +237,22 @@ export class AuthService {
           data: { usedAt: new Date() },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'EMAIL_VERIFICATION',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User verified email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Email verified successfully' };
     } catch (err) {
@@ -251,7 +268,8 @@ export class AuthService {
 
       const newHash = await argon.hash(dto.newPassword);
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: {
@@ -273,6 +291,22 @@ export class AuthService {
           },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'PASSWORD_RESET',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User reset password for email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Password reset successfully. Please log in with your new password.' };
     } catch (err) {
@@ -366,7 +400,7 @@ export class AuthService {
         throw new BadRequestException('This campus ID is already linked to another account');
       }
 
-      await this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id: user.id },
         data: {
           studentId: parsed.studentId,
@@ -375,6 +409,22 @@ export class AuthService {
           campusIdVerifiedAt: new Date(),
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'CAMPUS_ID_VERIFICATION',
+          entityType: 'USER',
+          entityId: user.id,
+          outcome: 'SUCCESS',
+          details: `User verified campus ID: ${parsed.studentId}`,
+          beforeState: user,
+          afterState: updated,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return {
         message: 'Campus ID verified successfully',
