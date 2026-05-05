@@ -113,8 +113,8 @@ export default function MyEventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="max-w-7xl mx-auto px-6 pt-32 pb-24 space-y-12">
+    <div className="min-h-screen">
+      <main className="max-w-7xl mx-auto px-6 space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
