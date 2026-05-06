@@ -1,9 +1,10 @@
-import { Settings, Users, Target, Info, Calendar, GraduationCap, UserPlus } from "lucide-react";
+import { Settings, Users, Target, Info, Calendar, GraduationCap } from "lucide-react";
 import { InputController } from "@/components/shared/InputController";
 import { useEventTypes } from "../../api/get-event-types";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
 import { EventType } from "../../types";
+import { GraduationSetupSection } from "./GraduationSetupSection";
 
 interface AdvancedConfigStepProps {
   data: EventFormData;
@@ -96,38 +97,7 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
 
         {/* Conditional Graduation Settings */}
         {isGraduation && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-8 bg-brand/5 rounded-xl border border-brand/10 space-y-8">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-brand flex items-center justify-center border-4 border-white shadow-lg shadow-brand/20">
-                  <GraduationCap className="text-white" size={18} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Graduation Ceremony</h3>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Manage student guest invitations</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <InputController
-                  label="Guest Limit Per Student"
-                  icon={UserPlus}
-                  type="number"
-                  value={data.guestLimitPerUser ?? 2}
-                  onChange={(e) => onUpdate({ guestLimitPerUser: parseInt(e.target.value) || 0 })}
-                  placeholder="e.g. 2"
-                />
-                <div className="bg-white/50 p-4 rounded-xl border border-brand/5 flex items-center gap-3">
-                  <div className="p-2 bg-brand/10 rounded-lg text-brand">
-                    <Info size={16} />
-                  </div>
-                  <p className="text-[10px] font-medium text-gray-500 leading-tight">
-                    Registered students will be allowed to invite this many guests. Each guest will receive a unique digital ticket via email.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <GraduationSetupSection data={data} onUpdate={onUpdate} />
         )}
       </WizardSection>
     </div>

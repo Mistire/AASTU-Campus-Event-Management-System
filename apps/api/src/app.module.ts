@@ -22,6 +22,8 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { SupportModule } from './support/support.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { GraduationModule } from './graduation/graduation.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
     SupportModule,
     FeedbackModule,
     BookmarksModule,
+    GraduationModule,
+    TelegramModule,
   ],
 })
 export class AppModule {}

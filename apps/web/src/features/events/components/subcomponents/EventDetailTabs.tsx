@@ -1,7 +1,8 @@
-import { Building2, Hash, MapPin, CheckCircle2, Users, Layers, Shield } from "lucide-react";
+import { Building2, Hash, MapPin, CheckCircle2, Users, Layers, Shield, GraduationCap } from "lucide-react";
 import { CemsTab } from "@/components/cems/CemsTab";
 import { AttendanceHub } from "../attendance/AttendanceHub";
 import { EventOrganizers } from "../organizers/EventOrganizers";
+import { GraduationGuestsTab } from "../graduation/GraduationGuestsTab";
 
 interface EventDetailTabsProps {
   eventId: string;
@@ -11,6 +12,8 @@ interface EventDetailTabsProps {
 }
 
 export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDetailTabsProps) {
+  const isGraduation = event?.eventType?.name?.toUpperCase() === "GRADUATION";
+
   const allTabs = [
     {
       value: "attendance",
@@ -18,6 +21,13 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
       icon: <Users className="w-full h-full" />,
       hidden: !canManage,
       content: <AttendanceHub eventId={eventId} canEdit={canEdit} />,
+    },
+    {
+      value: "graduation-guests",
+      label: "Graduation Guests",
+      icon: <GraduationCap className="w-full h-full" />,
+      hidden: !canManage || !isGraduation,
+      content: <GraduationGuestsTab eventId={eventId} />,
     },
     {
       value: "team",

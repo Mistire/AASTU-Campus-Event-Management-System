@@ -444,10 +444,11 @@ model EventInvites {
   createdAt    DateTime     @default(now()) @map("created_at")
   invitedBy    String       @map("invited_by") @db.Uuid
   respondedAt  DateTime?    @map("responded_at")
-  attendance   Attendance[]
-  event        Event        @relation(fields: [eventId], references: [id])
-  inviter      User         @relation("InviterUser", fields: [invitedBy], references: [id])
-  user         User?        @relation("InvitedUser", fields: [userId], references: [id])
+  attendance        Attendance[]
+  event             Event             @relation(fields: [eventId], references: [id])
+  inviter           User              @relation("InviterUser", fields: [invitedBy], references: [id])
+  user              User?             @relation("InvitedUser", fields: [userId], references: [id])
+  graduationRecord  GraduationRecord?
 
   @@unique([eventId, invitedEmail])
   @@map("event_invites")
@@ -641,4 +642,41 @@ enum TicketStatus {
 enum OneTimeTokenType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+}
+
+// ─── Graduation Feature ───────────────────────────────────────────────────────
+
+model GraduationRecord {
+  id          String       @id @default(uuid()) @db.Uuid
+  inviteId    String       @unique @map("invite_id") @db.Uuid
+  fullName    String       @map("full_name") @db.VarChar
+  gpa         Float
+  tier        String       @db.VarChar
+  guestSlots  Int          @map("guest_slots")
+  claimToken  String       @unique @map("claim_token") @db.VarChar
+  claimed     Boolean      @default(false)
+  claimedAt   DateTime?    @map("claimed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  invite      EventInvites @relation(fields: [inviteId], references: [id])
+  guestPasses GuestPass[]
+
+  @@map("graduation_records")
+}
+
+model GuestPass {
+  id                 String           @id @default(uuid()) @db.Uuid
+  graduationRecordId String           @map("graduation_record_id") @db.Uuid
+  parentLabel        String           @map("parent_label") @db.VarChar
+  deliveryMethod     String           @map("delivery_method") @db.VarChar
+  telegramUsername   String?          @map("telegram_username") @db.VarChar
+  parentEmail        String?          @map("parent_email") @db.VarChar
+  telegramChatId     String?          @map("telegram_chat_id") @db.VarChar
+  telegramToken      String?          @unique @map("telegram_token") @db.VarChar
+  qrToken            String           @unique @map("qr_token") @db.VarChar
+  delivered          Boolean          @default(false)
+  deliveredAt        DateTime?        @map("delivered_at")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  graduationRecord   GraduationRecord @relation(fields: [graduationRecordId], references: [id])
+
+  @@map("guest_passes")
 }
