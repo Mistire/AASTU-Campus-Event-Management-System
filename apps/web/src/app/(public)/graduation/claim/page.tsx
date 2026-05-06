@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { GraduationCap, CheckCircle, Mail, Send, Copy, Check, Loader2, AlertCircle, Star, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CemsButton } from "@/components/cems/CemsButton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -267,17 +268,17 @@ export default function GraduationClaimPage() {
             {/* Delivery toggle */}
             <div className="flex gap-2">
               {(["TELEGRAM", "EMAIL"] as DeliveryMethod[]).map((method) => (
-                <button
+                <CemsButton
                   key={method}
                   onClick={() => updateParent(i, "deliveryMethod", method)}
                   className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
                     parent.deliveryMethod === method
-                      ? "bg-gray-900 text-white shadow"
-                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                      ? "bg-brand text-white shadow"
+                      : "bg-gray-50 text-gray-400 hover:bg-gray-200"
                   }`}
                 >
-                  {method === "TELEGRAM" ? "📨 Telegram" : "✉️ Email"}
-                </button>
+                  {method === "TELEGRAM" ? "Telegram" : "Email"}
+                </CemsButton>
               ))}
             </div>
 
@@ -323,17 +324,17 @@ export default function GraduationClaimPage() {
         )}
 
         {/* Submit */}
-        <Button
+        <CemsButton
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
+          className="w-full h-14 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
         >
           {submitting ? (
             <><Loader2 size={16} className="mr-2 animate-spin" /> Processing...</>
           ) : (
             <><GraduationCap size={16} className="mr-2" /> Submit &amp; Get Links</>
           )}
-        </Button>
+        </CemsButton>
 
         <p className="text-center text-xs text-gray-400">
           This link is personal to you and can only be used once.
