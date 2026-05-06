@@ -40,18 +40,24 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
 
     // Use polling in development (no public URL needed), webhook in production
     const webhookUrl = this.configService.get<string>('TELEGRAM_WEBHOOK_URL');
-    try {
-      if (webhookUrl) {
-        await this.bot.telegram.setWebhook(webhookUrl);
-        this.logger.log(`Telegram webhook set to ${webhookUrl}`);
-      } else {
-        await this.bot.launch({ dropPendingUpdates: true });
-        this.isPolling = true;
-        this.logger.log('Telegram bot started in polling mode (development)');
-      }
-    } catch (err: any) {
-      this.logger.error(`Failed to start Telegram bot: ${err.message}`);
-      this.logger.warn('The API will continue running without Telegram functionality.');
+    if (webhookUrl) {
+      // Webhook mode: async but quick
+      this.bot.telegram.setWebhook(webhookUrl)
+        .then(() => this.logger.log(`Telegram webhook set to ${webhookUrl}`))
+        .catch((err: any) => {
+          this.logger.error(`Failed to set Telegram webhook: ${err.message}`);
+          this.logger.warn('The API will continue running without Telegram webhook.');
+        });
+    } else {
+      // Polling mode: bot.launch() blocks internally — run it detached so onModuleInit returns immediately
+      this.bot.launch({ dropPendingUpdates: true })
+        .then(() => this.logger.log('Telegram bot started in polling mode (development)'))
+        .catch((err: any) => {
+          this.logger.error(`Failed to start Telegram bot in polling mode: ${err.message}`);
+          this.logger.warn('The API will continue running without Telegram functionality.');
+        });
+      this.isPolling = true;
+      this.logger.log('Telegram bot launch initiated (non-blocking)');
     }
   }
 

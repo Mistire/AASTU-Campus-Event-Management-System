@@ -66,7 +66,7 @@ export function GraduationSetupSection({ data, onUpdate, eventId }: GraduationSe
     try {
       const formData = new FormData();
       formData.append("file", csvFile);
-      const res = await apiFetch(`/graduation/${eventId}/import-csv`, {
+      const res = await apiFetch(`/api/graduation/${eventId}/import-csv`, {
         method: "POST",
         body: formData,
       });
@@ -100,7 +100,7 @@ export function GraduationSetupSection({ data, onUpdate, eventId }: GraduationSe
     let successCount = 0;
     for (const row of validRows) {
       try {
-        const res = await apiFetch(`/graduation/${eventId}/add-student`, {
+        const res = await apiFetch(`/api/graduation/${eventId}/add-student`, {
           method: "POST",
           body: JSON.stringify({
             email: row.email,

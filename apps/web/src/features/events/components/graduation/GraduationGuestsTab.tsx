@@ -21,7 +21,7 @@ const TIER = {
 // ─── API Calls ────────────────────────────────────────────────────────────────
 
 async function fetchStudents(eventId: string) {
-  const res = await apiFetch(`/graduation/${eventId}/students`);
+  const res = await apiFetch(`/api/graduation/${eventId}/students`);
   const data = await res.json();
   return data.data ?? data;
 }
@@ -36,7 +36,7 @@ function AddStudentForm({ eventId, onSuccess }: { eventId: string; onSuccess: ()
     if (!form.email || !form.fullName || !form.gpa) return;
     setLoading(true);
     try {
-      const res = await apiFetch(`/graduation/${eventId}/add-student`, {
+      const res = await apiFetch(`/api/graduation/${eventId}/add-student`, {
         method: "POST",
         body: JSON.stringify({
           email: form.email,
@@ -92,7 +92,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await apiFetch(`/graduation/${eventId}/import-csv`, {
+      const res = await apiFetch(`/api/graduation/${eventId}/import-csv`, {
         method: "POST",
         body: formData,
       });
@@ -167,7 +167,7 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
   const handleResend = async (guestPassId: string) => {
     setResending(guestPassId);
     try {
-      const res = await apiFetch(`/graduation/guest-pass/${guestPassId}/resend`, {
+      const res = await apiFetch(`/api/graduation/guest-pass/${guestPassId}/resend`, {
         method: "POST"
       });
       const data = await res.json();
