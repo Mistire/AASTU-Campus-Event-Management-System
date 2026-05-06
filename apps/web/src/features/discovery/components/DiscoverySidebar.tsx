@@ -8,7 +8,8 @@ import {
   History, 
   Bookmark,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -37,6 +38,12 @@ const SIDEBAR_ITEMS = [
     href: "/my-events/bookmarks",
     icon: Bookmark,
     description: "Saved for later"
+  },
+    {
+    label: "Profile",
+    href: "/profile",
+    icon: User,
+    description: "My profile"
   }
 ];
 

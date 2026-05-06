@@ -205,7 +205,7 @@ export const TicketModal = ({
             <div className="px-7 pb-6 pt-1 flex gap-3">
               <CemsButton
                 onClick={() => window.print()}
-                className="flex-1 h-12 rounded-2xl bg-gray-900 hover:bg-gray-800 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-gray-900/20 cursor-pointer"
+                className="flex-1 h-12 rounded-2xl bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer"
               >
                 <Download size={14} />
                 Save Ticket

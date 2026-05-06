@@ -1,15 +1,11 @@
 "use client";
 
-import { LayoutGrid } from "lucide-react";
 
 export function DiscoveryHeader() {
   return (
-    <header className="pt-4 space-y-2">
+    <header className="pt-1 space-y-2 ml-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center">
-          <LayoutGrid className="text-brand" size={20} />
-        </div>
-        <h1 className="text-4xl font-black tracking-tight text-gray-900">
+        <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
           Discovery <span className="text-brand">Center</span>
         </h1>
       </div>

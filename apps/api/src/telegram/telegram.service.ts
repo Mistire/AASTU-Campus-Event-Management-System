@@ -40,13 +40,18 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
 
     // Use polling in development (no public URL needed), webhook in production
     const webhookUrl = this.configService.get<string>('TELEGRAM_WEBHOOK_URL');
-    if (webhookUrl) {
-      await this.bot.telegram.setWebhook(webhookUrl);
-      this.logger.log(`Telegram webhook set to ${webhookUrl}`);
-    } else {
-      this.bot.launch({ dropPendingUpdates: true });
-      this.isPolling = true;
-      this.logger.log('Telegram bot started in polling mode (development)');
+    try {
+      if (webhookUrl) {
+        await this.bot.telegram.setWebhook(webhookUrl);
+        this.logger.log(`Telegram webhook set to ${webhookUrl}`);
+      } else {
+        await this.bot.launch({ dropPendingUpdates: true });
+        this.isPolling = true;
+        this.logger.log('Telegram bot started in polling mode (development)');
+      }
+    } catch (err: any) {
+      this.logger.error(`Failed to start Telegram bot: ${err.message}`);
+      this.logger.warn('The API will continue running without Telegram functionality.');
     }
   }
 
