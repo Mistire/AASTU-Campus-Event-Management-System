@@ -8,6 +8,7 @@ import { EventFeedCard } from "@/features/events/components/EventFeedCard";
 import { EventHeroCard } from "@/features/events/components/EventHeroCard";
 import { FilterBar } from "@/features/events/components/FilterBar";
 import { DiscoveryHeader } from "@/features/discovery/components/DiscoveryHeader";
+import { DiscoveryCarousel } from "@/features/discovery/components/DiscoveryCarousel";
 import { Button } from "@/components/ui/button";
 import {
   Compass,
@@ -62,7 +63,7 @@ export default function StudentHomePage() {
 
   return (
     <OnboardingGate>
-      <div className="max-w-[1400px] mx-auto space-y-12 pb-20">
+      <div className="max-w-[1400px] mx-auto ml-3 space-y-12 pb-20">
         <DiscoveryHeader />
 
         {!hasFilters && (
@@ -82,30 +83,28 @@ export default function StudentHomePage() {
               </Button>
             </div>
 
-            <div className="relative group">
-              <div className="flex items-center gap-6 overflow-x-auto pb-8 pt-2 px-2 scrollbar-hide">
-                {isLoadingRecs ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl shrink-0"
-                    />
+            <DiscoveryCarousel>
+              {isLoadingRecs ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl shrink-0"
+                  />
+                ))
+              ) : recommendations && recommendations.length > 0 ? (
+                Array.from(new Set(recommendations.map((e) => e.id)))
+                  .map((id) => recommendations.find((e) => e.id === id)!)
+                  .map((event) => (
+                    <EventHeroCard key={event.id} event={event} />
                   ))
-                ) : recommendations && recommendations.length > 0 ? (
-                  Array.from(new Set(recommendations.map((e) => e.id)))
-                    .map((id) => recommendations.find((e) => e.id === id)!)
-                    .map((event) => (
-                      <EventHeroCard key={event.id} event={event} />
-                    ))
-                ) : (
-                  <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-                    <p className="text-sm font-bold uppercase tracking-widest">
-                      Feed is being personalized...
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+              ) : (
+                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+                  <p className="text-sm font-bold uppercase tracking-widest">
+                    Feed is being personalized...
+                  </p>
+                </div>
+              )}
+            </DiscoveryCarousel>
           </section>
         )}
 

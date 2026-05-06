@@ -1,13 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { CategoryRecord } from '../types';
 import { Tag as TagIcon } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
     {
         id: "index",
         header: "No.",
         cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
+        size: 32,
     },
     {
         accessorKey: "name",
@@ -16,7 +17,7 @@ export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
             <div className="flex items-center gap-2">
                 <TagIcon className="w-4 h-4 text-brand" />
                 <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors">
-                    {row.original.name}
+                    {truncate(row.original.name, 25)}
                 </span>
             </div>
         ),
@@ -24,7 +25,7 @@ export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
     {
         accessorKey: "description",
         header: "Description",
-        cell: ({ row }) => <span className="text-sm font-medium text-gray-600 line-clamp-1">{row.original.description}</span>,
+        cell: ({ row }) => <span className="text-sm font-medium text-gray-600">{truncate(row.original.description, 25)}</span>,
     },
     {
         accessorKey: "eventCount",

@@ -76,9 +76,17 @@
         ]
     },
     {
-        "name": "export-logs",
+        "name": "activity",
         "allowed": [
             "ADMIN"
+        ]
+    },
+    {
+        "name": "invitations",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STAFF"
         ]
     }
 ]

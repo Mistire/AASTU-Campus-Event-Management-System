@@ -8,11 +8,29 @@ import { useUsers } from '@/features/users/api/getUsers';
 import { getUsersColumns } from '@/features/users/components/UsersTableConfig';
 import { UserRecord } from '@/features/users/types';
 import { UserPreviewPanel } from '@/features/users/components/UserPreviewPanel';
+import { useRoles } from '@/features/permissions/api/getRoles';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function UsersPage() {
-    const { data: users, isLoading, error } = useUsers();
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [search, setSearch] = useState("");
+    const [roleId, setRoleId] = useState<string>("");
+
+    const { data: roles } = useRoles();
+
+    const { data: usersData, isLoading, error } = useUsers({
+        page,
+        limit,
+        search,
+        roleId: roleId || undefined
+    });
+
     const columns = getUsersColumns();
     const [previewUser, setPreviewUser] = useState<UserRecord | null>(null);
+
+    const totalPages = usersData?.meta?.totalPages || 1;
+    const totalItems = usersData?.meta?.total || 0;
 
     if (error) {
         return (
@@ -43,31 +61,52 @@ export default function UsersPage() {
                 </CemsButton>
             </div>
 
-            {/* Master-Detail Layout */}
-            <div className="flex gap-6">
-                {/* Table */}
-                <div className="bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm border border-gray-200 flex-1 min-w-0">
-                    <CemsTable
-                        data={users || []}
-                        columns={columns}
-                        loading={isLoading}
-                        emptyMessage="No users found."
-                        enableSorting
-                        enableGlobalFilter
-                        enableColumnVisibility
-                        enableRowSelection
-                        onRowClick={(user) => setPreviewUser(user)}
-                    />
-                </div>
-
-                {/* Detail Panel */}
-                {previewUser && (
-                    <UserPreviewPanel 
-                        user={previewUser} 
-                        onClose={() => setPreviewUser(null)} 
-                    />
-                )}
+            {/* Table */}
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                <CemsTable
+                    data={usersData?.data || []}
+                    columns={columns}
+                    loading={isLoading}
+                    emptyMessage="No users found."
+                    enableSorting
+                    enableGlobalFilter
+                    enableColumnVisibility
+                    onRowClick={(user) => setPreviewUser(user)}
+                    
+                    // Server-side pagination props
+                    manualPagination
+                    pageCount={totalPages}
+                    pageIndex={page - 1}
+                    pageSize={limit}
+                    totalItems={totalItems}
+                    onPageChange={(newPageIndex) => setPage(newPageIndex + 1)}
+                    onPageSizeChange={(newSize) => {
+                        setLimit(newSize);
+                        setPage(1);
+                    }}
+                    renderToolbarActions={() => (
+                        <div className="flex items-center gap-2">
+                            <Select value={roleId} onValueChange={(val) => { setRoleId(val ?? ""); setPage(1); }}>
+                                <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                                    <SelectValue placeholder="Filter by Role" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                                    <SelectItem value="">All Roles</SelectItem>
+                                    {roles?.map((r: any) => (
+                                        <SelectItem key={r.id} value={r.id}>{r.roleName}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                />
             </div>
+
+            {/* Detail Panel Overlay */}
+            <UserPreviewPanel 
+                user={previewUser} 
+                onClose={() => setPreviewUser(null)} 
+            />
         </div>
     );
 }

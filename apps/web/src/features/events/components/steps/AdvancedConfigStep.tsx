@@ -1,9 +1,10 @@
-import { Settings, Users, Target, Info, Calendar } from "lucide-react";
+import { Settings, Users, Target, Info, Calendar, GraduationCap } from "lucide-react";
 import { InputController } from "@/components/shared/InputController";
 import { useEventTypes } from "../../api/get-event-types";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
 import { EventType } from "../../types";
+import { GraduationSetupSection } from "./GraduationSetupSection";
 
 interface AdvancedConfigStepProps {
   data: EventFormData;
@@ -13,7 +14,9 @@ interface AdvancedConfigStepProps {
 export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) {
   const { data: eventTypes } = useEventTypes();
   const selectedType = (eventTypes as EventType[])?.find((t) => t.id === data.eventTypeId);
-  const isHackathon = selectedType?.name?.toUpperCase() === "HACKATHON";
+  const typeName = selectedType?.name?.toUpperCase() || "";
+  const isHackathon = typeName === "HACKATHON";
+  const isGraduation = typeName === "GRADUATION";
 
   const handleUpdate = (field: keyof EventFormData["hackathonConfig"], value: string | number) => {
     onUpdate({ 
@@ -29,7 +32,7 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
         title="Global Overrides" 
         subtitle="Custom configurations & rules"
       >
-        {!isHackathon && (
+        {!isHackathon && !isGraduation && (
           <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/30">
             <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
               <Settings className="text-gray-200" size={24} />
@@ -90,6 +93,11 @@ export function AdvancedConfigStep({ data, onUpdate }: AdvancedConfigStepProps) 
               />
             </div>
           </div>
+        )}
+
+        {/* Conditional Graduation Settings */}
+        {isGraduation && (
+          <GraduationSetupSection data={data} onUpdate={onUpdate} />
         )}
       </WizardSection>
     </div>

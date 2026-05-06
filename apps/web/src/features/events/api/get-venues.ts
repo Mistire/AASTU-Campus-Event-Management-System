@@ -9,7 +9,7 @@ const getVenues = async (): Promise<Venue[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch venues");
   
-  return (result.data?.data || result.data) || [];
+  return result.data?.data || result.data || result || [];
 };
 
 export const useVenues = () => {

@@ -1,51 +1,75 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminDashboardStatsDto, AssignRoleDto, ListUserQueryDto } from './dto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
   async listUsers(query: ListUserQueryDto) {
     try {
-      return this.prisma.user.findMany({
-        where: {
-          ...(query.roleId ? { roleId: query.roleId } : {}),
-          ...(query.search
-            ? {
-                OR: [
-                  {
-                    fullName: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+      const { page = 1, limit = 10, search, roleId } = query;
+      const skip = (page - 1) * limit;
+
+      const where = {
+        ...(roleId ? { roleId } : {}),
+        ...(search
+          ? {
+              OR: [
+                {
+                  fullName: {
+                    contains: search,
+                    mode: 'insensitive' as const,
                   },
-                  {
-                    email: {
-                      contains: query.search,
-                      mode: 'insensitive',
-                    },
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: 'insensitive' as const,
                   },
-                ],
-              }
-            : {}),
-        },
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true,
+                },
+              ],
+            }
+          : {}),
+      };
+
+      const [data, total] = await Promise.all([
+        this.prisma.user.findMany({
+          where,
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
                 },
               },
             },
+            department: true,
           },
-          department: true,
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip,
+          take: limit,
+        }),
+        this.prisma.user.count({ where }),
+      ]);
+
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
+      };
     } catch (err) {
       console.error('AdminService.listUsers error:', err);
       throw err;
@@ -87,7 +111,7 @@ export class AdminService {
         throw new NotFoundException('Role not found');
       }
 
-      return this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id: userId },
         data: { roleId: dto.roleId },
         include: {
@@ -103,6 +127,24 @@ export class AdminService {
           department: true,
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: 'ADMIN', // The admin performing the action (should ideally pass from controller)
+          action: 'ASSIGN_ROLE',
+          entityType: 'USER',
+          entityId: userId,
+          outcome: 'SUCCESS',
+          details: `Role updated for user: ${user.email}`,
+          beforeState: { ...user },
+          afterState: { ...updatedUser },
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+
+      return updatedUser;
     } catch (err) {
       console.error('AdminService.assignRoleToUser error:', err);
       throw err;

@@ -1,13 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { VenueRecord } from '../types';
+import { Venue } from '../api';
 import { Home } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
-export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
+export const getVenuesColumns = (): ColumnDef<Venue>[] => [
     {
         id: "index",
         header: "No.",
         cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
+        size: 32,
     },
     {
         accessorKey: "name",
@@ -16,7 +17,7 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
             <div className="flex items-center gap-2">
                 <Home className="w-4 h-4 text-brand" />
                 <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors">
-                    {row.original.name}
+                    {truncate(row.original.name, 25)}
                 </span>
             </div>
         ),
@@ -24,12 +25,12 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
     {
         accessorKey: "building",
         header: "Building",
-        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{row.original.building}</span>,
+        cell: ({ row }) => <span className="text-sm font-bold text-gray-700">{truncate(row.original.building || 'N/A', 25)}</span>,
     },
     {
         accessorKey: "roomNumber",
         header: "Room",
-        cell: ({ row }) => <span className="text-sm font-semibold text-gray-600">{row.original.roomNumber}</span>,
+        cell: ({ row }) => <span className="text-sm font-semibold text-gray-600">{row.original.roomNumber || 'N/A'}</span>,
     },
     {
         accessorKey: "capacity",
@@ -37,7 +38,7 @@ export const getVenuesColumns = (): ColumnDef<VenueRecord>[] => [
         cell: ({ row }) => (
             <div>
                 <span className="text-sm font-black text-gray-900 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
-                    {row.original.capacity}
+                    {row.original.capacity || 0}
                 </span>
             </div>
         ),

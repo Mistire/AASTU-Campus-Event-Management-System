@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PendingInvitationsModal } from '@/features/events/components/organizers/PendingInvitationsModal';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -56,11 +57,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                <main className="flex-1 p-6 md:p-8 lg:p-10 w-full overflow-y-visible">
+                <main className="flex-1 px-6 py-8 md:px-12 md:py-10 lg:px-16 lg:py-12 w-full overflow-y-visible max-w-[1450px] mx-auto">
                     <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
                         {children}
                     </div>
                 </main>
+                <PendingInvitationsModal />
             </div>
         </div>
     );

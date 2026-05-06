@@ -1,13 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Tag } from '../api';
 import { Hash } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getTagsColumns = (): ColumnDef<Tag>[] => [
     {
         id: "index",
         header: "No.",
         cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
+        size: 32,
     },
     {
         accessorKey: "name",
@@ -16,7 +17,7 @@ export const getTagsColumns = (): ColumnDef<Tag>[] => [
             <div className="flex items-center gap-2">
                 <Hash className="w-4 h-4 text-brand" />
                 <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors lowercase">
-                    {row.original.name}
+                    {truncate(row.original.name, 25)}
                 </span>
             </div>
         ),

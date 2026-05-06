@@ -32,6 +32,7 @@ export interface Event {
   eventType?: EventType | null;
   venue: Venue;
   createdBy: string;
+  guestLimitPerUser?: number;
   organizers?: Array<{
     id: string;
     userId: string;

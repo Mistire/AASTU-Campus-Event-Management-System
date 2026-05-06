@@ -23,6 +23,7 @@ import { TicketGeneratorUtil } from './ticket-generator.util';
 import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -48,6 +49,7 @@ export class EventsService {
     private readonly notificationsService: NotificationsService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -194,6 +196,21 @@ export class EventsService {
       },
     });
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'CREATE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event created: "${event.title}"`,
+        afterState: event,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return event;
   }
 
@@ -215,7 +232,7 @@ export class EventsService {
 
     // 2. Notify all Admins
     const admins = await this.prisma.user.findMany({
-      where: { role: { roleName: 'Admin' } },
+      where: { role: { roleName: 'ADMIN' } },
       select: { id: true },
     });
 
@@ -228,10 +245,26 @@ export class EventsService {
       );
     }
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'SUBMIT_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event submitted for approval: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
-  async approve(eventId: string) {
+  async approve(eventId: string, adminId?: string) {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'APPROVED');
 
@@ -246,10 +279,26 @@ export class EventsService {
       NotificationType.EVENT_APPROVED,
     );
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: adminId || event.createdBy || 'SYSTEM', 
+        action: 'APPROVE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event approved: "${event.title}"${adminId ? ` by admin ${adminId}` : ''}`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
-  async reject(eventId: string, reason?: string) {
+  async reject(eventId: string, adminId?: string, reason?: string) {
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'REJECTED');
 
@@ -264,12 +313,46 @@ export class EventsService {
       NotificationType.EVENT_REJECTED,
     );
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: adminId || event.createdBy || 'SYSTEM',
+        action: 'REJECT_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event rejected: "${event.title}"${reason ? `. Reason: ${reason}` : ''}${adminId ? ` by admin ${adminId}` : ''}`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
   async cancel(eventId: string, userId: string) {
     const event = await this.assertOrganizerOrCreator(eventId, userId);
-    return this.transitionStatus(event.id, event.statusId, 'CANCELLED');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'CANCELLED');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'CANCEL_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event cancelled: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updated;
   }
 
   async goLive(eventId: string, userId?: string) {
@@ -278,6 +361,22 @@ export class EventsService {
     }
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'LIVE');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: userId || event.createdBy || 'SYSTEM',
+        action: 'GO_LIVE',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event went live: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
 
     // Notify all registered attendees
     const registrations = await this.prisma.registration.findMany({
@@ -330,7 +429,25 @@ export class EventsService {
   async archive(eventId: string, userId: string) {
     await this.assertOrganizerOrCreator(eventId, userId);
     const event = await this.findOneRaw(eventId);
-    return this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
+    const updated = await this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'ARCHIVE_EVENT',
+        entityType: 'EVENT',
+        entityId: event.id,
+        outcome: 'SUCCESS',
+        details: `Event archived: "${event.title}"`,
+        beforeState: { ...event },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updated;
   }
 
   async remove(eventId: string, user: AuthUser) {
@@ -364,7 +481,12 @@ export class EventsService {
       const startTime = dto.startTime ? new Date(dto.startTime) : event.startTime;
       const endTime = dto.endTime ? new Date(dto.endTime) : event.endTime;
 
-      const isAvailable = await this.venuesService.checkAvailability(venueId, startTime, endTime);
+      const isAvailable = await this.venuesService.checkAvailability(
+        venueId,
+        startTime,
+        endTime,
+        eventId,
+      );
       if (!isAvailable) {
         throw new BadRequestException('The venue is already booked for this time range');
       }
@@ -390,7 +512,7 @@ export class EventsService {
       }
     }
 
-    return this.prisma.event.update({
+    const updatedEvent = await this.prisma.event.update({
       where: { id: eventId },
       data: {
         ...(dto.title && { title: dto.title }),
@@ -404,11 +526,29 @@ export class EventsService {
       },
       include: this.defaultIncludes(),
     });
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId,
+        action: 'UPDATE_EVENT',
+        entityType: 'EVENT',
+        entityId: eventId,
+        outcome: 'SUCCESS',
+        details: `Event updated: "${updatedEvent.title}"`,
+        beforeState: event,
+        afterState: updatedEvent,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    return updatedEvent;
   }
 
   // FIND ALL — with status, type, tag and search filters + pagination
 
-  async findAll(query: EventQueryDto, user: AuthUser) {
+  async findAll(query: EventQueryDto, user?: AuthUser) {
     const {
       search,
       date,
@@ -426,20 +566,20 @@ export class EventsService {
     const where: any = {};
 
     // 1. Enforce Status Visibility Logic
-    const userRole = user.role; // Student, Organizer, Admin
+    const userRole = user?.role?.toUpperCase();
 
-    if (userRole === 'Admin') {
+    if (userRole === 'ADMIN') {
       // Admins see whatever they specifically filter for, or everything if no filter
       if (status) {
         where.status = { statusName: status };
       }
     } else {
-      // Non-Admins: Students and Organizers
+      // Non-Admins: Students, Organizers, or Guests (undefined user)
       if (status) {
         // If a specific status is requested, verify permission
         if (['APPROVED', 'LIVE'].includes(status)) {
           where.status = { statusName: status };
-        } else {
+        } else if (user) {
           // Attempting to see DRAFT/PENDING: only if they are the creator or organizer
           where.AND = [
             { status: { statusName: status } },
@@ -450,24 +590,32 @@ export class EventsService {
               ],
             },
           ];
+        } else {
+          // Guest cannot see non-public statuses
+          where.status = { statusName: { in: ['APPROVED', 'LIVE'] } };
         }
       } else {
         // Default View: Show APPROVED and LIVE events
-        // PLUS show the user's own DRAFT/PENDING events if they are an organizer
-        where.OR = [
-          { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
-          {
-            AND: [
-              { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
-              {
-                OR: [
-                  { createdBy: user.id },
-                  { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
-                ],
-              },
-            ],
-          },
-        ];
+        if (user) {
+          // PLUS show the user's own DRAFT/PENDING events if they are an organizer
+          where.OR = [
+            { status: { statusName: { in: ['APPROVED', 'LIVE'] } } },
+            {
+              AND: [
+                { status: { statusName: { in: ['DRAFT', 'PENDING'] } } },
+                {
+                  OR: [
+                    { createdBy: user.id },
+                    { organizers: { some: { userId: user.id, status: 'ACCEPTED' } } },
+                  ],
+                },
+              ],
+            },
+          ];
+        } else {
+          // Guest only sees public events
+          where.status = { statusName: { in: ['APPROVED', 'LIVE'] } };
+        }
       }
     }
 

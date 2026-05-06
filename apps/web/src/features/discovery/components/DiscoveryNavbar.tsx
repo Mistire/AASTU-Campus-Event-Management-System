@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/ui/Logo";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import Image from "next/image";
 
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
@@ -30,37 +31,22 @@ export function DiscoveryNavbar() {
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 h-16">
       <div className="max-w-[1400px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         
-        {/* Left: Branding & Nav Links */}
         <div className="flex items-center gap-10">
           <Logo />
 
-          <div className="hidden md:flex items-center gap-1">
-             <NavItem 
-               href="/discovery" 
-               label="Discovery" 
-               icon={LayoutGrid} 
-               active={pathname === "/discovery"} 
-             />
-             <NavItem 
-               href="/my-events" 
-               label="My Events" 
-               icon={Calendar} 
-               active={pathname === "/my-events"}
-             />
+          <div className="h-8 w-px bg-gray-100 hidden md:block" />
+
+          <div className="hidden md:flex flex-col">
+             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none mb-1">Current View</p>
+             <h2 className="text-sm font-black text-gray-900 uppercase tracking-tight">
+                {pathname === "/discovery" ? "Event Discovery" : 
+                 pathname === "/my-events" ? "My Schedule" : 
+                 pathname === "/my-events/past" ? "Event History" :
+                 pathname === "/my-events/bookmarks" ? "Saved Events" :
+                 pathname === "/profile" ? "User Profile" : "Campus Events"}
+             </h2>
           </div>
         </div>
-
-        {/* Center: Search (Visible on md+) */}
-        {/* <div className="hidden lg:flex flex-1 max-w-md mx-8">
-           <div className="relative w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search events, organizers, or tags..."
-                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-brand/20 focus:ring-4 focus:ring-brand/5 rounded-2xl py-2 pl-12 pr-4 text-sm font-medium transition-all"
-              />
-           </div>
-        </div> */}
 
         {/* Right: Actions & Profile */}
         <div className="flex items-center gap-3">
@@ -75,8 +61,12 @@ export function DiscoveryNavbar() {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center gap-2 p-1 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
             >
-              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10">
-                 <User className="text-brand" size={16} />
+              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
+                 {profile?.profileImage ? (
+                   <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+                 ) : (
+                   <User className="text-brand" size={16} />
+                 )}
               </div>
               <div className="hidden sm:block text-left">
                  <p className="text-xs font-black text-gray-900 leading-none truncate max-w-[100px]">{profile?.full_name}</p>
@@ -100,7 +90,6 @@ export function DiscoveryNavbar() {
                    <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
                       <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
                    </Link>
-                   <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
                        <ProfileItem 
                          icon={LayoutGrid} 
@@ -130,27 +119,6 @@ export function DiscoveryNavbar() {
   );
 }
 
-interface NavItemProps {
-  href: string;
-  label: string;
-  icon: any;
-  active?: boolean;
-}
-
-const NavItem = ({ href, label, icon: Icon, active }: NavItemProps) => (
-  <Link
-    href={href}
-    className={cn(
-      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300",
-      active
-        ? "bg-brand/10 text-brand shadow-sm shadow-brand/5"
-        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-    )}
-  >
-    <Icon size={18} className={active ? "text-brand" : "text-gray-400"} />
-    {label}
-  </Link>
-);
 
 interface ProfileItemProps {
   icon: any;

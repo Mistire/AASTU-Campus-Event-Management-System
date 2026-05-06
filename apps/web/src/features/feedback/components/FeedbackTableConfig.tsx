@@ -1,6 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { FeedbackRecord } from '../types';
 import { User, Star } from 'lucide-react';
+import { truncate } from "@/lib/utils";
 
 export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
     {
@@ -10,27 +11,27 @@ export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
         size: 50,
     },
     {
-        accessorKey: "userName",
+        accessorKey: "user",
         header: "User",
         cell: ({ row }) => (
-            <div className="flex items-center gap-2 font-black text-gray-900 group-hover:text-brand transition-colors">
-                <User className="w-4 h-4 text-brand" />
-                {row.original.userName}
+            <div className="flex flex-col">
+                <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{truncate(row.original.user.fullName, 25)}</span>
+                <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{row.original.user.email}</span>
             </div>
         ),
     },
     {
-        accessorKey: "eventName",
+        accessorKey: "event",
         header: "Event",
-        cell: ({ row }) => <span className="text-sm font-bold text-gray-600 line-clamp-1">{row.original.eventName}</span>,
+        cell: ({ row }) => <span className="text-sm font-black text-gray-900">{truncate(row.original.event.title, 25)}</span>,
     },
     {
         accessorKey: "rating",
         header: "Rating",
         cell: ({ row }) => (
-            <div className="flex items-center gap-1.5 font-black text-amber-500 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100 shadow-sm w-fit">
-                <Star className="w-3.5 h-3.5 fill-amber-500" />
-                {row.original.rating}/5
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-full border border-amber-100 shadow-sm w-fit">
+                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span className="text-xs font-black text-amber-700">{row.original.rating}</span>
             </div>
         ),
     },
@@ -38,18 +39,14 @@ export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
         accessorKey: "comment",
         header: "Comment",
         cell: ({ row }) => (
-            <span className="text-sm font-medium text-gray-500 italic line-clamp-1 max-w-[280px]">
-                &quot;{row.original.comment}&quot;
+            <span className="text-sm font-medium text-gray-600 line-clamp-1 max-w-[300px]">
+                {row.original.comment || <span className="text-gray-300 italic">No comment</span>}
             </span>
         ),
     },
     {
-        accessorKey: "date",
+        accessorKey: "createdAt",
         header: "Date",
-        cell: ({ row }) => (
-            <div className="text-right pr-4">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.original.date}</span>
-            </div>
-        ),
+        cell: ({ row }) => <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{new Date(row.original.createdAt).toLocaleDateString()}</span>,
     },
 ];

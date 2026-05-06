@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { NotificationPopover } from "@/features/notifications/components/NotificationPopover";
@@ -52,8 +53,12 @@ export function Header() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors">
-              <User className="text-brand" size={20} />
+            <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors overflow-hidden relative">
+              {profile?.profileImage ? (
+                <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+              ) : (
+                <User className="text-brand" size={20} />
+              )}
             </div>
             <div className="hidden sm:block text-left mr-2 min-w-[80px]">
               <p className="text-xs font-black text-gray-900 leading-tight truncate">
@@ -87,7 +92,6 @@ export function Header() {
                   <Link href="/dashboard/profile" onClick={() => setIsProfileOpen(false)}>
                     <ProfileItem icon={User} label="Profile" onClick={() => {}} />
                   </Link>
-                  <ProfileItem icon={Settings} label="Preferences" onClick={() => {}} />
                 </div>
                 
                 <div className="h-px bg-gray-50 my-1" />

@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { truncate } from "@/lib/utils";
 import { AttendanceRecord } from "../../types/attendance";
 import { format } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
@@ -15,10 +16,10 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
         </div>
         <div>
           <p className="font-black text-sm text-gray-900 tracking-tight leading-none mb-1">
-            {row.original.user.fullName}
+            {truncate(row.original.user.fullName, 25)}
           </p>
           <p className="text-[10px] font-bold text-gray-400">
-            {row.original.user.email}
+            {truncate(row.original.user.email, 25)}
           </p>
         </div>
       </div>
@@ -40,7 +41,7 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
         <span className="font-bold text-sm text-gray-700">
-          {row.original.session?.title || "Main Event"}
+          {truncate(row.original.session?.title || "Main Event", 25)}
         </span>
       </div>
     ),

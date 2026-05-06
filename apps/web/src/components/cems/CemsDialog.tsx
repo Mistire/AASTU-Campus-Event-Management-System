@@ -40,7 +40,7 @@ export function CemsDialogContent({
   return (
     <DialogContent
       className={cn(
-        "rounded-xl border-none bg-white shadow-2xl shadow-gray-300/40 p-0 gap-0 overflow-hidden",
+        "rounded-xl border-none bg-white shadow-2xl shadow-gray-300/40 p-0 gap-0 overflow-hidden flex flex-col",
         sizeMap[size],
         className,
       )}
@@ -113,9 +113,9 @@ export function CemsDialogFooter({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <DialogFooter
+    <div
       className={cn(
-        "px-6 py-4 border-t border-gray-50 bg-gray-50/30",
+        "px-8 py-6 border-t border-gray-100 bg-gray-50/50 flex items-center justify-end gap-3 mt-auto shrink-0",
         className,
       )}
       {...props}

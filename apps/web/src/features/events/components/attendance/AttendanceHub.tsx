@@ -2,16 +2,17 @@ import { ClipboardCheck, Camera, Maximize2, FileDown, Table as TableIcon, FileTe
 import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
 import { AttendanceStats } from "../AttendanceStats";
 import { AttendanceTable } from "../AttendanceTable";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { AttendeeScanner } from "./AttendeeScanner";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 interface AttendanceHubProps {
   eventId: string;
+  canEdit: boolean;
 }
 
-export function AttendanceHub({ eventId }: AttendanceHubProps) {
+export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -55,14 +56,16 @@ export function AttendanceHub({ eventId }: AttendanceHubProps) {
             </button>
           </div>
 
-          <CemsButton 
-            onClick={() => setIsScannerOpen(true)}
-            className="h-14 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 flex items-center gap-3 active:scale-95 transition-all"
-          >
-            <Camera size={18} />
-            Launch QR Scanner
-            <Maximize2 size={16} className="opacity-50" />
-          </CemsButton>
+          {canEdit && (
+            <CemsButton 
+              onClick={() => setIsScannerOpen(true)}
+              className="h-14 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 flex items-center gap-3 active:scale-95 transition-all"
+            >
+              <Camera size={18} />
+              Launch QR Scanner
+              <Maximize2 size={16} className="opacity-50" />
+            </CemsButton>
+          )}
         </div>
       </div>
 

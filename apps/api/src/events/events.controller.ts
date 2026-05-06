@@ -16,7 +16,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { EventQueryDto } from './dto/event-query.dto';
 import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guard';
-import { Roles, GetUser } from '../auth/decorator';
+import { Roles, GetUser, Public } from '../auth/decorator';
 import type { AuthUser } from '../auth/jwt.strategy';
 
 @ApiTags('Events')
@@ -41,9 +41,10 @@ export class EventsController {
     return this.eventsService.inviteGuests(eventId, userId, dto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all events with filtering and pagination' })
-  findAll(@GetUser() user: AuthUser, @Query() query: EventQueryDto) {
+  findAll(@GetUser() user: AuthUser | undefined, @Query() query: EventQueryDto) {
     return this.eventsService.findAll(query, user);
   }
 
@@ -61,6 +62,7 @@ export class EventsController {
     return this.eventsService.getMyOrganizedEvents(user.id, query);
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get full event details by ID' })
   findOne(@Param('id') id: string) {
@@ -92,15 +94,15 @@ export class EventsController {
   @Patch(':id/approve')
   @Roles('Admin')
   @ApiOperation({ summary: 'Approve event (PENDING → APPROVED). Admin only.' })
-  approve(@Param('id') id: string) {
-    return this.eventsService.approve(id);
+  approve(@Param('id') id: string, @GetUser() user: AuthUser) {
+    return this.eventsService.approve(id, user.id);
   }
 
   @Patch(':id/reject')
   @Roles('Admin')
   @ApiOperation({ summary: 'Reject event (PENDING → REJECTED). Admin only.' })
-  reject(@Param('id') id: string, @Body('reason') reason?: string) {
-    return this.eventsService.reject(id, reason);
+  reject(@Param('id') id: string, @GetUser() user: AuthUser, @Body('reason') reason?: string) {
+    return this.eventsService.reject(id, user.id, reason);
   }
 
   @Patch(':id/cancel')

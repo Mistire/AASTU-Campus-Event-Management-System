@@ -10,10 +10,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InviteOrganizerDto } from './dto/invitation.dto';
+import { EmailService } from '../auth/email.service';
 
 @Injectable()
 export class OrganizersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async invite(eventId: string, inviterId: string, dto: InviteOrganizerDto) {
     const event = await this.prisma.event.findUnique({
@@ -65,6 +69,18 @@ export class OrganizersService {
       },
     });
 
+    // Send Email
+    const inviter = await this.prisma.user.findUnique({ where: { id: inviterId } });
+    try {
+      await this.emailService.sendOrganizerInvitationEmail(
+        organizer.user.email,
+        inviter?.fullName || 'An organizer',
+        event.title,
+      );
+    } catch (e) {
+      console.error(`Failed to send organizer invitation email: ${e.message}`);
+    }
+
     return organizer;
   }
 
@@ -108,6 +124,21 @@ export class OrganizersService {
         type: 'ORGANIZER_RESPONSE',
       },
     });
+
+    // Send Email to Creator
+    const creator = await this.prisma.user.findUnique({ where: { id: organizer.event.createdBy } });
+    if (creator?.email) {
+      try {
+        await this.emailService.sendOrganizerResponseEmail(
+          creator.email,
+          updated.user.fullName,
+          organizer.event.title,
+          newStatus,
+        );
+      } catch (e) {
+        console.error(`Failed to send organizer response email: ${e.message}`);
+      }
+    }
 
     return updated;
   }

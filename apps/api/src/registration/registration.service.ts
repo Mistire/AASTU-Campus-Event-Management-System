@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { Prisma, Registration, EventWaitlist } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TicketGeneratorUtil } from '../events/ticket-generator.util';
 import { Event } from '@prisma/client';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 // ─── DTOs ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +39,7 @@ export type RegistrationResult =
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 @Injectable()
-export class RegistrationService {
+export class RegistrationService implements OnModuleInit {
   private readonly logger = new Logger(RegistrationService.name);
   /** In-memory cache: status name → status id */
   private readonly statusCache = new Map<string, string>();
@@ -50,7 +52,38 @@ export class RegistrationService {
     private readonly emailService: EmailService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
+
+  async onModuleInit() {
+    await this.bootstrapStatuses();
+  }
+
+  /**
+   * Ensures that the required registration statuses exist in the database.
+   * This provides a permanent fix for cases where the database seed hasn't been run.
+   */
+  private async bootstrapStatuses() {
+    const statuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'REJECTED', 'APPROVED'];
+    this.logger.log('Bootstrapping registration statuses...');
+
+    for (const name of statuses) {
+      try {
+        const existing = await this.prisma.registrationStatus.findFirst({
+          where: { name },
+        });
+
+        if (!existing) {
+          await this.prisma.registrationStatus.create({
+            data: { name },
+          });
+        }
+      } catch (error) {
+        this.logger.error(`Failed to bootstrap status ${name}: ${error.message}`);
+      }
+    }
+    this.logger.log('Registration statuses bootstrapped successfully.');
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Status id cache
@@ -157,6 +190,24 @@ export class RegistrationService {
         });
       }
 
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId,
+          action: result.kind === 'registered' ? 'EVENT_REGISTRATION' : 'EVENT_WAITLIST_JOIN',
+          entityType: 'EVENT',
+          entityId: eventId,
+          outcome: 'SUCCESS',
+          details:
+            result.kind === 'registered'
+              ? `User registered for event. Status: ${dto.userId === userId ? 'Direct' : 'Admin Action'}`
+              : `User joined event waitlist`,
+          afterState: result,
+        });
+      } catch (e) {
+        this.logger.error(`Failed to create audit log: ${e.message}`);
+      }
+
       return result;
     } catch (err) {
       this.rethrowSerializationError(err);
@@ -178,7 +229,7 @@ export class RegistrationService {
         async (tx) => {
           const reg = await tx.registration.findUnique({
             where: { id: registrationId },
-            include: { status: true },
+            include: { status: true, event: true },
           });
           if (!reg) {
             throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -206,6 +257,23 @@ export class RegistrationService {
           }
 
           await this.analyticsService.invalidateEventCache(reg.eventId);
+
+          // Audit Log
+          try {
+            await this.auditLogsService.createLog({
+              userId: studentId,
+              action: 'EVENT_REGISTRATION_CANCEL',
+              entityType: 'EVENT',
+              entityId: reg.eventId,
+              outcome: 'SUCCESS',
+              details: `Student cancelled registration for event: "${reg.event?.title}"`,
+              beforeState: { ...reg },
+              afterState: { ...updated },
+            });
+          } catch (e) {
+            this.logger.error(`Failed to create audit log: ${e.message}`);
+          }
+
           return updated;
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -220,10 +288,6 @@ export class RegistrationService {
   // Organizer actions
   // ──────────────────────────────────────────────────────────────────────────
 
-  /**
-   * Organizer approves a PENDING registration.
-   * Requirements: 4.1, 4.2, 4.5, 4.6
-   */
   async approveByOrganizer(dto: OrganizerActionDto): Promise<Registration> {
     const { registrationId, organizerId } = dto;
 
@@ -266,6 +330,22 @@ export class RegistrationService {
       this.logger.error(`Failed to send registration ticket after approval: ${err.message}`);
     });
 
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: organizerId,
+        action: 'EVENT_REGISTRATION_APPROVE',
+        entityType: 'EVENT',
+        entityId: reg.eventId,
+        outcome: 'SUCCESS',
+        details: `Organizer approved registration for student`,
+        beforeState: { ...reg },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
@@ -278,7 +358,7 @@ export class RegistrationService {
 
     const reg = await this.prisma.registration.findUnique({
       where: { id: registrationId },
-      include: { status: true },
+      include: { status: true, event: true },
     });
     if (!reg) {
       throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -301,6 +381,23 @@ export class RegistrationService {
     );
 
     await this.analyticsService.invalidateEventCache(reg.eventId);
+
+    // Audit Log
+    try {
+      await this.auditLogsService.createLog({
+        userId: organizerId,
+        action: 'EVENT_REGISTRATION_REJECT',
+        entityType: 'EVENT',
+        entityId: reg.eventId,
+        outcome: 'SUCCESS',
+        details: `Organizer rejected registration for student`,
+        beforeState: { ...reg },
+        afterState: { ...updated },
+      });
+    } catch (e) {
+      this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
     return updated;
   }
 
@@ -316,7 +413,7 @@ export class RegistrationService {
         async (tx) => {
           const reg = await tx.registration.findUnique({
             where: { id: registrationId },
-            include: { status: true },
+            include: { status: true, event: true },
           });
           if (!reg) {
             throw new NotFoundException(`Registration ${registrationId} not found`);
@@ -344,6 +441,23 @@ export class RegistrationService {
           );
 
           await this.analyticsService.invalidateEventCache(reg.eventId);
+
+          // Audit Log
+          try {
+            await this.auditLogsService.createLog({
+              userId: organizerId,
+              action: 'EVENT_REGISTRATION_REMOVE',
+              entityType: 'EVENT',
+              entityId: reg.eventId,
+              outcome: 'SUCCESS',
+              details: `Organizer removed registration for student`,
+              beforeState: { ...reg },
+              afterState: { ...updated },
+            });
+          } catch (e) {
+            this.logger.error(`Failed to create audit log: ${e.message}`);
+          }
+
           return updated;
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
@@ -371,6 +485,8 @@ export class RegistrationService {
               venue: true,
               status: true,
               media: { where: { mediaType: 'THUMBNAIL' } },
+              _count: { select: { registrations: true } },
+              eventType: true,
             },
           },
           status: true,
@@ -385,6 +501,8 @@ export class RegistrationService {
               venue: true,
               status: true,
               media: { where: { mediaType: 'THUMBNAIL' } },
+              _count: { select: { registrations: true } },
+              eventType: true,
             },
           },
         },

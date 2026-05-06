@@ -51,15 +51,15 @@ The system supports both **web** (Next.js) and **mobile** (Flutter) platforms, e
 
 At AASTU, event management currently relies on:
 
-| Current Approach | Issue |
-|:---|:---|
-| Physical notice boards & posters | Limited reach, easily missed |
-| Word-of-mouth announcements | Inconsistent and unreliable |
-| Scattered social media posts | Fragmented, no coordination |
-| No centralized calendar | Frequent scheduling conflicts |
-| Manual attendance tracking | Inaccurate, time-consuming |
-| No feedback mechanism | No way to improve event quality |
-| Generic announcements | No personalization for students |
+| Current Approach                 | Issue                           |
+| :------------------------------- | :------------------------------ |
+| Physical notice boards & posters | Limited reach, easily missed    |
+| Word-of-mouth announcements      | Inconsistent and unreliable     |
+| Scattered social media posts     | Fragmented, no coordination     |
+| No centralized calendar          | Frequent scheduling conflicts   |
+| Manual attendance tracking       | Inaccurate, time-consuming      |
+| No feedback mechanism            | No way to improve event quality |
+| Generic announcements            | No personalization for students |
 
 **CEMS solves these problems** by providing a single, integrated platform with intelligent features that improve coordination, increase participation, and enable data-driven decision making.
 
@@ -68,12 +68,14 @@ At AASTU, event management currently relies on:
 ## Key Features
 
 ### User Management & Authentication
+
 - Secure registration and login (email/phone)
 - Role-Based Access Control (RBAC): **Student**, **Organizer**, **Admin**
 - JWT-based stateless authentication
 - Profile management with interest preferences
 
 ### Core Event Management
+
 - Full event lifecycle: create, edit, publish, approve, delete
 - Administrative approval workflow for organizer-submitted events
 - Event categorization (workshops, seminars, competitions, etc.)
@@ -81,36 +83,42 @@ At AASTU, event management currently relies on:
 - Media upload for event posters/banners
 
 ### Event Discovery & Search
+
 - Centralized event calendar and listing
 - Filter by category, date, department, popularity
 - Keyword-based search
 - Role-aware browsing (students see approved events, organizers see their own, admins see all)
 
 ### AI-Based Event Recommendation
+
 - Personalized suggestions based on user interests, past attendance, and popularity
 - Hybrid filtering: content-based + collaborative approaches
 - Continuous learning from user interactions (views, clicks, ratings)
 - Cold-start handling strategies
 
 ### Event Participation
+
 - RSVP system ("Interested" / "Going")
 - Organizer approval workflow for RSVPs
 - Seat assignment and digital badge generation
 - QR code-based attendance tracking and check-in
 
 ### Notifications & Alerts
+
 - Real-time in-app notifications
 - Email integration
 - Event reminders, updates, and cancellation alerts
 - New event notifications matching user interests
 
 ### Analytics & Reporting
+
 - Event views, RSVPs, attendance rates, feedback summaries
 - Participation trends over time
 - Organizer and admin dashboards
 - Data-driven insights for future event planning.
 
 ### Feedback & Ratings
+
 - Post-event rating and comment submission
 - Feedback data feeds into AI recommendation engine
 - Aggregated feedback reports for organizers
@@ -186,13 +194,13 @@ graph TD
 
 ### Why Modular Monolith?
 
-| Feature | Modular Monolith | Microservices | Simple Monolith | Serverless |
-|:---|:---|:---|:---|:---|
-| **Dev Speed** | High | Low | Highest (initially) | Medium |
-| **Complexity** | Medium | Very High | Low (until growth) | High |
-| **Deployment** | Simple | Complex (K8s) | Simple | Simple |
-| **Performance** | High (in-memory) | Medium (network) | High | Mixed (cold starts) |
-| **AI Integration** | Seamless | Difficult (silos) | Messy | Costly (timeouts) |
+| Feature            | Modular Monolith | Microservices     | Simple Monolith     | Serverless          |
+| :----------------- | :--------------- | :---------------- | :------------------ | :------------------ |
+| **Dev Speed**      | High             | Low               | Highest (initially) | Medium              |
+| **Complexity**     | Medium           | Very High         | Low (until growth)  | High                |
+| **Deployment**     | Simple           | Complex (K8s)     | Simple              | Simple              |
+| **Performance**    | High (in-memory) | Medium (network)  | High                | Mixed (cold starts) |
+| **AI Integration** | Seamless         | Difficult (silos) | Messy               | Costly (timeouts)   |
 
 > The Modular Monolith is the "Golden Middle" — fast development with clean code that can scale to microservices when needed.
 
@@ -200,44 +208,45 @@ graph TD
 
 ## Technology Stack
 
-| Layer | Technology | Purpose |
-|:---|:---|:---|
-| **Frontend (Web)** | Next.js, TailwindCSS, React Query | SSR, responsive UI, data fetching |
-| **Mobile App** | Flutter | Cross-platform (Android & iOS) |
-| **Backend** | NestJS (Node.js) | RESTful API, business logic |
-| **Database** | PostgreSQL | Primary relational data store (ACID) |
-| **Cache & Queue** | Redis + BullMQ | Caching, async task processing |
-| **Real-time** | Socket.IO (NestJS Gateways) | WebSocket-based in-app notifications |
-| **Authentication** | JWT (access + refresh tokens) | Stateless session management |
-| **File Storage** | S3 / Cloudinary | Event posters, profile photos |
-| **Notifications** | Firebase Push, SendGrid, Twilio | Push, email |
-| **Monitoring** | Prometheus + Grafana | Uptime, logs, performance |
-| **CI/CD** | GitHub Actions | Automated builds & deployments |
-| **Containerization** | Docker | Consistent environments |
-| **Version Control** | Git & GitHub | Source code management |
-| **Design** | Figma | UI/UX prototyping |
+| Layer                | Technology                        | Purpose                              |
+| :------------------- | :-------------------------------- | :----------------------------------- |
+| **Frontend (Web)**   | Next.js, TailwindCSS, React Query | SSR, responsive UI, data fetching    |
+| **Mobile App**       | Flutter                           | Cross-platform (Android & iOS)       |
+| **Backend**          | NestJS (Node.js)                  | RESTful API, business logic          |
+| **Database**         | PostgreSQL                        | Primary relational data store (ACID) |
+| **Cache & Queue**    | Redis + BullMQ                    | Caching, async task processing       |
+| **Real-time**        | Socket.IO (NestJS Gateways)       | WebSocket-based in-app notifications |
+| **Authentication**   | JWT (access + refresh tokens)     | Stateless session management         |
+| **File Storage**     | S3 / Cloudinary                   | Event posters, profile photos        |
+| **Notifications**    | Firebase Push, SendGrid, Twilio   | Push, email                          |
+| **Monitoring**       | Prometheus + Grafana              | Uptime, logs, performance            |
+| **CI/CD**            | GitHub Actions                    | Automated builds & deployments       |
+| **Containerization** | Docker                            | Consistent environments              |
+| **Version Control**  | Git & GitHub                      | Source code management               |
+| **Design**           | Figma                             | UI/UX prototyping                    |
 
 ---
 
 ## System Modules
 
-| Module | Responsibility |
-|:---|:---|
-| **Auth Module** | Registration, login, JWT tokens, password management, RBAC |
-| **User Module** | Profiles, preferences, interests, role management |
-| **Event Module** | Event CRUD, categories/tags, schedule validation, conflict detection |
-| **Registration Module** | RSVP, QR check-in, attendance tracking, capacity management |
-| **Notification Module** | Real-time in-app (WebSocket), push, email via async queue with retry logic |
+| Module                       | Responsibility                                                              |
+| :--------------------------- | :-------------------------------------------------------------------------- |
+| **Auth Module**              | Registration, login, JWT tokens, password management, RBAC                  |
+| **User Module**              | Profiles, preferences, interests, role management                           |
+| **Event Module**             | Event CRUD, categories/tags, schedule validation, conflict detection        |
+| **Registration Module**      | RSVP, QR check-in, attendance tracking, capacity management                 |
+| **Notification Module**      | Real-time in-app (WebSocket), push, email via async queue with retry logic  |
 | **AI Recommendation Module** | Content-based + collaborative filtering, vector similarity, batched updates |
-| **Analytics Module** | Participation metrics, trends, dashboards, report generation |
-| **Media / Storage** | Image uploads, CDN delivery, lifecycle management |
-| **Admin Module** | User management, system logging, audit, global settings |
+| **Analytics Module**         | Participation metrics, trends, dashboards, report generation                |
+| **Media / Storage**          | Image uploads, CDN delivery, lifecycle management                           |
+| **Admin Module**             | User management, system logging, audit, global settings                     |
 
 ---
 
 ## User Roles
 
 ### Student
+
 - Browse and search approved events
 - RSVP / mark interest
 - Receive personalized AI recommendations
@@ -246,6 +255,7 @@ graph TD
 - Receive notifications
 
 ### Event Organizer
+
 - Create and manage events (pending admin approval)
 - Upload event posters
 - View RSVP requests and approve/reject
@@ -253,6 +263,7 @@ graph TD
 - Collect and view feedback
 
 ### Administrator
+
 - Approve, update, or delete any event
 - Manage user accounts and roles
 - Monitor scheduling conflicts
@@ -290,6 +301,7 @@ graph TD
 ```
 
 **Key aspects:**
+
 - **User interest vectors** computed from stated preferences, past attendance, interactions
 - **Cosine similarity** algorithm matches users to relevant events
 - **Continuous learning** from views, clicks, RSVPs, and feedback
@@ -303,17 +315,17 @@ graph TD
 
 CEMS implements a layered security architecture:
 
-| Layer | Mechanism |
-|:---|:---|
-| **Authentication** | JWT access/refresh tokens, bcrypt/argon2 password hashing |
-| **Authorization** | RBAC (Student, Organizer, Admin) enforced via middleware |
-| **Data Transmission** | HTTPS/TLS everywhere, encrypted in transit |
-| **Database** | PostgreSQL access control, row-level security, encrypted backups |
-| **Input Validation** | Multi-layer validation (client + server), XSS/SQL injection prevention |
-| **QR Check-in** | Signed, time-limited tokens, replay/tamper detection |
-| **Rate Limiting** | Brute-force protection on sensitive endpoints |
-| **Monitoring** | Operational logging, anomaly detection, audit trails |
-| **Dependencies** | Regular audits, automated vulnerability alerts |
+| Layer                 | Mechanism                                                              |
+| :-------------------- | :--------------------------------------------------------------------- |
+| **Authentication**    | JWT access/refresh tokens, bcrypt/argon2 password hashing              |
+| **Authorization**     | RBAC (Student, Organizer, Admin) enforced via Proxy                    |
+| **Data Transmission** | HTTPS/TLS everywhere, encrypted in transit                             |
+| **Database**          | PostgreSQL access control, row-level security, encrypted backups       |
+| **Input Validation**  | Multi-layer validation (client + server), XSS/SQL injection prevention |
+| **QR Check-in**       | Signed, time-limited tokens, replay/tamper detection                   |
+| **Rate Limiting**     | Brute-force protection on sensitive endpoints                          |
+| **Monitoring**        | Operational logging, anomaly detection, audit trails                   |
+| **Dependencies**      | Regular audits, automated vulnerability alerts                         |
 
 ---
 
@@ -363,12 +375,12 @@ AASTU-Campus-Event-Management-System/
 
 ## Team
 
-| Name | ID | Role |
-|:---|:---|:---|
-| Miraf Debebe | ETS 1110/14 | Team Member |
-| Mistire Daniel | ETS 1115/14 | Team Member |
-| Nasifay Chala | ETS 1195/14 | Team Member |
-| Natan Addis | ETS 1199/14 | Team Member |
+| Name            | ID          | Role        |
+| :-------------- | :---------- | :---------- |
+| Miraf Debebe    | ETS 1110/14 | Team Member |
+| Mistire Daniel  | ETS 1115/14 | Team Member |
+| Nasifay Chala   | ETS 1195/14 | Team Member |
+| Natan Addis     | ETS 1199/14 | Team Member |
 | Nathnael Keleme | ETS 1222/14 | Team Member |
 
 **Advisor:** Inst. Befekadu Belete

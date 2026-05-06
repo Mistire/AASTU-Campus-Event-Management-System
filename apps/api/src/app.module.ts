@@ -18,6 +18,12 @@ import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { SupportModule } from './support/support.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { GraduationModule } from './graduation/graduation.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -48,6 +54,12 @@ import { DepartmentsModule } from './departments/departments.module';
     PermissionModule,
     AttendanceModule,
     DepartmentsModule,
+    AuditLogsModule,
+    SupportModule,
+    FeedbackModule,
+    BookmarksModule,
+    GraduationModule,
+    TelegramModule,
   ],
 })
 export class AppModule {}

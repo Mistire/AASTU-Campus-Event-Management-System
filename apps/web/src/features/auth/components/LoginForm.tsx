@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail } from "lucide-react";
@@ -16,6 +16,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +62,12 @@ export function LoginForm() {
         description: `Logged in as ${normalizedRole.toLowerCase()}`,
       });
 
-      if (normalizedRole === "STUDENT") {
+      const redirectTo = searchParams.get("redirectTo");
+      console.log("[LoginForm] Redirecting to:", redirectTo || (normalizedRole === "STUDENT" ? "/discovery" : "/dashboard"));
+
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else if (normalizedRole === "STUDENT") {
         router.push("/discovery");
       } else {
         router.push("/dashboard");

@@ -1,9 +1,12 @@
 export interface Ticket {
     id: string;
     subject: string;
-    user: string;
-    priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+    category: 'TECHNICAL' | 'ACCOUNT' | 'EVENT_ISSUE' | 'EMERGENCY' | 'OTHER';
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
     status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
-    category: 'TECHNICAL' | 'FINANCIAL' | 'GENERAL_INQUIRY';
-    date: string;
+    createdAt: string;
+    user: {
+        fullName: string;
+        email: string;
+    };
 }

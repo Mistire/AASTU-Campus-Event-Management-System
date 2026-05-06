@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
 };
 
+import { SupportFAB } from "@/features/support/components/SupportFAB";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,6 +37,7 @@ export default function RootLayout({
       <body className="flex flex-col">
         <Toaster 
           position="top-right"
+          richColors
           toastOptions={{
             style: {
               background: 'rgba(255, 255, 255, 0.8)',
@@ -49,7 +52,7 @@ export default function RootLayout({
         />
         <Providers>
           <SmoothScroll>{children}</SmoothScroll>
-          <Toaster position="top-right" richColors />
+          <SupportFAB />
         </Providers>
       </body>
     </html>

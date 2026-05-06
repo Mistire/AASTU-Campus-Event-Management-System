@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +14,7 @@ import {
 } from './dto';
 import { EmailService } from './email.service';
 import { randomBytes } from 'crypto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 type JwtPayload = {
   sub: string;
@@ -38,6 +35,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
@@ -86,7 +84,7 @@ export class AuthService {
   }
 
   private buildUserResponse(user: any) {
-    return {
+    const response = {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
@@ -96,7 +94,11 @@ export class AuthService {
       isCampusIdVerified: user.isCampusIdVerified,
       studentId: user.studentId,
       academicProgram: user.academicProgram,
+      profileImage: user.profileImage,
+      phone: user.phone,
     };
+    console.log('[AuthService] Built user response:', response);
+    return response;
   }
 
   private normalizeFullName(value: string) {
@@ -227,7 +229,8 @@ export class AuthService {
       const token = await this.consumeOneTimeToken('EMAIL_VERIFICATION', dto.token);
       if (!token) throw new BadRequestException('Invalid or expired token');
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: { isEmailVerified: true, emailVerifiedAt: new Date() },
@@ -238,6 +241,22 @@ export class AuthService {
           data: { usedAt: new Date() },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'EMAIL_VERIFICATION',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User verified email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Email verified successfully' };
     } catch (err) {
@@ -253,7 +272,8 @@ export class AuthService {
 
       const newHash = await argon.hash(dto.newPassword);
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: {
@@ -275,6 +295,22 @@ export class AuthService {
           },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'PASSWORD_RESET',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User reset password for email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Password reset successfully. Please log in with your new password.' };
     } catch (err) {
@@ -368,7 +404,7 @@ export class AuthService {
         throw new BadRequestException('This campus ID is already linked to another account');
       }
 
-      await this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id: user.id },
         data: {
           studentId: parsed.studentId,
@@ -377,6 +413,22 @@ export class AuthService {
           campusIdVerifiedAt: new Date(),
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'CAMPUS_ID_VERIFICATION',
+          entityType: 'USER',
+          entityId: user.id,
+          outcome: 'SUCCESS',
+          details: `User verified campus ID: ${parsed.studentId}`,
+          beforeState: user,
+          afterState: updated,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return {
         message: 'Campus ID verified successfully',
@@ -407,12 +459,19 @@ export class AuthService {
       if (!role) throw new BadRequestException('Role not found');
 
       const passwordHash = await argon.hash(dto.password);
+
+      // Ensure departmentId is a valid UUID or null (empty strings cause Prisma errors)
+      const sanitizedDepartmentId =
+        dto.departmentId && dto.departmentId.trim() !== '' ? dto.departmentId : null;
+
       const user = await this.prisma.user.create({
         data: {
           fullName: dto.fullName,
           email,
           passwordHash,
+          phone: dto.phone,
           roleId: role.id,
+          departmentId: sanitizedDepartmentId,
         },
         include: {
           role: {
@@ -433,7 +492,26 @@ export class AuthService {
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
 
-      console.log('Session and tokens created for:', user.email);
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'SIGNUP',
+          entityType: 'USER',
+          outcome: 'SUCCESS',
+          details: `New user signed up: ${user.email}`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
+          role: user.role.roleName,
+          afterState: {
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role.roleName,
+          },
+        });
+      } catch (logError) {
+        console.error('Non-critical error: Audit log creation failed during signup:', logError);
+      }
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,
@@ -442,10 +520,25 @@ export class AuthService {
           : 'Signup successful, but we could not send the verification email right now. Please try again later.',
       };
     } catch (err) {
-      if (err.code === 'P2002') {
+      console.error('AuthService.signUp failed:', {
+        email: dto.email,
+        error: err instanceof Error ? err.message : err,
+        code: (err as any).code,
+        stack: err instanceof Error ? err.stack : undefined
+      });
+
+      if ((err as any).code === 'P2002') {
         throw new BadRequestException('Email already in use');
       }
-      console.error('AuthService.signUp error:', err);
+      
+      if ((err as any).code === 'P2003') {
+        throw new BadRequestException('Invalid department or role selection');
+      }
+
+      if ((err as any).code === 'P2007') {
+        throw new BadRequestException('Invalid data format provided');
+      }
+
       throw err;
     }
   }
@@ -460,19 +553,42 @@ export class AuthService {
         },
       });
 
-      if (!user) throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        // Cannot log: no valid userId (FK constraint). Just reject.
+        throw new UnauthorizedException('Invalid credentials');
+      }
       const pwMatches = await argon.verify(user.passwordHash, dto.password);
-      if (!pwMatches) throw new UnauthorizedException('Invalid credentials');
+      if (!pwMatches) {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'LOGIN',
+          entityType: 'USER',
+          outcome: 'FAILURE',
+          details: `Failed login attempt for email: ${email} (Invalid password)`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
+          role: user.role.roleName,
+        });
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Please verify your email first');
       }
 
-      // if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
-      //   throw new UnauthorizedException('Please verify your campus ID QR first');
-      // }
-
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'LOGIN',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `User logged in successfully: ${email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+      });
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,

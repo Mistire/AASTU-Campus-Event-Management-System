@@ -11,9 +11,12 @@ import {
   Lock,
   Mail,
   User, 
-  Phone
+  Phone,
+
 } from "lucide-react";
 import { toast } from "sonner";
+import { useDepartments } from "@/features/departments/api";
+import { CemsSelect } from "@/components/cems/CemsSelect";
 
 interface SignupFormData {
   fullName: string;
@@ -22,6 +25,7 @@ interface SignupFormData {
   password: string;
   confirmPassword: string;
   role: "Student" | "Organizer";
+  departmentId: string;
   agreeTerms: boolean;
 }
 
@@ -33,8 +37,10 @@ export function SignupForm() {
     password: "",
     confirmPassword: "",
     role: "Student",
+    departmentId: "",
     agreeTerms: false,
   });
+  const { data: departments } = useDepartments();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,7 +73,9 @@ export function SignupForm() {
           fullName: form.fullName,
           email: form.email,
           password: form.password,
+          phone: form.phone,
           roleName: form.role,
+          departmentId: form.role === "Student" ? form.departmentId : undefined,
         }),
       });
       const data = await res.json();
@@ -208,6 +216,18 @@ export function SignupForm() {
             />
           </div>
         </div>
+        
+        {/* Department Selection (Only for Students) */}
+        {form.role === "Student" && (
+          <CemsSelect
+            label="Department"
+            placeholder="Select your department"
+            value={form.departmentId}
+            onValueChange={(val) => setForm(p => ({ ...p, departmentId: val }))}
+            options={departments?.map(dept => ({ value: dept.id, label: dept.name })) || []}
+            className="animate-in slide-in-from-top-2 duration-300"
+          />
+        )}
 
         {/* Password */}
         <div className="space-y-1.5">

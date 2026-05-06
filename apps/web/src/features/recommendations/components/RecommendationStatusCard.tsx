@@ -20,7 +20,7 @@ import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 
 export function RecommendationStatusCard() {
   const { health, isLoadingHealth, isRetraining, triggerRetrain } = useRecommendationManagement();
@@ -42,7 +42,7 @@ export function RecommendationStatusCard() {
   const lastTrained = health?.last_trained ? new Date(health.last_trained) : null;
 
   return (
-    <CemsCard className="overflow-hidden border-brand/5 shadow-xl shadow-brand/5 bg-gradient-to-br from-white to-brand/[0.02]">
+    <CemsCard className="overflow-hidden border-brand/5 shadow-xl shadow-brand/5 bg-gradient-to-br from-white to-brand/2">
       <CemsCardHeader
         icon={<Brain className="text-brand animate-pulse-slow" />}
         title="Discovery Engine"

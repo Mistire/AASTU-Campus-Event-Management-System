@@ -8,10 +8,14 @@ import { useVenues } from '@/features/venues/api';
 import { getVenuesColumns } from '@/features/venues/components/VenuesTableConfig';
 import { AddVenueModal } from '@/features/venues/components/AddVenueModal';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function VenuesPage() {
     const columns = getVenuesColumns();
-    const { data: venues, isLoading } = useVenues();
+    const [minCapacity, setMinCapacity] = useState<string>("");
+    const { data: venues, isLoading } = useVenues({
+        minCapacity: minCapacity ? parseInt(minCapacity) : undefined
+    });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     if (isLoading) {
@@ -56,6 +60,22 @@ export default function VenuesPage() {
                     enableSorting
                     enableGlobalFilter
                     enableColumnVisibility
+                    renderToolbarActions={() => (
+                        <div className="flex items-center gap-2">
+                            <Select value={minCapacity} onValueChange={(val) => setMinCapacity(val ?? "")}>
+                                <SelectTrigger className="h-8 min-w-[150px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                                    <SelectValue placeholder="Min Capacity" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                                    <SelectItem value="">Any Capacity</SelectItem>
+                                    <SelectItem value="50">50+ Seats</SelectItem>
+                                    <SelectItem value="100">100+ Seats</SelectItem>
+                                    <SelectItem value="200">200+ Seats</SelectItem>
+                                    <SelectItem value="500">500+ Seats</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                 />
             </div>
 

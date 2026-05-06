@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -228,22 +225,27 @@ async function main() {
 
   if (draftStatus && seminarType && hallVenue) {
     const existingEvent = await prisma.event.findFirst({
-      where: { title: 'Annual Tech Summit 2026' },
+      where: { title: 'Coding Bootcamp 2026' },
     });
 
     if (!existingEvent) {
       // Get an organizer user (if seeded)
       const organizer = await prisma.user.findFirst({
-        where: { role: { roleName: 'Organizer' } },
+        where: { role: { roleName: 'ORGANIZER' } },
       });
 
       if (organizer) {
+        const liveStatus = await prisma.eventStatus.findUnique({ where: { statusName: 'LIVE' } });
+        const approvedStatus = await prisma.eventStatus.findUnique({
+          where: { statusName: 'APPROVED' },
+        });
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 7);
         const dayAfter = new Date(tomorrow);
         dayAfter.setDate(dayAfter.getDate() + 1);
 
-        const event = await prisma.event.create({
+        // Event 1: Draft
+        const event1 = await prisma.event.create({
           data: {
             title: 'Annual Tech Summit 2026',
             description: 'A grand summit showcasing student tech projects and innovations.',
@@ -258,26 +260,48 @@ async function main() {
           },
         });
 
-        // Add creator as organizer
-        await prisma.eventOrganizers.create({
+        // Event 2: Live
+        await prisma.event.create({
           data: {
-            eventId: event.id,
-            userId: organizer.id,
-            role: 'Creator',
-            status: 'ACCEPTED',
+            title: 'Coding Bootcamp 2026',
+            description: 'Intensive 2-day coding workshop for beginners.',
+            capacity: 50,
+            startTime: new Date(),
+            endTime: dayAfter,
+            statusId: liveStatus?.id || draftStatus.id,
+            eventTypeId: seminarType.id, // Should be Workshop but seminarType is available
+            venueId: hallVenue.id,
+            createdBy: organizer.id,
+            requiresApproval: false,
           },
         });
 
-        console.log('✅ Sample Event "Annual Tech Summit 2026" seeded in DRAFT status.');
+        // Event 3: Approved
+        await prisma.event.create({
+          data: {
+            title: 'AI Ethics Seminar',
+            description: 'Discussion on the future of AI and its ethical implications.',
+            capacity: 100,
+            startTime: tomorrow,
+            endTime: dayAfter,
+            statusId: approvedStatus?.id || draftStatus.id,
+            eventTypeId: seminarType.id,
+            venueId: hallVenue.id,
+            createdBy: organizer.id,
+            requiresApproval: true,
+          },
+        });
+
+        console.log('Sample Events seeded.');
       } else {
-        console.log('⚠️  No organizer user found. Run script_users first to seed users.');
+        console.log('No organizer user found. Run script_users first to seed users.');
       }
     } else {
-      console.log('ℹ️  Sample event already exists, skipping.');
+      console.log('Sample events already exist, skipping.');
     }
   }
 
-  console.log('\n🎉 Events module data seeding complete!');
+  console.log('\nEvents module data seeding complete!');
 }
 
 main()
