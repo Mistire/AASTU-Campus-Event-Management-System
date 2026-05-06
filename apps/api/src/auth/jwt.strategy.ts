@@ -19,8 +19,8 @@ export type AuthUser = {
   sessionId: string;
   isEmailVerified: boolean;
   isCampusIdVerified: boolean;
-  profileImage?: string;
-  phone?: string;
+  profileImage: string | null;
+  phone: string | null;
 };
 
 @Injectable()

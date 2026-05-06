@@ -71,9 +71,68 @@ export class AttendanceService {
     const attendeeId = decoded.sub;
     const ticketEventId = decoded.eventId;
     const isGuest = decoded.isGuest;
+    const tokenType = decoded.type; // 'GUEST_PASS' for graduation parent QR codes
 
     if (ticketEventId !== eventId) {
       throw new ForbiddenException('Ticket is not valid for this event');
+    }
+
+    // ── Graduation Parent Guest Pass ──────────────────────────────────────────
+    if (tokenType === 'GUEST_PASS') {
+      const guestPassId = decoded.guestPassId;
+      const guestPass = await this.prisma.guestPass.findUnique({
+        where: { id: guestPassId },
+        include: {
+          graduationRecord: {
+            include: { invite: { select: { eventId: true } } },
+          },
+        },
+      });
+
+      if (!guestPass || guestPass.graduationRecord.invite.eventId !== eventId) {
+        throw new ForbiddenException('Guest pass is invalid or not for this event');
+      }
+
+      // Prevent double-scan: check by qrToken uniqueness
+      const existingCheckIn = await this.prisma.attendance.findFirst({
+        where: { qrToken: ticketToken, eventId },
+      });
+      if (existingCheckIn) {
+        return { ...existingCheckIn, alreadyCheckedIn: true };
+      }
+
+      const checkin = await this.prisma.attendance.create({
+        data: {
+          eventId,
+          sessionId,
+          qrToken: ticketToken,
+          checkInTime: new Date(),
+          // userId / inviteId intentionally null — this is a parent guest
+        },
+      });
+
+      try {
+        await this.auditLogsService.createLog({
+          userId: organizerId,
+          action: 'EVENT_CHECKIN',
+          entityType: 'ATTENDANCE',
+          entityId: checkin.id,
+          outcome: 'SUCCESS',
+          details: `Graduation parent guest check-in for event: "${event.title}" — ${guestPass.parentLabel}`,
+          afterState: checkin,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+
+      return {
+        ...checkin,
+        guestInfo: {
+          parentLabel: guestPass.parentLabel,
+          studentName: guestPass.graduationRecord.fullName,
+          tier: guestPass.graduationRecord.tier,
+        },
+      };
     }
 
     // 3. Verify session if provided

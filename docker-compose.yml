@@ -77,6 +77,10 @@ services:
       SMTP_FROM: nasifayc11@gmail.com
       BACKEND_URL: http://localhost
       FRONTEND_URL: http://localhost:3001
+      TELEGRAM_BOT_TOKEN: 8616602222:AAEPzO2_5gWCLONks2EkGdGBlHcAZn9DbSA
+      TELEGRAM_BOT_USERNAME: aastu_cems_bot
+      # TELEGRAM_WEBHOOK_URL: https://your-domain.com/api/telegram/webhook  ← set in production
+
       ML_SERVICE_URL: http://ml-service:8000
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
