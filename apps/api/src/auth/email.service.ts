@@ -92,6 +92,14 @@ export class EmailService {
     `;
   }
 
+  private getMailIcons() {
+    return {
+      star: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+      medal: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;"><path d="M12 2l3 9h-6l3-9zm0 11c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm-7 4c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7-7-3.13-7-7z"/></svg>`,
+      cap: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>`,
+    };
+  }
+
   private async sendMail(to: string, subject: string, html: string) {
     try {
       await this.transporter.sendMail({
@@ -240,5 +248,80 @@ export class EmailService {
     );
 
     await this.sendMail(email, `[RESPONSE] Organizer Invitation: ${eventTitle}`, html);
+  }
+
+  async sendGraduationClaimEmail(
+    email: string,
+    studentName: string,
+    eventTitle: string,
+    claimUrl: string,
+  ) {
+    const html = this.getHtmlLayout(
+      'Graduation Ceremony',
+      `Your graduation invite for ${eventTitle}`,
+      `<p>Congratulations, <strong>${studentName}</strong>!</p>
+       <p>You are cordially invited to the <strong>${eventTitle}</strong> graduation ceremony.</p>
+       <p>Please click the button below to set up entry passes for your parent guest(s). You will be able to send them a Telegram link or email with their unique QR code for entry.</p>
+       <p style="color:#94a3b8; font-size:12px;">This link is personal to you — please do not share it with others.</p>`,
+      { text: 'Claim My Guest Passes', url: claimUrl },
+    );
+
+    await this.sendMail(email, `Graduation Invite — Claim Your Guest Passes`, html);
+    this.logger.log(`Graduation claim email sent to ${email}`);
+  }
+
+  async sendParentQREmail(
+    parentEmail: string,
+    studentName: string,
+    tier: string,
+    event: {
+      title: string;
+      startTime: Date;
+      venue?: { name: string; building?: string | null } | null;
+    },
+    pdfBuffer: Buffer,
+  ) {
+    const icons = this.getMailIcons();
+    const tierLabels: Record<string, { label: string; icon: string; color: string }> = {
+      DISTINGUISHED: { label: 'Distinguished Guest', icon: icons.star, color: '#d97706' },
+      HONORS: { label: 'Honors Guest', icon: icons.medal, color: '#7c3aed' },
+      GRADUATE: { label: 'Graduate Guest', icon: icons.cap, color: '#0284c7' },
+    };
+    const tierInfo = tierLabels[tier] ?? { label: 'Guest', icon: '', color: '#64748b' };
+    const tierLabel = `<span style="color:${tierInfo.color}; font-weight:800; display:inline-flex; align-items:center; gap:6px;">${tierInfo.icon} ${tierInfo.label}</span>`;
+
+    const dateStr = new Date(event.startTime).toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    const venueName = event.venue?.name ?? 'Campus Venue';
+
+    const html = this.getHtmlLayout(
+      `You're Invited!`,
+      `Graduation invitation for ${studentName}`,
+      `<p>You have been invited as a <strong>${tierLabel}</strong> to the graduation ceremony of <strong>${studentName}</strong>.</p>
+       <p><strong>Event:</strong> ${event.title}<br/>
+          <strong>Date:</strong> ${dateStr}<br/>
+          <strong>Venue:</strong> ${venueName}</p>
+       <p>Your personalized QR code is attached to this email as a PDF. Please present it at the entrance gate on the day of the ceremony.</p>`,
+    );
+
+    await this.transporter.sendMail({
+      from: `"AASTU Campus Event Management System" <${this.configService.get<string>('SMTP_FROM')}>`,
+      to: parentEmail,
+      subject: `Your Graduation Entry Pass — ${event.title}`,
+      html,
+      attachments: [
+        {
+          filename: `GraduationPass_${studentName.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+
+    this.logger.log(`Parent QR email sent to ${parentEmail} for student ${studentName}`);
   }
 }
