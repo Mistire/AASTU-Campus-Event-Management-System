@@ -35,7 +35,7 @@ export function NotificationPopover() {
   return (
     <Popover>
       <PopoverTrigger render={
-        <button className="relative p-2 text-gray-400 hover:text-brand rounded-xl transition-all active:scale-95 hover:bg-gray-50 group">
+        <button className="relative p-2 text-gray-400 hover:text-brand rounded-lg transition-all active:scale-95 hover:bg-gray-50 group">
           <Bell size={25} className={cn("transition-transform group-hover:rotate-12", hasUnread && "animate-pulse text-brand")} />
           {hasUnread && (
             <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-black text-white ring-2 ring-white">
@@ -44,7 +44,7 @@ export function NotificationPopover() {
           )}
         </button>
       } />
-      <PopoverContent className="w-80 p-0 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-gray-100 overflow-hidden" align="end">
+      <PopoverContent className="w-80 p-0 rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-gray-100 overflow-hidden" align="end">
         <div className="flex items-center justify-between p-4 border-b border-gray-50 bg-white sticky top-0 z-10">
           <div className="flex items-center gap-2">
             <h3 className="text-xs font-black uppercase tracking-widest text-gray-900">Notifications</h3>
@@ -68,14 +68,14 @@ export function NotificationPopover() {
         <div className="max-h-[380px] overflow-y-auto overflow-x-hidden p-2 space-y-1">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="p-3 bg-gray-50/50 rounded-xl space-y-2">
+              <div key={i} className="p-3 bg-gray-50/50 rounded-lg space-y-2">
                 <Skeleton className="h-3 w-2/3" />
                 <Skeleton className="h-2 w-full" />
               </div>
             ))
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
+              <div className="w-16 h-16 rounded-lg bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                 <Bell size={32} />
               </div>
               <p className="text-xs font-bold text-gray-900">All caught up!</p>
@@ -86,13 +86,13 @@ export function NotificationPopover() {
               <div 
                 key={n.id} 
                 className={cn(
-                  "group relative p-3 rounded-xl transition-all border border-transparent hover:border-gray-100 hover:bg-gray-50/50 flex gap-3 cursor-pointer",
+                  "group relative p-3 rounded-lg transition-all border border-transparent hover:border-gray-100 hover:bg-gray-50/50 flex gap-3 cursor-pointer",
                   !n.isRead && "bg-brand/[0.02] border-brand/5"
                 )}
                 onClick={() => !n.isRead && markRead.mutate(n.id)}
               >
                 <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
+                  "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border",
                   n.type.includes("ERROR") || n.type.includes("REJECTED") ? "bg-red-50 text-red-500 border-red-100" :
                   n.type.includes("SUCCESS") || n.type.includes("APPROVED") ? "bg-emerald-50 text-emerald-500 border-emerald-100" :
                   "bg-brand/5 text-brand border-brand/10"

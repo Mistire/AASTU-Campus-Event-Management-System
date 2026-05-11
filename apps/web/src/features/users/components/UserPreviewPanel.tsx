@@ -32,7 +32,7 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
               <UsersIcon size={120} />
             </div>
             <div className="flex items-center gap-5 relative z-10">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl font-black border border-white/30 shadow-xl">
+              <div className="w-16 h-16 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl font-black border border-white/30 shadow-xl">
                 {(user.name || '?').charAt(0).toUpperCase()}
               </div>
               <div className="space-y-1">
@@ -43,7 +43,7 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
                   {user.name}
                 </h3>
                 <div className="flex items-center gap-2 pt-1">
-                  <CemsBadge className="bg-white/20 text-white rounded-full px-3 py-0.5 text-[8px] font-black uppercase tracking-widest border-none">
+                  <CemsBadge className="bg-white/20 text-white rounded-lg px-3 py-0.5 text-[8px] font-black uppercase tracking-widest border-none">
                     {user.role}
                   </CemsBadge>
                 </div>
@@ -55,7 +55,7 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
           <div className="p-5 space-y-4 flex-1 overflow-y-auto">
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Shield className="w-3.5 h-3.5 text-brand" />
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Access Level</span>
@@ -63,7 +63,7 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
                 <p className="text-sm font-black text-gray-900 uppercase tracking-wider">{user.role}</p>
                 <p className="text-[9px] text-gray-400 mt-0.5">System Permissions</p>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Calendar className="w-3.5 h-3.5 text-brand" />
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Registration</span>
@@ -74,14 +74,14 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
             </div>
 
             {/* Status Card */}
-            <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Account Status</p>
                   <p className="text-xs font-bold text-gray-700">Currently {user.status}</p>
                 </div>
                 <span className={cn(
-                  "inline-flex items-center px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                  "inline-flex items-center px-4 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border",
                   user.status === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                   user.status === 'inactive' ? 'bg-red-50 text-red-600 border-red-100' :
                   'bg-amber-50 text-amber-600 border-amber-100'
@@ -94,7 +94,7 @@ export const UserPreviewPanel = ({ user, onClose }: UserPreviewPanelProps) => {
             {/* Contact Info */}
             <div className="space-y-2">
               <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Contact Details</h4>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100">
                   <Mail className="w-5 h-5" />
                 </div>

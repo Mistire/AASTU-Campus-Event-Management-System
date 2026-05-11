@@ -34,7 +34,7 @@ export function RegistrationSidebar({
   return (
     <div className="sticky top-32 space-y-8">
       {/* Registration Card */}
-      <div className="p-8 rounded-xl bg-white border border-gray-100 shadow-xl shadow-brand/5 relative overflow-hidden">
+      <div className="p-8 rounded-lg bg-white border border-gray-100 shadow-xl shadow-brand/5 relative overflow-hidden">
         {/* Bg Decorative Glow */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
@@ -82,7 +82,7 @@ export function RegistrationSidebar({
               onClick={handleRegister}
               disabled={isActionDisabled || isFull}
               className={cn(
-                "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all flex items-center justify-center gap-3",
+                "w-full h-14 rounded-lg font-black uppercase tracking-widest text-[11px] shadow-xl transition-all flex items-center justify-center gap-3",
                 isFull || isEnded
                   ? "bg-gray-100 text-gray-400 shadow-none hover:bg-gray-100"
                   : "bg-brand hover:bg-brand-hover text-white shadow-brand/20 active:scale-95"
@@ -104,7 +104,7 @@ export function RegistrationSidebar({
             <div className="space-y-3">
               <div
                 className={cn(
-                  "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 border-2",
+                  "w-full h-14 rounded-lg font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 border-2",
                   status === "confirmed" 
                     ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
                     : status === "waitlisted" 
@@ -125,7 +125,7 @@ export function RegistrationSidebar({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isActionDisabled}
-                className="w-full h-12 rounded-xl border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-100 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-lg border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-100 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2"
               >
                 {isCancelling ? <Loader2 className="animate-spin" size={16} /> : <><XCircle size={16} /> Cancel Registration</>}
               </CemsButton>
@@ -142,12 +142,12 @@ export function RegistrationSidebar({
       </div>
 
       {/* Host Quick Profile */}
-      <div className="p-8 rounded-xl bg-white border border-gray-100 shadow-sm space-y-4">
+      <div className="p-8 rounded-lg bg-white border border-gray-100 shadow-sm space-y-4">
         <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">
           Organized By
         </h4>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-brand/5 flex items-center justify-center">
             <CheckCircle2 className="text-brand" size={24} />
           </div>
           <div>

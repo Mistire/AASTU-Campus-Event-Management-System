@@ -46,13 +46,13 @@ export default function InvitationsPage() {
           invitations.map((inv) => (
             <div 
               key={inv.id}
-              className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-xl shadow-gray-200/20 hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8 group overflow-hidden relative"
+              className="bg-white rounded-lg p-8 border border-gray-100 shadow-xl shadow-gray-200/20 hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8 group overflow-hidden relative"
             >
               {/* Brand Accent */}
               <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand opacity-20 group-hover:opacity-100 transition-opacity" />
 
               <div className="flex items-start gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand shrink-0">
+                <div className="w-16 h-16 rounded-lg bg-brand/5 flex items-center justify-center text-brand shrink-0">
                   <Calendar size={32} />
                 </div>
                 
@@ -78,7 +78,7 @@ export default function InvitationsPage() {
                   onClick={() => handleResponse(inv.id, false)}
                   disabled={respondMutation.isPending}
                   variant="outline"
-                  className="h-12 px-6 rounded-2xl border-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 font-black uppercase tracking-widest text-[10px] transition-all"
+                  className="h-12 px-6 rounded-lg border-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 font-black uppercase tracking-widest text-[10px] transition-all"
                 >
                   <X size={16} className="mr-2" />
                   Decline
@@ -86,7 +86,7 @@ export default function InvitationsPage() {
                 <CemsButton
                   onClick={() => handleResponse(inv.id, true)}
                   disabled={respondMutation.isPending}
-                  className="h-12 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand/20 transition-all flex items-center"
+                  className="h-12 px-8 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-brand/20 transition-all flex items-center"
                 >
                   {respondMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -99,7 +99,7 @@ export default function InvitationsPage() {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 rounded-[40px] border-2 border-dashed border-gray-100">
+          <div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 rounded-lg border-2 border-dashed border-gray-100">
             <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl shadow-gray-200/50 mb-6">
               <Shield size={40} className="text-gray-200" />
             </div>

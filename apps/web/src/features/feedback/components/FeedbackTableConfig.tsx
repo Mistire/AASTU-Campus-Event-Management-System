@@ -29,7 +29,7 @@ export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
         accessorKey: "rating",
         header: "Rating",
         cell: ({ row }) => (
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-full border border-amber-100 shadow-sm w-fit">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg border border-amber-100 shadow-sm w-fit">
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 <span className="text-xs font-black text-amber-700">{row.original.rating}</span>
             </div>

@@ -62,7 +62,7 @@ export const TicketModal = ({
           className="relative"
         >
           {/* ─── Outer Ticket Shell ─── */}
-          <div className="bg-white rounded-[28px] overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04]">
+          <div className="bg-white rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04]">
 
             {/* ─── Header: Brand Gradient ─── */}
             <div className="relative overflow-hidden">
@@ -80,7 +80,7 @@ export const TicketModal = ({
                 {/* Top row: Logo + Ticket ID */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center ring-1 ring-white/10">
+                    <div className="w-9 h-9 rounded-lg bg-white/15 backdrop-blur-md flex items-center justify-center ring-1 ring-white/10">
                       <Ticket className="text-white" size={16} />
                     </div>
                     <div>
@@ -171,7 +171,7 @@ export const TicketModal = ({
                   <motion.div
                     whileHover={{ scale: 1.04 }}
                     transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="relative p-3 rounded-2xl bg-gradient-to-br from-gray-50 to-white ring-1 ring-gray-100 shadow-sm"
+                    className="relative p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white ring-1 ring-gray-100 shadow-sm"
                   >
                     {/* Corner accent dots */}
                     <div className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-brand/40" />
@@ -185,7 +185,7 @@ export const TicketModal = ({
                       alt="Check-in QR Code"
                       width={150}
                       height={150}
-                      className="rounded-xl"
+                      className="rounded-lg"
                     />
                   </motion.div>
 
@@ -205,14 +205,14 @@ export const TicketModal = ({
             <div className="px-7 pb-6 pt-1 flex gap-3">
               <CemsButton
                 onClick={() => window.print()}
-                className="flex-1 h-12 rounded-2xl bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer"
+                className="flex-1 h-12 rounded-lg bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer"
               >
                 <Download size={14} />
                 Save Ticket
               </CemsButton>
               <button
                 onClick={() => onOpenChange(false)}
-                className="h-12 px-5 rounded-2xl bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-600 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
+                className="h-12 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-600 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
               >
                 Close
               </button>

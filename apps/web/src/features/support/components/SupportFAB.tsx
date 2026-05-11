@@ -59,7 +59,7 @@ export function SupportFAB() {
                             initial={{ opacity: 0, x: 20, scale: 0.8 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, x: 20, scale: 0.8 }}
-                            className="absolute bottom-0 right-full mr-4 bg-white px-4 py-2 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-200/50 whitespace-nowrap hidden md:block"
+                            className="absolute bottom-0 right-full mr-4 bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-2xl shadow-gray-200/50 whitespace-nowrap hidden md:block"
                         >
                             <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest">
                                 Need Help? <span className="text-brand">Ask Support</span>
@@ -73,8 +73,8 @@ export function SupportFAB() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsOpen(true)}
                     className={cn(
-                        "w-14 h-14 rounded-2xl bg-brand text-white shadow-2xl shadow-brand/30 flex items-center justify-center transition-all duration-300 relative overflow-hidden group",
-                        isHovered && "rounded-[1.5rem]"
+                        "w-14 h-14 rounded-lg bg-brand text-white shadow-2xl shadow-brand/30 flex items-center justify-center transition-all duration-300 relative overflow-hidden group",
+                        isHovered && "rounded-lg"
                     )}
                 >
                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -98,7 +98,7 @@ export function SupportFAB() {
                                 name="subject"
                                 required
                                 placeholder="e.g., Cannot register for Hackathon"
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all"
+                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all"
                             />
                         </div>
 
@@ -107,7 +107,7 @@ export function SupportFAB() {
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
                                 <select 
                                     name="category"
-                                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
                                 >
                                     <option value="TECHNICAL">Technical Issue</option>
                                     <option value="ACCOUNT">Account Problem</option>
@@ -120,7 +120,7 @@ export function SupportFAB() {
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Priority</label>
                                 <select 
                                     name="priority"
-                                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
                                 >
                                     <option value="LOW">Low</option>
                                     <option value="MEDIUM">Medium</option>
@@ -137,7 +137,7 @@ export function SupportFAB() {
                                 required
                                 rows={4}
                                 placeholder="Please describe your issue in detail..."
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none"
+                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none"
                             />
                         </div>
 
@@ -146,7 +146,7 @@ export function SupportFAB() {
                                 type="button" 
                                 cemsVariant="brand-ghost" 
                                 onClick={() => setIsOpen(false)}
-                                className="rounded-xl"
+                                className="rounded-lg"
                             >
                                 Cancel
                             </CemsButton>
@@ -154,7 +154,7 @@ export function SupportFAB() {
                                 type="submit" 
                                 cemsVariant="brand"
                                 loading={createTicket.isPending}
-                                className="rounded-xl shadow-lg shadow-brand/20 px-8"
+                                className="rounded-lg shadow-lg shadow-brand/20 px-8"
                             >
                                 <Send className="w-4 h-4 mr-2" />
                                 Raise Ticket

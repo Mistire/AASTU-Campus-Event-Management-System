@@ -21,7 +21,7 @@ export function SpeakerChip({ fullName, title, bio, profileImage }: SpeakerChipP
       <Tooltip>
         <TooltipTrigger>
           <div className="flex items-center gap-2 group cursor-help transition-all">
-            <Avatar className="w-8 h-8 rounded-xl border border-gray-100 shadow-sm group-hover:scale-110 group-hover:border-brand/20 transition-all">
+            <Avatar className="w-8 h-8 rounded-lg border border-gray-100 shadow-sm group-hover:scale-110 group-hover:border-brand/20 transition-all">
               {profileImage && <AvatarImage src={profileImage} alt={fullName} />}
               <AvatarFallback className="bg-brand/5 text-[10px] font-black text-brand uppercase tracking-widest border-none">
                 {initials}
@@ -39,10 +39,10 @@ export function SpeakerChip({ fullName, title, bio, profileImage }: SpeakerChipP
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="p-4 w-64 rounded-2xl shadow-2xl border-gray-100 bg-white">
+        <TooltipContent className="p-4 w-64 rounded-lg shadow-2xl border-gray-100 bg-white">
            <div className="space-y-2">
               <div className="flex items-center gap-3">
-                 <Avatar className="w-12 h-12 rounded-xl">
+                 <Avatar className="w-12 h-12 rounded-lg">
                     {profileImage && <AvatarImage src={profileImage} alt={fullName} />}
                     <AvatarFallback className="bg-brand/10 text-brand font-black">{initials}</AvatarFallback>
                  </Avatar>

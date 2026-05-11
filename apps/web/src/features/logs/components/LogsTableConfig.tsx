@@ -23,7 +23,7 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
             const isSuccess = outcome === 'SUCCESS';
             return (
                 <div className={cn(
-                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded-full border uppercase tracking-widest shadow-sm w-fit",
+                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded-lg border uppercase tracking-widest shadow-sm w-fit",
                     isSuccess ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
                 )}>
                     {isSuccess ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}

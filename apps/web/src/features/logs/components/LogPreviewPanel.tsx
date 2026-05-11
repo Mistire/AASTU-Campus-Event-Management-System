@@ -24,8 +24,8 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
             <div className="flex flex-col h-full bg-gray-50">
                 {isLoading ? (
                     <div className="p-8 space-y-4">
-                        <Skeleton className="h-40 rounded-2xl" />
-                        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+                        <Skeleton className="h-40 rounded-lg" />
+                        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
                     </div>
                 ) : log ? (
                     <>
@@ -45,7 +45,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     {log.action}
                                 </h3>
                                 <div className={cn(
-                                    "inline-flex px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-white/20 bg-white/10 backdrop-blur-md shadow-lg"
+                                    "inline-flex px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/20 bg-white/10 backdrop-blur-md shadow-lg"
                                 )}>
                                     {log.outcome}
                                 </div>
@@ -61,9 +61,9 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     Identity & Access
                                 </h4>
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
                                         <div className={cn(
-                                            "w-12 h-12 rounded-xl flex items-center justify-center border transition-colors",
+                                            "w-12 h-12 rounded-lg flex items-center justify-center border transition-colors",
                                             isFailure ? "bg-rose-50 border-rose-100 text-rose-500" : "bg-brand/5 border-brand/10 text-brand"
                                         )}>
                                             <User className="w-6 h-6" />
@@ -75,9 +75,9 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                         </div>
                                     </div>
                                     
-                                    <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
                                         <div className={cn(
-                                            "w-12 h-12 rounded-xl flex items-center justify-center border transition-colors",
+                                            "w-12 h-12 rounded-lg flex items-center justify-center border transition-colors",
                                             isFailure ? "bg-rose-50 border-rose-100 text-rose-500" : "bg-brand/5 border-brand/10 text-brand"
                                         )}>
                                             <ShieldCheck className="w-6 h-6" />
@@ -96,7 +96,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     <Clock className="w-3.5 h-3.5" />
                                     Audit Context
                                 </h4>
-                                <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm space-y-4">
+                                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm space-y-4">
                                     <div className="flex justify-between items-center">
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Entity Type</span>
                                         <span className="text-xs font-black text-gray-900">{log.entityType}</span>
@@ -121,13 +121,13 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     Network Intelligence
                                 </h4>
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
                                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">IP Address</span>
                                         <span className="text-xs font-black text-brand bg-brand/5 px-3 py-1 rounded-lg">{log.ipAddress || '—'}</span>
                                     </div>
-                                    <div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                                    <div className="p-5 bg-white rounded-lg border border-gray-100 shadow-sm">
                                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">User Agent String</p>
-                                        <p className="text-[11px] font-bold text-gray-600 break-all leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100/50">{log.userAgent || '—'}</p>
+                                        <p className="text-[11px] font-bold text-gray-600 break-all leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100/50">{log.userAgent || '—'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +143,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                         {log.beforeState && (
                                             <div className="space-y-2">
                                                 <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest ml-1">Previous State (Pre-action)</p>
-                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-rose-100/50 p-5 rounded-2xl overflow-auto max-h-64 shadow-sm">
+                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-rose-100/50 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
                                                     {JSON.stringify(log.beforeState, null, 2)}
                                                 </pre>
                                             </div>
@@ -151,7 +151,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                         {log.afterState && (
                                             <div className="space-y-2">
                                                 <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest ml-1">Modified State (Post-action)</p>
-                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-emerald-100/50 p-5 rounded-2xl overflow-auto max-h-64 shadow-sm">
+                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-emerald-100/50 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
                                                     {JSON.stringify(log.afterState, null, 2)}
                                                 </pre>
                                             </div>

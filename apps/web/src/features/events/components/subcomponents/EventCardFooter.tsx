@@ -67,7 +67,7 @@ export function EventCardFooter({
 
       <Button
         className={cn(
-          "relative z-10 rounded-2xl h-10 px-5 font-black uppercase tracking-widest text-[10px] shadow-lg transition-all",
+          "relative z-10 rounded-lg h-10 px-5 font-black uppercase tracking-widest text-[10px] shadow-lg transition-all",
           isEnded || isFull
             ? "bg-gray-100 text-gray-400 shadow-none hover:bg-gray-100"
             : "bg-brand hover:bg-brand-hover text-white shadow-brand/20 hover:translate-x-1"

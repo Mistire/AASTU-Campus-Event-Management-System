@@ -33,7 +33,7 @@ export default function EventCreatePage() {
       </div>
 
       {/* Main Wizard */}
-      <div className="bg-white rounded-xl p-4 sm:p-10 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-lg p-4 sm:p-10 shadow-sm border border-gray-100">
         <EventCreateWizard />
       </div>
     </div>

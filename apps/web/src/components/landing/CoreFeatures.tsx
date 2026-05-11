@@ -62,7 +62,7 @@ export default function CoreFeatures() {
           {/* 1. Discovery Engine (Large Focus) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-xl bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-lg bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-xs tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -71,7 +71,7 @@ export default function CoreFeatures() {
             </div>
 
             <div className="relative z-10">
-              <div className="w-16 h-16 rounded-3xl bg-brand text-white flex items-center justify-center mb-10 shadow-xl shadow-brand/20 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-lg bg-brand text-white flex items-center justify-center mb-10 shadow-xl shadow-brand/20 group-hover:scale-110 transition-transform duration-500">
                 <Brain size={32} />
               </div>
               <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">
@@ -88,9 +88,9 @@ export default function CoreFeatures() {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-gray-100 shadow-sm transition-all group-hover:translate-x-2"
+                    className="flex items-center gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-md border border-gray-100 shadow-sm transition-all group-hover:translate-x-2"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-brand to-cyan-400 opacity-20" />
+                    <div className="w-10 h-10 rounded-lg bg-linear-to-tr from-brand to-cyan-400 opacity-20" />
                     <div className="flex-1">
                       <div className="h-2 w-32 bg-gray-100 rounded-full mb-2" />
                       <div className="h-2 w-20 bg-gray-50 rounded-full" />
@@ -109,7 +109,7 @@ export default function CoreFeatures() {
           {/* 2. Full Hackathon Lifecycle (Vertical Spotlight) */}
           <motion.div
             variants={item}
-            className="md:row-span-2 group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="md:row-span-2 group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-[10px] tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -118,7 +118,7 @@ export default function CoreFeatures() {
             </div>
 
             <div>
-              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform">
+              <div className="w-14 h-14 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform">
                 <Trophy size={28} />
               </div>
               <h3 className="text-2xl font-black text-gray-900 mb-4 tracking-tight leading-tight uppercase">
@@ -155,7 +155,7 @@ export default function CoreFeatures() {
                 ))}
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-xs font-bold text-red-400 flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-gray-50 border border-gray-100 text-xs font-bold text-red-400 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                 Submission: 02:44:12
               </div>
@@ -165,10 +165,10 @@ export default function CoreFeatures() {
           {/* 3. Event Access Types */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="flex-1 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center group-hover:rotate-12 transition-transform">
+              <div className="w-12 h-12 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover:rotate-12 transition-transform">
                 <Lock size={22} />
                 
               </div>
@@ -185,16 +185,16 @@ export default function CoreFeatures() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2 justify-center">
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-green-50 text-green-600">
                 Public
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-blue-50 text-blue-600">
                 Private
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-orange-50 text-orange-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-orange-50 text-orange-600">
                 Invite Only
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-50 text-purple-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-purple-50 text-purple-600">
                 Restricted
               </span>
             </div>
@@ -203,10 +203,10 @@ export default function CoreFeatures() {
           {/* 4. Digital Entry Ecosystem (QR Focus) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 group relative p-10 rounded-xl bg-linear-to-r from-gray-900 to-gray-800 text-white border border-gray-700 shadow-2xl overflow-hidden flex items-center gap-10"
+            className="md:col-span-2 group relative p-10 rounded-lg bg-linear-to-r from-gray-900 to-gray-800 text-white border border-gray-700 shadow-2xl overflow-hidden flex items-center gap-10"
           >
             <div className="flex-1 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center mb-6 backdrop-blur-xl border border-white/5 group-hover:rotate-12 transition-transform">
+              <div className="w-12 h-12 rounded-lg bg-white/10 text-white flex items-center justify-center mb-6 backdrop-blur-xl border border-white/5 group-hover:rotate-12 transition-transform">
                 <QrCode size={22} />
               </div>
               <h3 className="text-2xl font-black mb-3 tracking-tight">
@@ -219,7 +219,7 @@ export default function CoreFeatures() {
             </div>
 
             {/* Micro-UI: Pulse QR */}
-            <div className="hidden lg:flex items-center justify-center w-32 h-32 rounded-3xl bg-white/5 border border-white/10 relative p-4 group-hover:scale-105 transition-transform duration-500">
+            <div className="hidden lg:flex items-center justify-center w-32 h-32 rounded-lg bg-white/5 border border-white/10 relative p-4 group-hover:scale-105 transition-transform duration-500">
               <QrCode size={64} className="opacity-20 text-brand" />
               <motion.div
                 animate={{ y: [0, 60, 0] }}
@@ -232,9 +232,9 @@ export default function CoreFeatures() {
           {/* 5. Smart Scheduling Engine */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-xl bg-white border border-gray-100 shadow-xl overflow-hidden"
+            className="group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+            <div className="w-12 h-12 rounded-lg bg-cyan-50 text-cyan-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
               <CalendarClock size={22} />
             </div>
             <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight leading-none">
@@ -254,7 +254,7 @@ export default function CoreFeatures() {
           {/* 6. Live Engagement Analytics (Wide Bottom) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 group relative p-10 rounded-xl bg-linear-to-br from-brand via-brand-hover to-blue-700 text-white border border-white/20 shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 group relative p-10 rounded-lg bg-linear-to-br from-brand via-brand-hover to-blue-700 text-white border border-white/20 shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <Users size={100} className="text-white/5 -mr-10 -mt-10" />
@@ -262,7 +262,7 @@ export default function CoreFeatures() {
 
             <div className="flex items-center gap-10">
               <div className="flex-1">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest mb-6">
                   Real-Time Engine
                 </div>
                 <h3 className="text-3xl font-black mb-4 tracking-tight leading-tight leading-none">

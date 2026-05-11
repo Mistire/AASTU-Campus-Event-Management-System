@@ -5,4 +5,5 @@ export interface UserRecord {
     role: string;
     status: 'active' | 'inactive' | 'pending';
     joined: string;
+    profileImage?: string;
 }

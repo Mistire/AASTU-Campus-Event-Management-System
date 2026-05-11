@@ -17,6 +17,7 @@ import {
   UserEngagementDto,
   OrganizerOverviewDto,
   ArchivedEventDto,
+  TopOrganizerDto,
 } from './dto/response.dto';
 import { ExportQueryDto } from './dto/export-query.dto';
 import { TimeRangeDto } from './dto/time-range.dto';
@@ -516,6 +517,62 @@ export class AnalyticsService {
     await this.setCached(cacheKey, result, 300);
 
     return result;
+  }
+
+  async getTopOrganizer(): Promise<TopOrganizerDto[]> {
+    const organizers = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { role: { roleName: { in: ['ORGANIZER', 'Organizer'] } } },
+          { createdEvents: { some: {} } }
+        ],
+        NOT: {
+          role: { roleName: { in: ['ADMIN', 'Admin'] } }
+        }
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        profileImage: true,
+        createdEvents: {
+          select: {
+            id: true,
+            registrations: {
+              select: { id: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!organizers || organizers.length === 0) return [];
+
+    const mapped = organizers.map((o) => {
+      const totalEvents = o.createdEvents.length;
+      const totalRegistrations = o.createdEvents.reduce(
+        (sum, e) => sum + e.registrations.length,
+        0,
+      );
+      return {
+        userId: o.id,
+        fullName: o.fullName,
+        email: o.email,
+        profileImage: o.profileImage || undefined,
+        totalEvents,
+        totalRegistrations,
+      };
+    });
+
+    // Sort by registrations, then by event count
+    const sorted = mapped.sort((a, b) => {
+      if (b.totalRegistrations !== a.totalRegistrations) {
+        return b.totalRegistrations - a.totalRegistrations;
+      }
+      return b.totalEvents - a.totalEvents;
+    });
+
+    return sorted;
   }
 
   async getCategoryAnalytics(

@@ -13,16 +13,18 @@ import {
   isSameDay, 
   addDays, 
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Ticket, CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface MyEventsCalendarProps {
   events: any[];
+  onViewTicket?: (entry: any) => void;
 }
 
-export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
+export function MyEventsCalendar({ events, onViewTicket }: MyEventsCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
 
@@ -39,7 +41,7 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
     return (
       <div className="flex items-center justify-between px-8 py-6 bg-linear-to-r from-white to-gray-50/50">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center shadow-inner">
+          <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center shadow-inner">
             <CalendarIcon className="text-brand" size={24} />
           </div>
           <div>
@@ -51,12 +53,12 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-100 shadow-sm">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="rounded-xl hover:bg-gray-100 h-10 w-10"
+            className="rounded-lg hover:bg-gray-100 h-10 w-10"
           >
             <ChevronLeft size={20} />
           </Button>
@@ -65,7 +67,7 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
             variant="ghost"
             size="icon"
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="rounded-xl hover:bg-gray-100 h-10 w-10"
+            className="rounded-lg hover:bg-gray-100 h-10 w-10"
           >
             <ChevronRight size={20} />
           </Button>
@@ -109,12 +111,12 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
             className={cn(
               "relative h-20 sm:h-24 border-r border-b border-gray-100 p-2 transition-all cursor-pointer group/day",
               !isCurrentMonth && "bg-gray-50/20 opacity-30",
-              isSelected ? "bg-brand/[0.03]" : "hover:bg-gray-50/80",
+              isSelected ? "bg-brand/5" : "hover:bg-gray-50/80",
               i === 6 && "border-r-0"
             )}
           >
             <div className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-xl text-xs font-black transition-all",
+                "flex items-center justify-center w-8 h-8 rounded-lg text-xs font-black transition-all",
                 isToday ? "ring-2 ring-brand ring-offset-2" : "",
                 isSelected ? "bg-brand text-white shadow-lg shadow-brand/30 scale-110" : "text-gray-900"
             )}>
@@ -144,7 +146,7 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Calendar Grid */}
-      <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-2xl shadow-gray-200/50 overflow-hidden flex flex-col h-full">
+      <div className="lg:col-span-2 bg-white rounded-lg border border-gray-100 shadow-2xl shadow-gray-200/50 overflow-hidden flex flex-col h-full">
         {renderHeader()}
         {renderDays()}
         <div className="flex-1">
@@ -154,7 +156,7 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
 
       {/* Selected Day Details - Premium Light Sidebar Style */}
       <div className="lg:col-span-1 flex flex-col gap-6">
-        <div className="bg-white rounded-3xl p-8 text-gray-900 border border-gray-100 shadow-xl shadow-gray-200/50 relative overflow-hidden h-full min-h-[400px]">
+        <div className="bg-white rounded-lg p-8 text-gray-900 border border-gray-100 shadow-xl shadow-gray-200/50 relative overflow-hidden h-full min-h-[400px]">
           <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />
           
           <div className="relative z-10 space-y-8 h-full flex flex-col">
@@ -168,36 +170,77 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
             <div className="flex-1 space-y-4 overflow-y-auto pr-2 scrollbar-hide">
               <AnimatePresence mode="wait">
                 {dayEvents.length > 0 ? (
-                  dayEvents.map((entry, idx) => (
-                    <motion.div
-                      key={entry.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-brand/20 hover:bg-white transition-all group shadow-sm hover:shadow-md"
-                    >
-                      <h4 className="font-black text-sm mb-3 group-hover:text-brand transition-colors text-gray-900">
-                        {entry.event.title}
-                      </h4>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                          <Clock size={12} className="text-brand" />
-                          {format(new Date(entry.event.startTime), "h:mm a")}
+                  dayEvents.map((entry, idx) => {
+                    const status = entry.status?.name || (entry.entryType === "waitlisted" ? "WAITLISTED" : "CONFIRMED");
+                    const hasTicket = !!entry.ticketToken;
+
+                    return (
+                      <motion.div
+                        key={entry.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="p-5 rounded-lg bg-gray-50 border border-gray-100 hover:border-brand/20 hover:bg-white transition-all group shadow-sm hover:shadow-md relative overflow-hidden"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <Link href={`/events/${entry.event.id}`} className="flex-1 pr-2">
+                            <h4 className="font-black text-sm group-hover:text-brand transition-colors text-gray-900">
+                              {entry.event.title}
+                            </h4>
+                          </Link>
+                          <div className={cn(
+                            "px-2 py-0.5 rounded-lg font-black uppercase tracking-widest text-[7px] flex items-center gap-1 shrink-0",
+                            status === "CONFIRMED" ? "bg-emerald-50 text-emerald-600" : 
+                            status === "PENDING" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"
+                          )}>
+                            {status === "CONFIRMED" ? <CheckCircle2 size={8} /> : <Clock size={8} />}
+                            {status}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                          <MapPin size={12} className="text-brand" />
-                          <span className="truncate">{entry.event.venue?.name || "Online"}</span>
+
+                        <div className="flex flex-col gap-2 mb-4">
+                          <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                            <Clock size={12} className="text-brand" />
+                            {format(new Date(entry.event.startTime), "h:mm a")}
+                          </div>
+                          <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                            <MapPin size={12} className="text-brand" />
+                            <span className="truncate">{entry.event.venue?.name || "Online"}</span>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))
+
+                        <div className="flex gap-2">
+                          <Link href={`/events/${entry.event.id}`} className="flex-1">
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="w-full h-8 rounded-lg border-gray-200 text-gray-500 hover:text-brand hover:border-brand font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-2"
+                            >
+                              <Info size={12} />
+                              Details
+                            </Button>
+                          </Link>
+                          {status === "CONFIRMED" && hasTicket && onViewTicket && (
+                            <Button 
+                              onClick={() => onViewTicket(entry)}
+                              size="sm"
+                              className="flex-1 h-8 rounded-lg bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-2"
+                            >
+                              <Ticket size={12} />
+                              Ticket
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })
                 ) : (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="h-full flex flex-col items-center justify-center text-center py-12"
                   >
-                    <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 rounded-lg bg-gray-50 flex items-center justify-center mb-4">
                       <Clock size={24} className="text-gray-200" />
                     </div>
                     <p className="text-xs font-bold text-gray-300 uppercase tracking-[0.2em]">No events scheduled</p>
@@ -207,9 +250,11 @@ export function MyEventsCalendar({ events }: MyEventsCalendarProps) {
             </div>
 
             {dayEvents.length > 0 && (
-              <Button className="w-full h-14 rounded-2xl bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-brand/20">
-                View All Details
-              </Button>
+              <div className="pt-6 border-t border-gray-100">
+                <Button className="w-full h-14 rounded-lg bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-[10px] shadow-xl shadow-brand/20">
+                  View All Details
+                </Button>
+              </div>
             )}
           </div>
         </div>

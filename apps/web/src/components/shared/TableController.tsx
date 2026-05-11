@@ -147,7 +147,7 @@ export function TableController<TData>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300">
+                    <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-300">
                         <Loader2 className="w-6 h-6 opacity-20" />
                     </div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{emptyMessage}</p>

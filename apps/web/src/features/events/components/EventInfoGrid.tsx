@@ -14,9 +14,9 @@ interface InfoCardProps {
 
 function InfoCard({ icon: Icon, label, value, subValue, className }: InfoCardProps) {
   return (
-    <div className={cn("p-6 rounded-xl bg-white border border-gray-100 shadow-sm transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
+    <div className={cn("p-6 rounded-lg bg-white border border-gray-100 shadow-sm transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
       <div className="flex flex-col gap-4">
-        <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
+        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
           <Icon size={20} />
         </div>
         <div className="space-y-1">

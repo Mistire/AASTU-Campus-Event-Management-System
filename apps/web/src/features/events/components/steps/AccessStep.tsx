@@ -93,14 +93,14 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
                 type="button"
                 onClick={() => updateAccess(option.id)}
                 className={cn(
-                  "flex flex-col items-start p-6 rounded-xl border-2 transition-all duration-300 text-left group gap-4",
+                  "flex flex-col items-start p-6 rounded-lg border-2 transition-all duration-300 text-left group gap-4",
                   isSelected
                     ? "bg-white border-brand shadow-2xl shadow-brand/10 scale-[1.02]"
                     : "bg-gray-50/50 border-gray-100/50 hover:bg-white hover:border-brand/30 hover:shadow-xl hover:shadow-gray-200/40"
                 )}
               >
                 <div className={cn(
-                  "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors shadow-sm",
+                  "w-12 h-12 rounded-lg flex items-center justify-center transition-colors shadow-sm",
                   isSelected ? "bg-brand text-white" : cn(option.bg, option.color)
                 )}>
                   <option.icon size={20} />
@@ -127,10 +127,10 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
 
       {/* Invite Only Section */}
       {accessType === "INVITE_ONLY" && (
-        <div className="space-y-8 p-10 bg-gray-50/30 rounded-xl border border-gray-100/50 animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="space-y-8 p-10 bg-gray-50/30 rounded-lg border border-gray-100/50 animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-gray-100 shadow-sm">
+              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
                 <Users className="text-brand" size={18} />
               </div>
               <div>
@@ -149,7 +149,7 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
               />
               <label 
                 htmlFor="csv-upload"
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 bg-white text-[10px] font-black uppercase tracking-widest text-gray-500 hover:border-brand hover:text-brand cursor-pointer transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-lg border border-gray-200 bg-white text-[10px] font-black uppercase tracking-widest text-gray-500 hover:border-brand hover:text-brand cursor-pointer transition-all shadow-sm active:scale-95"
               >
                 <FileUp size={14} />
                 Import CSV
@@ -176,7 +176,7 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
               <Button 
                 type="button"
                 onClick={() => addInvite(emailInput)}
-                className="h-12 px-8 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-gray-200"
+                className="h-12 px-8 rounded-lg bg-gray-900 hover:bg-gray-800 text-white font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-gray-200"
               >
                 Add
               </Button>
@@ -187,7 +187,7 @@ export function AccessStep({ data, onUpdate }: AccessStepProps) {
                 <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic py-4">No guests invited yet...</p>
               ) : (
                 invites.map((email) => (
-                  <div key={email} className="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2 rounded-xl group/invite shadow-sm hover:border-brand/30 transition-all">
+                  <div key={email} className="flex items-center gap-2 bg-white border border-gray-100 px-4 py-2 rounded-lg group/invite shadow-sm hover:border-brand/30 transition-all">
                     <span className="text-[11px] font-bold text-gray-600">{email}</span>
                     <button 
                       type="button"

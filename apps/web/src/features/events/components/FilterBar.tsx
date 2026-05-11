@@ -2,10 +2,9 @@
 
 import { useCategories } from "../api/useCategories";
 import { cn } from "@/lib/utils";
-import { Search, SlidersHorizontal, ChevronRight, X } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Search, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 
 interface FilterBarProps {
   onFilterChange: (filters: {
@@ -13,12 +12,28 @@ interface FilterBarProps {
     categoryId: string | null;
   }) => void;
   isLoading?: boolean;
+  initialSearch?: string;
+  initialCategoryId?: string | null;
 }
 
-export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
+export function FilterBar({ 
+  onFilterChange, 
+  isLoading,
+  initialSearch = "",
+  initialCategoryId = null
+}: FilterBarProps) {
   const { data: categories } = useCategories();
-  const [search, setSearch] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [search, setSearch] = useState(initialSearch);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCategoryId);
+
+  // Sync with external state changes (e.g. reset)
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    setSelectedCategoryId(initialCategoryId);
+  }, [initialCategoryId]);
 
   // Debounce search
   useEffect(() => {
@@ -30,11 +45,6 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
 
   const selectCategory = (id: string | null) => {
     setSelectedCategoryId(id);
-  };
-
-  const clearFilters = () => {
-    setSearch("");
-    setSelectedCategoryId(null);
   };
 
   return (
@@ -49,7 +59,7 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                 placeholder="Find events, workshops, hackathons..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-12 py-3.5 rounded-2xl border border-gray-100 bg-white text-sm font-semibold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all shadow-sm"
+                className="w-full pl-12 pr-12 py-3.5 rounded-lg border border-gray-100 bg-white text-sm font-semibold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all shadow-sm"
               />
               <AnimatePresence>
                 {search && (
@@ -65,11 +75,6 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                 )}
               </AnimatePresence>
            </div>
-           
-           <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white border border-gray-100 text-sm font-black uppercase tracking-widest text-gray-400 hover:border-brand hover:text-brand transition-all shadow-sm shrink-0">
-             <SlidersHorizontal size={16} />
-             <span>Refine</span>
-           </button>
         </div>
 
         {/* Category Horizontal Rail */}
@@ -78,7 +83,7 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
              <button
                 onClick={() => selectCategory(null)}
                 className={cn(
-                  "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
+                  "px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
                   selectedCategoryId === null
                     ? "bg-brand border-brand text-white shadow-lg shadow-brand/20"
                     : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
@@ -92,7 +97,7 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                   key={cat.id}
                   onClick={() => selectCategory(cat.id)}
                   className={cn(
-                    "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
+                    "px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
                     selectedCategoryId === cat.id
                       ? "bg-brand border-brand text-white shadow-lg shadow-brand/20"
                       : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
@@ -102,7 +107,6 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                </button>
              ))}
            </div>
-
         </div>
       </div>
     </div>

@@ -40,7 +40,7 @@ export default function AuthShell({
         {/* Center: Hero Text */}
         <div className="relative z-10">
           {badge && (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
               {badge}
             </div>
           )}

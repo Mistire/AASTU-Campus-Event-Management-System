@@ -85,9 +85,9 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+          <div className="w-16 h-16 rounded-lg bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
             <Tag className="w-8 h-8" />
           </div>
           <div>
@@ -106,7 +106,7 @@ export default function CategoriesPage() {
             render={
               <CemsButton
                 cemsVariant="brand"
-                className="rounded-xl shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]"
+                className="rounded-lg shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Category
@@ -117,7 +117,7 @@ export default function CategoriesPage() {
             showCloseButton={false}
             className="p-0 border-none bg-transparent shadow-none max-w-md"
           >
-            <div className="bg-white rounded-xl overflow-hidden shadow-2xl">
+            <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
               <ModalHeader title="New Category" />
               <div className="p-8 space-y-6">
                 <InputController
@@ -148,7 +148,7 @@ export default function CategoriesPage() {
         </Dialog>
       </div>
 
-      <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+      <div className="bg-white rounded-lg overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
         <CemsTable
           data={categories || []}
           columns={allColumns}

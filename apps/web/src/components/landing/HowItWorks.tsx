@@ -116,13 +116,13 @@ export default function HowItWorks() {
                     <div className="absolute -top-3 -right-3 bg-white border border-gray-100 text-brand text-[10px] font-brand font-black w-10 h-10 rounded-full flex items-center justify-center z-20 shadow-xl shadow-brand/10 ring-4 ring-gray-50/50">
                       0{index + 1}
                     </div>
-                    <div className="bg-brand text-white w-24 h-24 flex items-center justify-center rounded-xl shadow-2xl shadow-brand/20 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-brand/40 group-hover:-translate-y-2 relative overflow-hidden">
+                    <div className="bg-brand text-white w-24 h-24 flex items-center justify-center rounded-lg shadow-2xl shadow-brand/20 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-brand/40 group-hover:-translate-y-2 relative overflow-hidden">
                       <Icon className="w-10 h-10 relative z-10" strokeWidth={1.5} />
                       <div className="absolute inset-0 bg-linear-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </div>
 
-                  <div className="p-6 rounded-xl bg-white/60 backdrop-blur-md border border-gray-100 shadow-xl transition-all group-hover:shadow-2xl group-hover:bg-white group-hover:-translate-y-1">
+                  <div className="p-6 rounded-lg bg-white/60 backdrop-blur-md border border-gray-100 shadow-xl transition-all group-hover:shadow-2xl group-hover:bg-white group-hover:-translate-y-1">
                     <h3 className="font-brand font-black text-xs uppercase tracking-widest mb-3 text-brand">
                       Step 0{index + 1}
                     </h3>
@@ -161,11 +161,11 @@ export default function HowItWorks() {
                   <div className="absolute -top-3 -right-3 bg-white border border-gray-100 text-brand text-[10px] font-brand font-black w-8 h-8 rounded-full flex items-center justify-center z-20 shadow-lg ring-2 ring-gray-50">
                     0{index + 1}
                   </div>
-                  <div className="bg-brand text-white w-20 h-20 flex items-center justify-center rounded-xl shadow-xl shadow-brand/20">
+                  <div className="bg-brand text-white w-20 h-20 flex items-center justify-center rounded-lg shadow-xl shadow-brand/20">
                     <Icon className="w-8 h-8" strokeWidth={1.5} />
                   </div>
                 </div>
-                <div className="p-8 rounded-xl bg-white border border-gray-100 shadow-lg">
+                <div className="p-8 rounded-lg bg-white border border-gray-100 shadow-lg">
                   <h3 className="font-brand font-black text-[10px] uppercase tracking-widest mb-2 text-brand">
                     Step 0{index + 1}
                   </h3>

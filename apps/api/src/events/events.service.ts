@@ -557,6 +557,7 @@ export class EventsService {
       status,
       eventType,
       tag,
+      categoryId,
       venueId,
       createdById,
       upcomingOnly,
@@ -641,6 +642,10 @@ export class EventsService {
 
     if (tag) {
       where.tags = { some: { tagId: tag } };
+    }
+
+    if (categoryId) {
+      where.eventCategories = { some: { categoryId: categoryId } };
     }
 
     if (date) {

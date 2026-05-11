@@ -61,7 +61,7 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
             const val = row.original.status;
             return (
                 <div className={cn(
-                    "inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm",
+                    "inline-flex items-center px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border shadow-sm",
                     val === 'OPEN' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                     val === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                     val === 'RESOLVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :

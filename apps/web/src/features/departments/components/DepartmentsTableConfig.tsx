@@ -32,7 +32,7 @@ export const getDepartmentsColumns = (): ColumnDef<Department>[] => [
         header: "Students",
         cell: ({ row }) => (
             <div>
-                <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
                     {row.original._count?.users || 0}
                 </span>
             </div>

@@ -15,7 +15,7 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
   const thumbnailUrl = getThumbnailUrl(event);
 
   return (
-    <section className="relative rounded-xl overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
+    <section className="relative rounded-lg overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
       {thumbnailUrl ? (
         <Image
           src={thumbnailUrl}
@@ -40,7 +40,7 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
           <div className="flex items-center gap-3">
             <Badge
               className={cn(
-                "px-3 py-1.5 rounded-full border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md",
+                "px-3 py-1.5 rounded-lg border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md",
                 isLive ? "bg-red-500/20 text-red-100" : "bg-white/10 text-white"
               )}
             >
@@ -58,7 +58,7 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
               )}
             </Badge>
             {event.eventType && (
-              <Badge className="bg-brand/20 backdrop-blur-md border border-brand/30 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-brand-subtle">
+              <Badge className="bg-brand/20 backdrop-blur-md border border-brand/30 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] text-brand-subtle">
                 {event.eventType.name}
               </Badge>
             )}

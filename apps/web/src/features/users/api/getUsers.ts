@@ -12,6 +12,7 @@ interface RawUser {
     };
     isEmailVerified: boolean;
     createdAt: string;
+    profileImage?: string;
 }
 
 interface PaginatedUsersResponse {
@@ -63,6 +64,7 @@ export async function fetchUsers(query: UserQuery) {
             month: 'short',
             day: 'numeric'
         }),
+        profileImage: user.profileImage || undefined,
     }));
 
     return {

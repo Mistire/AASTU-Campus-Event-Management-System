@@ -97,7 +97,7 @@ export default function EventDetailPage() {
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="text-gray-500 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-xl"
+          className="text-gray-500 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-lg"
         >
           <ArrowLeft size={16} /> Back to Discover
         </Button>
@@ -108,14 +108,14 @@ export default function EventDetailPage() {
               navigator.clipboard.writeText(window.location.href);
               toast.success("Link copied!");
             }}
-            className="rounded-xl p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
+            className="rounded-lg p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
           >
             <Share2 size={16} />
           </Button>
           <Button
             variant="outline"
             onClick={handleAddToCalendar}
-            className="rounded-xl p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
+            className="rounded-lg p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
           >
             <CalendarPlus size={16} />
           </Button>
@@ -139,7 +139,7 @@ export default function EventDetailPage() {
             <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
               About <span className="text-brand">this Event</span>
             </h2>
-            <div className="prose prose-brand max-w-none text-gray-600 font-medium leading-relaxed bg-gray-50/50 p-8 rounded-3xl border border-dashed border-gray-100">
+            <div className="prose prose-brand max-w-none text-gray-600 font-medium leading-relaxed bg-gray-50/50 p-8 rounded-lg border border-dashed border-gray-100">
               {event.description ||
                 "Organizers haven't provided a full description yet."}
             </div>
@@ -148,7 +148,7 @@ export default function EventDetailPage() {
                 <Badge
                   key={t.id}
                   variant="secondary"
-                  className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 border-none"
+                  className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 border-none"
                 >
                   #{t.tag.name}
                 </Badge>
@@ -184,7 +184,7 @@ export default function EventDetailPage() {
       <SimilarEventsRail eventId={id} />
 
       <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 mt-20">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">
 
         </div>
       </div>

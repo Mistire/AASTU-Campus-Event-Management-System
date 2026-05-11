@@ -12,7 +12,7 @@ export function EventCardHoverPreview({ event }: EventCardHoverPreviewProps) {
       <HoverCardTrigger className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 backdrop-blur-sm border border-gray-100 text-gray-300 hover:text-brand hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100">
         <Info size={14} />
       </HoverCardTrigger>
-      <HoverCardContent className="w-80 rounded-2xl shadow-2xl border-gray-100 p-0 overflow-hidden">
+      <HoverCardContent className="w-80 rounded-lg shadow-2xl border-gray-100 p-0 overflow-hidden">
         <div className="p-4 bg-brand/5 border-b border-brand/10">
           <h4 className="text-sm font-black text-brand uppercase tracking-widest">Event Preview</h4>
           <p className="text-lg font-black text-gray-900 leading-tight mt-1">{event.title}</p>

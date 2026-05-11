@@ -70,8 +70,8 @@ export function PendingInvitationsModal() {
         </CemsDialogHeader>
 
         <div className="p-8 space-y-6">
-          <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex items-start gap-5">
-            <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm text-brand shrink-0">
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-100 flex items-start gap-5">
+            <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center shadow-sm text-brand shrink-0">
               <Calendar size={24} />
             </div>
             <div className="space-y-1">
@@ -93,7 +93,7 @@ export function PendingInvitationsModal() {
 
           {pendingInvitations.length > 1 && (
             <div className="flex justify-center">
-              <p className="text-[9px] font-black text-brand bg-brand/5 px-3 py-1 rounded-full uppercase tracking-widest">
+              <p className="text-[9px] font-black text-brand bg-brand/5 px-3 py-1 rounded-lg uppercase tracking-widest">
                 {currentIndex + 1} of {pendingInvitations.length} Invitations
               </p>
             </div>
@@ -105,7 +105,7 @@ export function PendingInvitationsModal() {
             onClick={() => handleResponse(false)}
             disabled={respondMutation.isPending}
             variant="outline"
-            className="h-11 px-6 rounded-xl border-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 font-black uppercase tracking-widest text-[9px]"
+            className="h-11 px-6 rounded-lg border-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 font-black uppercase tracking-widest text-[9px]"
           >
             <X size={14} className="mr-2" />
             Decline
@@ -113,7 +113,7 @@ export function PendingInvitationsModal() {
           <CemsButton
             onClick={() => handleResponse(true)}
             disabled={respondMutation.isPending}
-            className="h-11 px-8 rounded-xl bg-brand text-white font-black uppercase tracking-widest text-[9px] shadow-lg shadow-brand/20"
+            className="h-11 px-8 rounded-lg bg-brand text-white font-black uppercase tracking-widest text-[9px] shadow-lg shadow-brand/20"
           >
             {respondMutation.isPending ? (
               <Loader2 size={14} className="animate-spin mr-2" />

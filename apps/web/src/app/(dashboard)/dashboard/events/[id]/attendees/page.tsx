@@ -86,9 +86,9 @@ export default function EventAttendeesPage() {
       header: "Attendee",
       cell: ({ row }) => (
         <div className="flex items-center gap-3 py-1">
-          <div className="w-9 h-9 rounded-xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
             {row.original.user.profileImage ? (
-              <Image src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-xl" />
+              <Image src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-lg" />
             ) : (
               row.original.user.fullName.charAt(0)
             )}
@@ -215,8 +215,8 @@ export default function EventAttendeesPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-48 rounded-xl" />
-        <Skeleton className="h-[500px] w-full rounded-3xl" />
+        <Skeleton className="h-10 w-48 rounded-lg" />
+        <Skeleton className="h-[500px] w-full rounded-lg" />
       </div>
     );
   }
@@ -231,12 +231,12 @@ export default function EventAttendeesPage() {
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="w-fit text-gray-400 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-xl mb-2 -ml-2"
+            className="w-fit text-gray-400 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-lg mb-2 -ml-2"
           >
             <ArrowLeft size={14} /> Back to Dashboard
           </Button>
           <div className="flex items-center gap-3">
-             <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shadow-sm shadow-brand/20">
+             <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center text-brand shadow-sm shadow-brand/20">
                <Users size={24} />
              </div>
              <div>
@@ -250,9 +250,9 @@ export default function EventAttendeesPage() {
 
         <Button 
           onClick={() => setIsScannerOpen(true)}
-          className="h-16 px-8 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all"
+          className="h-16 px-8 rounded-lg bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all"
         >
-          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
             <ScanLine size={18} />
           </div>
           Scan QR & Check-in
@@ -278,7 +278,7 @@ export default function EventAttendeesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <Input 
                 placeholder="Search by name or email..." 
-                className="pl-10 h-10 rounded-xl bg-gray-50/50 border-gray-100 text-[11px] font-bold"
+                className="pl-10 h-10 rounded-lg bg-gray-50/50 border-gray-100 text-[11px] font-bold"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -287,7 +287,7 @@ export default function EventAttendeesPage() {
         />
         <CemsCardContent>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6 bg-gray-50/50 p-1 rounded-xl h-auto">
+            <TabsList className="mb-6 bg-gray-50/50 p-1 rounded-lg h-auto">
               <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
               <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
               <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>

@@ -97,7 +97,7 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
             {/* Profile Image Section */}
             <div className="flex flex-col items-center gap-4 pb-4 border-b border-gray-50">
                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                    <div className="w-24 h-24 rounded-3xl bg-gray-50 border-2 border-gray-100 flex items-center justify-center overflow-hidden transition-all group-hover:border-brand/30 group-hover:shadow-xl shadow-brand/5">
+                    <div className="w-24 h-24 rounded-lg bg-gray-50 border-2 border-gray-100 flex items-center justify-center overflow-hidden transition-all group-hover:border-brand/30 group-hover:shadow-xl shadow-brand/5">
                         {previewUrl ? (
                             <Image src={previewUrl} alt="Preview" fill className="object-cover" />
                         ) : (
@@ -136,7 +136,7 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
                     value={formData.fullName}
                     onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                     placeholder="Enter your full name"
-                    className="pl-12 h-14 rounded-2xl border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-brand/50 transition-all font-bold text-gray-900"
+                    className="pl-12 h-14 rounded-lg border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-brand/50 transition-all font-bold text-gray-900"
                     required
                   />
                 </div>
@@ -153,7 +153,7 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="+251 (00) 000-0000"
-                    className="pl-12 h-14 rounded-2xl border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-brand/5 transition-all font-bold text-gray-900"
+                    className="pl-12 h-14 rounded-lg border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-brand/5 transition-all font-bold text-gray-900"
                   />
                 </div>
               </div>
@@ -165,14 +165,14 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
               type="button" 
               variant="ghost" 
               onClick={onClose}
-              className="rounded-xl font-bold text-xs h-12"
+              className="rounded-lg font-bold text-xs h-12"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={updateProfile.isPending}
-              className="rounded-xl bg-brand text-white font-bold text-xs h-12 px-8 shadow-lg shadow-brand/20 hover:shadow-xl transition-all"
+              className="rounded-lg bg-brand text-white font-bold text-xs h-12 px-8 shadow-lg shadow-brand/20 hover:shadow-xl transition-all"
             >
               {updateProfile.isPending ? (
                 <Loader2 className="mr-2 animate-spin" size={16} />

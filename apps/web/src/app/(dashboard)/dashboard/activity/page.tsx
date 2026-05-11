@@ -58,7 +58,7 @@ export default function ActivityPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm">
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
             Total Events
           </p>
@@ -66,7 +66,7 @@ export default function ActivityPage() {
             {isLoading ? "—" : totalLogs}
           </p>
         </div>
-        <div className="bg-white rounded-2xl border border-rose-100 p-6 shadow-sm">
+        <div className="bg-white rounded-lg border border-rose-100 p-6 shadow-sm">
           <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest">
             Failed Attempts
           </p>
@@ -74,7 +74,7 @@ export default function ActivityPage() {
             {isLoading ? "—" : failures}
           </p>
         </div>
-        <div className="bg-white rounded-2xl border border-emerald-100 p-6 shadow-sm">
+        <div className="bg-white rounded-lg border border-emerald-100 p-6 shadow-sm">
           <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
             System Health
           </p>
@@ -87,7 +87,7 @@ export default function ActivityPage() {
       </div>
 
       {/* Table Layout */}
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 transition-all duration-500">
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 transition-all duration-500">
         <CemsTable
           data={logs}
           columns={columns}

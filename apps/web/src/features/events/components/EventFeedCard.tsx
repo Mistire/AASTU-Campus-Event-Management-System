@@ -56,7 +56,7 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
-      className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-brand/5 transition-all duration-300 overflow-hidden"
+      className="group relative bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-brand/5 transition-all duration-300 overflow-hidden"
     >
       {/* Visual Header */}
       <EventCardImage event={event} />

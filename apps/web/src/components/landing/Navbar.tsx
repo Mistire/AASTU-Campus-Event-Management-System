@@ -63,7 +63,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/signup"
-              className="group text-sm font-bold px-6 py-2.5 rounded-xl bg-brand hover:bg-brand-hover text-white shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-2"
+              className="group text-sm font-bold px-6 py-2.5 rounded-lg bg-brand hover:bg-brand-hover text-white shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-2"
             >
               Get Started 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -102,14 +102,14 @@ export default function Navbar() {
             <Link
               href="/login"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-4 text-gray-900 font-bold border border-gray-200 rounded-xl"
+              className="w-full text-center py-4 text-gray-900 font-bold border border-gray-200 rounded-lg"
             >
               Login to Portal
             </Link>
             <Link
               href="/signup"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-4 bg-brand text-white font-bold rounded-xl shadow-xl shadow-brand/20"
+              className="w-full text-center py-4 bg-brand text-white font-bold rounded-lg shadow-xl shadow-brand/20"
             >
               Get Started Now
             </Link>

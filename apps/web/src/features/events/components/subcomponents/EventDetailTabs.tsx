@@ -42,7 +42,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
       icon: <MapPin className="w-full h-full" />,
       content: (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex items-center gap-2 mb-2">
               <Building2 className="h-4 w-4 text-orange-500" />
               <h4 className="text-xs font-bold text-gray-400 uppercase">
@@ -53,7 +53,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
               {event.venue.building || "Main Campus"}
             </p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex items-center gap-2 mb-2">
               <Hash className="h-4 w-4 text-blue-500" />
               <h4 className="text-xs font-bold text-gray-400 uppercase">
@@ -64,7 +64,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
               {event.venue.roomNumber || "TBD"}
             </p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 md:col-span-2">
+          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 md:col-span-2">
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="h-4 w-4 text-green-500" />
               <h4 className="text-xs font-bold text-gray-400 uppercase">
@@ -106,7 +106,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 bg-gray-50/50 rounded-2xl p-6 border border-gray-100 group-hover:border-brand/20 group-hover:bg-white transition-all duration-300">
+                    <div className="flex-1 bg-gray-50/50 rounded-lg p-6 border border-gray-100 group-hover:border-brand/20 group-hover:bg-white transition-all duration-300">
                       <h4 className="text-lg font-black text-gray-900 mb-2 tracking-tight leading-none uppercase">
                         {session.title}
                       </h4>
@@ -141,7 +141,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
               ))}
             </div>
           ) : (
-            <div className="p-12 border border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-gray-400">
+            <div className="p-12 border border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center text-gray-400">
               <CheckCircle2 className="h-10 w-10 mb-3 opacity-20" />
               <p className="font-bold tracking-tight uppercase text-xs">
                 No special sessions defined for this event.
@@ -156,7 +156,7 @@ export function EventDetailTabs({ eventId, event, canManage, canEdit }: EventDet
   const tabItems = allTabs.filter(tab => !tab.hidden);
 
   return (
-    <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
       <CemsTab
         tabs={tabItems}
         defaultValue="attendance"
