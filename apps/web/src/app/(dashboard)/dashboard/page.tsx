@@ -139,7 +139,7 @@ export default function DashboardPage() {
               {user.fullName.charAt(0)}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-900 truncate">
+              <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
                 {user.fullName}
               </p>
               <p className="text-[10px] text-gray-400 truncate">
@@ -154,7 +154,7 @@ export default function DashboardPage() {
       accessorKey: "event.title",
       header: "Event",
       cell: ({ row }) => (
-        <p className="text-xs font-medium text-gray-600 line-clamp-1 max-w-[180px]">
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 line-clamp-1 max-w-[180px]">
           {row.original.event.title}
         </p>
       ),
@@ -196,7 +196,7 @@ export default function DashboardPage() {
       {/* Dashboard Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight tracking-tighter uppercase">
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight tracking-tighter uppercase">
             System <span className="text-brand">Overview</span>
           </h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
@@ -206,22 +206,22 @@ export default function DashboardPage() {
 
         {isAdmin && (
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Export Data</span>
-            <div className="flex bg-white rounded-lg border border-gray-100 p-1 shadow-sm">
+            <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2">Export Data</span>
+            <div className="flex bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-1 shadow-sm">
                 <Button 
                    variant="ghost" 
                    size="sm" 
                    onClick={() => exportAnalytics({ type: "admin", format: "csv" })}
-                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 dark:text-gray-400 hover:text-brand transition-colors"
                 >
                   <TableIcon size={12} /> CSV
                 </Button>
-                <div className="w-px h-4 bg-gray-100 my-auto" />
+                <div className="w-px h-4 bg-gray-100 dark:bg-gray-700 my-auto" />
                 <Button 
                    variant="ghost" 
                    size="sm" 
                    onClick={() => exportAnalytics({ type: "admin", format: "pdf" })}
-                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 dark:text-gray-400 hover:text-brand transition-colors"
                 >
                   <FileText size={12} /> PDF
                 </Button>

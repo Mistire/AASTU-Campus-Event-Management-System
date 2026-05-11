@@ -54,9 +54,9 @@ export function DiscoverySidebar() {
     <aside className="hidden lg:block w-72 shrink-0">
       <div className="sticky top-24 space-y-6">
         {/* Main Navigation Card */}
-        <div className="bg-white/50 backdrop-blur-xl border border-gray-100 rounded-lg p-4 shadow-sm">
+        <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-lg p-4 shadow-sm">
           <div className="px-4 py-2 mb-4">
-             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Menu</p>
+             <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Menu</p>
           </div>
           
           <nav className="space-y-2">
@@ -72,16 +72,16 @@ export function DiscoverySidebar() {
                     "group relative flex items-center gap-4 px-4 py-4 rounded-lg transition-all duration-500",
                     isActive 
                       ? "bg-brand text-white shadow-xl shadow-brand/20 scale-[1.02]" 
-                      : "text-gray-500 hover:bg-white hover:shadow-lg hover:text-brand"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg dark:hover:shadow-none hover:text-brand dark:hover:text-brand"
                   )}
                 >
                   <div className={cn(
                     "w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-500",
-                    isActive ? "bg-white/20" : "bg-gray-50 group-hover:bg-brand/5"
+                    isActive ? "bg-white/20" : "bg-gray-50 dark:bg-gray-800 group-hover:bg-brand/5 dark:group-hover:bg-brand/10"
                   )}>
                     <Icon size={20} className={cn(
                       "transition-colors",
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-brand"
+                      isActive ? "text-white" : "text-gray-400 dark:text-gray-500 group-hover:text-brand"
                     )} />
                   </div>
                   
@@ -89,7 +89,7 @@ export function DiscoverySidebar() {
                     <p className="text-sm font-black tracking-tight">{item.label}</p>
                     <p className={cn(
                       "text-[10px] font-bold uppercase tracking-wider mt-0.5 opacity-60",
-                      isActive ? "text-white/80" : "text-gray-400"
+                      isActive ? "text-white/80" : "text-gray-400 dark:text-gray-500"
                     )}>
                       {item.description}
                     </p>

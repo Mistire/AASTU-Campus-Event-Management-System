@@ -42,7 +42,7 @@ export function EventErrorState({ onBack }: { onBack: () => void }) {
           <Info size={40} className="text-red-500" />
         </span>
       </div>
-      <h3 className="text-2xl font-black text-gray-900 mb-2">Event not found</h3>
+      <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">Event not found</h3>
       <Button
         onClick={onBack}
         className="mt-8 rounded-lg bg-brand text-white font-black uppercase tracking-widest text-[10px] h-12 px-10"

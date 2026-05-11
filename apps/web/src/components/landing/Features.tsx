@@ -43,7 +43,7 @@ export default function Features() {
 
   if (isLoading) {
     return (
-      <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white via-gray-50/20 to-white overflow-hidden">
+      <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white dark:from-black via-gray-50/20 dark:via-gray-950/20 to-white dark:to-black overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="h-10" />
           <Skeleton className="h-16 w-64 mx-auto mb-12 rounded-lg" />
@@ -64,7 +64,7 @@ export default function Features() {
   }
 
   return (
-    <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white via-gray-50/20 to-white overflow-hidden">
+    <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white dark:from-black via-gray-50/20 dark:via-gray-950/20 to-white dark:to-black overflow-hidden">
       
       {/* ── Background Decorations ── */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[50px_50px]" />
@@ -74,7 +74,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-20">
           <div className="h-10" />
-          <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter">
+          <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tighter">
             Upcoming <span className="text-brand">Discovery.</span>
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-xl font-medium leading-relaxed">
@@ -90,7 +90,7 @@ export default function Features() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-8 group relative rounded-lg overflow-hidden shadow-2xl h-[550px] border border-gray-100 flex flex-col justify-end p-10"
+              className="lg:col-span-8 group relative rounded-lg overflow-hidden shadow-2xl h-[550px] border border-gray-100 dark:border-gray-800 flex flex-col justify-end p-10"
             >
               <Image
                 src={getEventImage(featuredEvent.id, 0)}
@@ -195,7 +195,7 @@ export default function Features() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group relative rounded-lg overflow-hidden shadow-xl h-[260px] border border-gray-100 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
+                className="group relative rounded-lg overflow-hidden shadow-xl h-[260px] border border-gray-100 dark:border-gray-800 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
               >
                 <Image
                   src={getEventImage(event.id, i + 1)}
@@ -244,7 +244,7 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative rounded-lg overflow-hidden shadow-lg h-[320px] border border-gray-100 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
+              className="group relative rounded-lg overflow-hidden shadow-lg h-[320px] border border-gray-100 dark:border-gray-800 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
             >
               <Image
                 src={getEventImage(event.id, i + 3)}

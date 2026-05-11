@@ -37,7 +37,7 @@ export default function ArchivePage() {
           header: "Event",
           cell: ({ row }: any) => (
             <div className="flex flex-col">
-              <span className="font-black text-gray-900 tracking-tight">
+              <span className="font-black text-gray-900 dark:text-white tracking-tight">
                 {row.original.title}
               </span>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
@@ -68,7 +68,7 @@ export default function ArchivePage() {
           cell: ({ row }: any) => (
             <div className="flex items-center gap-2">
               <Users className="w-3.5 h-3.5 text-gray-400" />
-              <span className="font-bold text-gray-700">
+              <span className="font-bold text-gray-700 dark:text-gray-300">
                 {row.original.totalRegistrations}
               </span>
             </div>
@@ -87,7 +87,7 @@ export default function ArchivePage() {
                     rate > 70 ? "text-emerald-500" : "text-amber-500",
                   )}
                 />
-                <span className="font-bold text-gray-700">{rate}%</span>
+                <span className="font-bold text-gray-700 dark:text-gray-300">{rate}%</span>
               </div>
             );
           },
@@ -98,7 +98,7 @@ export default function ArchivePage() {
           cell: ({ row }: any) => (
             <div className="flex items-center gap-1.5">
               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span className="font-bold text-gray-700">
+              <span className="font-bold text-gray-700 dark:text-gray-300">
                 {row.original.averageRating.toFixed(1)}
               </span>
             </div>
@@ -147,7 +147,7 @@ export default function ArchivePage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header section with Stats Summary */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-lg border border-gray-100 shadow-sm relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-8 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
 
@@ -156,10 +156,10 @@ export default function ArchivePage() {
             <Archive size={32} />
           </div>
           <div>
-            <h1 className="text-4xl font-black tracking-tight text-gray-900 uppercase">
+            <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
               Archive
             </h1>
-            <p className="text-gray-500 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+            <p className="text-gray-500 dark:text-gray-400 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Review performance of ended events
             </p>
@@ -167,12 +167,12 @@ export default function ArchivePage() {
         </div>
 
         <div className="flex items-center gap-4 relative z-10">
-          <div className="hidden lg:flex items-center gap-8 px-8 border-l border-gray-100">
+          <div className="hidden lg:flex items-center gap-8 px-8 border-l border-gray-100 dark:border-gray-800">
             <div className="text-center">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
                 Total Archived
               </p>
-              <p className="text-2xl font-black text-gray-900">
+              <p className="text-2xl font-black text-gray-900 dark:text-white">
                 {archive?.length || 0}
               </p>
             </div>
@@ -182,7 +182,7 @@ export default function ArchivePage() {
               </p>
               <div className="flex items-center justify-center gap-1">
                 <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <p className="text-2xl font-black text-gray-900">
+                <p className="text-2xl font-black text-gray-900 dark:text-white">
                   {(
                     (archive?.reduce(
                       (acc, curr) => acc + curr.averageRating,
@@ -197,7 +197,7 @@ export default function ArchivePage() {
       </div>
 
       {/* Main Table Content */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
         <CemsTable
           columns={columns}
           data={archive || []}
@@ -214,7 +214,7 @@ export default function ArchivePage() {
         className="max-w-md"
       >
         {selectedEvent && (
-          <div className="flex flex-col h-full bg-gray-50">
+          <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
             {/* Header Area */}
             <div className="p-8 bg-brand text-white relative overflow-hidden shrink-0">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
@@ -261,35 +261,35 @@ export default function ArchivePage() {
             <div className="p-5">
               <div className="grid grid-cols-1 gap-4">
                 {/* Stat Card 1 */}
-                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group">
                   <div className="flex items-center justify-between mb-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Users size={16} />
                     </div>
-                    <span className="text-[8px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md uppercase tracking-widest">
+                    <span className="text-[8px] font-black text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded-md uppercase tracking-widest">
                       +{selectedEvent.totalRegistrations}
                     </span>
                   </div>
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     Total Impact
                   </p>
-                  <p className="text-lg font-black text-gray-900 leading-tight">
+                  <p className="text-lg font-black text-gray-900 dark:text-white leading-tight">
                     {selectedEvent.totalRegistrations} Users Reach
                   </p>
                 </div>
 
                 {/* Stat Card 2 */}
-                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+                <div className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group">
                   <div className="flex items-center justify-between mb-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <TrendingUp size={16} />
                     </div>
                     <ArrowUpRight className="text-emerald-500 w-3.5 h-3.5" />
                   </div>
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     Conversion Rate
                   </p>
-                  <p className="text-lg font-black text-gray-900 leading-tight">
+                  <p className="text-lg font-black text-gray-900 dark:text-white leading-tight">
                     {Math.round(selectedEvent.attendanceRate)}% Attendance
                   </p>
                 </div>
@@ -297,20 +297,20 @@ export default function ArchivePage() {
 
               {/* Real Analytics Visualization */}
               <div className="mt-5 space-y-4">
-                <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                  <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4">
+                <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <h4 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest mb-4">
                     Participation Funnel
                   </h4>
                   <div className="space-y-4">
                     {/* Registrations Bar */}
                     <div className="space-y-1.5">
-                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
                         <span>Total Registrations</span>
-                        <span className="text-gray-900">
+                        <span className="text-gray-900 dark:text-white">
                           {selectedEvent.totalRegistrations}
                         </span>
                       </div>
-                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-blue-500 rounded-full"
                           style={{
@@ -321,13 +321,13 @@ export default function ArchivePage() {
                     </div>
                     {/* Attendance Bar */}
                     <div className="space-y-1.5">
-                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
                         <span>Actual Attendance</span>
-                        <span className="text-gray-900">
+                        <span className="text-gray-900 dark:text-white">
                           {selectedEvent.attendanceCount}
                         </span>
                       </div>
-                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-emerald-500 rounded-full"
                           style={{ width: `${selectedEvent.attendanceRate}%` }}
@@ -341,22 +341,22 @@ export default function ArchivePage() {
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
-                  <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3">
+                <div className="bg-white dark:bg-gray-900 p-5 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+                  <h4 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest mb-3">
                     Audience Feedback
                   </h4>
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
-                      <p className="text-[11px] text-gray-600 leading-relaxed">
+                      <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed">
                         Based on your average rating of{" "}
-                        <span className="font-bold text-gray-900">
+                        <span className="font-bold text-gray-900 dark:text-white">
                           {selectedEvent.averageRating.toFixed(1)}
                         </span>
                         , this event outperformed your historical average by
                         12%.
                       </p>
                     </div>
-                    <div className="w-12 h-12 rounded-full border-4 border-amber-100 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full border-4 border-amber-100 dark:border-amber-500/20 flex items-center justify-center">
                       <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                     </div>
                   </div>

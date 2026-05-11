@@ -89,7 +89,7 @@ export function UserInterests() {
             <Bookmark size={20} />
           </div>
           <div>
-            <h3 className="font-black text-gray-900 tracking-tight">
+            <h3 className="font-black text-gray-900 dark:text-white tracking-tight">
               Preferred Categories
             </h3>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -109,7 +109,7 @@ export function UserInterests() {
                   "px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm",
                   isSelected
                     ? "bg-brand border-brand text-white shadow-brand/20 scale-105"
-                    : "bg-white border-gray-100 text-gray-500 hover:border-brand/30 hover:bg-brand/5",
+                    : "bg-white dark:bg-gray-950 border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-brand/30 hover:bg-brand/5",
                 )}
               >
                 {category.name}
@@ -126,7 +126,7 @@ export function UserInterests() {
             <User size={20} />
           </div>
           <div>
-            <h3 className="font-black text-gray-900 tracking-tight">
+            <h3 className="font-black text-gray-900 dark:text-white tracking-tight">
               Technical Interests
             </h3>
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
@@ -147,8 +147,8 @@ export function UserInterests() {
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold transition-all border",
                     isSelected
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                      : "bg-gray-50 border-gray-100 text-gray-400 hover:bg-white hover:border-brand/20",
+                      ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                      : "bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:bg-white dark:hover:bg-gray-900 hover:border-brand/20",
                   )}
                 >
                   <TagIcon

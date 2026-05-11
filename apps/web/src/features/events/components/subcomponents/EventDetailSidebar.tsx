@@ -11,7 +11,7 @@ interface EventDetailSidebarProps {
 
 export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
   return (
-    <div className="bg-white rounded-lg shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50 sticky top-24">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl shadow-gray-200/50 dark:shadow-none overflow-hidden border border-gray-50 dark:border-gray-800 sticky top-24">
       {/* Brand Title Area */}
       <div className="bg-brand px-8 py-10 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10">
@@ -66,8 +66,8 @@ export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
       </div>
 
       {/* Location */}
-      <div className="px-8 py-4 space-y-3 border-t border-gray-50 pt-8">
-        <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-6 px-4">Location & Venue</p>
+      <div className="px-8 py-4 space-y-3 border-t border-gray-50 dark:border-gray-800 pt-8">
+        <p className="text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-[0.3em] mb-6 px-4">Location & Venue</p>
         <InfoRow
           icon={Building2}
           iconClassName="bg-orange-50 text-orange-500"
@@ -86,8 +86,8 @@ export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
       </div>
 
       {/* Schedule */}
-      <div className="px-8 py-4 pb-10 space-y-3 border-t border-gray-50 pt-8 mt-5">
-        <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-6 px-4">Date & Time</p>
+      <div className="px-8 py-4 pb-10 space-y-3 border-t border-gray-50 dark:border-gray-800 pt-8 mt-5">
+        <p className="text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-[0.3em] mb-6 px-4">Date & Time</p>
         <InfoRow
           icon={CalendarClock}
           iconClassName="bg-blue-50 text-blue-500"
@@ -105,15 +105,15 @@ export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
       </div>
 
       {/* Timestamps */}
-      <div className="px-8 py-4 pb-10 space-y-3 border-t border-gray-50 pt-8 mt-5">
-        <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-6 px-4">System Timestamps</p>
+      <div className="px-8 py-4 pb-10 space-y-3 border-t border-gray-50 dark:border-gray-800 pt-8 mt-5">
+        <p className="text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-[0.3em] mb-6 px-4">System Timestamps</p>
         <div className="flex items-center justify-between px-4">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Created At</span>
-          <span className="text-[11px] font-bold text-gray-700">{format(new Date(event.createdAt), "MMM d, yyyy · p")}</span>
+          <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Created At</span>
+          <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">{format(new Date(event.createdAt), "MMM d, yyyy · p")}</span>
         </div>
         <div className="flex items-center justify-between px-4">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Updated At</span>
-          <span className="text-[11px] font-bold text-gray-700">{format(new Date(event.updatedAt || event.createdAt), "MMM d, yyyy · p")}</span>
+          <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Updated At</span>
+          <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">{format(new Date(event.updatedAt || event.createdAt), "MMM d, yyyy · p")}</span>
         </div>
       </div>
     </div>

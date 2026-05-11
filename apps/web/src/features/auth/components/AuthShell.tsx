@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Logo from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function AuthShell({
   children,
@@ -57,7 +58,12 @@ export default function AuthShell({
       </div>
 
       {/* ── Right Panel: Form ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white dark:bg-gray-950 relative overflow-hidden">
+        {/* Theme Toggle */}
+        <div className="absolute top-8 right-8 z-50">
+          <ThemeToggle className="w-10 h-10 rounded-xl" />
+        </div>
+
         {/* Subtle dot grid */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[40px_40px]" />
         

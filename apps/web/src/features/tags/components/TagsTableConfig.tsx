@@ -16,7 +16,7 @@ export const getTagsColumns = (): ColumnDef<Tag>[] => [
         cell: ({ row }) => (
             <div className="flex items-center gap-2">
                 <Hash className="w-4 h-4 text-brand" />
-                <span className="font-semibold text-gray-900 group-hover:text-brand transition-colors lowercase">
+                <span className="font-semibold text-gray-900 dark:text-white group-hover:text-brand transition-colors lowercase">
                     {truncate(row.original.name, 25)}
                 </span>
             </div>

@@ -13,12 +13,12 @@ export const DetailCardSection = ({
 }) => (
   <div>
     <div className="px-6 pt-5 pb-2 flex items-center gap-2">
-      <Icon className="h-4 w-4 text-gray-500" />
-      <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
+      <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+      <h3 className="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">
         {label}
       </h3>
     </div>
-    <div className="border-t border-gray-900 mx-6" />
+    <div className="border-t border-gray-900 dark:border-gray-800 mx-6" />
     <div className="px-6 py-4 space-y-4">{children}</div>
   </div>
 );
@@ -40,11 +40,11 @@ export const DetailCardRow = ({
   <div className="flex items-start gap-3">
     <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${iconClassName}`} />
     <div>
-      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+      <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
         {label}
       </p>
-      <p className="text-sm font-semibold text-gray-800">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{value}</p>
+      {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
     </div>
   </div>
 );
@@ -60,10 +60,10 @@ export const DetailCardTimestamp = ({
   value: string;
 }) => (
   <div className="flex items-center gap-3">
-    <Icon className="h-4 w-4 text-gray-400 shrink-0" />
+    <Icon className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
     <div className="flex justify-between w-full">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className="text-xs font-semibold text-gray-700">{value}</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
+      <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">{value}</p>
     </div>
   </div>
 );
@@ -85,7 +85,7 @@ export const DetailCard = ({
 }) => {
   const BannerIcon = banner.icon;
   return (
-    <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 h-full">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800 h-full">
       {/* Blue banner */}
       <div className="bg-blue-600 px-6 py-8 text-white">
         <div className="flex flex-col items-center text-center gap-3">

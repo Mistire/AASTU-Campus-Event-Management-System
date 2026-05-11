@@ -38,14 +38,15 @@ export default function RootLayout({
         <Toaster 
           position="top-right"
           richColors
+          theme="system"
           toastOptions={{
             style: {
-              background: 'rgba(255, 255, 255, 0.8)',
+              background: 'hsl(var(--background) / 0.8)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid var(--border)',
+              border: '1px solid hsl(var(--border))',
               borderRadius: '1rem',
               fontFamily: 'var(--font-brand)',
-              color: 'var(--primary)',
+              color: 'hsl(var(--foreground))',
             },
             className: 'font-brand font-bold',
           }}

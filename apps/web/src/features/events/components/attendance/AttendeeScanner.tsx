@@ -115,7 +115,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
         initial={{ scale: 0.9, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.9, y: 20, opacity: 0 }}
-        className="relative w-full max-w-lg bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
         <div className="p-8 pb-4 flex items-center justify-between">
@@ -124,19 +124,19 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
               <Camera className="text-brand" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-black text-gray-900 tracking-tight leading-none">
+              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
                 QR Scanner
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mt-1">
                 AASTU Check-in System
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -194,22 +194,22 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
           <div className="mt-8 grid grid-cols-3 gap-4 w-full">
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <QrCode size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Auto Scan</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Auto Scan</span>
             </div>
-            <div className="flex flex-col items-center gap-2 border-x border-gray-100">
-               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+            <div className="flex flex-col items-center gap-2 border-x border-gray-100 dark:border-gray-800">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <ShieldCheck size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Secure JWT</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Secure JWT</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <History size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Live Logs</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Live Logs</span>
             </div>
           </div>
         </div>

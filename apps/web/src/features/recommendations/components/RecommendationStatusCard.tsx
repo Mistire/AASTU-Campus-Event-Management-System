@@ -42,7 +42,7 @@ export function RecommendationStatusCard() {
   const lastTrained = health?.last_trained ? new Date(health.last_trained) : null;
 
   return (
-    <CemsCard className="overflow-hidden border-brand/5 shadow-xl shadow-brand/5 bg-gradient-to-br from-white to-brand/2">
+    <CemsCard className="overflow-hidden border-brand/5 shadow-xl shadow-brand/5 bg-gradient-to-br from-white dark:from-gray-900 to-brand/2 dark:to-brand/5">
       <CemsCardHeader
         icon={<Brain className="text-brand animate-pulse-slow" />}
         title="Discovery Engine"
@@ -70,7 +70,7 @@ export function RecommendationStatusCard() {
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none mb-1">
                   Last Model Sync
                 </p>
-                <p className="text-sm font-bold text-gray-900 truncate">
+                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                   {lastTrained ? formatDistanceToNow(lastTrained, { addSuffix: true }) : "Never"}
                 </p>
               </div>
@@ -79,7 +79,7 @@ export function RecommendationStatusCard() {
             <div className="flex items-center gap-4 group">
               <div className={cn(
                 "w-10 h-10 rounded-lg flex items-center justify-center border transition-colors shrink-0",
-                isHealthy ? "bg-green-50 border-green-100 group-hover:bg-green-100" : "bg-orange-50 border-orange-100 group-hover:bg-orange-100"
+                isHealthy ? "bg-green-50 border-green-100 group-hover:bg-green-100 dark:bg-black dark:border-black " : "bg-orange-50 border-orange-100 group-hover:bg-orange-100 dark:bg-black dark:border-black"
               )}>
                 {isHealthy ? <CheckCircle2 className="w-5 h-5 text-green-600" /> : <AlertCircle className="w-5 h-5 text-orange-600" />}
               </div>
@@ -87,7 +87,7 @@ export function RecommendationStatusCard() {
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] leading-none mb-1">
                   Model Integrity
                 </p>
-                <p className="text-sm font-bold text-gray-900 truncate">
+                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
                   {isHealthy ? "Hybrid Weights Loaded" : "Partial State (Cold Start Only)"}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export function RecommendationStatusCard() {
           {/* Action Center */}
           <div className="flex flex-col justify-center items-center md:items-end gap-3">
              <div className="text-center md:text-right hidden sm:block">
-                <p className="text-[10px] font-medium text-gray-500 leading-relaxed max-w-[200px]">
+                <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 leading-relaxed max-w-[200px]">
                   Triggers database scan & retraining of vectors. Use after bulk data imports.
                 </p>
              </div>

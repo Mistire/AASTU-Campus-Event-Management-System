@@ -168,4 +168,22 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
+
+  /* Recharts Dark Mode Fixes */
+  .recharts-default-tooltip {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--foreground) !important;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  }
+
+  .recharts-tooltip-item {
+    color: var(--foreground) !important;
+  }
+
+  .recharts-tooltip-label {
+    color: var(--foreground) !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+  }
 }

@@ -115,7 +115,7 @@ export function ProfileView() {
             </div>
             <button 
               onClick={handleImageClick}
-              className="absolute -bottom-2 -right-2 p-4 bg-white rounded-lg shadow-2xl text-brand hover:bg-brand hover:text-white transition-all transform hover:rotate-12 active:scale-95"
+              className="absolute -bottom-2 -right-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-2xl text-brand hover:bg-brand hover:text-white transition-all transform hover:rotate-12 active:scale-95 border border-white/10 dark:border-gray-700"
             >
               <Camera size={20} />
             </button>
@@ -159,7 +159,7 @@ export function ProfileView() {
           <div className="flex flex-col gap-3 min-w-[200px]">
             <Button 
               onClick={() => setIsEditModalOpen(true)}
-              className="w-full rounded-lg bg-white text-brand font-black uppercase tracking-widest text-[10px] h-14 shadow-2xl hover:bg-gray-50 transition-all hover:-translate-y-1"
+              className="w-full rounded-lg bg-white dark:bg-gray-800 text-brand font-black uppercase tracking-widest text-[10px] h-14 shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:-translate-y-1 border border-white/10 dark:border-gray-700"
             >
               <Edit2 size={16} className="mr-3" />
               Edit Profile
@@ -180,7 +180,7 @@ export function ProfileView() {
         {/* Account DNA Card */}
         <motion.div
           variants={itemVariants}
-          className="lg:col-span-1 bg-white p-10 rounded-lg border border-gray-100 shadow-xl shadow-gray-200/50 space-y-8 relative overflow-hidden"
+          className="lg:col-span-1 bg-white dark:bg-gray-900 p-10 rounded-lg border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none space-y-8 relative overflow-hidden"
         >
           <div className="absolute -right-8 -top-8 w-32 h-32 bg-brand/5 rounded-full blur-2xl" />
 
@@ -189,7 +189,7 @@ export function ProfileView() {
               <Fingerprint size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900 leading-tight tracking-tight">
+              <h3 className="text-xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
                 Account DNA
               </h3>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
@@ -225,7 +225,7 @@ export function ProfileView() {
         {/* Identity Details Card */}
         <motion.div
           variants={itemVariants}
-          className="lg:col-span-2 bg-white p-10 rounded-lg border border-gray-100 shadow-xl shadow-gray-200/50 space-y-8 relative group"
+          className="lg:col-span-2 bg-white dark:bg-gray-900 p-10 rounded-lg border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none space-y-8 relative group"
         >
           <div className="absolute top-0 right-0 p-12 text-brand/5 group-hover:text-brand/10 transition-colors duration-700 pointer-events-none">
             <User size={180} strokeWidth={0.5} />
@@ -236,7 +236,7 @@ export function ProfileView() {
               <User size={28} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900 leading-tight tracking-tight">
+              <h3 className="text-xl font-black text-gray-900 dark:text-white leading-tight tracking-tight">
                 Identity Details
               </h3>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
@@ -274,7 +274,7 @@ export function ProfileView() {
       {profile?.role === "STUDENT" && (
         <motion.div
           variants={itemVariants}
-          className="bg-white p-10 rounded-lg border border-gray-100 shadow-xl shadow-gray-200/50 relative overflow-hidden group"
+          className="bg-white dark:bg-gray-900 p-10 rounded-lg border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none relative overflow-hidden group"
         >
           <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full -ml-32 -mt-32 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700" />
           <UserInterests />
@@ -299,14 +299,14 @@ const InfoItem = ({
   value: string;
 }) => (
   <div className="space-y-2 group">
-    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+    <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">
       {label}
     </p>
-    <div className="flex items-center gap-4 p-5 bg-gray-50/50 rounded-lg border border-gray-100/50 group-hover:bg-white group-hover:border-brand/30 group-hover:shadow-2xl group-hover:shadow-brand/5 transition-all duration-500">
-      <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-brand/40 group-hover:text-brand group-hover:scale-110 transition-all duration-500 shadow-sm">
+    <div className="flex items-center gap-4 p-5 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-100/50 dark:border-gray-800 group-hover:bg-white dark:group-hover:bg-gray-800 group-hover:border-brand/30 group-hover:shadow-2xl group-hover:shadow-brand/5 transition-all duration-500">
+      <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-brand/40 dark:text-brand/60 group-hover:text-brand group-hover:scale-110 transition-all duration-500 shadow-sm">
         <Icon size={20} />
       </div>
-      <span className="text-[15px] font-bold text-gray-800 truncate tracking-tight">
+      <span className="text-[15px] font-bold text-gray-800 dark:text-gray-200 truncate tracking-tight">
         {value}
       </span>
     </div>
@@ -328,31 +328,31 @@ const StatusRow = ({
 }) => {
   const colorClasses = {
     brand: "bg-brand/5 text-brand border-brand/10",
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    gray: "bg-gray-50 text-gray-400 border-gray-100",
+    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
+    gray: "bg-gray-50 text-gray-400 border-gray-100 dark:bg-gray-800 dark:text-gray-500 dark:border-gray-700",
   };
 
   return (
-    <div className="flex items-center justify-between p-5 bg-gray-50/50 rounded-lg border border-gray-100/50 hover:bg-white hover:border-brand/30 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500 group">
+    <div className="flex items-center justify-between p-5 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-100/50 dark:border-gray-800 hover:bg-white dark:hover:bg-gray-800 hover:border-brand/30 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500 group">
       <div className="flex items-center gap-4">
         <div
           className={cn(
             "p-2.5 rounded-lg border transition-all duration-500 group-hover:scale-110",
             active
               ? colorClasses[color]
-              : "bg-gray-50 text-gray-300 border-gray-100",
+              : "bg-gray-50 dark:bg-gray-900 text-gray-300 dark:text-gray-600 border-gray-100 dark:border-gray-800",
           )}
         >
           <Icon size={18} />
         </div>
-        <span className="text-sm font-bold text-gray-600 tracking-tight">
+        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 tracking-tight">
           {label}
         </span>
       </div>
       <span
         className={cn(
           "text-[10px] font-black px-3 py-1 rounded-lg tracking-widest uppercase",
-          active ? "bg-brand/10 text-brand" : "text-gray-400 bg-gray-100",
+          active ? "bg-brand/10 text-brand" : "text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-900",
         )}
       >
         {value}

@@ -39,13 +39,13 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative bg-linear-to-b from-brand-subtle/50 via-white to-white pt-32 pb-24 px-6 md:px-10 text-center overflow-hidden">
+    <section className="relative bg-linear-to-b from-brand-subtle/50 dark:from-brand/10 via-white dark:via-black to-white dark:to-black pt-32 pb-24 px-6 md:px-10 text-center overflow-hidden">
 
       {/* ── Background: Radial Dot Grid ── */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[50px_50px]" />
 
       {/* ── Background: Moving Blobs ── */}
-      <motion.div
+      {/* <motion.div
         animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, 30, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         className="absolute top-20 -left-20 w-80 h-80 bg-brand/10 rounded-full blur-3xl opacity-60 z-0"
@@ -54,7 +54,7 @@ export default function Hero() {
         animate={{ scale: [1, 1.3, 1], x: [0, -40, 0], y: [0, 60, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-subtle rounded-full blur-3xl opacity-40 z-0"
-      />
+      /> */}
 
       {/* ── Content ── */}
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -99,7 +99,7 @@ export default function Hero() {
 
           <Link
             href="#features"
-            className="px-10 py-4 rounded-lg border border-border bg-white/50 backdrop-blur-sm hover:bg-white text-muted-foreground font-brand font-black text-xs uppercase tracking-widest transition-all"
+            className="px-10 py-4 rounded-lg border border-border bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 text-muted-foreground font-brand font-black text-xs uppercase tracking-widest transition-all"
           >
             Explore Features
           </Link>
@@ -121,7 +121,7 @@ export default function Hero() {
                 key={leftImages[leftIdx]}
                 src={leftImages[leftIdx]}
                 alt="Campus life left"
-                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tl-[160px] rounded-tr-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tl-[160px] rounded-tr-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white dark:border-gray-800"
                 initial={{ opacity: 0, x: -20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1, rotate: -2 }}
                 exit={{ opacity: 0, x: -20, scale: 0.95 }}
@@ -137,7 +137,7 @@ export default function Hero() {
                 key={centerImages[centerIdx]}
                 src={centerImages[centerIdx]}
                 alt="Campus life center"
-                className="w-[200px] md:w-[380px] h-[280px] md:h-[480px] object-cover rounded-t-full rounded-b-lg shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] ring-12 ring-white transition-all duration-700"
+                className="w-[200px] md:w-[380px] h-[280px] md:h-[480px] object-cover rounded-t-full rounded-b-lg shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] ring-12 ring-white dark:ring-gray-800 transition-all duration-700"
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -153,7 +153,7 @@ export default function Hero() {
                 key={rightImages[rightIdx]}
                 src={rightImages[rightIdx]}
                 alt="Campus life right"
-                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tr-[160px] rounded-tl-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tr-[160px] rounded-tl-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white dark:border-gray-800"
                 initial={{ opacity: 0, x: 20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1, rotate: 2 }}
                 exit={{ opacity: 0, x: 20, scale: 0.95 }}

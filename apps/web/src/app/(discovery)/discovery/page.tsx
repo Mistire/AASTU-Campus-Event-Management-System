@@ -71,7 +71,7 @@ export default function StudentHomePage() {
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-3">
                 <Compass className="text-brand" size={24} />
-                <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
+                <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
                   Recommended for You
                 </h2>
               </div>
@@ -98,7 +98,7 @@ export default function StudentHomePage() {
                     <EventHeroCard key={event.id} event={event} />
                   ))
               ) : (
-                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-lg bg-gray-50/50">
+                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg bg-gray-50/50 dark:bg-gray-900/50">
                   <p className="text-sm font-bold uppercase tracking-widest">
                     Feed is being personalized...
                   </p>
@@ -119,7 +119,7 @@ export default function StudentHomePage() {
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
               <CalendarDays className="text-gray-400" size={24} />
-              <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
+              <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
                 {hasFilters ? "Search Results" : "All Upcoming Events"}
               </h2>
             </div>
@@ -128,7 +128,7 @@ export default function StudentHomePage() {
                 Showing{" "}
                 {Array.isArray(eventsData?.data) ? eventsData.data.length : 0} Events
               </span>
-              <div className="h-4 w-px bg-gray-200" />
+              <div className="h-4 w-px bg-gray-200 dark:bg-gray-800" />
               <span className="text-brand">Newest First</span>
             </div>
           </div>
@@ -141,8 +141,8 @@ export default function StudentHomePage() {
             ) : !Array.isArray(eventsData?.data) ||
               eventsData.data.length === 0 ? (
               <div className="lg:col-span-2 py-32 flex flex-col items-center justify-center text-center">
-                <SearchX className="text-gray-300" size={40} />
-                <h3 className="text-xl font-bold text-gray-900 mt-6">
+                <SearchX className="text-gray-300 dark:text-gray-700" size={40} />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-6">
                   No matching events
                 </h3>
                 <Button
@@ -169,7 +169,7 @@ export default function StudentHomePage() {
               <Button
                 onClick={loadMore}
                 disabled={isFetchingEvents}
-                className="group h-12 px-10 rounded-lg bg-white border border-gray-100 text-gray-900 font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
+                className="group h-12 px-10 rounded-lg bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 text-gray-900 dark:text-white font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
               >
                 {isFetchingEvents ? (
                   <Loader2 className="animate-spin" size={14} />

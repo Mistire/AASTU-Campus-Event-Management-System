@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const links = [
   { name: "Home", href: "/" },
@@ -30,7 +31,7 @@ export default function Navbar() {
         className={cn(
           "sticky top-0 z-100 w-full transition-all duration-300 px-6 md:px-12",
           scrolled 
-            ? "py-3 bg-white/70 backdrop-blur-xl border-b border-gray-100/50 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]" 
+            ? "py-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-gray-100/50 dark:border-gray-800/50 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:shadow-none" 
             : "py-5 bg-transparent border-b border-transparent"
         )}
       >
@@ -45,7 +46,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-semibold text-gray-600 hover:text-brand transition-colors relative group"
+                className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-brand dark:hover:text-brand transition-colors relative group"
               >
                 {link.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand transition-all duration-300 group-hover:w-full" />
@@ -55,9 +56,10 @@ export default function Navbar() {
 
           {/* ── Action Buttons ── */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle className="w-9 h-9 rounded-lg" />
             <Link
               href="/login"
-              className="text-sm font-bold text-gray-700 hover:text-brand px-4 py-2 transition-colors"
+              className="text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-brand transition-colors px-4 py-2"
             >
               Login
             </Link>
@@ -71,19 +73,22 @@ export default function Navbar() {
           </div>
 
           {/* ── Mobile Toggle ── */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-gray-600 hover:text-brand transition-colors"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle className="w-9 h-9 rounded-lg" />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-brand transition-colors"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* ── Mobile Menu Overlay ── */}
       <div
         className={cn(
-          "fixed inset-0 z-99 bg-white/95 backdrop-blur-2xl md:hidden transition-transform duration-500 ease-in-out px-8 pt-24",
+          "fixed inset-0 z-99 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl md:hidden transition-transform duration-500 ease-in-out px-8 pt-24",
           isOpen ? "translate-y-0" : "-translate-y-full"
         )}
       >
@@ -93,7 +98,7 @@ export default function Navbar() {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-2xl font-bold text-gray-900 border-b border-gray-100 pb-4"
+              className="text-2xl font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-4"
             >
               {link.name}
             </Link>
@@ -102,7 +107,7 @@ export default function Navbar() {
             <Link
               href="/login"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-4 text-gray-900 font-bold border border-gray-200 rounded-lg"
+              className="w-full text-center py-4 text-gray-900 dark:text-white font-bold border border-gray-200 dark:border-gray-800 rounded-lg"
             >
               Login to Portal
             </Link>
