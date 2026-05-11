@@ -100,7 +100,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
+              className="hidden md:flex text-gray-400 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
               onClick={onToggleCollapse}
             >
               {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -111,7 +111,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-gray-400 hover:text-gray-600 rounded-xl"
+              className="md:hidden text-gray-400 hover:text-gray-600 rounded-lg"
               onClick={onClose}
             >
               <X className="w-5 h-5" />
@@ -149,7 +149,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
                     href={item.to}
                     onClick={onClose}
                     className={cn(
-                      "group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-bold tracking-tight",
+                      "group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-300 text-sm font-bold tracking-tight",
                       isCollapsed && "px-0 justify-center h-12 w-12 mx-auto",
                       isActive
                         ? "bg-brand text-white shadow-lg shadow-brand/20"
@@ -180,10 +180,10 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
         isCollapsed && "p-2"
       )}>
         <div className={cn(
-          "group relative flex items-center gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100/50 hover:bg-white hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500",
+          "group relative flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 border border-gray-100/50 hover:bg-white hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500",
           isCollapsed && "p-0 h-14 w-14 mx-auto justify-center"
         )}>
-          <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors shrink-0 overflow-hidden relative">
+          <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors shrink-0 overflow-hidden relative">
             {profile?.profileImage ? (
               <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
             ) : (
@@ -204,7 +204,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
 
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all active:scale-90"
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all active:scale-90"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />

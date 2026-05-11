@@ -57,7 +57,7 @@ export function CemsSelect({
         <Select {...props}>
           <SelectTrigger 
             className={cn(
-              "w-full pl-10 pr-10 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-left flex items-center justify-between min-h-[52px] bg-gray-50/50",
+              "w-full pl-10 pr-10 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all text-left flex items-center justify-between min-h-[52px] bg-gray-50/50",
               triggerClassName
             )}
           >
@@ -65,7 +65,7 @@ export function CemsSelect({
               {selectedLabel || undefined}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1 z-[100] bg-white ring-1 ring-black/5 min-w-[var(--radix-select-trigger-width)]">
+          <SelectContent className="rounded-lg border-gray-100 shadow-2xl p-1 z-[100] bg-white ring-1 ring-black/5 min-w-[var(--radix-select-trigger-width)]">
             {options ? (
               options.map((opt) => (
                 <SelectItem 

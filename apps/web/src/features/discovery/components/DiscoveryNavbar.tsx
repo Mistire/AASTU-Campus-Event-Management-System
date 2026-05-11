@@ -50,7 +50,7 @@ export function DiscoveryNavbar() {
 
         {/* Right: Actions & Profile */}
         <div className="flex items-center gap-3">
-          <button className="p-2 text-gray-400 hover:text-brand rounded-xl">
+          <button className="p-2 text-gray-400 hover:text-brand rounded-lg">
              <Bell size={20} />
           </button>
           
@@ -59,9 +59,9 @@ export function DiscoveryNavbar() {
           <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 p-1 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
+              className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
             >
-              <div className="w-8 h-8 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
+              <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
                  {profile?.profileImage ? (
                    <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
                  ) : (
@@ -81,7 +81,7 @@ export function DiscoveryNavbar() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-gray-100 shadow-2xl p-2 z-50 overflow-hidden"
+                  className="absolute right-0 mt-2 w-56 rounded-lg bg-white border border-gray-100 shadow-2xl p-2 z-50 overflow-hidden"
                 >
                    <div className="p-3 border-b border-gray-50 mb-1">
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Authenticated as</p>
@@ -131,7 +131,7 @@ const ProfileItem = ({ icon: Icon, label, onClick, danger }: ProfileItemProps) =
   <button
     onClick={onClick}
     className={cn(
-      "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all",
+      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all",
       danger
         ? "text-red-500 hover:bg-red-50"
         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"

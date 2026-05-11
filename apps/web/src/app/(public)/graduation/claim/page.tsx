@@ -165,7 +165,7 @@ export default function GraduationClaimPage() {
   if (error && !status) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-4">
+        <div className="max-w-md w-full bg-white rounded-lg p-10 shadow-xl border border-gray-100 text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto">
             <AlertCircle className="text-red-500" size={32} />
           </div>
@@ -180,7 +180,7 @@ export default function GraduationClaimPage() {
   if (status?.claimed && !result) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-4">
+        <div className="max-w-md w-full bg-white rounded-lg p-10 shadow-xl border border-gray-100 text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
             <CheckCircle className="text-emerald-500" size={32} />
           </div>
@@ -198,7 +198,7 @@ export default function GraduationClaimPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="max-w-lg w-full space-y-6">
-          <div className="bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-3">
+          <div className="bg-white rounded-lg p-10 shadow-xl border border-gray-100 text-center space-y-3">
             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
               <CheckCircle className="text-emerald-500" size={32} />
             </div>
@@ -207,9 +207,9 @@ export default function GraduationClaimPage() {
           </div>
 
           {result.telegramLinks.map((link) => (
-            <div key={link.parentLabel} className="bg-white rounded-2xl p-6 shadow border border-gray-100 space-y-3">
+            <div key={link.parentLabel} className="bg-white rounded-lg p-6 shadow border border-gray-100 space-y-3">
               <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{link.parentLabel} — Telegram</p>
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100">
                 <Send size={16} className="text-sky-500 shrink-0" />
                 <p className="text-sm text-gray-700 truncate flex-1">{link.deepLink}</p>
                 <button
@@ -224,10 +224,10 @@ export default function GraduationClaimPage() {
           ))}
 
           {result.emailSent.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 shadow border border-gray-100 space-y-2">
+            <div className="bg-white rounded-lg p-6 shadow border border-gray-100 space-y-2">
               <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Email Delivery</p>
               {result.emailSent.map((email) => (
-                <div key={email} className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl">
+                <div key={email} className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
                   <Mail size={14} className="text-emerald-500" />
                   <p className="text-sm text-emerald-700">QR pass sent to <strong>{email}</strong></p>
                 </div>
@@ -244,14 +244,14 @@ export default function GraduationClaimPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-lg w-full space-y-6">
         {/* Header card */}
-        <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${tier?.color} p-8 text-white shadow-2xl`}>
+        <div className={`relative rounded-lg overflow-hidden bg-gradient-to-br ${tier?.color} p-8 text-white shadow-2xl`}>
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
           <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60 mb-1">AASTU — CEMS</p>
           <h1 className="text-3xl font-black tracking-tight">{status?.event.title}</h1>
           <p className="text-white/70 text-sm mt-1">
             {status && new Date(status.event.startTime).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur rounded-xl border border-white/20">
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur rounded-lg border border-white/20">
             {tier && <tier.icon size={18} className="text-white" />}
             <span className="text-xs font-black uppercase tracking-widest">{tier?.label}</span>
           </div>
@@ -262,7 +262,7 @@ export default function GraduationClaimPage() {
 
         {/* Parent entry cards */}
         {parents.map((parent, i) => (
-          <div key={i} className={`bg-white rounded-2xl p-6 shadow border ${tier?.border ?? "border-gray-100"} space-y-4`}>
+          <div key={i} className={`bg-white rounded-lg p-6 shadow border ${tier?.border ?? "border-gray-100"} space-y-4`}>
             <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{parent.parentLabel}</p>
 
             {/* Delivery toggle */}
@@ -271,7 +271,7 @@ export default function GraduationClaimPage() {
                 <CemsButton
                   key={method}
                   onClick={() => updateParent(i, "deliveryMethod", method)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     parent.deliveryMethod === method
                       ? "bg-brand text-white shadow"
                       : "bg-gray-50 text-gray-400 hover:bg-gray-200"
@@ -284,7 +284,7 @@ export default function GraduationClaimPage() {
 
             {/* Input */}
             {parent.deliveryMethod === "TELEGRAM" ? (
-              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus-within:border-sky-300 transition-colors">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus-within:border-sky-300 transition-colors">
                 <span className="text-gray-400 font-bold text-sm">@</span>
                 <input
                   type="text"
@@ -295,7 +295,7 @@ export default function GraduationClaimPage() {
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus-within:border-sky-300 transition-colors">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus-within:border-sky-300 transition-colors">
                 <Mail size={14} className="text-gray-400 shrink-0" />
                 <input
                   type="email"
@@ -317,7 +317,7 @@ export default function GraduationClaimPage() {
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
             <AlertCircle size={16} className="text-red-500 shrink-0" />
             <p className="text-sm text-red-600">{error}</p>
           </div>
@@ -327,7 +327,7 @@ export default function GraduationClaimPage() {
         <CemsButton
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full h-14 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
+          className="w-full h-14 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
         >
           {submitting ? (
             <><Loader2 size={16} className="mr-2 animate-spin" /> Processing...</>

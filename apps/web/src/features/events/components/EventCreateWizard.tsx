@@ -223,7 +223,7 @@ export function EventCreateWizard() {
             <div key={step.id} className="flex flex-col items-center gap-3 relative">
               <div 
                 className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all duration-300",
+                  "w-10 h-10 rounded-lg flex items-center justify-center border-2 transition-all duration-300",
                   isActive 
                     ? "bg-brand border-brand text-white shadow-lg shadow-brand/20 scale-110" 
                     : isCompleted 
@@ -282,7 +282,7 @@ export function EventCreateWizard() {
           variant="outline"
           onClick={handleBack}
           disabled={currentStep === 1}
-          className="rounded-2xl font-bold text-xs uppercase tracking-widest h-12 px-8 border-gray-100 hover:bg-gray-50 transition-all disabled:opacity-30"
+          className="rounded-lg font-bold text-xs uppercase tracking-widest h-12 px-8 border-gray-100 hover:bg-gray-50 transition-all disabled:opacity-30"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back
@@ -292,7 +292,7 @@ export function EventCreateWizard() {
           <Button
             onClick={handleNext}
             disabled={!isStepValid()}
-            className="rounded-2xl bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-12 px-10 shadow-lg shadow-brand/20 transition-all active:scale-95 disabled:opacity-50"
+            className="rounded-lg bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-12 px-10 shadow-lg shadow-brand/20 transition-all active:scale-95 disabled:opacity-50"
           >
             Continue
             <ChevronRight className="ml-2 h-4 w-4" />
@@ -301,7 +301,7 @@ export function EventCreateWizard() {
           <Button
             onClick={handleCreateEvent}
             disabled={createEventMutation.isPending || !isStepValid()}
-            className="rounded-2xl bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-12 px-10 shadow-xl shadow-brand/40 transition-all active:scale-95 disabled:opacity-50"
+            className="rounded-lg bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-12 px-10 shadow-xl shadow-brand/40 transition-all active:scale-95 disabled:opacity-50"
           >
             {createEventMutation.isPending ? "Creating..." : "Create Event"}
             <Check className="ml-2 h-4 w-4" />

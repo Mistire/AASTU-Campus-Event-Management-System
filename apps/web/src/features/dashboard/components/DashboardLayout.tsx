@@ -46,7 +46,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="mr-6 md:hidden text-gray-900 hover:bg-gray-100 rounded-xl transition-all active:scale-95"
+                        className="mr-6 md:hidden text-gray-900 hover:bg-gray-100 rounded-lg transition-all active:scale-95"
                         onClick={() => setIsSidebarOpen(true)}
                     >
                         <Menu className="h-6 w-6" />

@@ -17,7 +17,7 @@ export function DepartmentActivityChart() {
   const { data, isLoading } = useDepartmentAnalytics("30d");
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[220px] rounded-xl" />;
+    return <Skeleton className="w-full h-[220px] rounded-lg" />;
   }
 
   const chartData = (data || [])

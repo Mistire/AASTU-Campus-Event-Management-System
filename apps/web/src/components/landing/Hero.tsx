@@ -90,7 +90,7 @@ export default function Hero() {
         >
           <Link
             href="/signup"
-            className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-2xl shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
+            className="group relative inline-flex items-center gap-3 bg-brand text-white px-10 py-4 rounded-lg shadow-2xl shadow-brand/30 hover:bg-brand-hover transition-all font-brand font-black text-xs uppercase tracking-widest overflow-hidden"
           >
             <span className="relative z-10">Get Started</span>
             <ArrowRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -99,7 +99,7 @@ export default function Hero() {
 
           <Link
             href="#features"
-            className="px-10 py-4 rounded-2xl border border-border bg-white/50 backdrop-blur-sm hover:bg-white text-muted-foreground font-brand font-black text-xs uppercase tracking-widest transition-all"
+            className="px-10 py-4 rounded-lg border border-border bg-white/50 backdrop-blur-sm hover:bg-white text-muted-foreground font-brand font-black text-xs uppercase tracking-widest transition-all"
           >
             Explore Features
           </Link>
@@ -121,7 +121,7 @@ export default function Hero() {
                 key={leftImages[leftIdx]}
                 src={leftImages[leftIdx]}
                 alt="Campus life left"
-                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tl-[160px] rounded-tr-3xl rounded-b-3xl shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tl-[160px] rounded-tr-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
                 initial={{ opacity: 0, x: -20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1, rotate: -2 }}
                 exit={{ opacity: 0, x: -20, scale: 0.95 }}
@@ -137,7 +137,7 @@ export default function Hero() {
                 key={centerImages[centerIdx]}
                 src={centerImages[centerIdx]}
                 alt="Campus life center"
-                className="w-[200px] md:w-[380px] h-[280px] md:h-[480px] object-cover rounded-t-full rounded-b-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] ring-12 ring-white transition-all duration-700"
+                className="w-[200px] md:w-[380px] h-[280px] md:h-[480px] object-cover rounded-t-full rounded-b-lg shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] ring-12 ring-white transition-all duration-700"
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -153,7 +153,7 @@ export default function Hero() {
                 key={rightImages[rightIdx]}
                 src={rightImages[rightIdx]}
                 alt="Campus life right"
-                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tr-[160px] rounded-tl-3xl rounded-b-3xl shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
+                className="w-[160px] md:w-[280px] h-[220px] md:h-[380px] object-cover rounded-tr-[160px] rounded-tl-lg rounded-b-lg shadow-2xl z-0 grayscale-[0.2] hover:grayscale-0 transition-all duration-700 border-4 border-white"
                 initial={{ opacity: 0, x: 20, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1, rotate: 2 }}
                 exit={{ opacity: 0, x: 20, scale: 0.95 }}

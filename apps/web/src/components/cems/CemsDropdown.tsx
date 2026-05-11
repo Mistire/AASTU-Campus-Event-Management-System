@@ -29,7 +29,7 @@ export function CemsDropdownContent({
   return (
     <DropdownMenuContent
       className={cn(
-        "min-w-[200px] rounded-xl bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95",
+        "min-w-[200px] rounded-lg bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95",
         className,
       )}
       {...props}

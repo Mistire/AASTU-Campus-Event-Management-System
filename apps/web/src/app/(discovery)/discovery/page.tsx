@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { OnboardingGate } from "@/features/onboarding/components/OnboardingGate";
 import { useEvents, EventQueryParams } from "@/features/events/api/useEvents";
 import { useRecommendations } from "@/features/events/api/useRecommendations";
@@ -38,7 +38,7 @@ export default function StudentHomePage() {
     5
   );
 
-  const handleFilterChange = (filters: {
+  const handleFilterChange = useCallback((filters: {
     search: string;
     categoryId: string | null;
   }) => {
@@ -48,7 +48,7 @@ export default function StudentHomePage() {
       categoryId: filters.categoryId || undefined,
       page: 1,
     }));
-  };
+  }, []);
 
   const loadMore = () => {
     if (eventsData && queryParams.page! < eventsData.meta.totalPages) {
@@ -88,7 +88,7 @@ export default function StudentHomePage() {
                 Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton
                     key={i}
-                    className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl shrink-0"
+                    className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-lg shrink-0"
                   />
                 ))
               ) : recommendations && recommendations.length > 0 ? (
@@ -98,7 +98,7 @@ export default function StudentHomePage() {
                     <EventHeroCard key={event.id} event={event} />
                   ))
               ) : (
-                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-lg bg-gray-50/50">
                   <p className="text-sm font-bold uppercase tracking-widest">
                     Feed is being personalized...
                   </p>
@@ -111,6 +111,8 @@ export default function StudentHomePage() {
         <FilterBar
           onFilterChange={handleFilterChange}
           isLoading={isFetchingEvents}
+          initialSearch={queryParams.search}
+          initialCategoryId={queryParams.categoryId}
         />
 
         <section className="space-y-8">
@@ -134,7 +136,7 @@ export default function StudentHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {isLoadingEvents && !eventsData ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-40 w-full rounded-3xl" />
+                <Skeleton key={i} className="h-40 w-full rounded-lg" />
               ))
             ) : !Array.isArray(eventsData?.data) ||
               eventsData.data.length === 0 ? (
@@ -148,7 +150,7 @@ export default function StudentHomePage() {
                   onClick={() =>
                     handleFilterChange({ search: "", categoryId: null })
                   }
-                  className="mt-8 rounded-xl font-black uppercase tracking-widest text-[10px]"
+                  className="mt-8 rounded-lg font-black uppercase tracking-widest text-[10px]"
                 >
                   Reset All Filters
                 </Button>
@@ -167,7 +169,7 @@ export default function StudentHomePage() {
               <Button
                 onClick={loadMore}
                 disabled={isFetchingEvents}
-                className="group h-12 px-10 rounded-2xl bg-white border border-gray-100 text-gray-900 font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
+                className="group h-12 px-10 rounded-lg bg-white border border-gray-100 text-gray-900 font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
               >
                 {isFetchingEvents ? (
                   <Loader2 className="animate-spin" size={14} />

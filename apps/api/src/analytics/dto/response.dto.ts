@@ -27,6 +27,15 @@ export class TopEventDto {
   attendanceRate: number;
 }
 
+export class TopOrganizerDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  profileImage?: string;
+  totalEvents: number;
+  totalRegistrations: number;
+}
+
 export class CategoryAnalyticsDto {
   categoryId: string;
   name: string;

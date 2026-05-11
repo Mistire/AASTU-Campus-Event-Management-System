@@ -115,12 +115,12 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
         initial={{ scale: 0.9, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.9, y: 20, opacity: 0 }}
-        className="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-lg bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
         <div className="p-8 pb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
               <Camera className="text-brand" size={20} />
             </div>
             <div>
@@ -142,7 +142,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
         {/* Scanner Window */}
         <div className="flex-1 p-6 flex flex-col items-center">
-          <div className="relative w-full aspect-square rounded-[32px] overflow-hidden bg-gray-900 shadow-inner group">
+          <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-900 shadow-inner group">
              <div id="reader" className="w-full h-full border-none" />
              
              {!isLibraryLoaded && (
@@ -154,7 +154,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
              {/* Scan Overlay UI */}
              <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20">
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-3xl" />
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-lg" />
                <motion.div 
                  animate={{ scaleX: [1, 1.1, 1] }}
                  transition={{ repeat: Infinity, duration: 2 }}
@@ -194,19 +194,19 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
           <div className="mt-8 grid grid-cols-3 gap-4 w-full">
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
                  <QrCode size={20} />
                </div>
                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Auto Scan</span>
             </div>
             <div className="flex flex-col items-center gap-2 border-x border-gray-100">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
                  <ShieldCheck size={20} />
                </div>
                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Secure JWT</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
                  <History size={20} />
                </div>
                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Live Logs</span>

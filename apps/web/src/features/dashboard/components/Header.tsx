@@ -51,9 +51,9 @@ export function Header() {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
+            className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors overflow-hidden relative">
+            <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors overflow-hidden relative">
               {profile?.profileImage ? (
                 <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
               ) : (
@@ -78,7 +78,7 @@ export function Header() {
           </button>
 
           {isProfileOpen && (
-            <div className="absolute right-0 mt-3 w-60 rounded-xl bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-2 z-50 transform origin-top-right transition-all animate-in fade-in zoom-in duration-200">
+            <div className="absolute right-0 mt-3 w-60 rounded-lg bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-2 z-50 transform origin-top-right transition-all animate-in fade-in zoom-in duration-200">
                 <div className="p-4 border-b border-gray-50 mb-1">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
                     Authenticated As
@@ -128,7 +128,7 @@ const ProfileItem = ({
   <button
     onClick={onClick}
     className={cn(
-      "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all",
+      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all",
       danger
         ? "text-red-500 hover:bg-red-50"
         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"

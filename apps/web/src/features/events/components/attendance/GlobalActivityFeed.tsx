@@ -10,18 +10,18 @@ interface GlobalActivityFeedProps {
 
 export function GlobalActivityFeed({ recent, isLoading }: GlobalActivityFeedProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col h-fit">
+    <div className="bg-white rounded-lg border border-gray-100 shadow-sm flex flex-col h-fit">
       <div className="p-8 border-b border-gray-50">
         <h2 className="text-xl font-black text-gray-900 tracking-tight">Live Activity</h2>
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Latest check-ins</p>
       </div>
       <div className="p-6 space-y-6">
         {isLoading ? (
-          [1,2,3].map(i => <div key={i} className="h-16 rounded-2xl bg-gray-50 animate-pulse" />)
+          [1,2,3].map(i => <div key={i} className="h-16 rounded-lg bg-gray-50 animate-pulse" />)
         ) : (
           recent?.map((item: AttendanceRecord) => (
             <div key={item.id} className="flex gap-4 group cursor-default">
-              <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-brand font-black text-xs shrink-0 group-hover:bg-brand/5 group-hover:border-brand/20 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-brand font-black text-xs shrink-0 group-hover:bg-brand/5 group-hover:border-brand/20 transition-all">
                 {item.user.fullName[0]}
               </div>
               <div className="flex-1 min-w-0">
@@ -47,7 +47,7 @@ export function GlobalActivityFeed({ recent, isLoading }: GlobalActivityFeedProp
       </div>
       <Link 
         href="/dashboard/events" 
-        className="m-6 p-4 rounded-2xl bg-gray-50 text-center text-xs font-black text-gray-500 hover:bg-gray-100 transition-all border border-transparent hover:border-gray-200"
+        className="m-6 p-4 rounded-lg bg-gray-50 text-center text-xs font-black text-gray-500 hover:bg-gray-100 transition-all border border-transparent hover:border-gray-200"
       >
         Manage All Events
       </Link>

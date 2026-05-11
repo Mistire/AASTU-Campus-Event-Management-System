@@ -17,7 +17,7 @@ export function GlobalAttendanceStats({ stats, isLoading }: GlobalAttendanceStat
             <UserCheck size={80} />
           </div>
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-11 h-11 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-brand/5 flex items-center justify-center text-brand shrink-0">
               <UserCheck size={22} />
             </div>
             <div>
@@ -27,7 +27,7 @@ export function GlobalAttendanceStats({ stats, isLoading }: GlobalAttendanceStat
               </h3>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-50 w-fit px-2 py-0.5 rounded-full border border-emerald-100 text-[10px] font-bold">
+          <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-50 w-fit px-2 py-0.5 rounded-lg border border-emerald-100 text-[10px] font-bold">
             <TrendingUp size={12} />
             <span>{stats?.engagementTrend || "+12%"}</span>
           </div>
@@ -40,7 +40,7 @@ export function GlobalAttendanceStats({ stats, isLoading }: GlobalAttendanceStat
             <Calendar size={80} />
           </div>
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
               <Calendar size={22} />
             </div>
             <div>
@@ -60,7 +60,7 @@ export function GlobalAttendanceStats({ stats, isLoading }: GlobalAttendanceStat
             <Activity size={80} />
           </div>
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0">
               <Activity size={22} />
             </div>
             <div>

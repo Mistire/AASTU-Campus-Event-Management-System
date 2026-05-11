@@ -139,7 +139,7 @@ export function EventFormModal({
             {/* Section 1: Basic Info */}
             <motion.div variants={itemVariants} className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10">
                   <Info className="text-brand" size={18} />
                 </div>
                 <div>
@@ -165,12 +165,12 @@ export function EventFormModal({
                   </div>
                   <Select value={formData.eventTypeId} onValueChange={(val) => setFormData({...formData, eventTypeId: val})}>
                     <SelectTrigger className={cn(
-                      "h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all w-full",
+                      "h-12 bg-gray-50/50 border-gray-100 rounded-lg text-sm font-semibold focus:bg-white transition-all w-full",
                       errors.eventTypeId && "border-red-200 ring-1 ring-red-100"
                     )}>
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
+                    <SelectContent className="rounded-lg border-gray-100 shadow-2xl p-1">
                       {eventTypes?.map(t => (
                         <SelectItem key={t.id} value={t.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">
                           {t.name}
@@ -191,7 +191,7 @@ export function EventFormModal({
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Share the vision, goals, and what to expect..."
-                  className="min-h-32 rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold p-4"
+                  className="min-h-32 rounded-lg border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold p-4"
                 />
               </div>
             </motion.div>
@@ -199,7 +199,7 @@ export function EventFormModal({
             {/* Section 2: Logistics */}
             <motion.div variants={itemVariants} className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10">
                   <MapPin className="text-brand" size={18} />
                 </div>
                 <div>
@@ -216,12 +216,12 @@ export function EventFormModal({
                   </div>
                   <Select value={formData.venueId} onValueChange={(val) => setFormData({...formData, venueId: val})}>
                     <SelectTrigger className={cn(
-                      "h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all w-full",
+                      "h-12 bg-gray-50/50 border-gray-100 rounded-lg text-sm font-semibold focus:bg-white transition-all w-full",
                       errors.venueId && "border-red-200 ring-1 ring-red-100"
                     )}>
                       <SelectValue placeholder="Choose a Location" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
+                    <SelectContent className="rounded-lg border-gray-100 shadow-2xl p-1">
                       {venues?.map(v => (
                         <SelectItem key={v.id} value={v.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">
                           {v.name}
@@ -245,7 +245,7 @@ export function EventFormModal({
             {/* Section 3: Schedule */}
             <motion.div variants={itemVariants} className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10">
                   <Calendar className="text-brand" size={18} />
                 </div>
                 <div>
@@ -282,7 +282,7 @@ export function EventFormModal({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
-            className="rounded-xl font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-6 h-10"
+            className="rounded-lg font-bold text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs uppercase tracking-widest px-6 h-10"
           >
             Cancel
           </CemsButton>
@@ -291,7 +291,7 @@ export function EventFormModal({
             onClick={handleSubmit}
             loading={isSaving}
             disabled={isSaving}
-            className="rounded-xl font-black text-xs uppercase tracking-widest px-8 shadow-lg shadow-brand/20 transition-all active:scale-95 h-10"
+            className="rounded-lg font-black text-xs uppercase tracking-widest px-8 shadow-lg shadow-brand/20 transition-all active:scale-95 h-10"
           >
             {event ? "Update Event" : "Create Event"}
           </CemsButton>

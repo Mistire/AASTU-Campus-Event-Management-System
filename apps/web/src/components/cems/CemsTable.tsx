@@ -387,7 +387,7 @@ function ColumnVisibilityPopover({ columns }: { columns: any[] }) {
         Columns
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-xl bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-lg bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95 duration-150">
           <p className="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-1">Toggle Columns</p>
           {columns.map((column) => (
             <button

@@ -45,7 +45,7 @@ export default function FinalCTA() {
         >
           <Link
             href="/signup"
-            className="group relative w-full sm:w-auto bg-white text-brand px-12 py-5 rounded-xl shadow-2xl shadow-black/20 hover:bg-blue-50 transition-all font-brand font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 overflow-hidden"
+            className="group relative w-full sm:w-auto bg-white text-brand px-12 py-5 rounded-lg shadow-2xl shadow-black/20 hover:bg-blue-50 transition-all font-brand font-black text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 overflow-hidden"
           >
             <span className="relative z-10">GET STARTED NOW</span>
             <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -54,7 +54,7 @@ export default function FinalCTA() {
           
           <Link
             href="mailto:support@cems.aastu.edu.et"
-            className="w-full sm:w-auto text-white/90 px-12 py-5 rounded-xl hover:bg-white/10 transition-all font-brand font-black text-xs uppercase tracking-[0.2em] border border-white/20 backdrop-blur-sm"
+            className="w-full sm:w-auto text-white/90 px-12 py-5 rounded-lg hover:bg-white/10 transition-all font-brand font-black text-xs uppercase tracking-[0.2em] border border-white/20 backdrop-blur-sm"
           >
             Contact Support
           </Link>

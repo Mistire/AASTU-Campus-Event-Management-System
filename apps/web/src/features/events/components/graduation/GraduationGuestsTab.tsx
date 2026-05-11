@@ -59,7 +59,7 @@ function AddStudentForm({ eventId, onSuccess }: { eventId: string; onSuccess: ()
   };
 
   return (
-    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+    <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 space-y-3">
       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Add Student Manually</p>
       <div className="grid grid-cols-3 gap-2">
         <input placeholder="Full Name" value={form.fullName} onChange={(e) => setForm(s => ({ ...s, fullName: e.target.value }))}
@@ -70,7 +70,7 @@ function AddStudentForm({ eventId, onSuccess }: { eventId: string; onSuccess: ()
           className="px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-900 placeholder-gray-300 outline-none focus:border-brand/40" />
       </div>
       <button onClick={handleSubmit} disabled={loading}
-        className="w-full py-2.5 rounded-xl bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+        className="w-full py-2.5 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
         {loading ? <><Loader2 size={12} className="animate-spin" /> Adding...</> : <><Plus size={12} /> Add & Send Email</>}
       </button>
     </div>
@@ -111,7 +111,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
   };
 
   return (
-    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+    <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 space-y-3">
       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Import from CSV</p>
       <p className="text-[10px] text-gray-400">Required columns: <code className="bg-gray-200 px-1 rounded">email, fullName, gpa</code></p>
       <div
@@ -119,7 +119,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) setFile(f); setResult(null); }}
         onClick={() => fileRef.current?.click()}
-        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isDragging ? "border-brand bg-brand/5" : file ? "border-emerald-400 bg-emerald-50" : "border-gray-200 hover:border-brand/30 hover:bg-white"}`}
+        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${isDragging ? "border-brand bg-brand/5" : file ? "border-emerald-400 bg-emerald-50" : "border-gray-200 hover:border-brand/30 hover:bg-white"}`}
       >
         {file ? (
           <div className="flex items-center justify-center gap-2">
@@ -140,7 +140,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
       </div>
 
       {result && (
-        <div className="p-3 bg-white rounded-xl border border-gray-100 flex gap-4 text-xs">
+        <div className="p-3 bg-white rounded-lg border border-gray-100 flex gap-4 text-xs">
           <span className="font-black text-emerald-600">✓ {result.imported} imported</span>
           {result.skipped > 0 && <span className="font-black text-gray-400">↷ {result.skipped} skipped</span>}
           {result.errors.length > 0 && <span className="font-black text-red-500">✗ {result.errors.length} errors</span>}
@@ -149,7 +149,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
 
       {file && (
         <button onClick={handleUpload} disabled={uploading}
-          className="w-full py-2.5 rounded-xl bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+          className="w-full py-2.5 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
           {uploading ? <><Loader2 size={12} className="animate-spin" /> Importing...</> : <><Upload size={12} /> Import & Send Emails</>}
         </button>
       )}
@@ -192,11 +192,11 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
   const totalPasses = student.guestPasses?.length ?? 0;
 
   return (
-    <div className={`rounded-xl border ${tier.border} overflow-hidden`}>
+    <div className={`rounded-lg border ${tier.border} overflow-hidden`}>
       {/* Main Row */}
       <div className={`flex items-center gap-4 p-4 ${tier.bg} cursor-pointer`} onClick={() => setExpanded(!expanded)}>
         {/* Tier badge */}
-        <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center ${tier.text} ${tier.bg} border ${tier.border}`}>
+        <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${tier.text} ${tier.bg} border ${tier.border}`}>
           <tier.icon size={16} />
         </div>
 
@@ -215,11 +215,11 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
         {/* Claim status */}
         <div className="shrink-0 text-center">
           {student.claimed ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[9px] font-black">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] font-black">
               <Check size={9} /> Claimed
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full text-[9px] font-black">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-400 rounded-lg text-[9px] font-black">
               Pending
             </span>
           )}
@@ -250,11 +250,11 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{gp.deliveryMethod}</p>
               </div>
               {gp.delivered ? (
-                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
                   <Check size={9} /> Delivered
                 </span>
               ) : (
-                <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Pending</span>
+                <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg">Pending</span>
               )}
               <button
                 onClick={() => handleResend(gp.id)}
@@ -304,7 +304,7 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
           { label: "Passes Claimed", value: `${claimed}/${students.length}`, color: "text-violet-600" },
           { label: "QR Delivered", value: `${deliveredPasses}/${totalPasses}`, color: "text-emerald-600" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+          <div key={label} className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-center">
             <p className={`text-xl font-black ${color}`}>{value}</p>
             <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{label}</p>
           </div>
@@ -314,15 +314,15 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
       {/* Action buttons */}
       <div className="flex gap-2">
         <CemsButton onClick={() => { setShowCsv(!showCsv); setShowAdd(false); }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${showCsv ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${showCsv ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
           <Upload size={12} /> CSV Import
         </CemsButton>
         <CemsButton onClick={() => { setShowAdd(!showAdd); setShowCsv(false); }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${showAdd ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${showAdd ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
           <Plus size={12} /> Add Student
         </CemsButton>
         <CemsButton onClick={() => refetch()}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
           <RefreshCw size={12} /> Refresh
         </CemsButton>
       </div>
@@ -336,7 +336,7 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
           <Loader2 className="animate-spin text-brand" size={32} />
         </div>
       ) : students.length === 0 ? (
-        <div className="py-16 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-3 text-center">
+        <div className="py-16 border-2 border-dashed border-gray-100 rounded-lg flex flex-col items-center justify-center gap-3 text-center">
           <GraduationCap className="text-gray-200" size={40} />
           <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No students imported yet</p>
           <p className="text-[10px] text-gray-300">Use CSV Import or Add Student to get started</p>

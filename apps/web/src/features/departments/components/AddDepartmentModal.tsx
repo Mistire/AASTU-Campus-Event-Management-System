@@ -71,7 +71,7 @@ export function AddDepartmentModal({ open, onOpenChange }: AddDepartmentModalPro
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="p-0 border-none bg-transparent shadow-none max-w-md">
-        <div className="bg-white rounded-xl overflow-hidden shadow-2xl flex flex-col">
+        <div className="bg-white rounded-lg overflow-hidden shadow-2xl flex flex-col">
           <ModalHeader title="Add New Department" />
           
           <div className="p-8 space-y-6">

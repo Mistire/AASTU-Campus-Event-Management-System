@@ -172,7 +172,7 @@ export const EventsList = () => {
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
+      <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
         Error loading events: {error.message}
       </div>
     );
@@ -181,9 +181,9 @@ export const EventsList = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
+          <div className="w-14 h-14 rounded-lg bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
             <Calendar size={28} />
           </div>
           <div>
@@ -196,7 +196,7 @@ export const EventsList = () => {
           <CemsButton 
             cemsVariant="brand"
             onClick={handleAddEvent}
-            className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
+            className="rounded-lg px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
           >
             <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
             Create New Event
@@ -210,7 +210,7 @@ export const EventsList = () => {
       <div className="flex gap-6">
         {/* Table */}
         <div className={cn(
-          "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+          "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex-1 min-w-0",
         )}>
           <CemsTable
             columns={columns}
@@ -237,7 +237,7 @@ export const EventsList = () => {
                   <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
                     <SelectValue placeholder="Organizer" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                  <SelectContent className="rounded-lg border-gray-100 shadow-2xl">
                     <SelectItem value="">All Organizers</SelectItem>
                     {users?.map((u) => (
                       <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
@@ -249,7 +249,7 @@ export const EventsList = () => {
                   <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                  <SelectContent className="rounded-lg border-gray-100 shadow-2xl">
                     <SelectItem value="">All Statuses</SelectItem>
                     {STATUS_OPTIONS.map((s) => (
                       <SelectItem key={s} value={s}>{s}</SelectItem>
@@ -261,7 +261,7 @@ export const EventsList = () => {
                   <SelectTrigger className="h-8 min-w-[130px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
                     <SelectValue placeholder="Venue" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                  <SelectContent className="rounded-lg border-gray-100 shadow-2xl">
                     <SelectItem value="">All Venues</SelectItem>
                     {venues?.map((v) => (
                       <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>

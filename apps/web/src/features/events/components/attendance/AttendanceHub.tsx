@@ -36,11 +36,11 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-white rounded-2xl border border-gray-100 p-1 shadow-xl shadow-gray-200/50">
+          <div className="flex bg-white rounded-lg border border-gray-100 p-1 shadow-xl shadow-gray-200/50">
             <button
                onClick={() => handleExport("csv")}
                disabled={isExporting}
-               className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
+               className="flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
             >
               <TableIcon size={14} />
               CSV
@@ -49,7 +49,7 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
             <button
                onClick={() => handleExport("pdf")}
                disabled={isExporting}
-               className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
+               className="flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
             >
               <FileText size={14} />
               PDF
@@ -59,7 +59,7 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
           {canEdit && (
             <CemsButton 
               onClick={() => setIsScannerOpen(true)}
-              className="h-14 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 flex items-center gap-3 active:scale-95 transition-all"
+              className="h-14 px-8 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 flex items-center gap-3 active:scale-95 transition-all"
             >
               <Camera size={18} />
               Launch QR Scanner
@@ -77,7 +77,7 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
             <ClipboardCheck className="text-brand" />
             Check-in Log
           </h3>
-          <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full font-black text-[9px] uppercase tracking-widest flex items-center gap-2">
+          <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center gap-2">
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
              Live Updates Enabled
           </div>

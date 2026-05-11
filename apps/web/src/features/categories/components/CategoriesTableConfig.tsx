@@ -32,7 +32,7 @@ export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
         header: "Events",
         cell: ({ row }) => (
             <div>
-                <span className="text-[10px] font-black text-brand bg-brand/5 px-3 py-1 rounded-full border border-brand/10">
+                <span className="text-[10px] font-black text-brand bg-brand/5 px-3 py-1 rounded-lg border border-brand/10">
                     {row.original.eventCount}
                 </span>
             </div>

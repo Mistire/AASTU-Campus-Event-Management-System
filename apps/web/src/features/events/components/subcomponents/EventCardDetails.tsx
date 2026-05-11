@@ -19,7 +19,7 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
   return (
     <div className="flex gap-5">
       {/* Left: Date Block */}
-      <div className="flex flex-col items-center justify-center w-16 h-20 rounded-2xl bg-gray-50 border border-gray-100 shrink-0 group-hover:bg-brand/5 group-hover:border-brand/10 transition-colors">
+      <div className="flex flex-col items-center justify-center w-16 h-20 rounded-lg bg-gray-50 border border-gray-100 shrink-0 group-hover:bg-brand/5 group-hover:border-brand/10 transition-colors">
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-brand/60 transition-colors">{month}</span>
         <span className="text-2xl font-black text-gray-900 group-hover:text-brand transition-colors">{day}</span>
         {isLive && (
@@ -45,7 +45,7 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
             <button 
               onClick={onToggleSave}
               className={cn(
-                "relative z-10 p-2 rounded-xl transition-all border shrink-0",
+                "relative z-10 p-2 rounded-lg transition-all border shrink-0",
                 isSaved 
                   ? "bg-brand/10 border-brand/20 text-brand scale-110" 
                   : "bg-gray-50 border-gray-100 text-gray-300 hover:text-brand hover:border-brand/20"

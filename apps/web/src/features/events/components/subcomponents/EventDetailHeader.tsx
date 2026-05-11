@@ -10,11 +10,11 @@ interface EventDetailHeaderProps {
 
 export function EventDetailHeader({ title, onBack, onEdit, canEdit }: EventDetailHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/50 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/50 backdrop-blur-sm p-6 rounded-lg border border-gray-100 shadow-sm">
       <div className="flex items-center gap-5">
         <button
           onClick={onBack}
-          className="w-12 h-12 flex items-center justify-center bg-white hover:bg-gray-50 rounded-2xl border border-gray-100 shadow-sm transition-all active:scale-95 text-gray-600 hover:text-brand"
+          className="w-12 h-12 flex items-center justify-center bg-white hover:bg-gray-50 rounded-lg border border-gray-100 shadow-sm transition-all active:scale-95 text-gray-600 hover:text-brand"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
@@ -32,7 +32,7 @@ export function EventDetailHeader({ title, onBack, onEdit, canEdit }: EventDetai
           <CemsButton 
             onClick={onEdit}
             cemsVariant="brand" 
-            className="font-black rounded-2xl text-xs uppercase tracking-widest px-8 py-4 h-auto items-center gap-2 shadow-xl shadow-brand/20 transition-all active:scale-95 group"
+            className="font-black rounded-lg text-xs uppercase tracking-widest px-8 py-4 h-auto items-center gap-2 shadow-xl shadow-brand/20 transition-all active:scale-95 group"
           >
             <Pencil size={16} className="group-hover:rotate-12 transition-transform" />
             Edit Event

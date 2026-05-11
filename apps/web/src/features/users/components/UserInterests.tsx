@@ -85,7 +85,7 @@ export function UserInterests() {
       {/* Category Preferences Section */}
       <section className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-brand/5 rounded-xl text-brand">
+          <div className="p-2 bg-brand/5 rounded-lg text-brand">
             <Bookmark size={20} />
           </div>
           <div>
@@ -106,7 +106,7 @@ export function UserInterests() {
                 key={category.id}
                 onClick={() => toggleCategory(category.id)}
                 className={cn(
-                  "px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm",
+                  "px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm",
                   isSelected
                     ? "bg-brand border-brand text-white shadow-brand/20 scale-105"
                     : "bg-white border-gray-100 text-gray-500 hover:border-brand/30 hover:bg-brand/5",
@@ -122,7 +122,7 @@ export function UserInterests() {
       {/* Technical Interests Section */}
       <section className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-brand/5 rounded-xl text-brand">
+          <div className="p-2 bg-brand/5 rounded-lg text-brand">
             <User size={20} />
           </div>
           <div>
@@ -145,7 +145,7 @@ export function UserInterests() {
                   key={interest.id}
                   onClick={() => toggleInterest(interest.id)}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold transition-all border",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold transition-all border",
                     isSelected
                       ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                       : "bg-gray-50 border-gray-100 text-gray-400 hover:bg-white hover:border-brand/20",

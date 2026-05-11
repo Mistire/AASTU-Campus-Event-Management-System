@@ -63,7 +63,7 @@ export function RecommendationStatusCard() {
           {/* Status Metrics */}
           <div className="space-y-4">
             <div className="flex items-center gap-4 group">
-              <div className="w-10 h-10 rounded-xl bg-brand/5 flex items-center justify-center border border-brand/10 transition-colors group-hover:bg-brand/10 shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 transition-colors group-hover:bg-brand/10 shrink-0">
                 <History className="w-5 h-5 text-brand/70" />
               </div>
               <div className="min-w-0">
@@ -78,7 +78,7 @@ export function RecommendationStatusCard() {
 
             <div className="flex items-center gap-4 group">
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center border transition-colors shrink-0",
+                "w-10 h-10 rounded-lg flex items-center justify-center border transition-colors shrink-0",
                 isHealthy ? "bg-green-50 border-green-100 group-hover:bg-green-100" : "bg-orange-50 border-orange-100 group-hover:bg-orange-100"
               )}>
                 {isHealthy ? <CheckCircle2 className="w-5 h-5 text-green-600" /> : <AlertCircle className="w-5 h-5 text-orange-600" />}
@@ -107,7 +107,7 @@ export function RecommendationStatusCard() {
                 disabled={isRetraining || isLoadingHealth}
                 onClick={handleSync}
                 className={cn(
-                  "relative h-11 px-8 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all",
+                  "relative h-11 px-8 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all",
                   "bg-brand hover:bg-brand-dark shadow-lg shadow-brand/20 active:scale-95 disabled:grayscale-[0.5]",
                   isRetraining && "pl-12"
                 )}

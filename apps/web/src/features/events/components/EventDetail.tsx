@@ -85,8 +85,8 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
           
           {/* Graduation Indicator if applicable */}
           {event.eventType?.name?.toUpperCase() === "GRADUATION" && (
-            <div className="p-6 bg-brand/5 rounded-xl border border-brand/10 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-white shadow-lg shadow-brand/20">
+            <div className="p-6 bg-brand/5 rounded-lg border border-brand/10 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-white shadow-lg shadow-brand/20">
                 <GraduationCap size={20} />
               </div>
               <div>
@@ -105,9 +105,9 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
           )}
 
           {/* Description card */}
-          <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden p-10">
+          <div className="bg-white rounded-lg shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden p-10">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
+              <div className="w-12 h-12 rounded-lg bg-brand/5 flex items-center justify-center text-brand">
                 <Info size={24} />
               </div>
               <div>
@@ -116,7 +116,7 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
               </div>
             </div>
             
-            <div className="bg-gray-50/50 rounded-xl p-8 border border-gray-100">
+            <div className="bg-gray-50/50 rounded-lg p-8 border border-gray-100">
               <p className="text-gray-600 leading-relaxed font-medium whitespace-pre-wrap">
                 {event.description || "No description provided for this event."}
               </p>

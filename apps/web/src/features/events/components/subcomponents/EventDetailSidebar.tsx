@@ -11,14 +11,14 @@ interface EventDetailSidebarProps {
 
 export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
   return (
-    <div className="bg-white rounded-xl shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50 sticky top-24">
+    <div className="bg-white rounded-lg shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50 sticky top-24">
       {/* Brand Title Area */}
       <div className="bg-brand px-8 py-10 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Calendar size={120} />
         </div>
         <div className="relative flex flex-col items-center text-center gap-4">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-2xl">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/30 shadow-2xl">
             <Calendar className="h-10 w-10 text-white" />
           </div>
           <div>
@@ -30,7 +30,7 @@ export function EventDetailSidebar({ event }: EventDetailSidebarProps) {
             </p>
           </div>
           <CemsBadge
-            className={`${getStatusColor(event.status.statusName as EventStatusName)} rounded-full px-6 py-1.5 font-black text-[9px] uppercase tracking-[0.15em] border-none shadow-lg`}
+            className={`${getStatusColor(event.status.statusName as EventStatusName)} rounded-lg px-6 py-1.5 font-black text-[9px] uppercase tracking-[0.15em] border-none shadow-lg`}
           >
             {event.status.statusName}
           </CemsBadge>

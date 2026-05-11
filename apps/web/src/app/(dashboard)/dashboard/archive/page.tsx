@@ -127,7 +127,7 @@ export default function ArchivePage() {
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-xl h-8 px-3 gap-2 text-brand hover:bg-brand/5 font-black text-[9px] uppercase tracking-widest"
+            className="rounded-lg h-8 px-3 gap-2 text-brand hover:bg-brand/5 font-black text-[9px] uppercase tracking-widest"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedEvent(row.original);
@@ -147,12 +147,12 @@ export default function ArchivePage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header section with Stats Summary */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-lg border border-gray-100 shadow-sm relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
 
         <div className="flex items-center gap-5 relative z-10">
-          <div className="w-16 h-16 rounded-2xl bg-brand text-white flex items-center justify-center shadow-2xl shadow-brand/20 ring-4 ring-brand/10">
+          <div className="w-16 h-16 rounded-lg bg-brand text-white flex items-center justify-center shadow-2xl shadow-brand/20 ring-4 ring-brand/10">
             <Archive size={32} />
           </div>
           <div>
@@ -197,7 +197,7 @@ export default function ArchivePage() {
       </div>
 
       {/* Main Table Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <CemsTable
           columns={columns}
           data={archive || []}
@@ -242,7 +242,7 @@ export default function ArchivePage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/10">
+                  <div className="bg-white/10 backdrop-blur-md rounded-lg p-2.5 border border-white/10">
                     <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5 text-center">
                       Score
                     </p>
@@ -261,7 +261,7 @@ export default function ArchivePage() {
             <div className="p-5">
               <div className="grid grid-cols-1 gap-4">
                 {/* Stat Card 1 */}
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
                   <div className="flex items-center justify-between mb-2.5">
                     <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Users size={16} />
@@ -279,7 +279,7 @@ export default function ArchivePage() {
                 </div>
 
                 {/* Stat Card 2 */}
-                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
                   <div className="flex items-center justify-between mb-2.5">
                     <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <TrendingUp size={16} />
@@ -297,7 +297,7 @@ export default function ArchivePage() {
 
               {/* Real Analytics Visualization */}
               <div className="mt-5 space-y-4">
-                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
                   <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4">
                     Participation Funnel
                   </h4>
@@ -341,7 +341,7 @@ export default function ArchivePage() {
                   </p>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm">
                   <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3">
                     Audience Feedback
                   </h4>

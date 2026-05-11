@@ -40,7 +40,7 @@ export function CemsDialogContent({
   return (
     <DialogContent
       className={cn(
-        "rounded-xl border-none bg-white shadow-2xl shadow-gray-300/40 p-0 gap-0 overflow-hidden flex flex-col",
+        "rounded-lg border-none bg-white shadow-2xl shadow-gray-300/40 p-0 gap-0 overflow-hidden flex flex-col",
         sizeMap[size],
         className,
       )}
@@ -72,7 +72,7 @@ export function CemsDialogHeader({
     >
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="w-9 h-9 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
             {icon}
           </div>
         )}

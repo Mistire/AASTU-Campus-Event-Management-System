@@ -61,11 +61,11 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
   if (guestLimit === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
       <div className="p-8 border-b border-gray-50">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
+            <div className="w-12 h-12 rounded-lg bg-brand/5 flex items-center justify-center text-brand">
               <UserPlus size={24} />
             </div>
             <div>
@@ -74,7 +74,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-brand/5 rounded-full border border-brand/10">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-brand/5 rounded-lg border border-brand/10">
               <span className="text-[10px] font-black text-brand uppercase tracking-widest">
                 {invitedCount} / {guestLimit} Used
               </span>
@@ -85,7 +85,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
 
       <div className="p-8 space-y-8">
         {/* Help box */}
-        <div className="bg-gray-50 rounded-2xl p-4 flex items-start gap-3 border border-gray-100">
+        <div className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 border border-gray-100">
           <Info className="text-gray-400 shrink-0 mt-0.5" size={16} />
           <p className="text-[11px] font-medium text-gray-500 leading-relaxed">
             As a registered student, you can invite up to {guestLimit} guests to this {event.eventType?.name || "event"}. 
@@ -112,7 +112,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
                 type="submit"
                 cemsVariant="brand"
                 disabled={inviteMutation.isPending}
-                className="h-12 px-8 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand/20 transition-all active:scale-95"
+                className="h-12 px-8 rounded-lg font-black text-xs uppercase tracking-widest shadow-lg shadow-brand/20 transition-all active:scale-95"
               >
                 {inviteMutation.isPending ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -126,7 +126,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
             </div>
           </form>
         ) : (
-          <div className="py-6 text-center bg-brand/5 rounded-2xl border border-dashed border-brand/20">
+          <div className="py-6 text-center bg-brand/5 rounded-lg border border-dashed border-brand/20">
             <p className="text-[10px] font-black text-brand uppercase tracking-widest">
               You have reached your guest limit
             </p>
@@ -148,7 +148,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
               invites.map((invite: any) => (
                 <div 
                   key={invite.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:bg-white hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5 transition-all"
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 group hover:bg-white hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5 transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 group-hover:text-brand transition-colors border border-gray-50">

@@ -23,11 +23,11 @@ interface CemsCardProps extends React.ComponentProps<"div"> {
 
 const variantStyles: Record<CemsCardVariant, string> = {
   default:
-    "bg-white rounded-xl shadow-sm shadow-gray-200/60 ring-1 ring-gray-100",
+    "bg-white rounded-lg shadow-sm shadow-gray-200/60 ring-1 ring-gray-100",
   glass:
-    "bg-white/60 backdrop-blur-xl rounded-xl shadow-sm ring-1 ring-white/40",
-  flat: "bg-gray-50/60 rounded-xl ring-0 shadow-none",
-  outlined: "bg-white rounded-xl ring-1 ring-gray-200 shadow-none",
+    "bg-white/60 backdrop-blur-xl rounded-lg shadow-sm ring-1 ring-white/40",
+  flat: "bg-gray-50/60 rounded-lg ring-0 shadow-none",
+  outlined: "bg-white rounded-lg ring-1 ring-gray-200 shadow-none",
 };
 
 /**
@@ -95,7 +95,7 @@ export function CemsCardHeader({
     >
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="w-9 h-9 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
             {icon}
           </div>
         )}

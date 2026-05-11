@@ -86,7 +86,7 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
         showCloseButton={false}
         className="p-0 border-none bg-transparent shadow-none max-w-lg"
       >
-        <div className="bg-white rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="bg-white rounded-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
           <ModalHeader title="Add New Venue" />
 
           <div className="p-8 space-y-6 overflow-y-auto">
@@ -151,7 +151,7 @@ export function AddVenueModal({ open, onOpenChange }: AddVenueModalProps) {
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Any special notes about the venue (e.g. has projector, AC)..."
-                  className="min-h-[100px] rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold resize-none pr-4"
+                  className="min-h-[100px] rounded-lg border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold resize-none pr-4"
                 />
               </div>
             </div>

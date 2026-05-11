@@ -53,7 +53,7 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
                     {/* Ticket Description */}
-                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <div className="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand">
                                 <User className="w-3.5 h-3.5" />
@@ -71,7 +71,7 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Conversation</h4>
                         {ticket?.messages?.length === 0 ? (
                             <div className="text-center py-8">
-                                <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300 mx-auto mb-3">
+                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-300 mx-auto mb-3">
                                     <Clock className="w-6 h-6" />
                                 </div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No replies yet</p>
@@ -81,7 +81,7 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                                 <div 
                                     key={msg.id}
                                     className={cn(
-                                        "max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm",
+                                        "max-w-[85%] p-4 rounded-lg text-sm leading-relaxed shadow-sm",
                                         msg.userId === ticket.userId 
                                             ? "bg-white border border-gray-100 mr-auto" 
                                             : "bg-brand text-white ml-auto"
@@ -107,12 +107,12 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                             onChange={(e) => setReplyMessage(e.target.value)}
                             placeholder="Type your reply here..."
                             rows={3}
-                            className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none pr-14"
+                            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none pr-14"
                         />
                         <button
                             type="submit"
                             disabled={!replyMessage.trim() || replyTicket.isPending}
-                            className="absolute bottom-3 right-3 w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            className="absolute bottom-3 right-3 w-10 h-10 rounded-lg bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
                         >
                             <Send className="w-4 h-4" />
                         </button>

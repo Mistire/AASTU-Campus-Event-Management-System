@@ -11,9 +11,9 @@ export default function FeedbackPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
                         <MessageSquare className="w-8 h-8" />
                     </div>
                     <div>
@@ -24,13 +24,13 @@ export default function FeedbackPage() {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-2xl border border-amber-100">
+                <div className="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-lg border border-amber-100">
                     <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                     <span className="text-sm font-black text-amber-700 uppercase tracking-widest">4.8 Avg Rating</span>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+            <div className="bg-white rounded-lg overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
                 <CemsTable
                     data={feedback || []}
                     columns={columns}

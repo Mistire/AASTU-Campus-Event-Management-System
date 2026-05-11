@@ -85,7 +85,7 @@ export const DetailCard = ({
 }) => {
   const BannerIcon = banner.icon;
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 h-full">
+    <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 h-full">
       {/* Blue banner */}
       <div className="bg-blue-600 px-6 py-8 text-white">
         <div className="flex flex-col items-center text-center gap-3">

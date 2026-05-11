@@ -46,7 +46,7 @@ export function SocialProofBubble({ type, count, label, className }: SocialProof
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 shadow-lg shadow-black/5",
+        "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/20 shadow-lg shadow-black/5",
         config.bg,
         config.text,
         className

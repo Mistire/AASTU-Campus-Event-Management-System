@@ -50,7 +50,7 @@ export const EventPreviewPanel = ({
                 {event.title}
               </h3>
               <CemsBadge
-                className={`${getStatusColor(event.status.statusName)} rounded-full px-3 py-0.5 text-[8px] font-black uppercase tracking-widest mt-1 border-none bg-white/20 text-white`}
+                className={`${getStatusColor(event.status.statusName)} rounded-lg px-3 py-0.5 text-[8px] font-black uppercase tracking-widest mt-1 border-none bg-white/20 text-white`}
               >
                 {event.status.statusName}
               </CemsBadge>
@@ -61,7 +61,7 @@ export const EventPreviewPanel = ({
           <div className="p-5 space-y-4 flex-1 overflow-y-auto">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <MapPin className="w-3.5 h-3.5 text-brand" />
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
@@ -75,7 +75,7 @@ export const EventPreviewPanel = ({
                   {event.venue.location}
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Users className="w-3.5 h-3.5 text-brand" />
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
@@ -95,7 +95,7 @@ export const EventPreviewPanel = ({
                 <Clock className="w-3.5 h-3.5 text-brand" />
                 Schedule
               </h4>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm space-y-3">
+              <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                     Start
@@ -122,7 +122,7 @@ export const EventPreviewPanel = ({
                 <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
                   Description
                 </h4>
-                <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
                   <p className="text-xs text-gray-600 font-medium leading-relaxed">
                     {event.description}
                   </p>
@@ -153,7 +153,7 @@ export const EventPreviewPanel = ({
               <div className="p-5">
                 <CemsButton
                   cemsVariant="brand"
-                  className="w-full rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-11 gap-3 group active:scale-95 transition-all"
+                  className="w-full rounded-lg font-black text-[10px] uppercase tracking-[0.2em] h-11 gap-3 group active:scale-95 transition-all"
                   onClick={() => router.push(`/dashboard/events/${event.id}`)}
                 >
                   View Full Details

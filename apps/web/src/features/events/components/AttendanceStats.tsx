@@ -13,7 +13,7 @@ export function AttendanceStats({ eventId }: AttendanceStatsProps) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-[72px] rounded-2xl bg-gray-50 animate-pulse" />
+          <div key={i} className="h-[72px] rounded-lg bg-gray-50 animate-pulse" />
         ))}
       </div>
     );

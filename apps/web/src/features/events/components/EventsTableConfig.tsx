@@ -69,7 +69,7 @@ export const getEventsColumns = (
     cell: ({ row }) => {
       const statusName = row.original.status.statusName;
       return (
-        <CemsBadge className={`${getStatusColor(statusName)} rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest border shadow-sm`}>
+        <CemsBadge className={`${getStatusColor(statusName)} rounded-lg px-4 py-1 text-[9px] font-black uppercase tracking-widest border shadow-sm`}>
           {statusName}
         </CemsBadge>
       );
@@ -91,7 +91,7 @@ export const getEventsColumns = (
             <button 
               type="button" 
               onClick={() => onManageAttendees(event)}
-              className="p-2 text-brand hover:bg-brand/5 rounded-xl transition-all"
+              className="p-2 text-brand hover:bg-brand/5 rounded-lg transition-all"
               title="Manage Attendees"
             >
               <Users size={18} />
@@ -103,7 +103,7 @@ export const getEventsColumns = (
             <button 
               type="button" 
               onClick={() => onSubmit(event)}
-              className="p-2 text-amber-500 hover:bg-amber-50 rounded-xl transition-all"
+              className="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-all"
               title="Submit for Approval"
             >
               <Send size={18} />
@@ -116,7 +116,7 @@ export const getEventsColumns = (
               <button 
                 type="button" 
                 onClick={() => onApprove(event)}
-                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg transition-all"
                 title="Approve Event"
               >
                 <Check size={18} />
@@ -124,7 +124,7 @@ export const getEventsColumns = (
               <button 
                 type="button" 
                 onClick={() => onReject(event)}
-                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
                 title="Reject Event"
               >
                 <X size={18} />
@@ -137,7 +137,7 @@ export const getEventsColumns = (
             <button 
               type="button" 
               onClick={() => onGoLive(event)}
-              className="p-2 text-brand hover:bg-brand/5 rounded-xl transition-all"
+              className="p-2 text-brand hover:bg-brand/5 rounded-lg transition-all"
               title="Go Live"
             >
               <Play size={18} />
@@ -147,7 +147,7 @@ export const getEventsColumns = (
           <button 
             type="button" 
             onClick={() => onEdit(event)}
-            className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-xl transition-all"
+            className="p-2 text-gray-400 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
             title="Edit Event"
           >
             <Pencil size={18} />
@@ -155,7 +155,7 @@ export const getEventsColumns = (
           <button 
             type="button" 
             onClick={() => onDelete(event)}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
             title="Delete Event"
           >
             <Trash2 size={18} />

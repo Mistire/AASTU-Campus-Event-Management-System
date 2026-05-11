@@ -41,7 +41,7 @@ export function CemsMetricCard({
   return (
     <Card
       className={cn(
-        "bg-white rounded-xl shadow-sm shadow-gray-200/60 ring-1 ring-gray-100",
+        "bg-white rounded-lg shadow-sm shadow-gray-200/60 ring-1 ring-gray-100",
         "group hover:shadow-md hover:shadow-gray-200/80 hover:-translate-y-0.5 transition-all duration-300",
         "overflow-hidden",
         className,
@@ -49,7 +49,7 @@ export function CemsMetricCard({
     >
       <CardContent className="p-4 flex items-center gap-4">
         {/* Icon */}
-        <div className="w-11 h-11 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0 group-hover:bg-brand/10 transition-colors">
+        <div className="w-11 h-11 rounded-lg bg-brand/5 flex items-center justify-center text-brand shrink-0 group-hover:bg-brand/10 transition-colors">
           <Icon size={20} />
         </div>
 

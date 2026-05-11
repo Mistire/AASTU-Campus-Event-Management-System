@@ -130,7 +130,7 @@ export function SignupForm() {
                 key={r.value}
                 type="button"
                 onClick={() => setForm((p) => ({ ...p, role: r.value }))}
-                className={`p-3.5 rounded-xl border text-left transition-all ${form.role === r.value
+                className={`p-3.5 rounded-lg border text-left transition-all ${form.role === r.value
                     ? "border-brand bg-brand/5 shadow-sm shadow-brand/10"
                     : "border-gray-100 bg-gray-50/50 hover:border-gray-200"
                   }`}
@@ -167,7 +167,7 @@ export function SignupForm() {
               onChange={handleChange}
               placeholder="Abebe Bekele"
               required
-              className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-10 pr-4 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
           </div>
         </div>
@@ -190,7 +190,7 @@ export function SignupForm() {
               onChange={handleChange}
               placeholder="you@aastu.edu.et"
               required
-              className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-10 pr-4 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export function SignupForm() {
               value={form.phone}
               onChange={handleChange}
               placeholder="+251 9XX XXX XXX"
-              className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-10 pr-4 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
           </div>
         </div>
@@ -247,7 +247,7 @@ export function SignupForm() {
               onChange={handleChange}
               placeholder="Min. 8 characters"
               required
-              className="w-full pl-10 pr-12 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-10 pr-12 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
             <button
               type="button"
@@ -277,7 +277,7 @@ export function SignupForm() {
               onChange={handleChange}
               placeholder="Re-enter your password"
               required
-              className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-10 pr-4 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-sm font-medium text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
             />
           </div>
         </div>
@@ -309,7 +309,7 @@ export function SignupForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-xl shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden mt-2"
+          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-lg shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden mt-2"
         >
           <span className="relative z-10">
             {isLoading ? "Creating Account..." : "Create Account"}
