@@ -95,7 +95,7 @@ export function LoginForm() {
           <Lock size={10} />
           Secure Auth Gateway
         </div>
-        <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 tracking-tighter mb-3">
+        <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-3">
           Welcome back.
         </h1>
         <p className="text-gray-500 text-sm font-medium leading-relaxed">
@@ -116,7 +116,7 @@ export function LoginForm() {
           <div className="relative">
             <Mail
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 group-focus-within:text-brand transition-colors"
             />
             <input
               id="login-email"
@@ -125,7 +125,7 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@aastu.edu.et"
               required
-              className="w-full pl-11 pr-4 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-4 py-3.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 text-gray-900 dark:text-white text-sm font-medium placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand/30 dark:focus:bg-black transition-all"
             />
           </div>
         </div>
@@ -149,7 +149,7 @@ export function LoginForm() {
           <div className="relative">
             <Lock
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 group-focus-within:text-brand transition-colors"
             />
             <input
               id="login-password"
@@ -158,7 +158,7 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••"
               required
-              className="w-full pl-11 pr-12 py-3.5 rounded-lg border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-12 py-3.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 text-gray-900 dark:text-white text-sm font-medium placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand/30 dark:focus:bg-black transition-all"
             />
             <button
               type="button"

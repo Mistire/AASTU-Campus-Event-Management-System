@@ -21,7 +21,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
             onOpenChange={(open) => !open && onClose()}
             className="max-w-xl"
         >
-            <div className="flex flex-col h-full bg-gray-50">
+            <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
                 {isLoading ? (
                     <div className="p-8 space-y-4">
                         <Skeleton className="h-40 rounded-lg" />
@@ -61,30 +61,30 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     Identity & Access
                                 </h4>
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
+                                    <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4">
                                         <div className={cn(
                                             "w-12 h-12 rounded-lg flex items-center justify-center border transition-colors",
-                                            isFailure ? "bg-rose-50 border-rose-100 text-rose-500" : "bg-brand/5 border-brand/10 text-brand"
+                                            isFailure ? "bg-rose-50 border-rose-100 text-rose-500 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400" : "bg-brand/5 border-brand/10 text-brand dark:bg-brand/10 dark:border-brand/20"
                                         )}>
                                             <User className="w-6 h-6" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Actor</p>
-                                            <p className="text-sm font-black text-gray-900 truncate">{log.user?.fullName || 'System'}</p>
-                                            <p className="text-[10px] text-gray-500 font-medium truncate">{log.user?.email || 'Automated Task'}</p>
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">Actor</p>
+                                            <p className="text-sm font-black text-gray-900 dark:text-white truncate">{log.user?.fullName || 'System'}</p>
+                                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate">{log.user?.email || 'Automated Task'}</p>
                                         </div>
                                     </div>
                                     
-                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-4">
+                                    <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-4">
                                         <div className={cn(
                                             "w-12 h-12 rounded-lg flex items-center justify-center border transition-colors",
-                                            isFailure ? "bg-rose-50 border-rose-100 text-rose-500" : "bg-brand/5 border-brand/10 text-brand"
+                                            isFailure ? "bg-rose-50 border-rose-100 text-rose-500 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400" : "bg-brand/5 border-brand/10 text-brand dark:bg-brand/10 dark:border-brand/20"
                                         )}>
                                             <ShieldCheck className="w-6 h-6" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Access Role</p>
-                                            <p className="text-sm font-black text-gray-900">{log.role || 'N/A'}</p>
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">Access Role</p>
+                                            <p className="text-sm font-black text-gray-900 dark:text-white">{log.role || 'N/A'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -96,20 +96,20 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     <Clock className="w-3.5 h-3.5" />
                                     Audit Context
                                 </h4>
-                                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm space-y-4">
+                                <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Entity Type</span>
-                                        <span className="text-xs font-black text-gray-900">{log.entityType}</span>
+                                        <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Entity Type</span>
+                                        <span className="text-xs font-black text-gray-900 dark:text-white">{log.entityType}</span>
                                     </div>
-                                    <div className="h-px bg-gray-50" />
+                                    <div className="h-px bg-gray-50 dark:bg-gray-800" />
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Entity ID</span>
-                                        <span className="text-[10px] font-mono text-gray-500">{log.entityId || '—'}</span>
+                                        <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Entity ID</span>
+                                        <span className="text-[10px] font-mono text-gray-500 dark:text-gray-400">{log.entityId || '—'}</span>
                                     </div>
-                                    <div className="h-px bg-gray-50" />
+                                    <div className="h-px bg-gray-50 dark:bg-gray-800" />
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Timestamp</span>
-                                        <span className="text-xs font-black text-gray-900">{new Date(log.createdAt).toLocaleString()}</span>
+                                        <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Timestamp</span>
+                                        <span className="text-xs font-black text-gray-900 dark:text-white">{new Date(log.createdAt).toLocaleString()}</span>
                                     </div>
                                 </div>
                             </div>
@@ -121,13 +121,13 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                     Network Intelligence
                                 </h4>
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
-                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">IP Address</span>
-                                        <span className="text-xs font-black text-brand bg-brand/5 px-3 py-1 rounded-lg">{log.ipAddress || '—'}</span>
+                                    <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between">
+                                        <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">IP Address</span>
+                                        <span className="text-xs font-black text-brand bg-brand/5 dark:bg-brand/10 px-3 py-1 rounded-lg">{log.ipAddress || '—'}</span>
                                     </div>
-                                    <div className="p-5 bg-white rounded-lg border border-gray-100 shadow-sm">
-                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">User Agent String</p>
-                                        <p className="text-[11px] font-bold text-gray-600 break-all leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100/50">{log.userAgent || '—'}</p>
+                                    <div className="p-5 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+                                        <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">User Agent String</p>
+                                        <p className="text-[11px] font-bold text-gray-600 dark:text-gray-400 break-all leading-relaxed bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700/50">{log.userAgent || '—'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +143,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                         {log.beforeState && (
                                             <div className="space-y-2">
                                                 <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest ml-1">Previous State (Pre-action)</p>
-                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-rose-100/50 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
+                                                <pre className="text-[10px] font-mono text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-rose-100/50 dark:border-rose-900/30 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
                                                     {JSON.stringify(log.beforeState, null, 2)}
                                                 </pre>
                                             </div>
@@ -151,7 +151,7 @@ export function LogPreviewPanel({ id, onClose }: LogPreviewPanelProps) {
                                         {log.afterState && (
                                             <div className="space-y-2">
                                                 <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest ml-1">Modified State (Post-action)</p>
-                                                <pre className="text-[10px] font-mono text-gray-600 bg-white border border-emerald-100/50 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
+                                                <pre className="text-[10px] font-mono text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 border border-emerald-100/50 dark:border-emerald-900/30 p-5 rounded-lg overflow-auto max-h-64 shadow-sm">
                                                     {JSON.stringify(log.afterState, null, 2)}
                                                 </pre>
                                             </div>

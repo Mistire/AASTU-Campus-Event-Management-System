@@ -87,10 +87,10 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
   };
 
   return (
-    <div className="flex flex-col h-full bg-white text-gray-600 transition-all duration-500">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 transition-all duration-500">
       {/* ── Sidebar Header ── */}
       <div className={cn(
-        "flex items-center justify-between h-20 px-6 border-b border-gray-100 shrink-0",
+        "flex items-center justify-between h-20 px-6 border-b border-gray-100 dark:border-gray-800 shrink-0",
         isCollapsed && "px-4 justify-center"
       )}>
         {!isCollapsed && <Logo />}
@@ -100,7 +100,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
             <Button
               variant="ghost"
               size="icon"
-              className="hidden md:flex text-gray-400 hover:text-brand hover:bg-brand/5 rounded-lg transition-all"
+              className="hidden md:flex text-gray-400 dark:text-gray-500 hover:text-brand dark:hover:text-brand hover:bg-brand/5 dark:hover:bg-brand/10 rounded-lg transition-all"
               onClick={onToggleCollapse}
             >
               {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -111,7 +111,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-gray-400 hover:text-gray-600 rounded-lg"
+              className="md:hidden text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg"
               onClick={onClose}
             >
               <X className="w-5 h-5" />
@@ -129,7 +129,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
           {Object.entries(sections).map(([sectionName, items]) => (
             <div key={sectionName} className="space-y-1">
               {!isCollapsed && (
-                <p className="px-3 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">
+                <p className="px-3 mb-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] pl-4">
                   {sectionName}
                 </p>
               )}
@@ -153,7 +153,7 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
                       isCollapsed && "px-0 justify-center h-12 w-12 mx-auto",
                       isActive
                         ? "bg-brand text-white shadow-lg shadow-brand/20"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-brand",
+                        : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand dark:hover:text-white",
                     )}
                     title={isCollapsed ? item.title : undefined}
                   >
@@ -176,11 +176,11 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
 
       {/* ── Bottom: User Profile (Premium Card) ── */}
       <div className={cn(
-        "shrink-0 p-4 border-t border-gray-100 bg-white",
+        "shrink-0 p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900",
         isCollapsed && "p-2"
       )}>
         <div className={cn(
-          "group relative flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 border border-gray-100/50 hover:bg-white hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500",
+          "group relative flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 border border-gray-100/50 dark:border-gray-800/50 hover:bg-white dark:hover:bg-gray-800 hover:border-brand/20 dark:hover:border-brand/30 hover:shadow-xl hover:shadow-brand/5 transition-all duration-500",
           isCollapsed && "p-0 h-14 w-14 mx-auto justify-center"
         )}>
           <div className="w-10 h-10 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 shadow-sm group-hover:bg-brand/10 transition-colors shrink-0 overflow-hidden relative">
@@ -194,17 +194,17 @@ export function Sidebar({ onClose, isCollapsed, onToggleCollapse }: SidebarProps
           {!isCollapsed && (
             <>
               <div className="flex-1 min-w-0 mr-1">
-                <p className="text-[11px] font-black text-gray-900 leading-tight truncate">
+                <p className="text-[11px] font-black text-gray-900 dark:text-white leading-tight truncate">
                   {profile?.full_name || "Staff Member"}
                 </p>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 truncate">
+                <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5 truncate">
                   {profile?.email || "staff@aastu.edu.et"}
                 </p>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all active:scale-90"
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all active:scale-90"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />

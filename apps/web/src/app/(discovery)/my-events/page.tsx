@@ -27,7 +27,7 @@ export default function MyEventsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-black">
         <main className="max-w-7xl mx-auto px-6 pt-32 pb-24 space-y-8">
           <Skeleton className="h-12 w-64 rounded-lg" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -53,22 +53,22 @@ export default function MyEventsPage() {
 
   if (allEntries.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-black">
         <main className="max-w-7xl mx-auto px-6 pt-32 pb-24">
           <div className="flex flex-col items-center justify-center text-center py-20">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-24 h-24 rounded-full bg-brand/5 flex items-center justify-center mb-8"
+              className="w-24 h-24 rounded-full bg-brand/5 dark:bg-brand/10 flex items-center justify-center mb-8"
             >
-              <Calendar size={40} className="text-brand/40" />
+              <Calendar size={40} className="text-brand/40 dark:text-brand/60" />
             </motion.div>
 
             <motion.h1
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-brand font-black text-gray-900 tracking-tighter mb-4"
+              className="text-4xl md:text-5xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-4"
             >
               Your Schedule is <span className="text-brand">Empty</span>
             </motion.h1>
@@ -77,7 +77,7 @@ export default function MyEventsPage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-gray-500 text-lg max-w-md mx-auto mb-10"
+              className="text-gray-500 dark:text-gray-400 text-lg max-w-md mx-auto mb-10"
             >
               You haven&apos;t registered for any events yet. Start exploring
               the campus feed to find workshops, festivals, and more!
@@ -110,7 +110,7 @@ export default function MyEventsPage() {
       <main className="max-w-7xl mx-auto px-6 space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
+            <h1 className="text-5xl font-black tracking-tight text-gray-900 dark:text-white uppercase leading-none">
               My <span className="text-brand">Schedule</span>
             </h1>
             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">
@@ -120,19 +120,19 @@ export default function MyEventsPage() {
 
           {/* Quick Stats Dashboard */}
           <div className="flex items-center gap-4">
-            <div className="px-6 py-4 rounded-lg bg-gray-50 border border-gray-100 flex flex-col items-center">
-              <span className="text-2xl font-black text-gray-900">
+            <div className="px-6 py-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+              <span className="text-2xl font-black text-gray-900 dark:text-white">
                 {data?.registrations?.length || 0}
               </span>
-              <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">
+              <span className="text-[8px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Registered
               </span>
             </div>
-            <div className="px-6 py-4 rounded-lg bg-gray-50 border border-gray-100 flex flex-col items-center">
-              <span className="text-2xl font-black text-gray-900">
+            <div className="px-6 py-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col items-center">
+              <span className="text-2xl font-black text-gray-900 dark:text-white">
                 {data?.waitlist?.length || 0}
               </span>
-              <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">
+              <span className="text-[8px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Waitlist
               </span>
             </div>
@@ -142,16 +142,16 @@ export default function MyEventsPage() {
         {/* Invitations Alert Section */}
         {invitations &&
           invitations.some((i: any) => i.status === "PENDING") && (
-            <section className="bg-brand/5 border-2 border-brand/10 rounded-lg p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <section className="bg-brand/5 dark:bg-brand/10 border-2 border-brand/10 dark:border-brand/20 rounded-lg p-8 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 rounded-lg bg-brand text-white flex items-center justify-center shadow-xl shadow-brand/20">
                   <Ticket size={32} />
                 </div>
                 <div className="space-y-1">
-                  <h2 className="text-xl font-black text-gray-900 uppercase">
+                  <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase">
                     Pending Invitations
                   </h2>
-                  <p className="text-sm font-medium text-gray-500">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     You have been invited to help organize an event. Check your
                     dashboard to respond.
                   </p>
@@ -169,7 +169,7 @@ export default function MyEventsPage() {
         <section className="space-y-8">
           <div className="flex items-center gap-3 px-2">
             <Calendar size={20} className="text-brand" />
-            <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
               Visual Schedule
             </h2>
           </div>
@@ -186,7 +186,7 @@ export default function MyEventsPage() {
         {recommendations && recommendations.length > 0 && (
           <section className="pt-24 space-y-10">
             <div className="flex flex-col items-center text-center space-y-4">
-              <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight">
+              <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
                 Recommended <span className="text-brand">For You</span>
               </h2>
               <p className="text-gray-500 font-medium max-w-lg">
@@ -205,7 +205,7 @@ export default function MyEventsPage() {
               <Link href="/discovery">
                 <Button
                   variant="outline"
-                  className="rounded-lg h-12 px-8 font-black uppercase tracking-widest text-[10px] border-gray-200 hover:border-brand hover:text-brand transition-all"
+                  className="rounded-lg h-12 px-8 font-black uppercase tracking-widest text-[10px] border-gray-200 dark:border-gray-800 dark:text-gray-400 hover:border-brand hover:text-brand transition-all dark:bg-gray-900"
                 >
                   Browse All Events
                 </Button>

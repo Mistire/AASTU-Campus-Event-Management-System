@@ -136,10 +136,10 @@ export default function EventDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8">
         <div className="lg:col-span-8 space-y-16">
           <div className="space-y-6">
-            <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
+            <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase flex items-center gap-3">
               About <span className="text-brand">this Event</span>
             </h2>
-            <div className="prose prose-brand max-w-none text-gray-600 font-medium leading-relaxed bg-gray-50/50 p-8 rounded-lg border border-dashed border-gray-100">
+            <div className="prose prose-brand max-w-none text-gray-600 dark:text-gray-400 font-medium leading-relaxed bg-gray-50/50 dark:bg-gray-900/50 p-8 rounded-lg border border-dashed border-gray-100 dark:border-gray-800">
               {event.description ||
                 "Organizers haven't provided a full description yet."}
             </div>
@@ -148,7 +148,7 @@ export default function EventDetailPage() {
                 <Badge
                   key={t.id}
                   variant="secondary"
-                  className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 border-none"
+                  className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-none"
                 >
                   #{t.tag.name}
                 </Badge>
@@ -158,7 +158,7 @@ export default function EventDetailPage() {
 
           {event.sessions && event.sessions.length > 0 && (
             <div className="space-y-8">
-              <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
+              <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase flex items-center gap-3">
                 Agenda <span className="text-brand">& Sessions</span>
               </h2>
               <AgendaTimeline sessions={event.sessions} />
@@ -183,8 +183,8 @@ export default function EventDetailPage() {
 
       <SimilarEventsRail eventId={id} />
 
-      <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 mt-20">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">
+      <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 dark:border-gray-800 mt-20">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500 mb-4">
 
         </div>
       </div>

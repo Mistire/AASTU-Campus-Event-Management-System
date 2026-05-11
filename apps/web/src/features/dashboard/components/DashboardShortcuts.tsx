@@ -50,14 +50,14 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       desc: "Audit user permissions",
       icon: Users,
       href: "/dashboard/users",
-      color: "bg-blue-50 text-blue-600",
+      color: "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400",
     },
     {
       title: "System Logs",
       desc: "Review audit trails",
       icon: ShieldCheck,
       href: "/dashboard/audit-logs",
-      color: "bg-purple-50 text-purple-600",
+      color: "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400",
     },
   ];
 
@@ -68,14 +68,14 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       desc: "Manage your active list",
       icon: Calendar,
       href: "/dashboard/events",
-      color: "bg-blue-50 text-blue-600",
+      color: "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400",
     },
     {
       title: "Scanner",
       desc: "Validate guest tickets",
       icon: QrCode,
       href: "/dashboard/scanner",
-      color: "bg-orange-50 text-orange-600",
+      color: "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400",
     },
   ];
 
@@ -104,7 +104,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                     "group relative flex items-center gap-4 p-3 rounded-lg border transition-all duration-300",
                     action.featured
                       ? "bg-brand/5 border-brand/20 shadow-sm"
-                      : "bg-white border-gray-100 hover:border-brand/30 hover:shadow-md",
+                      : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 hover:border-brand/30 hover:shadow-md",
                   )}
                 >
                   <div
@@ -117,15 +117,15 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-black text-gray-900 group-hover:text-brand transition-colors">
+                    <p className="text-[13px] font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">
                       {action.title}
                     </p>
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                    <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-0.5">
                       {action.desc}
                     </p>
                   </div>
 
-                  <div className="w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-brand group-hover:text-white transition-all">
+                  <div className="w-7 h-7 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-300 dark:text-gray-600 group-hover:bg-brand group-hover:text-white transition-all">
                     <ArrowRight size={12} />
                   </div>
                 </Link>
@@ -141,9 +141,9 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
           title="Activity Pulse"
           bordered
           action={
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
               <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">
+              <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                 Live
               </span>
             </div>
@@ -153,8 +153,8 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
           <div className="space-y-6">
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-black text-gray-900">03</p>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                <p className="text-3xl font-black text-gray-900 dark:text-white">03</p>
+                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">
                   Ongoing Events
                 </p>
               </div>
@@ -181,18 +181,18 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
         <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-all pointer-events-none" />
       </CemsCard>
 
-      <CemsCard className="overflow-hidden border-none shadow-xl shadow-brand/5 to-gray-50/50">
+      <CemsCard className="overflow-hidden border-none shadow-xl shadow-brand/5">
         <CemsCardHeader className="pb-3 border-b border-gray-100/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="p-1.5 rounded-lg bg-brand/10 text-brand">
                 <TrendingUp className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-wider text-gray-800">
+              <h3 className="text-sm font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
                 Top Organizers
               </h3>
             </div>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
               Ranked
             </span>
           </div>
@@ -202,10 +202,10 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
             {isTopLoading ? (
               [1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="w-8 h-8 rounded-lg bg-gray-100" />
+                  <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-24 bg-gray-100 rounded" />
-                    <div className="h-2 w-16 bg-gray-50 rounded" />
+                    <div className="h-3 w-24 bg-gray-100 dark:bg-gray-800 rounded" />
+                    <div className="h-2 w-16 bg-gray-50 dark:bg-gray-900 rounded" />
                   </div>
                 </div>
               ))
@@ -220,7 +220,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                     "group flex items-center justify-between p-2 rounded-xl transition-all duration-300 border",
                     currentUser?.id === organizer.userId
                       ? "bg-brand/5 border-brand/20 shadow-md shadow-brand/5"
-                      : "hover:bg-white hover:shadow-md hover:shadow-brand/5 border-transparent hover:border-gray-100",
+                      : "hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:shadow-brand/5 border-transparent hover:border-gray-100 dark:hover:border-gray-700",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -241,7 +241,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                       </div>
                       <div
                         className={cn(
-                          "absolute -top-1.5 -left-1.5 w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black shadow-lg border-2 border-white",
+                          "absolute -top-1.5 -left-1.5 w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black shadow-lg border-2 border-white dark:border-gray-900",
                           idx === 0
                             ? "bg-amber-400 text-amber-900"
                             : idx === 1
@@ -256,7 +256,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-black text-gray-900 group-hover:text-brand transition-colors line-clamp-1">
+                        <span className="text-[13px] font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors line-clamp-1">
                           {organizer.fullName}
                         </span>
                         {currentUser?.id === organizer.userId && (
@@ -266,10 +266,10 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                        <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                           {organizer.totalEvents} Events
                         </span>
-                        <span className="w-1 h-1 rounded-full bg-gray-200" />
+                        <span className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800" />
                         <span className="text-[9px] font-black text-brand/70 uppercase tracking-tighter">
                           {organizer.totalRegistrations} Registrations
                         </span>
@@ -279,8 +279,8 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
                 </motion.div>
               ))
             ) : (
-              <div className="py-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              <div className="py-8 text-center bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-800">
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   No rankings yet
                 </p>
               </div>

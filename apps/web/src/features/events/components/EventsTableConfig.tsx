@@ -42,11 +42,11 @@ export const getEventsColumns = (
     header: "Event",
     cell: ({ row }) => (
       <div className="flex flex-col gap-1 py-1">
-        <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">
+        <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">
           {truncate(row.original.title, 25)}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2 py-0.5 bg-gray-50 rounded-md">
+          <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-2 py-0.5 bg-gray-50 dark:bg-gray-800 rounded-md">
             {row.original.eventType?.name || "Standard"}
           </span>
         </div>
@@ -58,8 +58,8 @@ export const getEventsColumns = (
     header: "Venue",
     cell: ({ row }) => (
       <div className="flex flex-col py-1">
-        <span className="text-sm font-bold text-gray-700">{truncate(row.original.venue.name, 25)}</span>
-        <span className="text-[10px] text-gray-400 font-medium">{truncate(row.original.venue.location || "", 25)}</span>
+        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{truncate(row.original.venue.name, 25)}</span>
+        <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{truncate(row.original.venue.location || "", 25)}</span>
       </div>
     ),
   },

@@ -94,8 +94,8 @@ export default function EventAttendeesPage() {
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-black text-gray-900 truncate tracking-tight">{row.original.user.fullName}</p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{row.original.user.email}</p>
+            <p className="text-sm font-black text-gray-900 dark:text-white truncate tracking-tight">{row.original.user.fullName}</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{row.original.user.email}</p>
           </div>
         </div>
       ),
@@ -240,8 +240,8 @@ export default function EventAttendeesPage() {
                <Users size={24} />
              </div>
              <div>
-               <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase">Attendee <span className="text-brand">Management</span></h1>
-               <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+               <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Attendee <span className="text-brand">Management</span></h1>
+               <p className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                  Control access and manage the guest list for this event
                </p>
              </div>
@@ -278,7 +278,7 @@ export default function EventAttendeesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <Input 
                 placeholder="Search by name or email..." 
-                className="pl-10 h-10 rounded-lg bg-gray-50/50 border-gray-100 text-[11px] font-bold"
+                className="pl-10 h-10 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-900 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -287,11 +287,11 @@ export default function EventAttendeesPage() {
         />
         <CemsCardContent>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6 bg-gray-50/50 p-1 rounded-lg h-auto">
-              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
-              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
-              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
+            <TabsList className="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-1 rounded-lg h-auto">
+              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
+              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
+              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all">

@@ -31,8 +31,8 @@ export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
                     )}
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{truncate(row.original.name || 'Unknown User', 25)}</span>
-                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest block">{truncate(row.original.email, 25)}</span>
+                    <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{truncate(row.original.name || 'Unknown User', 25)}</span>
+                    <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block">{truncate(row.original.email, 25)}</span>
                 </div>
             </div>
         ),
@@ -41,7 +41,7 @@ export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
         accessorKey: "role",
         header: "Role",
         cell: ({ row }) => (
-            <div className="flex items-center gap-2 font-black text-gray-700">
+            <div className="flex items-center gap-2 font-black text-gray-700 dark:text-gray-300">
                 <Shield className="w-3.5 h-3.5 text-brand" />
                 <span className="text-[10px] uppercase tracking-[0.1em]">{row.original.role}</span>
             </div>
@@ -56,9 +56,9 @@ export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
             return (
                 <div className={cn(
                     "inline-flex items-center px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border shadow-sm",
-                    val === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                    val === 'inactive' ? 'bg-red-50 text-red-600 border-red-100' :
-                    'bg-amber-50 text-amber-600 border-amber-100'
+                    val === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' :
+                    val === 'inactive' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' :
+                    'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'
                 )}>
                     {config.label}
                 </div>

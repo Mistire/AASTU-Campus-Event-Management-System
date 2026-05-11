@@ -62,7 +62,7 @@ export const TicketModal = ({
           className="relative"
         >
           {/* ─── Outer Ticket Shell ─── */}
-          <div className="bg-white rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04]">
+          <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04] dark:ring-gray-800">
 
             {/* ─── Header: Brand Gradient ─── */}
             <div className="relative overflow-hidden">
@@ -117,9 +117,9 @@ export const TicketModal = ({
 
             {/* ─── Perforated Edge ─── */}
             <div className="relative h-5">
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 shadow-inner" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 shadow-inner" />
-              <div className="absolute left-6 right-6 top-1/2 border-t-2 border-dashed border-gray-200/70" />
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 dark:bg-black/50 shadow-inner" />
+              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 dark:bg-black/50 shadow-inner" />
+              <div className="absolute left-6 right-6 top-1/2 border-t-2 border-dashed border-gray-200/70 dark:border-gray-800" />
             </div>
 
             {/* ─── Info Grid ─── */}
@@ -131,7 +131,7 @@ export const TicketModal = ({
                     <Calendar size={10} className="text-brand" />
                     Date
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {formattedDate}
                   </p>
                 </div>
@@ -142,7 +142,7 @@ export const TicketModal = ({
                     <Clock size={10} className="text-brand" />
                     Time
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {formattedTime}
                   </p>
                 </div>
@@ -153,11 +153,11 @@ export const TicketModal = ({
                     <MapPin size={10} className="text-brand" />
                     Venue
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {event.venue?.name || "Campus Venue"}
                   </p>
                   {(event.venue?.building || event.venue?.roomNumber) && (
-                    <p className="text-[11px] text-gray-400 font-medium">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
                       {[event.venue?.building, event.venue?.roomNumber].filter(Boolean).join(", ")}
                     </p>
                   )}
@@ -171,7 +171,7 @@ export const TicketModal = ({
                   <motion.div
                     whileHover={{ scale: 1.04 }}
                     transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="relative p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white ring-1 ring-gray-100 shadow-sm"
+                    className="relative p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 ring-1 ring-gray-100 dark:ring-gray-800 shadow-sm"
                   >
                     {/* Corner accent dots */}
                     <div className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-brand/40" />
@@ -191,11 +191,11 @@ export const TicketModal = ({
 
                   {/* Scan instruction */}
                   <div className="mt-4 flex items-center gap-2">
-                    <div className="h-px w-6 bg-gray-200" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300">
+                    <div className="h-px w-6 bg-gray-200 dark:bg-gray-800" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600">
                       Present at entrance
                     </span>
-                    <div className="h-px w-6 bg-gray-200" />
+                    <div className="h-px w-6 bg-gray-200 dark:bg-gray-800" />
                   </div>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export const TicketModal = ({
               </CemsButton>
               <button
                 onClick={() => onOpenChange(false)}
-                className="h-12 px-5 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-600 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
+                className="h-12 px-5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-[0.98] text-gray-600 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
               >
                 Close
               </button>
@@ -220,7 +220,7 @@ export const TicketModal = ({
 
             {/* ─── Bottom Brand Strip ─── */}
             <div className="px-7 pb-5">
-              <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.2em] text-gray-300 font-bold">
+              <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 font-bold">
                 <span>Campus Event Management</span>
                 <div className="flex items-center gap-1">
                   <div className="w-1 h-1 rounded-full bg-brand/50" />

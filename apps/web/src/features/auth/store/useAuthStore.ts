@@ -26,6 +26,8 @@ interface AuthState {
   clearAuth: () => void;
   hasRole: (role: Role) => boolean;
   hasAnyRole: (roles: Role[]) => boolean;
+  theme: "light" | "dark";
+  setTheme: (theme: "light" | "dark") => void;
 }
 
 const hybridStorage = {
@@ -81,6 +83,9 @@ export const useAuthStore = create<AuthState>()(
       hasAnyRole: (roles: Role[]) => {
         return roles.some((role) => get().hasRole(role));
       },
+
+      theme: "light",
+      setTheme: (theme) => set({ theme }),
     }),
     {
       name: "auth-storage",

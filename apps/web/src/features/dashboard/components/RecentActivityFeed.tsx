@@ -43,7 +43,7 @@ export function RecentActivityFeed({ activities, loading }: RecentActivityFeedPr
   }
 
   return (
-    <div className="divide-y divide-gray-50">
+    <div className="divide-y divide-gray-50 dark:divide-gray-800">
       {activities.map((activity, idx) => {
         const status = activity.status.name;
         const variant =
@@ -59,7 +59,7 @@ export function RecentActivityFeed({ activities, loading }: RecentActivityFeedPr
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="group flex items-center gap-4 p-4 hover:bg-gray-50/50 transition-all cursor-pointer relative"
+            className="group flex items-center gap-4 p-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-all cursor-pointer relative"
           >
             {/* User Avatar */}
             <div className="relative shrink-0">
@@ -67,7 +67,7 @@ export function RecentActivityFeed({ activities, loading }: RecentActivityFeedPr
                 {activity.user.fullName.charAt(0)}
               </div>
               <div className={cn(
-                "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white",
+                "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900",
                 status === "APPROVED" ? "bg-emerald-500" : "bg-amber-500"
               )} />
             </div>
@@ -75,16 +75,16 @@ export function RecentActivityFeed({ activities, loading }: RecentActivityFeedPr
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2 mb-0.5">
-                <span className="text-sm font-black text-gray-900 truncate">
+                <span className="text-sm font-black text-gray-900 dark:text-white truncate">
                   {activity.user.fullName}
                 </span>
                 <span className="text-[10px] font-medium text-gray-400">
                   {formatDistanceToNow(new Date(activity.registrationDate), { addSuffix: true })}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 flex items-center gap-1.5">
-                <Calendar size={12} className="text-gray-300" />
-                Registered for <span className="font-bold text-gray-700 truncate">{activity.event.title}</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                <Calendar size={12} className="text-gray-300 dark:text-gray-600" />
+                Registered for <span className="font-bold text-gray-700 dark:text-gray-200 truncate">{activity.event.title}</span>
               </p>
             </div>
 

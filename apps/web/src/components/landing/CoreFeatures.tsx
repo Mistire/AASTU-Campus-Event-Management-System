@@ -30,7 +30,7 @@ export default function CoreFeatures() {
   return (
     <section
       id="features"
-      className="relative py-32 px-6 md:px-12 overflow-hidden bg-linear-to-b from-white via-gray-50/40 to-white"
+      className="relative py-32 px-6 md:px-12 overflow-hidden bg-linear-to-b from-white dark:from-black via-gray-50/40 dark:via-gray-950 to-white dark:to-black"
     >
       {/* ── Background Decorations ── */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[50px_50px]" />
@@ -43,7 +43,7 @@ export default function CoreFeatures() {
           className="text-center mb-24"
         >
           <div className="h-10" />
-          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tighter">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tighter">
             Engineered for <span className="text-brand">Excellence.</span>
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-xl leading-relaxed font-medium">
@@ -62,7 +62,7 @@ export default function CoreFeatures() {
           {/* 1. Discovery Engine (Large Focus) */}
           <motion.div
             variants={item}
-            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-lg bg-linear-to-br from-brand/5 via-white to-white border border-brand/10 shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 md:row-span-2 group relative p-12 rounded-lg bg-linear-to-br from-brand/5 via-white dark:via-gray-900 to-white dark:to-gray-900 border border-brand/10 dark:border-brand/20 shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-xs tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -74,7 +74,7 @@ export default function CoreFeatures() {
               <div className="w-16 h-16 rounded-lg bg-brand text-white flex items-center justify-center mb-10 shadow-xl shadow-brand/20 group-hover:scale-110 transition-transform duration-500">
                 <Brain size={32} />
               </div>
-              <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">
+              <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-6 tracking-tight">
                 Personalized Discovery Engine
               </h3>
               <p className="text-gray-500 text-lg leading-relaxed max-w-md font-medium mb-12">
@@ -88,12 +88,12 @@ export default function CoreFeatures() {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 p-4 rounded-lg bg-white/60 backdrop-blur-md border border-gray-100 shadow-sm transition-all group-hover:translate-x-2"
+                    className="flex items-center gap-4 p-4 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-100 dark:border-gray-800 shadow-sm transition-all group-hover:translate-x-2"
                   >
                     <div className="w-10 h-10 rounded-lg bg-linear-to-tr from-brand to-cyan-400 opacity-20" />
                     <div className="flex-1">
-                      <div className="h-2 w-32 bg-gray-100 rounded-full mb-2" />
-                      <div className="h-2 w-20 bg-gray-50 rounded-full" />
+                      <div className="h-2 w-32 bg-gray-100 dark:bg-gray-800 rounded-full mb-2" />
+                      <div className="h-2 w-20 bg-gray-50 dark:bg-gray-900 rounded-full" />
                     </div>
                     <ArrowRight
                       size={14}
@@ -109,7 +109,7 @@ export default function CoreFeatures() {
           {/* 2. Full Hackathon Lifecycle (Vertical Spotlight) */}
           <motion.div
             variants={item}
-            className="md:row-span-2 group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="md:row-span-2 group relative p-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="absolute top-0 right-0 p-8">
               <div className="font-brand font-black text-[10px] tracking-widest text-brand opacity-20 group-hover:opacity-100 transition-opacity">
@@ -118,10 +118,10 @@ export default function CoreFeatures() {
             </div>
 
             <div>
-              <div className="w-14 h-14 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform">
+              <div className="w-14 h-14 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform">
                 <Trophy size={28} />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-4 tracking-tight leading-tight uppercase">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight uppercase">
                 Hackathon Lifecycle
               </h3>
               <p className="text-gray-500 text-base leading-relaxed font-medium mb-12">
@@ -134,12 +134,12 @@ export default function CoreFeatures() {
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400"
+                    className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-900 bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-[10px] font-black text-gray-400 dark:text-gray-500"
                   >
                     U{i}
                   </div>
                 ))}
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-brand text-white flex items-center justify-center text-[10px] font-black">
+                <div className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-900 bg-brand text-white flex items-center justify-center text-[10px] font-black">
                   +8
                 </div>
               </div>
@@ -148,14 +148,14 @@ export default function CoreFeatures() {
                 {["Innovation", "Code", "Pitch"].map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-[9px] font-bold text-gray-400"
+                    className="px-2 py-1 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg text-[9px] font-bold text-gray-400 dark:text-gray-500"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
 
-              <div className="p-3 rounded-lg bg-gray-50 border border-gray-100 text-xs font-bold text-red-400 flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-xs font-bold text-red-400 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                 Submission: 02:44:12
               </div>
@@ -165,15 +165,15 @@ export default function CoreFeatures() {
           {/* 3. Event Access Types */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="group relative p-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col justify-between"
           >
             <div className="flex-1 relative z-10">
-              <div className="w-12 h-12 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center group-hover:rotate-12 transition-transform">
+              <div className="w-12 h-12 rounded-lg bg-orange-50 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400 flex items-center justify-center group-hover:rotate-12 transition-transform">
                 <Lock size={22} />
                 
               </div>
               <div>
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">
+                <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
                   Event Access
                 </h3>
                 <p className="text-gray-500 text-sm font-medium mt-1">
@@ -185,16 +185,16 @@ export default function CoreFeatures() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2 justify-center">
-              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-green-50 text-green-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400">
                 Public
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-blue-50 text-blue-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 Private
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-orange-50 text-orange-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400">
                 Invite Only
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-purple-50 text-purple-600">
+              <span className="px-3 py-1 text-xs font-semibold rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400">
                 Restricted
               </span>
             </div>
@@ -232,12 +232,12 @@ export default function CoreFeatures() {
           {/* 5. Smart Scheduling Engine */}
           <motion.div
             variants={item}
-            className="group relative p-10 rounded-lg bg-white border border-gray-100 shadow-xl overflow-hidden"
+            className="group relative p-10 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-lg bg-cyan-50 text-cyan-500 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+            <div className="w-12 h-12 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
               <CalendarClock size={22} />
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight leading-none">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight leading-none">
               Smart Scheduler
             </h3>
             <p className="text-gray-500 text-xs leading-relaxed font-medium mb-6">
@@ -245,7 +245,7 @@ export default function CoreFeatures() {
             </p>
 
             {/* Conflict UI */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 border border-red-100 text-[10px] font-black text-red-500">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-[10px] font-black text-red-500 dark:text-red-400">
               <Zap size={10} className="fill-red-500" />
               Conflict: Venue B
             </div>

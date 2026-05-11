@@ -23,7 +23,7 @@ export function EventCardImage({ event }: EventCardImageProps) {
       <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
       
       <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-        <Badge className="bg-white/90 backdrop-blur-md text-gray-900 border-none font-black text-[9px] uppercase tracking-widest px-3 py-1 shadow-xl w-fit">
+        <Badge className="bg-white/90 dark:bg-gray-950/90 backdrop-blur-md text-gray-900 dark:text-white border-none font-black text-[9px] uppercase tracking-widest px-3 py-1 shadow-xl w-fit">
           {event.eventType?.name || "Event"}
         </Badge>
         <SocialProofBubble 

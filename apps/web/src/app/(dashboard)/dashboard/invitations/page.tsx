@@ -32,11 +32,11 @@ export default function InvitationsPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       <div className="flex flex-col gap-2 mb-12">
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-4">
+        <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-4">
           <Shield className="text-brand" size={40} />
           Your <span className="text-brand">Invitations</span>
         </h1>
-        <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">
+        <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px]">
           Review and respond to event co-organization requests
         </p>
       </div>
@@ -46,7 +46,7 @@ export default function InvitationsPage() {
           invitations.map((inv) => (
             <div 
               key={inv.id}
-              className="bg-white rounded-lg p-8 border border-gray-100 shadow-xl shadow-gray-200/20 hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8 group overflow-hidden relative"
+              className="bg-white dark:bg-gray-900 rounded-lg p-8 border border-gray-100 dark:border-gray-800 shadow-xl dark:shadow-none hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8 group overflow-hidden relative"
             >
               {/* Brand Accent */}
               <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand opacity-20 group-hover:opacity-100 transition-opacity" />
@@ -57,13 +57,13 @@ export default function InvitationsPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-brand transition-colors">
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white leading-tight group-hover:text-brand transition-colors">
                     {inv.event.title}
                   </h3>
                   <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                       <User size={14} className="text-brand/50" />
-                      Invited by <span className="text-gray-600">Lead Organizer</span>
+                      Invited by <span className="text-gray-600 dark:text-gray-300">Lead Organizer</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                       <div className="w-1 h-1 rounded-full bg-gray-300" />
@@ -78,7 +78,7 @@ export default function InvitationsPage() {
                   onClick={() => handleResponse(inv.id, false)}
                   disabled={respondMutation.isPending}
                   variant="outline"
-                  className="h-12 px-6 rounded-lg border-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 font-black uppercase tracking-widest text-[10px] transition-all"
+                  className="h-12 px-6 rounded-lg border-gray-100 dark:border-gray-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-100 dark:hover:border-rose-900/30 font-black uppercase tracking-widest text-[10px] transition-all"
                 >
                   <X size={16} className="mr-2" />
                   Decline
@@ -99,12 +99,12 @@ export default function InvitationsPage() {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 rounded-lg border-2 border-dashed border-gray-100">
-            <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl shadow-gray-200/50 mb-6">
-              <Shield size={40} className="text-gray-200" />
+          <div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 dark:bg-gray-900/50 rounded-lg border-2 border-dashed border-gray-100 dark:border-gray-800">
+            <div className="w-20 h-20 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl dark:shadow-none mb-6">
+              <Shield size={40} className="text-gray-200 dark:text-gray-700" />
             </div>
-            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">No pending invitations</h3>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">You are all caught up!</p>
+            <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight mb-2">No pending invitations</h3>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">You are all caught up!</p>
           </div>
         )}
       </div>

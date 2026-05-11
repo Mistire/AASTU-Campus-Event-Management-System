@@ -59,9 +59,9 @@ export function SupportFAB() {
                             initial={{ opacity: 0, x: 20, scale: 0.8 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, x: 20, scale: 0.8 }}
-                            className="absolute bottom-0 right-full mr-4 bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-2xl shadow-gray-200/50 whitespace-nowrap hidden md:block"
+                            className="absolute bottom-0 right-full mr-4 bg-white dark:bg-gray-900 px-4 py-2 rounded-lg border border-gray-100 dark:border-gray-800 shadow-2xl shadow-gray-200/50 dark:shadow-none whitespace-nowrap hidden md:block"
                         >
-                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest">
+                            <p className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">
                                 Need Help? <span className="text-brand">Ask Support</span>
                             </p>
                         </motion.div>
@@ -98,7 +98,7 @@ export function SupportFAB() {
                                 name="subject"
                                 required
                                 placeholder="e.g., Cannot register for Hackathon"
-                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all"
+                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all dark:text-white"
                             />
                         </div>
 
@@ -107,7 +107,7 @@ export function SupportFAB() {
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
                                 <select 
                                     name="category"
-                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer dark:text-white"
                                 >
                                     <option value="TECHNICAL">Technical Issue</option>
                                     <option value="ACCOUNT">Account Problem</option>
@@ -120,7 +120,7 @@ export function SupportFAB() {
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Priority</label>
                                 <select 
                                     name="priority"
-                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all cursor-pointer dark:text-white"
                                 >
                                     <option value="LOW">Low</option>
                                     <option value="MEDIUM">Medium</option>
@@ -137,7 +137,7 @@ export function SupportFAB() {
                                 required
                                 rows={4}
                                 placeholder="Please describe your issue in detail..."
-                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none"
+                                className="w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none dark:text-white"
                             />
                         </div>
 

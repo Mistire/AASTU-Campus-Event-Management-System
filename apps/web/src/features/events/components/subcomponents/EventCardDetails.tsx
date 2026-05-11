@@ -19,9 +19,9 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
   return (
     <div className="flex gap-5">
       {/* Left: Date Block */}
-      <div className="flex flex-col items-center justify-center w-16 h-20 rounded-lg bg-gray-50 border border-gray-100 shrink-0 group-hover:bg-brand/5 group-hover:border-brand/10 transition-colors">
-        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-brand/60 transition-colors">{month}</span>
-        <span className="text-2xl font-black text-gray-900 group-hover:text-brand transition-colors">{day}</span>
+      <div className="flex flex-col items-center justify-center w-16 h-20 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shrink-0 group-hover:bg-brand/5 dark:group-hover:bg-brand/10 group-hover:border-brand/10 transition-colors">
+        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 group-hover:text-brand/60 transition-colors">{month}</span>
+        <span className="text-2xl font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{day}</span>
         {isLive && (
           <div className="mt-1 flex items-center">
             <span className="relative flex h-1.5 w-1.5">
@@ -36,7 +36,7 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
       <div className="flex-1 min-w-0 flex flex-col justify-between">
         <div>
           <div className="flex items-start justify-between gap-4 mb-1">
-            <h3 className="text-lg font-black text-gray-900 leading-tight truncate group-hover:text-brand transition-colors">
+            <h3 className="text-lg font-black text-gray-900 dark:text-white leading-tight truncate group-hover:text-brand transition-colors">
               <Link href={`/events/${event.id}`} className="after:absolute after:inset-0 after:z-0">
                 {event.title}
               </Link>
@@ -48,7 +48,7 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
                 "relative z-10 p-2 rounded-lg transition-all border shrink-0",
                 isSaved 
                   ? "bg-brand/10 border-brand/20 text-brand scale-110" 
-                  : "bg-gray-50 border-gray-100 text-gray-300 hover:text-brand hover:border-brand/20"
+                  : "bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-300 dark:text-gray-600 hover:text-brand hover:border-brand/20"
               )}
             >
               <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} strokeWidth={isSaved ? 0 : 2} />
@@ -56,12 +56,12 @@ export function EventCardDetails({ event, isSaved, onToggleSave }: EventCardDeta
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 truncate">
-              <MapPin size={12} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
+              <MapPin size={12} className="text-gray-400 dark:text-gray-500" />
               <span>{event.venue?.name}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
-              <Calendar size={12} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              <Calendar size={12} className="text-gray-400 dark:text-gray-500" />
               <span>{format(startTime, "h:mm a")}</span>
             </div>
           </div>

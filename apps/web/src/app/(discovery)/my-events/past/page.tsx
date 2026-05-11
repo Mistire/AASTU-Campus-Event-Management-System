@@ -52,7 +52,7 @@ export default function PastEventsPage() {
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-4xl font-brand font-black text-gray-900 tracking-tighter mb-4 uppercase"
+          className="text-4xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-4 uppercase"
         >
           No <span className="text-gray-400">Past Events</span>
         </motion.h1>
@@ -60,7 +60,7 @@ export default function PastEventsPage() {
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-gray-500 text-lg max-w-md mx-auto mb-10"
+          className="text-gray-500 dark:text-gray-400 text-lg max-w-md mx-auto mb-10"
         >
           You haven&apos;t attended any events yet. Once you complete an event, it will appear here!
         </motion.p>
@@ -82,7 +82,7 @@ export default function PastEventsPage() {
   return (
     <div className="space-y-12 px-6">
       <div className="space-y-2">
-        <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
+        <h1 className="text-5xl font-black tracking-tight text-gray-900 dark:text-white uppercase leading-none">
           Event <span className="text-gray-400">History</span>
         </h1>
         <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">

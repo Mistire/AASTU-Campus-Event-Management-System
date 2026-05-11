@@ -61,16 +61,16 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
   if (guestLimit === 0) return null;
 
   return (
-    <div className="bg-white rounded-lg shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden">
-      <div className="p-8 border-b border-gray-50">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl shadow-gray-200/40 dark:shadow-none border border-gray-50 dark:border-gray-800 overflow-hidden">
+      <div className="p-8 border-b border-gray-50 dark:border-gray-800">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-brand/5 flex items-center justify-center text-brand">
               <UserPlus size={24} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">Guest Invitations</h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Invite your family & friends</p>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Guest Invitations</h3>
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Invite your family & friends</p>
             </div>
           </div>
           <div className="flex flex-col items-end">
@@ -85,7 +85,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
 
       <div className="p-8 space-y-8">
         {/* Help box */}
-        <div className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 border border-gray-100">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-start gap-3 border border-gray-100 dark:border-gray-700">
           <Info className="text-gray-400 shrink-0 mt-0.5" size={16} />
           <p className="text-[11px] font-medium text-gray-500 leading-relaxed">
             As a registered student, you can invite up to {guestLimit} guests to this {event.eventType?.name || "event"}. 
@@ -126,7 +126,7 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
             </div>
           </form>
         ) : (
-          <div className="py-6 text-center bg-brand/5 rounded-lg border border-dashed border-brand/20">
+          <div className="py-6 text-center bg-brand/5 dark:bg-brand/10 rounded-lg border border-dashed border-brand/20 dark:border-brand/30">
             <p className="text-[10px] font-black text-brand uppercase tracking-widest">
               You have reached your guest limit
             </p>
@@ -148,16 +148,16 @@ export function GuestInvitationCard({ event, userId }: GuestInvitationCardProps)
               invites.map((invite: any) => (
                 <div 
                   key={invite.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 group hover:bg-white hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5 transition-all"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 group hover:bg-white dark:hover:bg-gray-800 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5 transition-all"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-400 group-hover:text-brand transition-colors border border-gray-50">
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-950 flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:text-brand transition-colors border border-gray-50 dark:border-gray-800">
                       <Mail size={14} />
                     </div>
-                    <span className="text-sm font-bold text-gray-700">{invite.invitedEmail}</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{invite.invitedEmail}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-white rounded-lg border border-gray-100 text-gray-400">
+                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-white dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500">
                       {invite.status}
                     </span>
                   </div>

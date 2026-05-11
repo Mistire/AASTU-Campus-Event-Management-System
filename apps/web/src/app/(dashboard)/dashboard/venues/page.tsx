@@ -29,14 +29,14 @@ export default function VenuesPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                 <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-lg bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand border border-brand/10 dark:border-brand/20 shadow-sm shrink-0">
                         <MapPin className="w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase">Venues</h1>
-                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Venues</h1>
+                        <p className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
                              <span className="w-2 h-2 rounded-full bg-brand" />
                              Manage campus halls and outdoor spaces.
                         </p>
@@ -52,7 +52,7 @@ export default function VenuesPage() {
                 </CemsButton>
             </div>
 
-            <div className="bg-white rounded-lg overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+            <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-none border border-gray-100/50 dark:border-gray-800">
                 <CemsTable
                     data={venues || []}
                     columns={columns}
@@ -63,10 +63,10 @@ export default function VenuesPage() {
                     renderToolbarActions={() => (
                         <div className="flex items-center gap-2">
                             <Select value={minCapacity} onValueChange={(val) => setMinCapacity(val ?? "")}>
-                                <SelectTrigger className="h-8 min-w-[150px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
+                                <SelectTrigger className="h-8 min-w-[150px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
                                     <SelectValue placeholder="Min Capacity" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-lg border-gray-100 shadow-2xl">
+                                <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
                                     <SelectItem value="">Any Capacity</SelectItem>
                                     <SelectItem value="50">50+ Seats</SelectItem>
                                     <SelectItem value="100">100+ Seats</SelectItem>
