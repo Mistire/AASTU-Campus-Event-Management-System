@@ -9,7 +9,8 @@ import {
   LayoutGrid,
   Settings,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -53,57 +54,59 @@ export function DiscoveryNavbar() {
         <div className="flex items-center gap-3">
           <ThemeToggle className="w-8 h-8 rounded-lg" />
 
-          <button className="p-2 text-gray-400 hover:text-brand rounded-lg">
-             <Bell size={20} />
-          </button>
-          
-          <div className="h-6 w-px bg-gray-100 dark:bg-gray-800 mx-2" />
+          {profile ? (
+            <>
+              <button className="p-2 text-gray-400 hover:text-brand rounded-lg">
+                <Bell size={20} />
+              </button>
+              
+              <div className="h-6 w-px bg-gray-100 dark:bg-gray-800 mx-2" />
 
-          <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
-            >
-              <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
-                 {profile?.profileImage ? (
-                   <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
-                 ) : (
-                   <User className="text-brand" size={16} />
-                 )}
-              </div>
-              <div className="hidden sm:block text-left">
-                 <p className="text-xs font-black text-gray-900 dark:text-white leading-none truncate max-w-[100px]">{profile?.full_name}</p>
-                 <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">Student</p>
-              </div>
-              <ChevronDown size={14} className={cn("text-gray-400 transition-transform", isProfileOpen && "rotate-180")} />
-            </button>
-
-            <AnimatePresence>
-              {isProfileOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl p-2 z-50 overflow-hidden"
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
                 >
-                   <div className="p-3 border-b border-gray-50 dark:border-gray-800 mb-1">
-                      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Authenticated as</p>
-                      <p className="text-[11px] font-bold text-gray-900 dark:text-white truncate">{profile?.email || "student@aastu.edu.et"}</p>
-                   </div>
-                   <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
-                      <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
-                   </Link>
-                     {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
-                       <ProfileItem 
-                         icon={LayoutGrid} 
-                         label="Go to Dashboard" 
-                         onClick={() => {
-                           window.location.href = "/dashboard";
-                         }}
-                       />
-                     )}
-                     <div className="h-px bg-gray-50 dark:bg-gray-800 my-1" />
-                     <ProfileItem 
+                  <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
+                    {profile?.profileImage ? (
+                      <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+                    ) : (
+                      <User className="text-brand" size={16} />
+                    )}
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-xs font-black text-gray-900 dark:text-white leading-none truncate max-w-[100px]">{profile?.full_name}</p>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{profile?.role?.toLowerCase() || 'User'}</p>
+                  </div>
+                  <ChevronDown size={14} className={cn("text-gray-400 transition-transform", isProfileOpen && "rotate-180")} />
+                </button>
+
+                <AnimatePresence>
+                  {isProfileOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl p-2 z-50 overflow-hidden"
+                    >
+                      <div className="p-3 border-b border-gray-50 dark:border-gray-800 mb-1">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Authenticated as</p>
+                        <p className="text-[11px] font-bold text-gray-900 dark:text-white truncate">{profile?.email}</p>
+                      </div>
+                      <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
+                        <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
+                      </Link>
+                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
+                        <ProfileItem 
+                          icon={LayoutGrid} 
+                          label="Go to Dashboard" 
+                          onClick={() => {
+                            window.location.href = "/dashboard";
+                          }}
+                        />
+                      )}
+                      <div className="h-px bg-gray-50 dark:bg-gray-800 my-1" />
+                      <ProfileItem 
                         icon={LogOut} 
                         label="Sign Out" 
                         danger
@@ -111,11 +114,20 @@ export function DiscoveryNavbar() {
                           clearAuth();
                           window.location.href = "/login";
                         }}
-                     />
-                  </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <Link href={`/login?redirectTo=${encodeURIComponent(pathname)}`}>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                Sign In
+                <ArrowRight size={12} />
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

@@ -88,6 +88,11 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
     return response;
   }
 
+  const store = useAuthStore.getState();
+  if (!store.token && !store.refreshToken) {
+    return response;
+  }
+
   const refreshed = await doRefresh();
 
   if (!refreshed) {
