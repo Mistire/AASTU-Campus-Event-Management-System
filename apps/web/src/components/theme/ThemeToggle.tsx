@@ -17,7 +17,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       onClick={toggleTheme}
       className={cn(
-        "relative flex items-center justify-center w-9 h-9 rounded-xl border transition-all duration-300",
+        "relative flex items-center justify-center w-9 h-9 rounded-lg border transition-all duration-300",
         "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-sm",
         "hover:border-brand/30 dark:hover:border-brand/50 hover:shadow-md",
         className
@@ -32,7 +32,7 @@ export function ThemeToggle({ className }: { className?: string }) {
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             exit={{ y: -10, opacity: 0, rotate: 45 }}
             transition={{ duration: 0.2 }}
-            className="text-amber-500"
+            className="text-brand"
           >
             <Sun size={18} fill="currentColor" fillOpacity={0.2} />
           </motion.div>
@@ -43,7 +43,7 @@ export function ThemeToggle({ className }: { className?: string }) {
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             exit={{ y: -10, opacity: 0, rotate: -45 }}
             transition={{ duration: 0.2 }}
-            className="text-blue-400"
+            className="text-brand"
           >
             <Moon size={18} fill="currentColor" fillOpacity={0.2} />
           </motion.div>

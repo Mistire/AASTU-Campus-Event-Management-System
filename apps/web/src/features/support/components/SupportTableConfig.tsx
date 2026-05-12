@@ -17,7 +17,9 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
         cell: ({ row }) => (
             <div className="flex flex-col">
                 <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{truncate(row.original.subject, 25)}</span>
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">{truncate(row.original.user.fullName, 25)}</span>
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                    {row.original.user?.fullName || row.original.guestName || "Guest User"}
+                </span>
             </div>
         ),
     },

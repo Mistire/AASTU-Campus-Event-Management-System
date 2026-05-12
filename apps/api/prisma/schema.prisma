@@ -590,7 +590,9 @@ model Scores {
 
 model SupportTicket {
   id          String           @id @default(uuid()) @db.Uuid
-  userId      String           @map("user_id") @db.Uuid
+  userId      String?          @map("user_id") @db.Uuid
+  guestEmail  String?          @map("guest_email") @db.VarChar
+  guestName   String?          @map("guest_name") @db.VarChar
   subject     String           @db.VarChar
   description String?
   category    TicketCategory
@@ -600,7 +602,7 @@ model SupportTicket {
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
   messages    SupportMessage[]
-  user        User             @relation(fields: [userId], references: [id])
+  user        User?            @relation(fields: [userId], references: [id])
 
   @@map("support_tickets")
 }
@@ -608,11 +610,11 @@ model SupportTicket {
 model SupportMessage {
   id        String        @id @default(uuid()) @db.Uuid
   ticketId  String        @map("ticket_id") @db.Uuid
-  userId    String        @map("user_id") @db.Uuid
+  userId    String?       @map("user_id") @db.Uuid
   message   String
   createdAt DateTime      @default(now()) @map("created_at")
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  user      User          @relation(fields: [userId], references: [id])
+  user      User?         @relation(fields: [userId], references: [id])
 
   @@map("support_messages")
 }
