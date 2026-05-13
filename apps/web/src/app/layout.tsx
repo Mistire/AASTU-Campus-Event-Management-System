@@ -41,12 +41,12 @@ export default function RootLayout({
           theme="system"
           toastOptions={{
             style: {
-              background: 'hsl(var(--background) / 0.8)',
+              background: 'var(--background)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid hsl(var(--border))',
+              border: '1px solid var(--border)',
               borderRadius: '1rem',
               fontFamily: 'var(--font-brand)',
-              color: 'hsl(var(--foreground))',
+              color: 'var(--color-brand)',
             },
             className: 'font-brand font-bold',
           }}

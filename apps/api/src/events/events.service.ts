@@ -24,6 +24,7 @@ import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { FeedbackService } from '../feedback/feedback.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -50,6 +51,7 @@ export class EventsService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly auditLogsService: AuditLogsService,
+    private readonly feedbackService: FeedbackService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -445,6 +447,13 @@ export class EventsService {
       });
     } catch (e) {
       this.logger.error(`Failed to create audit log: ${e.message}`);
+    }
+
+    // Dispatch feedback request emails to all attendees
+    try {
+      await this.feedbackService.dispatchFeedbackEmails(eventId);
+    } catch (e) {
+      this.logger.error(`Failed to dispatch feedback emails for event ${eventId}: ${e.message}`);
     }
 
     return updated;

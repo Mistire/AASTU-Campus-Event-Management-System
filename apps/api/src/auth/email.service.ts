@@ -345,6 +345,26 @@ export class EmailService {
     await this.sendMail(email, `[SUPPORT] New reply: ${ticketSubject}`, html);
   }
 
+  async sendFeedbackRequestEmail(
+    email: string,
+    firstName: string,
+    eventTitle: string,
+    feedbackUrl: string,
+  ) {
+    const html = this.getHtmlLayout(
+      'Share your feedback',
+      `How was ${eventTitle}?`,
+      `<p>Hi <strong>${firstName}</strong>,</p>
+       <p>Thank you for attending <strong>"${eventTitle}"</strong>! We hope you had a great experience.</p>
+       <p>We'd love to hear what you thought. Your feedback helps us improve future events and takes less than 2 minutes to complete.</p>
+       <p style="color:#94a3b8; font-size:12px; margin-top:24px;">This link is personal to you and expires in 14 days. Please do not share it with others.</p>`,
+      { text: 'Share My Feedback', url: feedbackUrl },
+    );
+
+    await this.sendMail(email, `[FEEDBACK] How was "${eventTitle}"? — CEMS`, html);
+    this.logger.log(`Feedback request email sent to ${email} for event: ${eventTitle}`);
+  }
+
   async sendTicketAcknowledgementEmail(email: string, ticketId: string, ticketSubject: string) {
     const html = this.getHtmlLayout(
       'Support Ticket Received',
