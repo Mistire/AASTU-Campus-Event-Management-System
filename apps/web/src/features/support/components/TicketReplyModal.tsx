@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MessageSquare, Send, User, Clock, ShieldCheck, Hash, CheckCircle, Loader2 } from 'lucide-react';
+import { MessageSquare, Send, User, Clock, ShieldCheck, Hash, CheckCircle, Loader2, Lock } from 'lucide-react';
 import { CemsSheet } from '@/components/cems/CemsSheet';
 import { CemsButton } from '@/components/cems/CemsButton';
 import { CemsBadge } from '@/components/cems/CemsBadge';
@@ -48,6 +48,16 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
         }
     };
 
+    const handleClose = async () => {
+        try {
+            await updateStatus.mutateAsync('CLOSED');
+            ToastController.success({ message: "Ticket marked as closed!" });
+            onOpenChange(false);
+        } catch (error) {
+            ToastController.error({ message: "Failed to update ticket status." });
+        }
+    };
+
     return (
         <CemsSheet 
             open={open} 
@@ -73,15 +83,26 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
                                         Support Request
                                     </p>
-                                    {ticket.status !== 'RESOLVED' && (
-                                        <button 
-                                            onClick={handleResolve}
-                                            className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5"
-                                        >
-                                            <CheckCircle size={12} />
-                                            Resolve
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {ticket.status !== 'RESOLVED' && ticket.status !== 'CLOSED' && (
+                                            <button 
+                                                onClick={handleResolve}
+                                                className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5"
+                                            >
+                                                <CheckCircle size={12} />
+                                                Resolve
+                                            </button>
+                                        )}
+                                        {ticket.status !== 'CLOSED' && (
+                                            <button 
+                                                onClick={handleClose}
+                                                className="bg-red-500/20 hover:bg-red-500/30 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 border border-red-500/20"
+                                            >
+                                                <Lock size={12} />
+                                                Close
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                                 <h3 className="text-xl font-black tracking-tight leading-tight max-w-[90%]">
                                     {ticket.subject}
@@ -89,7 +110,8 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                                 <div className="flex items-center gap-2 pt-1">
                                     <CemsBadge className={cn(
                                         "rounded-lg px-3 py-0.5 text-[8px] font-black uppercase tracking-widest border-none bg-white/20 text-white",
-                                        ticket.status === 'RESOLVED' ? "bg-white/40" : "bg-emerald-500/40"
+                                        ticket.status === 'RESOLVED' ? "bg-white/40" : 
+                                        ticket.status === 'CLOSED' ? "bg-black/40" : "bg-emerald-500/40"
                                     )}>
                                         {ticket.status}
                                     </CemsBadge>
@@ -175,14 +197,14 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
                                 <textarea
                                     value={replyMessage}
                                     onChange={(e) => setReplyMessage(e.target.value)}
-                                    placeholder="Type a reply..."
+                                    placeholder={ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? "Ticket is resolved/closed" : "Type a reply..."}
                                     rows={3}
-                                    disabled={ticket.status === 'RESOLVED'}
+                                    disabled={ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'}
                                     className="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-transparent text-sm font-bold focus:bg-white dark:focus:bg-black focus:ring-4 focus:ring-brand/5 focus:border-brand/20 outline-none transition-all resize-none pr-16 disabled:opacity-50"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={!replyMessage.trim() || replyTicket.isPending || ticket.status === 'RESOLVED'}
+                                    disabled={!replyMessage.trim() || replyTicket.isPending || ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'}
                                     className="absolute bottom-4 right-4 w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
                                 >
                                     <Send className="w-4 h-4" />
