@@ -60,6 +60,26 @@
     "children": []
   },
   {
+    "icon": "FeedbackEvents",
+    "title": "Event Feedback",
+    "parent": "/dashboard/feedback/my-events",
+    "to": "/dashboard/feedback/my-events",
+    "section": "Management",
+    "allowed": ["ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "FeedbackTemplates",
+    "title": "FB Templates",
+    "parent": "/dashboard/feedback/templates",
+    "to": "/dashboard/feedback/templates",
+    "section": "Management",
+    "allowed": ["ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
     "icon": "Attendance",
     "title": "Attendance",
     "parent": "/dashboard/attendance",

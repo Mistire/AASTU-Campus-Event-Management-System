@@ -18,6 +18,8 @@ import { NotificationPopover } from "@/features/notifications/components/Notific
 import { useNotificationSocket } from "@/features/notifications/hooks/useNotificationSocket";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
+import { SidebarTrigger } from "@/components/ui/sidebar";
+
 export function Header() {
   const { profile, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -33,8 +35,8 @@ export function Header() {
 
   return (
     <div className="flex items-center justify-between w-full h-full bg-white dark:bg-gray-900 px-2">
-      <div className="flex items-center gap-3">
-        <h1 className="font-brand font-black text-2xl tracking-tighter text-gray-900 dark:text-white border-l-4 border-brand pl-4 ml-4">
+      <div className="flex items-center gap-2">
+        <h1 className="font-brand font-black text-2xl tracking-tighter text-gray-900 dark:text-white pl-4">
           Dashboard
         </h1>
       </div>
