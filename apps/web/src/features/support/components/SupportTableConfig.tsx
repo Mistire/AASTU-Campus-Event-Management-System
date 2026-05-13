@@ -67,9 +67,10 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
                     val === 'OPEN' ? 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
                     val === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
                     val === 'RESOLVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' :
+                    val === 'CLOSED' ? 'bg-gray-50 text-gray-600 border-gray-100 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20' :
                     'bg-gray-50 text-gray-400 border-gray-100 dark:bg-gray-800 dark:text-gray-500 dark:border-gray-700'
                 )}>
-                    {val}
+                    {val.replace('_', ' ')}
                 </div>
             );
         },
