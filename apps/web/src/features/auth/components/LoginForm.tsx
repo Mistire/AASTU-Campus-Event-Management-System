@@ -63,14 +63,30 @@ export function LoginForm() {
       });
 
       const redirectTo = searchParams.get("redirectTo");
-      console.log("[LoginForm] Redirecting to:", redirectTo || (normalizedRole === "STUDENT" ? "/discovery" : "/dashboard"));
+      const isDashboardUser = normalizedRole === "ADMIN" || normalizedRole === "ORGANIZER" || normalizedRole === "STAFF";
 
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else if (normalizedRole === "STUDENT") {
-        router.push("/discovery");
+      console.log("[LoginForm] Redirecting user:", normalizedRole, "redirectTo:", redirectTo);
+
+      if (isDashboardUser) {
+        // Admins, Organizers and Staff should go to dashboard unless the redirectTo is specifically a dashboard route
+        if (redirectTo && (redirectTo.startsWith('/dashboard') || redirectTo.startsWith('/api'))) {
+          router.push(redirectTo);
+        } else {
+          router.push("/dashboard");
+        }
       } else {
-        router.push("/dashboard");
+        // Students should go to discovery unless the redirectTo is a protected student route
+        const isStudentRoute = redirectTo && (
+          redirectTo.startsWith('/discovery') || 
+          redirectTo.startsWith('/my-events') || 
+          redirectTo.startsWith('/profile')
+        );
+        
+        if (redirectTo && isStudentRoute) {
+          router.push(redirectTo);
+        } else {
+          router.push("/discovery");
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";

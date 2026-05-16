@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export default function FinalCTA() {
   return (
-    <section className="relative py-40 px-8 bg-linear-to-br from-gray-900 via-brand to-brand-hover overflow-hidden">
+    <section id="final-cta" className="relative py-40 px-8 bg-linear-to-br from-gray-900 via-brand to-brand-hover overflow-hidden">
       
       {/* ── Background Decorations ── */}
       <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-size-[40px_40px]" />

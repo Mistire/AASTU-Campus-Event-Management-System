@@ -8,8 +8,8 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const links = [
   { name: "Home", href: "/" },
-  { name: "Features", href: "#features" },
-  { name: "Support", href: "/support" },
+  { name: "Features", href: "#core-features" },
+  { name: "Support", href: "#final-cta" },
 ];
 
 export default function Navbar() {

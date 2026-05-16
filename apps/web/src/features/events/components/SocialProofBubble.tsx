@@ -34,7 +34,7 @@ export function SocialProofBubble({ type, count, label, className }: SocialProof
     popular: {
       icon: UserCircle2,
       bg: "bg-white/80 dark:bg-gray-900/80",
-      text: "text-gray-700",
+      text: "text-gray-700 dark:text-gray-300",
       defaultLabel: `${count} students attending`,
     },
   }[type];
@@ -63,7 +63,7 @@ export function SocialProofBubble({ type, count, label, className }: SocialProof
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-4 h-4 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[6px] font-bold text-gray-400"
+              className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-900 bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-[6px] font-bold text-gray-400 dark:text-gray-500"
             >
               {String.fromCharCode(64 + i)}
             </div>
