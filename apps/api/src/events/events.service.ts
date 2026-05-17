@@ -582,6 +582,8 @@ export class EventsService {
       // Admins see whatever they specifically filter for, or everything if no filter
       if (status) {
         where.status = { statusName: status };
+      } else {
+        where.status = { statusName: { not: 'ARCHIVED' } };
       }
     } else {
       // Non-Admins: Students, Organizers, or Guests (undefined user)
@@ -752,6 +754,8 @@ export class EventsService {
 
     if (status) {
       where.status = { statusName: status };
+    } else {
+      where.status = { statusName: { not: 'ARCHIVED' } };
     }
 
     const skip = (page - 1) * limit;
@@ -763,7 +767,7 @@ export class EventsService {
           ...this.defaultIncludes(),
           _count: { select: { registrations: true } },
         },
-        orderBy: { startTime: 'desc' },
+        orderBy: { startTime: 'asc' },
         skip,
         take: limit,
       }),
@@ -1039,6 +1043,6 @@ export class EventsService {
   private resolveOrderBy(sortBy?: string): any {
     if (sortBy === 'date') return { startTime: 'asc' };
     if (sortBy === 'popularity') return { registrations: { _count: 'desc' } };
-    return { createdAt: 'desc' };
+    return { startTime: 'asc' };
   }
 }

@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { useEvents } from "@/features/events/api/get-events";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Helper to get consistent placeholder images
 const getEventImage = (id: string, index: number) => {
@@ -26,6 +27,7 @@ export default function Features() {
     limit: 10,
     sortBy: "date"
   });
+
 
   const events = data?.data || [];
   const featuredEvent = events[0];
@@ -279,7 +281,7 @@ export default function Features() {
                   onClick={() => handleRegister(event.id)}
                   className="w-full py-3.5 bg-white/10 hover:bg-brand backdrop-blur-md border border-white/20 hover:border-brand text-white rounded-lg text-[9px] font-brand font-black uppercase tracking-widest transition-all shadow-xl hover:shadow-brand/20 flex items-center justify-center gap-2"
                 >
-                  <BarChart size={12} /> Book Slot
+                  <BarChart size={12} /> Register
                 </button>
               </div>
             </motion.div>

@@ -4,12 +4,7 @@ import { Tag as TagIcon } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
 export const getCategoriesColumns = (): ColumnDef<CategoryRecord>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 32,
-    },
+
     {
         accessorKey: "name",
         header: "Category Name",

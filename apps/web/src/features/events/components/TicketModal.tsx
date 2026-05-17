@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
+import * as htmlToImage from "html-to-image";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +33,37 @@ export const TicketModal = ({
   event,
   ticketToken,
 }: TicketModalProps) => {
+  const ticketRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const ticketId = event.id?.slice(-8)?.toUpperCase() || "XXXXXXXX";
+
+  const handleDownload = async () => {
+    if (!ticketRef.current) return;
+    try {
+      setIsDownloading(true);
+      const dataUrl = await htmlToImage.toPng(ticketRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left',
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `CEMS-Ticket-${ticketId}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Ticket saved successfully!");
+    } catch (err) {
+      console.error("Failed to save ticket", err);
+      toast.error("Failed to save ticket image");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const formattedDate = useMemo(() => {
     return new Date(event.startTime).toLocaleDateString("en-US", {
       weekday: "short",
@@ -47,10 +80,9 @@ export const TicketModal = ({
     });
   }, [event.startTime]);
 
-  const ticketId = event.id?.slice(-8)?.toUpperCase() || "XXXXXXXX";
-
   // Generate QR Code URL using a public API
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketToken)}&color=0c4a6e&bgcolor=FFFFFF&format=svg`;
+  // Using pure black (000000) for maximum contrast to ensure webcams can easily binarize and scan the code.
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(ticketToken)}&color=000000&bgcolor=FFFFFF&format=svg`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,7 +94,7 @@ export const TicketModal = ({
           className="relative"
         >
           {/* ─── Outer Ticket Shell ─── */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04] dark:ring-gray-800">
+          <div ref={ticketRef} className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/4 dark:ring-gray-800">
 
             {/* ─── Header: Brand Gradient ─── */}
             <div className="relative overflow-hidden">
@@ -71,7 +103,7 @@ export const TicketModal = ({
 
               {/* Decorative circles */}
               <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-white/[0.07]" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/[0.05]" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
               <div className="absolute top-6 right-12 w-2 h-2 rounded-full bg-white/30 animate-pulse" />
               <div className="absolute top-16 right-24 w-1.5 h-1.5 rounded-full bg-white/20" />
 
@@ -201,23 +233,6 @@ export const TicketModal = ({
               </div>
             </div>
 
-            {/* ─── Footer ─── */}
-            <div className="px-7 pb-6 pt-1 flex gap-3">
-              <CemsButton
-                onClick={() => window.print()}
-                className="flex-1 h-12 rounded-lg bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer"
-              >
-                <Download size={14} />
-                Save Ticket
-              </CemsButton>
-              <button
-                onClick={() => onOpenChange(false)}
-                className="h-12 px-5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-[0.98] text-gray-600 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-
             {/* ─── Bottom Brand Strip ─── */}
             <div className="px-7 pb-5">
               <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 font-bold">
@@ -229,6 +244,24 @@ export const TicketModal = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* ─── Footer ─── */}
+          <div className="mt-4 flex gap-3">
+            <CemsButton
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex-1 h-12 rounded-lg bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer disabled:opacity-70"
+            >
+              <Download size={14} className={isDownloading ? "animate-bounce" : ""} />
+              {isDownloading ? "Saving..." : "Save Ticket"}
+            </CemsButton>
+            <button
+              onClick={() => onOpenChange(false)}
+              className="h-12 px-5 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] text-gray-600 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm"
+            >
+              Close
+            </button>
           </div>
         </motion.div>
       </DialogContent>

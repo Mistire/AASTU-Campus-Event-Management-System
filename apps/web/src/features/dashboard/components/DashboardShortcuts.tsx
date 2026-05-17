@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
+import { toast } from "sonner";
+import { useMyOrganizedEvents } from "@/features/events/api/get-events";
 import {
   Plus,
   Users,
@@ -33,6 +35,46 @@ interface DashboardShortcutsProps {
 export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
   const { profile: currentUser } = useAuthStore();
   const { data: topOrganizers, isLoading: isTopLoading } = useTopOrganizer();
+
+  const { data: organizedEventsData } = useMyOrganizedEvents(
+    { limit: 100 },
+    { enabled: !isAdmin && currentUser?.role === "ORGANIZER" }
+  );
+
+  const nearestEventId = useMemo(() => {
+    const events = organizedEventsData?.data || [];
+    if (events.length === 0) return null;
+
+    const now = new Date();
+
+    // Find ongoing events first (startTime <= now <= endTime)
+    const ongoingEvents = events.filter((e: any) => {
+      const start = new Date(e.startTime);
+      const end = new Date(e.endTime);
+      return start <= now && now <= end;
+    });
+    if (ongoingEvents.length > 0) {
+      return ongoingEvents[0].id;
+    }
+
+    // Find upcoming events (startTime > now) sorted by startTime ascending (closest to now)
+    const upcomingEvents = events
+      .filter((e: any) => new Date(e.startTime) > now)
+      .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    if (upcomingEvents.length > 0) {
+      return upcomingEvents[0].id;
+    }
+
+    // Fallback to the most recent past event (endTime < now) sorted by endTime descending (closest to now)
+    const pastEvents = events
+      .filter((e: any) => new Date(e.endTime) < now)
+      .sort((a: any, b: any) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime());
+    if (pastEvents.length > 0) {
+      return pastEvents[0].id;
+    }
+
+    return null;
+  }, [organizedEventsData]);
   const commonActions = [
     {
       title: "New Event",
@@ -74,7 +116,15 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       title: "Scanner",
       desc: "Validate guest tickets",
       icon: QrCode,
-      href: "/dashboard/scanner",
+      href: nearestEventId 
+        ? `/dashboard/events/${nearestEventId}/attendees?scanner=true` 
+        : "/dashboard/events",
+      onClick: (e: React.MouseEvent) => {
+        if (!nearestEventId) {
+          e.preventDefault();
+          toast.error("Please create an event first to use the ticket scanner!");
+        }
+      },
       color: "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400",
     },
   ];
@@ -100,6 +150,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
               >
                 <Link
                   href={action.href}
+                  onClick={action.onClick}
                   className={cn(
                     "group relative flex items-center gap-4 p-3 rounded-lg border transition-all duration-300",
                     action.featured

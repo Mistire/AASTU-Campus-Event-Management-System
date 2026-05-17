@@ -12,6 +12,8 @@ import { EventCardHoverPreview } from "./subcomponents/EventCardHoverPreview";
 import { useRegistration } from "../api/useRegistration";
 import { useBookmarkStatus, useToggleBookmark } from "../api/useBookmarks";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useMyRegistrations } from "../api/useRegistrationStatus";
 
 interface EventFeedCardProps {
   event: Event;
@@ -20,8 +22,15 @@ interface EventFeedCardProps {
 }
 
 export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: EventFeedCardProps) {
+  const { profile } = useAuthStore();
   const { data: isBookmarkedStatus } = useBookmarkStatus(event.id);
   const { mutate: toggleBookmark } = useToggleBookmark();
+  const { data: myRegistrations } = useMyRegistrations({ enabled: !!profile });
+
+  const isRegistered = myRegistrations?.registrations?.some(
+    (reg: any) => reg.eventId === event.id && (reg.status?.name === 'PENDING' || reg.status?.name === 'CONFIRMED')
+  );
+  const isWaitlisted = myRegistrations?.waitlist?.some((wait: any) => wait.eventId === event.id);
 
   const capacityPercent = Math.min(100, Math.round(((event._count?.registrations || 0) / event.capacity) * 100));
   const isAlmostFull = capacityPercent > 85 && capacityPercent < 100;
@@ -79,6 +88,8 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
             onRegister={handleRegister}
             isRegistering={isRegistering}
             isEnded={isEnded}
+            isRegistered={isRegistered}
+            isWaitlisted={isWaitlisted}
           />
         </div>
       </div>

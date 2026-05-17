@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { 
   useEventRegistrations, 
@@ -46,6 +46,7 @@ import Image from "next/image";
 export default function EventAttendeesPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const eventId = params.id as string;
   const { data, isLoading } = useEventRegistrations(eventId);
   const approve = useApproveRegistration();
@@ -56,7 +57,9 @@ export default function EventAttendeesPage() {
   const { data: attendance } = useAttendance(eventId);
   
   const [searchTerm, setSearchTerm] = useState("");
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  
+  const autoOpenScanner = searchParams.get("scanner") === "true";
+  const [isScannerOpen, setIsScannerOpen] = useState(autoOpenScanner);
 
   const allAttendees = useMemo(() => {
     if (!data) return [];
@@ -88,7 +91,7 @@ export default function EventAttendeesPage() {
         <div className="flex items-center gap-3 py-1">
           <div className="w-9 h-9 rounded-lg bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
             {row.original.user.profileImage ? (
-              <Image src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-lg" />
+              <Image src={row.original.user.profileImage} alt="" width={36} height={36} className="w-full h-full object-cover rounded-lg" />
             ) : (
               row.original.user.fullName.charAt(0)
             )}

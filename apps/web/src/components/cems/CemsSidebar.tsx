@@ -222,28 +222,26 @@ export function CemsSidebar() {
                         
                         return (
                           <Collapsible
-                            key={item.title}
+                            key={`${item.title}-${isSubActive}`}
                             defaultOpen={isSubActive}
                             className="group w-full"
                           >
                             <div className="space-y-1">
-                              <CollapsibleTrigger asChild>
-                                <button
-                                  className={cn(
-                                    "group flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition-all duration-300 text-sm font-bold tracking-tight",
-                                    isCollapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "px-4",
-                                    isSubActive 
-                                      ? "text-brand dark:text-white"
-                                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand dark:hover:text-white",
-                                  )}
-                                >
-                                  <Icon className={cn(
-                                    "w-5 h-5 transition-colors shrink-0",
-                                    isSubActive ? "text-brand dark:text-white" : "text-gray-400 group-hover:text-brand"
-                                  )} />
-                                  {!isCollapsed && <span>{item.title}</span>}
-                                  {!isCollapsed && <ChevronRight className="ml-auto w-4 h-4 transition-transform duration-300 group-data-[state=open]:rotate-90" />}
-                                </button>
+                              <CollapsibleTrigger
+                                className={cn(
+                                  "group flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition-all duration-300 text-sm font-bold tracking-tight",
+                                  isCollapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "px-4",
+                                  isSubActive 
+                                    ? "text-brand dark:text-white"
+                                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand dark:hover:text-white",
+                                )}
+                              >
+                                <Icon className={cn(
+                                  "w-5 h-5 transition-colors shrink-0",
+                                  isSubActive ? "text-brand dark:text-white" : "text-gray-400 group-hover:text-brand"
+                                )} />
+                                {!isCollapsed && <span>{item.title}</span>}
+                                {!isCollapsed && <ChevronRight className="ml-auto w-4 h-4 transition-transform duration-300 group-data-[state=open]:rotate-90" />}
                               </CollapsibleTrigger>
                               {!isCollapsed && (
                                 <CollapsibleContent>

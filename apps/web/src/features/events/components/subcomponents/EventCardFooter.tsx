@@ -12,6 +12,8 @@ interface EventCardFooterProps {
   onRegister?: (e: React.MouseEvent) => void;
   isRegistering?: boolean;
   isEnded?: boolean;
+  isRegistered?: boolean;
+  isWaitlisted?: boolean;
 }
 
 export function EventCardFooter({
@@ -23,6 +25,8 @@ export function EventCardFooter({
   onRegister,
   isRegistering,
   isEnded,
+  isRegistered,
+  isWaitlisted,
 }: EventCardFooterProps) {
   return (
     <div className="flex items-end justify-between gap-4">
@@ -68,14 +72,14 @@ export function EventCardFooter({
       <Button
         className={cn(
           "relative z-10 rounded-lg h-10 px-5 font-black uppercase tracking-widest text-[10px] shadow-lg transition-all",
-          isEnded || isFull
+          isEnded || isFull || isRegistered || isWaitlisted
             ? "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 shadow-none hover:bg-gray-100 dark:hover:bg-gray-800"
             : "bg-brand hover:bg-brand-hover text-white shadow-brand/20 hover:translate-x-1"
         )}
-        disabled={isFull || isRegistering || isEnded}
+        disabled={isFull || isRegistering || isEnded || isRegistered || isWaitlisted}
         onClick={onRegister}
       >
-        {isEnded ? "Ended" : (isRegistering ? "..." : (isFull ? "Waitlist" : "Register"))}
+        {isEnded ? "Ended" : (isRegistered ? "Registered" : (isWaitlisted ? "Waitlisted" : (isRegistering ? "..." : (isFull ? "Waitlist" : "Register"))))}
       </Button>
     </div>
   );

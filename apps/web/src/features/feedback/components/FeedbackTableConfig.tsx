@@ -4,12 +4,7 @@ import { User, Star } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
 export const getFeedbackColumns = (): ColumnDef<FeedbackRecord>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
-    },
+
     {
         accessorKey: "user",
         header: "User",
