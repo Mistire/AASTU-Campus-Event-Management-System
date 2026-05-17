@@ -6,12 +6,7 @@ import { cn, truncate } from "@/lib/utils";
 import Image from "next/image";
 
 export const getUsersColumns = (): ColumnDef<UserRecord>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 32,
-    },
+
     {
         accessorKey: "name",
         header: "User",

@@ -4,12 +4,7 @@ import { Hash } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
 export const getTagsColumns = (): ColumnDef<Tag>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 32,
-    },
+
     {
         accessorKey: "name",
         header: "Tag Name",

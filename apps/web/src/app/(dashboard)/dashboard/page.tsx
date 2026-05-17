@@ -117,17 +117,7 @@ export default function DashboardPage() {
 
   /* ── Table Columns ───────────────────────────────────────────── */
   const activityColumns: ColumnDef<RecentRegistration>[] = [
-    {
-      id: "index",
-      header: "#",
-      cell: ({ row }) => (
-        <span className="text-gray-400 font-medium text-xs">
-          {row.index + 1}
-        </span>
-      ),
-      size: 32,
-      enableSorting: false,
-    },
+
     {
       accessorKey: "user.fullName",
       header: "User",

@@ -27,23 +27,14 @@ export const getEventsColumns = (
   onGoLive: (event: Event) => void,
   onManageAttendees: (event: Event) => void
 ): ColumnDef<Event>[] => [
-  {
-    id: "index",
-    header: "No.",
-    cell: ({ row }) => (
-      <span className="text-gray-500 font-medium">
-        {row.index + 1}
-      </span>
-    ),
-    size: 32,
-  },
+
   {
     accessorKey: "title",
     header: "Event",
     cell: ({ row }) => (
       <div className="flex flex-col gap-1 py-1">
         <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">
-          {truncate(row.original.title, 25)}
+          {truncate(row.original.title, 50)}
         </span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-2 py-0.5 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -52,6 +43,26 @@ export const getEventsColumns = (
         </div>
       </div>
     ),
+    size: 320,
+  },
+  {
+    accessorKey: "startTime",
+    header: "Schedule",
+    cell: ({ row }) => {
+      const start = new Date(row.original.startTime);
+      const end = new Date(row.original.endTime);
+      return (
+        <div className="flex flex-col py-1">
+          <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+            {start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+          </span>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+            {start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })} - {end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+          </span>
+        </div>
+      );
+    },
+    size: 160,
   },
   {
     accessorKey: "venue",
@@ -62,6 +73,26 @@ export const getEventsColumns = (
         <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{truncate(row.original.venue.location || "", 25)}</span>
       </div>
     ),
+    size: 200,
+  },
+  {
+    id: "registrations",
+    header: "Registrations",
+    cell: ({ row }) => {
+      const registrations = row.original._count?.registrations || 0;
+      const capacity = row.original.capacity || row.original.venue?.capacity || 0;
+      return (
+        <div className="flex items-center gap-1.5 py-1">
+          <span className="text-sm font-black text-brand dark:text-brand-light">
+            {registrations}
+          </span>
+          <span className="text-xs text-gray-400 dark:text-gray-500">
+            / {capacity ? `${capacity} max` : "∞"}
+          </span>
+        </div>
+      );
+    },
+    size: 120,
   },
   {
     accessorKey: "status",
@@ -74,6 +105,7 @@ export const getEventsColumns = (
         </CemsBadge>
       );
     },
+    size: 110,
   },
   {
     id: "actions",
@@ -162,6 +194,7 @@ export const getEventsColumns = (
           </button>
         </div>
       );
-    }
+    },
+    size: 150,
   }
 ];

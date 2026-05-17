@@ -25,6 +25,7 @@ export function GlobalPerformanceTable({ data, isLoading }: GlobalPerformanceTab
           </span>
         </div>
       ),
+      size: 280,
     },
     {
       accessorKey: "registrations",
@@ -32,6 +33,7 @@ export function GlobalPerformanceTable({ data, isLoading }: GlobalPerformanceTab
       cell: ({ row }) => (
         <span className="font-semibold text-xs text-gray-600 dark:text-gray-400">{row.original.registrations}</span>
       ),
+      size: 110,
     },
     {
       accessorKey: "checkins",
@@ -41,6 +43,7 @@ export function GlobalPerformanceTable({ data, isLoading }: GlobalPerformanceTab
           {row.original.checkins}
         </CemsBadge>
       ),
+      size: 110,
     },
     {
       accessorKey: "rate",
@@ -56,6 +59,7 @@ export function GlobalPerformanceTable({ data, isLoading }: GlobalPerformanceTab
           <span className="text-[10px] font-bold text-gray-900 dark:text-white">{Math.round(row.original.rate)}%</span>
         </div>
       ),
+      size: 130,
     },
     {
       id: "actions",
@@ -71,6 +75,7 @@ export function GlobalPerformanceTable({ data, isLoading }: GlobalPerformanceTab
           </Link>
         </div>
       ),
+      size: 50,
     }
   ];
 

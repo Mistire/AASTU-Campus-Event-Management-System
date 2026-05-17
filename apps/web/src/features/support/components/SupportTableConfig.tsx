@@ -5,23 +5,19 @@ import { BadgeConfigs } from '@/components/ui/data-table/data-table';
 import { cn, truncate } from "@/lib/utils";
 
 export const getSupportColumns = (): ColumnDef<Ticket>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
-    },
+
     {
         accessorKey: "subject",
         header: "Subject",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{truncate(row.original.subject, 25)}</span>
+                <span className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{truncate(row.original.subject, 50)}</span>
                 <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     {row.original.user?.fullName || row.original.guestName || "Guest User"}
                 </span>
             </div>
         ),
+        size: 300,
     },
     {
         accessorKey: "category",
@@ -35,6 +31,7 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
                 </div>
             );
         },
+        size: 140,
     },
     {
         accessorKey: "priority",
@@ -55,6 +52,7 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
                 </div>
             );
         },
+        size: 120,
     },
     {
         accessorKey: "status",
@@ -74,11 +72,13 @@ export const getSupportColumns = (): ColumnDef<Ticket>[] => [
                 </div>
             );
         },
+        size: 130,
     },
     {
         accessorKey: "createdAt",
         header: "Date",
         cell: ({ row }) => <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{new Date(row.original.createdAt).toLocaleDateString()}</span>,
+        size: 110,
     },
 ];
 

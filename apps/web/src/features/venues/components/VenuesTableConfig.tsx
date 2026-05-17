@@ -4,12 +4,7 @@ import { Home } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
 export const getVenuesColumns = (): ColumnDef<Venue>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 32,
-    },
+
     {
         accessorKey: "name",
         header: "Venue Name",

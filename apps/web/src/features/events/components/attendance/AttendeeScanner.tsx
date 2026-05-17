@@ -29,6 +29,11 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
   useEffect(() => {
     // Load script dynamically from CDN to avoid build-time dependency issues in Docker
+    if ((window as any).Html5Qrcode) {
+      setIsLibraryLoaded(true);
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://unpkg.com/html5-qrcode";
     script.async = true;
@@ -36,68 +41,94 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch((err: any) => console.error("Failed to clear scanner", err));
-      }
+      // Keep the script cached for instant reuse on subsequent mounts
     };
   }, []);
+
+  const stateRef = useRef({ isPending, lastScanStatus: lastScan?.status });
+  useEffect(() => {
+    stateRef.current = { isPending, lastScanStatus: lastScan?.status };
+  }, [isPending, lastScan?.status]);
+
+  const handleScan = (decodedText: string) => {
+    const { isPending: pending, lastScanStatus } = stateRef.current;
+    if (pending || lastScanStatus === "loading") return;
+
+    setLastScan({ status: "loading", message: "Verifying ticket..." });
+    
+    checkIn(
+      { eventId, ticketToken: decodedText },
+      {
+        onSuccess: (data) => {
+          setLastScan({ 
+            status: "success", 
+            message: data.message || "Attendee successfully checked in!" 
+          });
+          toast.success("Check-in successful");
+          setTimeout(() => setLastScan(null), 3000);
+        },
+        onError: (error: any) => {
+          setLastScan({ 
+            status: "error", 
+            message: error.message || "Invalid or already used ticket" 
+          });
+          toast.error(error.message || "Failed to check in");
+          setTimeout(() => setLastScan(null), 5000);
+        }
+      }
+    );
+  };
 
   useEffect(() => {
     if (!isLibraryLoaded) return;
 
-    // Initialize scanner using the global object from the script
-    const Html5QrcodeScanner = (window as any).Html5QrcodeScanner;
-    if (!Html5QrcodeScanner) return;
+    const Html5Qrcode = (window as any).Html5Qrcode;
+    if (!Html5Qrcode) return;
+    
+    if (scannerRef.current) return; // Prevent double init
 
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-      aspectRatio: 1.0,
-      rememberLastUsedCamera: true,
-      supportedScanTypes: [0], // Camera only
-    };
+    const html5QrCode = new Html5Qrcode("reader");
+    scannerRef.current = html5QrCode;
 
-    const scanner = new Html5QrcodeScanner("reader", config, false);
-    scannerRef.current = scanner;
+    let isCameraActive = false;
 
-    const onScanSuccess = (decodedText: string) => {
-      if (isPending || lastScan?.status === "loading") return;
-
-      setLastScan({ status: "loading", message: "Verifying ticket..." });
-      
-      checkIn(
-        { eventId, ticketToken: decodedText },
-        {
-          onSuccess: (data) => {
-            setLastScan({ 
-              status: "success", 
-              message: data.message || "Attendee successfully checked in!" 
-            });
-            toast.success("Check-in successful");
-            // Clear status after 3 seconds to allow next scan
-            setTimeout(() => setLastScan(null), 3000);
-          },
-          onError: (error: any) => {
-            setLastScan({ 
-              status: "error", 
-              message: error.message || "Invalid or already used ticket" 
-            });
-            toast.error(error.message || "Failed to check in");
-            setTimeout(() => setLastScan(null), 5000);
-          }
-        }
-      );
-    };
-
-    scanner.render(onScanSuccess, (err: any) => {
-      // Ignore scan errors as they happen constantly when no QR is present
+    html5QrCode.start(
+      { facingMode: "environment" }, // Prefer back camera, falls back to webcam on PC
+      {
+        fps: 15, // Slightly higher framerate for better capture
+        // Removed qrbox and aspectRatio to scan the entire video feed natively
+      },
+      handleScan,
+      (err: any) => {
+        // Ignore scan frame errors
+      }
+    ).then(() => {
+      isCameraActive = true;
+    }).catch((err: any) => {
+      console.error("Camera failed to start:", err);
+      toast.error("Failed to access camera. Please check permissions.");
     });
 
     return () => {
-      scanner.clear().catch((error: any) => console.error("Failed to clear scanner", error));
+      const scannerInstance = scannerRef.current;
+      if (scannerInstance) {
+        // Nullify the global ref immediately to prevent any concurrent triggers
+        scannerRef.current = null;
+        
+        if (scannerInstance.isScanning) {
+          // Stop the camera feed safely on unmount before clearing
+          scannerInstance.stop().then(() => {
+            scannerInstance.clear().catch((err: any) => {});
+          }).catch((err: any) => {
+            console.error("Failed to stop scanner cleanly:", err);
+            try { scannerInstance.clear().catch((err: any) => {}); } catch (e) {}
+          });
+        } else {
+          try { scannerInstance.clear().catch((err: any) => {}); } catch (e) {}
+        }
+      }
     };
-  }, [eventId, checkIn, isPending, isLibraryLoaded, lastScan?.status]);
+  }, [isLibraryLoaded]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

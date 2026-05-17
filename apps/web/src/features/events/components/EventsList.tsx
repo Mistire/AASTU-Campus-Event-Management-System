@@ -233,17 +233,19 @@ export const EventsList = () => {
             }}
             renderToolbarActions={() => (
               <div className="flex items-center gap-2">
-                <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
-                  <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
-                    <SelectValue placeholder="Organizer" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
-                    <SelectItem value="">All Organizers</SelectItem>
-                    {users?.map((u) => (
-                      <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {!isOrganizer && (
+                  <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
+                    <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
+                      <SelectValue placeholder="Organizer" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
+                      <SelectItem value="">All Organizers</SelectItem>
+                      {users?.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
 
                 <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
                   <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">

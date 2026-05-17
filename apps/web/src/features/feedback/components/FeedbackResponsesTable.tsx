@@ -6,12 +6,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { truncate } from "@/lib/utils";
 
 export const getFeedbackResponseColumns = (): ColumnDef<FeedbackResponse>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
-    },
+
     {
         accessorKey: "attendee",
         header: "Attendee",
