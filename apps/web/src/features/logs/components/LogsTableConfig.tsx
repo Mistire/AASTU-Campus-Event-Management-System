@@ -4,12 +4,7 @@ import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn, truncate } from "@/lib/utils";
 
 export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
-    {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
-    },
+
     {
         accessorKey: "createdAt",
         header: "Timestamp",
@@ -23,8 +18,10 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
             const isSuccess = outcome === 'SUCCESS';
             return (
                 <div className={cn(
-                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded-full border uppercase tracking-widest shadow-sm w-fit",
-                    isSuccess ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
+                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded-lg border uppercase tracking-widest shadow-sm w-fit",
+                    isSuccess 
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
+                        : "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
                 )}>
                     {isSuccess ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
                     {outcome}
@@ -41,7 +38,7 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
         accessorKey: "action",
         header: "Action",
         cell: ({ row }) => (
-            <div className="font-bold text-xs text-gray-900">
+            <div className="font-bold text-xs text-gray-900 dark:text-white">
                 {truncate(row.original.action, 25)}
             </div>
         ),
@@ -51,7 +48,7 @@ export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
         header: "Actor",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{truncate(row.original.user.fullName, 25)}</span>
+                <span className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tight">{truncate(row.original.user.fullName, 25)}</span>
                 <span className="text-[8px] font-medium text-gray-400">{row.original.role || 'User'}</span>
             </div>
         ),

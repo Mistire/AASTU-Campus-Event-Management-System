@@ -49,12 +49,12 @@ export function InviteOrganizerDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white rounded-3xl p-8 border-none shadow-2xl">
+      <DialogContent className="max-w-md bg-white dark:bg-gray-950 rounded-lg p-8 border border-gray-100 dark:border-gray-800 shadow-2xl dark:shadow-none">
         <DialogHeader className="mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4">
             <UserPlus className="text-brand" size={24} />
           </div>
-          <DialogTitle className="text-2xl font-black text-gray-900 tracking-tight">
+          <DialogTitle className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             Invite <span className="text-brand">Co-Organizer</span>
           </DialogTitle>
           <DialogDescription className="text-gray-500 font-medium">
@@ -73,7 +73,7 @@ export function InviteOrganizerDialog({
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-brand/20 focus:border-brand/30 outline-none transition-all"
+              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg text-sm font-medium dark:text-white focus:ring-2 focus:ring-brand/20 focus:border-brand/30 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600"
             />
           </div>
 
@@ -92,10 +92,10 @@ export function InviteOrganizerDialog({
                 return (
                   <div
                     key={user.id}
-                    className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+                    className={`group flex items-center justify-between p-4 rounded-lg border transition-all duration-300 ${
                       isAlreadyInTeam 
-                        ? "bg-gray-50 border-gray-100 opacity-60" 
-                        : "bg-gray-50/50 border-gray-100 hover:bg-white hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5"
+                        ? "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 opacity-60" 
+                        : "bg-gray-50/50 dark:bg-gray-900/30 border-gray-100 dark:border-gray-800 hover:bg-white dark:hover:bg-gray-800 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/5"
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -103,7 +103,7 @@ export function InviteOrganizerDialog({
                         {user.fullName?.substring(0, 2) || "??"}
                       </div>
                       <div>
-                        <p className="text-sm font-black text-gray-900 leading-none mb-1">
+                        <p className="text-sm font-black text-gray-900 dark:text-white leading-none mb-1">
                           {user.fullName}
                         </p>
                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-tight">
@@ -114,7 +114,7 @@ export function InviteOrganizerDialog({
                     </div>
                     
                     {isAlreadyInTeam ? (
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-100 text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 text-[9px] font-black uppercase tracking-widest text-emerald-500">
                         <Check size={10} />
                         In Team
                       </div>
@@ -122,7 +122,7 @@ export function InviteOrganizerDialog({
                       <CemsButton
                         onClick={() => handleInvite(user.id)}
                         disabled={inviteMutation.isPending}
-                        className="h-9 px-4 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-brand hover:text-white hover:border-brand transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                        className="h-9 px-4 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-brand hover:text-white hover:border-brand transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
                       >
                         {inviteMutation.isPending ? (
                           <Loader2 className="animate-spin" size={12} />
@@ -151,7 +151,7 @@ export function InviteOrganizerDialog({
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3">
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
             <Shield size={14} />
           </div>

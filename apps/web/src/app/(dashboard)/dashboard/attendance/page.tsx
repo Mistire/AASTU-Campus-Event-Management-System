@@ -19,8 +19,8 @@ export default function GlobalAttendancePage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-black tracking-tight text-gray-900">Attendance Dashboard</h1>
-        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+        <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">Attendance Dashboard</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
           <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
           Campus-wide participation & event engagement monitoring
         </p>

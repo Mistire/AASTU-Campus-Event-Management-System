@@ -34,7 +34,7 @@ export default function UsersPage() {
 
     if (error) {
         return (
-            <div className="p-8 text-center bg-red-50 text-red-600 rounded-xl border border-red-100 font-black uppercase tracking-widest text-xs animate-in slide-in-from-top-4 duration-500">
+            <div className="p-8 text-center bg-red-50 text-red-600 rounded-lg border border-red-100 font-black uppercase tracking-widest text-xs animate-in slide-in-from-top-4 duration-500">
                 Error Loading Users: {error instanceof Error ? error.message : 'Unknown error'}
             </div>
         );
@@ -42,27 +42,27 @@ export default function UsersPage() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                 <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
                         <UsersIcon className="w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-gray-900">User Management</h1>
-                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">User Management</h1>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-brand" />
                             Control site access and permissions.
                         </p>
                     </div>
                 </div>
-                <CemsButton cemsVariant="brand" className="rounded-xl shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
+                <CemsButton cemsVariant="brand" className="rounded-lg shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
                     <Plus className="w-4 h-4 mr-2" />
                     Invite User
                 </CemsButton>
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
                 <CemsTable
                     data={usersData?.data || []}
                     columns={columns}
@@ -90,7 +90,7 @@ export default function UsersPage() {
                                 <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-white transition-all">
                                     <SelectValue placeholder="Filter by Role" />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
+                                <SelectContent className="rounded-lg border-gray-100 shadow-2xl">
                                     <SelectItem value="">All Roles</SelectItem>
                                     {roles?.map((r: any) => (
                                         <SelectItem key={r.id} value={r.id}>{r.roleName}</SelectItem>

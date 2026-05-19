@@ -49,12 +49,12 @@ export function BasicInfoStep({ data, onUpdate }: BasicInfoStepProps) {
               onValueChange={(val) => handleUpdate("eventTypeId", val)}
               disabled={loadingTypes}
             >
-              <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
+              <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-lg text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
                 <SelectValue placeholder={loadingTypes ? "Loading types..." : "Choose Type"}>
                   {(eventTypes as EventType[])?.find((t) => t.id === data.eventTypeId)?.name}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent sideOffset={4} className="rounded-xl border-gray-100 shadow-2xl p-1 w-(--radix-select-trigger-width)">
+              <SelectContent sideOffset={4} className="rounded-lg border-gray-100 shadow-2xl p-1 w-(--radix-select-trigger-width)">
                 {(eventTypes as EventType[])?.map((t) => (
                   <SelectItem key={t.id} value={t.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">
                     {t.name}
@@ -92,12 +92,12 @@ export function BasicInfoStep({ data, onUpdate }: BasicInfoStepProps) {
               onValueChange={(val) => handleUpdate("venueId", val)}
               disabled={loadingVenues}
             >
-              <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
+              <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-lg text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
                 <SelectValue placeholder={loadingVenues ? "Loading venues..." : "Choose Location"}>
                   {(venues as Venue[])?.find((v) => v.id === data.venueId)?.name}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent sideOffset={4} className="rounded-xl border-gray-100 shadow-2xl p-1 w-(--radix-select-trigger-width)">
+              <SelectContent sideOffset={4} className="rounded-lg border-gray-100 shadow-2xl p-1 w-(--radix-select-trigger-width)">
                 {(venues as Venue[])?.map((v) => (
                   <SelectItem key={v.id} value={v.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">
                     {v.name}
@@ -140,7 +140,7 @@ export function BasicInfoStep({ data, onUpdate }: BasicInfoStepProps) {
           />
         </div>
 
-        <div className="flex items-center space-x-3 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 group transition-all hover:bg-white hover:shadow-sm">
+        <div className="flex items-center space-x-3 p-4 bg-gray-50/50 rounded-lg border border-gray-100 group transition-all hover:bg-white hover:shadow-sm">
           <Checkbox 
             id="requires-approval" 
             checked={data.requiresApproval}

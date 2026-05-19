@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { GraduationCap, CheckCircle, Mail, Send, Copy, Check, Loader2, AlertCircle, Star, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CemsButton } from "@/components/cems/CemsButton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -154,7 +155,7 @@ export default function GraduationClaimPage() {
   // ── Loading ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
         <Loader2 className="animate-spin text-sky-500" size={40} />
       </div>
     );
@@ -163,13 +164,13 @@ export default function GraduationClaimPage() {
   // ── Error ──
   if (error && !status) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto">
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg p-10 shadow-xl border border-gray-100 dark:border-gray-800 text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mx-auto">
             <AlertCircle className="text-red-500" size={32} />
           </div>
-          <h1 className="text-xl font-black text-gray-900">Link Invalid</h1>
-          <p className="text-sm text-gray-500">{error}</p>
+          <h1 className="text-xl font-black text-gray-900 dark:text-white">Link Invalid</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
         </div>
       </div>
     );
@@ -178,13 +179,13 @@ export default function GraduationClaimPage() {
   // ── Already Claimed ──
   if (status?.claimed && !result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-lg p-10 shadow-xl border border-gray-100 dark:border-gray-800 text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mx-auto">
             <CheckCircle className="text-emerald-500" size={32} />
           </div>
-          <h1 className="text-xl font-black text-gray-900">Already Claimed</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-black text-gray-900 dark:text-white">Already Claimed</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             You have already submitted your parent guest information. If you need help, contact the event organizer.
           </p>
         </div>
@@ -195,40 +196,40 @@ export default function GraduationClaimPage() {
   // ── Success ──
   if (result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center p-6">
         <div className="max-w-lg w-full space-y-6">
-          <div className="bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-10 shadow-xl border border-gray-100 dark:border-gray-800 text-center space-y-3">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mx-auto">
               <CheckCircle className="text-emerald-500" size={32} />
             </div>
-            <h1 className="text-2xl font-black text-gray-900">You&apos;re all set!</h1>
-            <p className="text-sm text-gray-500">Share the links below with your parents so they can receive their entry QR codes.</p>
+            <h1 className="text-2xl font-black text-gray-900 dark:text-white">You&apos;re all set!</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Share the links below with your parents so they can receive their entry QR codes.</p>
           </div>
 
           {result.telegramLinks.map((link) => (
-            <div key={link.parentLabel} className="bg-white rounded-2xl p-6 shadow border border-gray-100 space-y-3">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{link.parentLabel} — Telegram</p>
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div key={link.parentLabel} className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800 space-y-3">
+              <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{link.parentLabel} — Telegram</p>
+              <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
                 <Send size={16} className="text-sky-500 shrink-0" />
-                <p className="text-sm text-gray-700 truncate flex-1">{link.deepLink}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{link.deepLink}</p>
                 <button
                   onClick={() => copyLink(link.deepLink)}
-                  className="shrink-0 w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-sky-50 hover:border-sky-200 transition-colors"
+                  className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-sky-50 dark:hover:bg-sky-500/10 hover:border-sky-200 dark:hover:border-sky-500/20 transition-colors"
                 >
-                  {copied === link.deepLink ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-gray-400" />}
+                  {copied === link.deepLink ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-gray-400 dark:text-gray-500" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-400">Copy this link and send it to {link.parentLabel} via WhatsApp or any messaging app.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Copy this link and send it to {link.parentLabel} via WhatsApp or any messaging app.</p>
             </div>
           ))}
 
           {result.emailSent.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 shadow border border-gray-100 space-y-2">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Email Delivery</p>
+            <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow border border-gray-100 dark:border-gray-800 space-y-2">
+              <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Email Delivery</p>
               {result.emailSent.map((email) => (
-                <div key={email} className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl">
+                <div key={email} className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
                   <Mail size={14} className="text-emerald-500" />
-                  <p className="text-sm text-emerald-700">QR pass sent to <strong>{email}</strong></p>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400">QR pass sent to <strong>{email}</strong></p>
                 </div>
               ))}
             </div>
@@ -240,17 +241,17 @@ export default function GraduationClaimPage() {
 
   // ── Main Claim Form ──
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center p-6">
       <div className="max-w-lg w-full space-y-6">
         {/* Header card */}
-        <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${tier?.color} p-8 text-white shadow-2xl`}>
+        <div className={`relative rounded-lg overflow-hidden bg-gradient-to-br ${tier?.color} p-8 text-white shadow-2xl`}>
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
           <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60 mb-1">AASTU — CEMS</p>
           <h1 className="text-3xl font-black tracking-tight">{status?.event.title}</h1>
           <p className="text-white/70 text-sm mt-1">
             {status && new Date(status.event.startTime).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur rounded-xl border border-white/20">
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur rounded-lg border border-white/20">
             {tier && <tier.icon size={18} className="text-white" />}
             <span className="text-xs font-black uppercase tracking-widest">{tier?.label}</span>
           </div>
@@ -261,47 +262,47 @@ export default function GraduationClaimPage() {
 
         {/* Parent entry cards */}
         {parents.map((parent, i) => (
-          <div key={i} className={`bg-white rounded-2xl p-6 shadow border ${tier?.border ?? "border-gray-100"} space-y-4`}>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{parent.parentLabel}</p>
+          <div key={i} className={`bg-white dark:bg-gray-900 rounded-lg p-6 shadow border ${tier?.border ?? "border-gray-100 dark:border-gray-800"} space-y-4`}>
+            <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">{parent.parentLabel}</p>
 
             {/* Delivery toggle */}
             <div className="flex gap-2">
               {(["TELEGRAM", "EMAIL"] as DeliveryMethod[]).map((method) => (
-                <button
+                <CemsButton
                   key={method}
                   onClick={() => updateParent(i, "deliveryMethod", method)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     parent.deliveryMethod === method
-                      ? "bg-gray-900 text-white shadow"
-                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                      ? "bg-brand text-white shadow"
+                      : "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
                 >
-                  {method === "TELEGRAM" ? "📨 Telegram" : "✉️ Email"}
-                </button>
+                  {method === "TELEGRAM" ? "Telegram" : "Email"}
+                </CemsButton>
               ))}
             </div>
 
             {/* Input */}
             {parent.deliveryMethod === "TELEGRAM" ? (
-              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus-within:border-sky-300 transition-colors">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 focus-within:border-sky-300 transition-colors">
                 <span className="text-gray-400 font-bold text-sm">@</span>
                 <input
                   type="text"
                   placeholder="parent_telegram_username"
                   value={parent.telegramUsername}
                   onChange={(e) => updateParent(i, "telegramUsername", e.target.value)}
-                  className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-300 outline-none font-medium"
+                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder:text-gray-600 outline-none font-medium"
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus-within:border-sky-300 transition-colors">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 focus-within:border-sky-300 transition-colors">
                 <Mail size={14} className="text-gray-400 shrink-0" />
                 <input
                   type="email"
                   placeholder="parent@email.com"
                   value={parent.parentEmail}
                   onChange={(e) => updateParent(i, "parentEmail", e.target.value)}
-                  className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-300 outline-none font-medium"
+                  className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder:text-gray-600 outline-none font-medium"
                 />
               </div>
             )}
@@ -316,24 +317,24 @@ export default function GraduationClaimPage() {
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-xl border border-red-100">
+          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
             <AlertCircle size={16} className="text-red-500 shrink-0" />
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
         {/* Submit */}
-        <Button
+        <CemsButton
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full h-14 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
+          className="w-full h-14 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl transition-all hover:-translate-y-0.5"
         >
           {submitting ? (
             <><Loader2 size={16} className="mr-2 animate-spin" /> Processing...</>
           ) : (
             <><GraduationCap size={16} className="mr-2" /> Submit &amp; Get Links</>
           )}
-        </Button>
+        </CemsButton>
 
         <p className="text-center text-xs text-gray-400">
           This link is personal to you and can only be used once.

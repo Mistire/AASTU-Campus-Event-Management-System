@@ -16,10 +16,10 @@ export default function BookmarkedEventsPage() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-12 w-64 rounded-xl" />
+        <Skeleton className="h-12 w-64 rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-48 rounded-3xl" />
+            <Skeleton key={i} className="h-48 rounded-lg" />
           ))}
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function BookmarkedEventsPage() {
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-4xl font-brand font-black text-gray-900 tracking-tighter mb-4 uppercase"
+          className="text-4xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-4 uppercase"
         >
           No <span className="text-brand">Bookmarks</span> Yet
         </motion.h1>
@@ -48,7 +48,7 @@ export default function BookmarkedEventsPage() {
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-gray-500 text-lg max-w-md mx-auto mb-10"
+          className="text-gray-500 dark:text-gray-400 text-lg max-w-md mx-auto mb-10"
         >
           Save events you&apos;re interested in to keep track of them here. Just
           click the bookmark icon on any event card.
@@ -57,7 +57,7 @@ export default function BookmarkedEventsPage() {
         <Link href="/discovery">
           <Button
             size="lg"
-            className="rounded-2xl h-14 px-8 bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3"
+            className="rounded-lg h-14 px-8 bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3"
           >
             <Search size={18} />
             Explore Feed
@@ -69,9 +69,9 @@ export default function BookmarkedEventsPage() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 px-6">
       <div className="space-y-2">
-        <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
+        <h1 className="text-5xl font-black tracking-tight text-gray-900 dark:text-white uppercase leading-none">
           Saved <span className="text-brand">Events</span>
         </h1>
         <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">
@@ -88,7 +88,7 @@ export default function BookmarkedEventsPage() {
       {recommendations && recommendations.length > 0 && (
         <section className="pt-24 space-y-10">
           <div className="flex flex-col items-center text-center space-y-4">
-            <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
               Recommended <span className="text-brand">For You</span>
             </h2>
           </div>
@@ -103,7 +103,7 @@ export default function BookmarkedEventsPage() {
             <Link href="/discovery">
               <Button
                 variant="outline"
-                className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest text-[10px] border-gray-200 hover:border-brand hover:text-brand transition-all"
+                className="rounded-lg h-12 px-8 font-black uppercase tracking-widest text-[10px] border-gray-200 hover:border-brand hover:text-brand transition-all"
               >
                 Browse All Events
               </Button>

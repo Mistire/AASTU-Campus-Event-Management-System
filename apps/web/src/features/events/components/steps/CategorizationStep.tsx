@@ -41,7 +41,7 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {loadingCategories ? (
             Array(6).fill(0).map((_, i) => (
-              <div key={i} className="h-16 rounded-2xl bg-gray-50 animate-pulse" />
+              <div key={i} className="h-16 rounded-lg bg-gray-50 animate-pulse" />
             ))
           ) : (
             categories?.map((category) => {
@@ -51,7 +51,7 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
                   key={category.id}
                   onClick={() => toggleCategory(category.id)}
                   className={cn(
-                    "flex flex-col items-start p-4 rounded-2xl border transition-all duration-300 text-left group",
+                    "flex flex-col items-start p-4 rounded-lg border transition-all duration-300 text-left group",
                     isSelected 
                       ? "bg-brand border-brand text-white shadow-lg shadow-brand/20 translate-y-[-2px]" 
                       : "bg-white border-gray-100 text-gray-600 hover:border-brand/30 hover:bg-brand/5"
@@ -83,7 +83,7 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
         <div className="flex flex-wrap gap-3">
           {loadingTags ? (
              Array(4).fill(0).map((_, i) => (
-                <div key={i} className="h-10 w-24 rounded-xl bg-gray-50 animate-pulse" />
+                <div key={i} className="h-10 w-24 rounded-lg bg-gray-50 animate-pulse" />
              ))
           ) : (
             tags?.map((tag) => {
@@ -93,7 +93,7 @@ export function CategorizationStep({ data, onUpdate }: CategorizationStepProps) 
                 key={tag.id}
                 onClick={() => toggleTag(tag.id)}
                 className={cn(
-                  "px-6 py-3 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all duration-300",
+                  "px-6 py-3 rounded-lg border-2 font-black text-xs uppercase tracking-widest transition-all duration-300",
                   isSelected
                     ? "bg-brand border-brand text-white shadow-lg shadow-brand/20 scale-105"
                     : "bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600"

@@ -60,7 +60,7 @@
   /* Brand colour: light blue — the one true primary */
   --color-brand: oklch(0.68 0.155 231);
   /* ~sky-400 / light blue */
-  --color-brand-hover: oklch(0.60 0.155 231);
+  --color-brand-hover: oklch(0.6 0.155 231);
   /* slightly darker on hover */
   --color-brand-subtle: oklch(0.95 0.04 231);
   /* 1/20 tint for bg fills */
@@ -162,10 +162,57 @@
 }
 @layer utilities {
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
+  }
+
+  .scrollbar-subtle {
+    scrollbar-width: 0.25px;
+    scrollbar-color: transparent transparent;
+  }
+
+  .scrollbar-subtle:hover {
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .scrollbar-subtle::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  .scrollbar-subtle::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-subtle::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  .scrollbar-subtle:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(120, 120, 120, 0.35);
+  }
+
+  /* Recharts Dark Mode Fixes */
+  .recharts-default-tooltip {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--foreground) !important;
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  }
+
+  .recharts-tooltip-item {
+    color: var(--foreground) !important;
+  }
+
+  .recharts-tooltip-label {
+    color: var(--foreground) !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
   }
 }

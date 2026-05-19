@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { useEvents } from "@/features/events/api/get-events";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Helper to get consistent placeholder images
 const getEventImage = (id: string, index: number) => {
@@ -27,6 +28,7 @@ export default function Features() {
     sortBy: "date"
   });
 
+
   const events = data?.data || [];
   const featuredEvent = events[0];
   const sideEvents = events.slice(1, 3);
@@ -43,15 +45,15 @@ export default function Features() {
 
   if (isLoading) {
     return (
-      <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white via-gray-50/20 to-white overflow-hidden">
+      <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white dark:from-black via-gray-50/20 dark:via-gray-950/20 to-white dark:to-black overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="h-10" />
-          <Skeleton className="h-16 w-64 mx-auto mb-12 rounded-xl" />
+          <Skeleton className="h-16 w-64 mx-auto mb-12 rounded-lg" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-            <Skeleton className="lg:col-span-8 h-[550px] rounded-xl" />
+            <Skeleton className="lg:col-span-8 h-[550px] rounded-lg" />
             <div className="lg:col-span-4 flex flex-col gap-8">
-              <Skeleton className="h-[260px] rounded-xl" />
-              <Skeleton className="h-[260px] rounded-xl" />
+              <Skeleton className="h-[260px] rounded-lg" />
+              <Skeleton className="h-[260px] rounded-lg" />
             </div>
           </div>
         </div>
@@ -64,7 +66,7 @@ export default function Features() {
   }
 
   return (
-    <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white via-gray-50/20 to-white overflow-hidden">
+    <section id="features" className="relative py-32 px-8 bg-linear-to-b from-white dark:from-black via-gray-50/20 dark:via-gray-950/20 to-white dark:to-black overflow-hidden">
       
       {/* ── Background Decorations ── */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[50px_50px]" />
@@ -74,7 +76,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-20">
           <div className="h-10" />
-          <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tighter">
+          <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tighter">
             Upcoming <span className="text-brand">Discovery.</span>
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-xl font-medium leading-relaxed">
@@ -90,7 +92,7 @@ export default function Features() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-8 group relative rounded-xl overflow-hidden shadow-2xl h-[550px] border border-gray-100 flex flex-col justify-end p-10"
+              className="lg:col-span-8 group relative rounded-lg overflow-hidden shadow-2xl h-[550px] border border-gray-100 dark:border-gray-800 flex flex-col justify-end p-10"
             >
               <Image
                 src={getEventImage(featuredEvent.id, 0)}
@@ -110,12 +112,12 @@ export default function Features() {
               </div>
 
               <div className="relative z-10 w-full">
-                <div className="p-12 rounded-xl bg-black/30 backdrop-blur-3xl border border-white/10 shadow-3xl">
+                <div className="p-12 rounded-lg bg-black/30 backdrop-blur-3xl border border-white/10 shadow-3xl">
                   <div className="flex items-center gap-4 mb-8">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand text-white text-[10px] font-brand font-black uppercase tracking-widest shadow-xl shadow-brand/20">
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-brand text-white text-[10px] font-brand font-black uppercase tracking-widest shadow-xl shadow-brand/20">
                       <Tag className="w-3.5 h-3.5" /> Featured {featuredEvent.eventType?.name || 'Event'}
                     </span>
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-400 text-[10px] font-brand font-black uppercase tracking-widest">
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-red-500/20 backdrop-blur-md border border-red-500/30 text-red-400 text-[10px] font-brand font-black uppercase tracking-widest">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                       Live Entry Open
                     </span>
@@ -157,7 +159,7 @@ export default function Features() {
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <button 
                       onClick={() => handleRegister(featuredEvent.id)}
-                      className="group relative inline-flex items-center gap-4 bg-brand hover:bg-brand-hover text-white px-12 py-5 rounded-xl font-brand font-black text-xs uppercase tracking-widest transition-all shadow-2xl shadow-brand/40 overflow-hidden"
+                      className="group relative inline-flex items-center gap-4 bg-brand hover:bg-brand-hover text-white px-12 py-5 rounded-lg font-brand font-black text-xs uppercase tracking-widest transition-all shadow-2xl shadow-brand/40 overflow-hidden"
                     >
                       <span className="relative z-10">RSVP SECURE SLOT</span>
                       <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -195,7 +197,7 @@ export default function Features() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group relative rounded-xl overflow-hidden shadow-xl h-[260px] border border-gray-100 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
+                className="group relative rounded-lg overflow-hidden shadow-xl h-[260px] border border-gray-100 dark:border-gray-800 flex flex-col justify-end p-8 transition-all hover:shadow-2xl hover:-translate-y-1"
               >
                 <Image
                   src={getEventImage(event.id, i + 1)}
@@ -244,7 +246,7 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative rounded-xl overflow-hidden shadow-lg h-[320px] border border-gray-100 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
+              className="group relative rounded-lg overflow-hidden shadow-lg h-[320px] border border-gray-100 dark:border-gray-800 p-8 flex flex-col justify-end transition-all hover:shadow-2xl hover:border-brand/20"
             >
               <Image
                 src={getEventImage(event.id, i + 3)}
@@ -277,9 +279,9 @@ export default function Features() {
                 
                 <button 
                   onClick={() => handleRegister(event.id)}
-                  className="w-full py-3.5 bg-white/10 hover:bg-brand backdrop-blur-md border border-white/20 hover:border-brand text-white rounded-xl text-[9px] font-brand font-black uppercase tracking-widest transition-all shadow-xl hover:shadow-brand/20 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-white/10 hover:bg-brand backdrop-blur-md border border-white/20 hover:border-brand text-white rounded-lg text-[9px] font-brand font-black uppercase tracking-widest transition-all shadow-xl hover:shadow-brand/20 flex items-center justify-center gap-2"
                 >
-                  <BarChart size={12} /> Book Slot
+                  <BarChart size={12} /> Register
                 </button>
               </div>
             </motion.div>

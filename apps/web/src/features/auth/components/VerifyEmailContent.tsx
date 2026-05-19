@@ -66,10 +66,10 @@ export function VerifyEmailContent() {
             <div className="flex justify-center mb-6">
               <Loader2 className="w-16 h-16 text-brand animate-spin stroke-[1.5]" />
             </div>
-            <h1 className="text-2xl font-brand font-black text-gray-900 mb-2">
+            <h1 className="text-2xl font-brand font-black text-gray-900 dark:text-white mb-2">
               Verifying security.
             </h1>
-            <p className="text-gray-500 font-medium">
+            <p className="text-gray-500 dark:text-gray-400 font-medium">
               We&apos;re validating your cryptographic token...
             </p>
           </motion.div>
@@ -94,22 +94,22 @@ export function VerifyEmailContent() {
               </div>
             </div>
             
-            <h1 className="text-3xl font-brand font-black text-gray-900 mb-4 tracking-tight">
+            <h1 className="text-3xl font-brand font-black text-gray-900 dark:text-white mb-4 tracking-tight">
               Access Granted.
             </h1>
-            <p className="text-gray-500 font-medium mb-8 leading-relaxed max-w-[280px] mx-auto">
+            <p className="text-gray-500 dark:text-gray-400 font-medium mb-8 leading-relaxed max-w-[280px] mx-auto">
               {message}
             </p>
 
             <Link
               href="/login"
-              className="group w-full inline-flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black py-4 rounded-xl transition-all shadow-xl shadow-brand/20 active:scale-95 mb-6"
+              className="group w-full inline-flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black py-4 rounded-lg transition-all shadow-xl shadow-brand/20 active:scale-95 mb-6"
             >
               Enter Dashboard
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
 
-            <div className="text-[10px] uppercase tracking-[0.2em] font-brand font-black text-gray-300">
+            <div className="text-[10px] uppercase tracking-[0.2em] font-brand font-black text-gray-300 dark:text-gray-700">
               Auto-redirect in {countdown}s
             </div>
           </motion.div>
@@ -126,7 +126,7 @@ export function VerifyEmailContent() {
               <XCircle className="w-20 h-20 stroke-[1.5]" />
             </div>
             
-            <h1 className="text-2xl font-brand font-black text-gray-900 mb-3 tracking-tight">
+            <h1 className="text-2xl font-brand font-black text-gray-900 dark:text-white mb-3 tracking-tight">
               Link Invalid.
             </h1>
             <p className="text-red-500/70 font-medium mb-10 leading-relaxed px-4">
@@ -136,7 +136,7 @@ export function VerifyEmailContent() {
             <div className="flex flex-col gap-4">
               <Link
                 href="/login"
-                className="w-full py-4 text-gray-900 font-brand font-black border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                className="w-full py-4 text-gray-900 dark:text-white font-brand font-black border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
               >
                 Back to Login
               </Link>

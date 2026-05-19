@@ -26,7 +26,7 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
              <ClipboardCheck className="text-brand" size={32} />
              Attendance <span className="text-brand">Hub</span>
           </h2>
@@ -36,20 +36,20 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-white rounded-2xl border border-gray-100 p-1 shadow-xl shadow-gray-200/50">
+          <div className="flex bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-1 shadow-xl shadow-gray-200/50 dark:shadow-none">
             <button
                onClick={() => handleExport("csv")}
                disabled={isExporting}
-               className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
+               className="flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
             >
               <TableIcon size={14} />
               CSV
             </button>
-            <div className="w-px h-6 bg-gray-100 my-auto" />
+            <div className="w-px h-6 bg-gray-100 dark:bg-gray-700 my-auto" />
             <button
                onClick={() => handleExport("pdf")}
                disabled={isExporting}
-               className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
+               className="flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-brand hover:bg-brand/5 transition-all disabled:opacity-50"
             >
               <FileText size={14} />
               PDF
@@ -59,7 +59,7 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
           {canEdit && (
             <CemsButton 
               onClick={() => setIsScannerOpen(true)}
-              className="h-14 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 flex items-center gap-3 active:scale-95 transition-all"
+              className="h-14 px-8 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3 active:scale-95 transition-all"
             >
               <Camera size={18} />
               Launch QR Scanner
@@ -73,11 +73,11 @@ export function AttendanceHub({ eventId, canEdit }: AttendanceHubProps) {
       
       <div className="pt-4">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
             <ClipboardCheck className="text-brand" />
             Check-in Log
           </h3>
-          <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full font-black text-[9px] uppercase tracking-widest flex items-center gap-2">
+          <div className="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center gap-2">
              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
              Live Updates Enabled
           </div>

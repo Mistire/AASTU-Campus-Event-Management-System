@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Table as TableIcon, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportAnalytics } from "@/features/dashboard/api/exportAnalytics";
@@ -45,6 +46,8 @@ import { CategoryDistributionChart } from "@/features/dashboard/components/chart
 import { DepartmentActivityChart } from "@/features/dashboard/components/charts/DepartmentActivityChart";
 import { TopEventsChart } from "@/features/dashboard/components/charts/TopEventsChart";
 import { RecommendationStatusCard } from "@/features/recommendations/components/RecommendationStatusCard";
+import { RecentActivityFeed } from "@/features/dashboard/components/RecentActivityFeed";
+import { DashboardShortcuts } from "@/features/dashboard/components/DashboardShortcuts";
 
 /* ================================================================
  *  DASHBOARD PAGE — Compact, space-efficient, chart-rich
@@ -56,9 +59,26 @@ export default function DashboardPage() {
   const {
     data: registrations,
     isLoading: isRegLoading,
-    refetch,
   } = useRecentRegistrations();
   const { data: stats, isLoading: isStatsLoading } = useDashboardStats();
+  const queryClient = useQueryClient();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Invalidate all dashboard-related queries to trigger a global refresh
+      await queryClient.invalidateQueries({
+        predicate: (query) => 
+          ['recent-registrations', 'dashboard-stats', 'top-organizer', 'registration-trends', 'category-distribution', 'department-activity', 'top-events']
+          .includes(query.queryKey[0] as string)
+      });
+    } finally {
+      // Small delay to ensure the user sees the 'Updating' state
+      setTimeout(() => setIsRefreshing(false), 800);
+    }
+  };
 
   useEffect(() => {
     if (
@@ -97,17 +117,7 @@ export default function DashboardPage() {
 
   /* ── Table Columns ───────────────────────────────────────────── */
   const activityColumns: ColumnDef<RecentRegistration>[] = [
-    {
-      id: "index",
-      header: "#",
-      cell: ({ row }) => (
-        <span className="text-gray-400 font-medium text-xs">
-          {row.index + 1}
-        </span>
-      ),
-      size: 32,
-      enableSorting: false,
-    },
+
     {
       accessorKey: "user.fullName",
       header: "User",
@@ -119,7 +129,7 @@ export default function DashboardPage() {
               {user.fullName.charAt(0)}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-900 truncate">
+              <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
                 {user.fullName}
               </p>
               <p className="text-[10px] text-gray-400 truncate">
@@ -134,7 +144,7 @@ export default function DashboardPage() {
       accessorKey: "event.title",
       header: "Event",
       cell: ({ row }) => (
-        <p className="text-xs font-medium text-gray-600 line-clamp-1 max-w-[180px]">
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 line-clamp-1 max-w-[180px]">
           {row.original.event.title}
         </p>
       ),
@@ -176,7 +186,7 @@ export default function DashboardPage() {
       {/* Dashboard Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight tracking-tighter uppercase">
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight tracking-tighter uppercase">
             System <span className="text-brand">Overview</span>
           </h1>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
@@ -186,22 +196,22 @@ export default function DashboardPage() {
 
         {isAdmin && (
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Export Data</span>
-            <div className="flex bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
+            <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mr-2">Export Data</span>
+            <div className="flex bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-1 shadow-sm">
                 <Button 
                    variant="ghost" 
                    size="sm" 
                    onClick={() => exportAnalytics({ type: "admin", format: "csv" })}
-                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 dark:text-gray-400 hover:text-brand transition-colors"
                 >
                   <TableIcon size={12} /> CSV
                 </Button>
-                <div className="w-px h-4 bg-gray-100 my-auto" />
+                <div className="w-px h-4 bg-gray-100 dark:bg-gray-700 my-auto" />
                 <Button 
                    variant="ghost" 
                    size="sm" 
                    onClick={() => exportAnalytics({ type: "admin", format: "pdf" })}
-                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 hover:text-brand"
+                   className="h-8 rounded-lg text-[9px] font-black uppercase tracking-widest gap-2 text-gray-500 dark:text-gray-400 hover:text-brand transition-colors"
                 >
                   <FileText size={12} /> PDF
                 </Button>
@@ -221,7 +231,7 @@ export default function DashboardPage() {
       >
         {isStatsLoading ? (
           Array.from({ length: isAdmin ? 5 : 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[72px] rounded-2xl" />
+            <Skeleton key={i} className="h-[72px] rounded-lg" />
           ))
         ) : isAdmin ? (
           <>
@@ -348,37 +358,50 @@ export default function DashboardPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════
-       *  RECENT REGISTRATIONS — Full-width table
+       *  ACTIVITY & QUICK ACTIONS — Split Layout
        * ═══════════════════════════════════════════════════════════ */}
-      <CemsCard>
-        <CemsCardHeader
-          icon={<Activity />}
-          title={isAdmin ? "Recent Activity" : "My Event Activity"}
-          bordered
-          action={
-            <button
-              onClick={() => refetch()}
-              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand hover:underline decoration-2 underline-offset-4 group"
-            >
-              <RefreshCw
-                size={12}
-                className="group-hover:rotate-180 transition-transform duration-700"
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Recent Activity Feed (Takes up 2/3) */}
+        <div className="lg:col-span-2">
+          <CemsCard className="overflow-hidden h-full">
+            <CemsCardHeader
+              icon={<Activity />}
+              title={isAdmin ? "Recent Activity" : "My Event Activity"}
+              bordered
+              action={
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className={cn(
+                    "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand hover:underline decoration-2 underline-offset-4 group transition-opacity",
+                    isRefreshing && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <RefreshCw
+                    size={12}
+                    className={cn(
+                      "transition-transform duration-700",
+                      isRefreshing ? "animate-spin" : "group-hover:rotate-180"
+                    )}
+                  />
+                  {isRefreshing ? "Updating..." : "Refresh"}
+                </button>
+              }
+            />
+            <CemsCardContent className="p-0">
+              <RecentActivityFeed 
+                activities={registrations?.slice(0, 7) || []} 
+                loading={isRegLoading} 
               />
-              Refresh
-            </button>
-          }
-        />
-        <CemsTable
-          columns={activityColumns}
-          data={registrations || []}
-          loading={isRegLoading}
-          emptyMessage="No recent registrations found."
-          enableSorting
-          enableGlobalFilter
-          enableColumnVisibility
-          pageSize={10}
-        />
-      </CemsCard>
+            </CemsCardContent>
+          </CemsCard>
+        </div>
+
+        {/* Shortcuts & Pulse (Takes up 1/3) */}
+        <div className="lg:col-span-1">
+          <DashboardShortcuts isAdmin={isAdmin} />
+        </div>
+      </div>
     </div>
   );
 }

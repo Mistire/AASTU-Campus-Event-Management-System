@@ -1,17 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MessageSquare, Send, User, Clock, CheckCircle } from 'lucide-react';
-import { 
-  CemsDialog, 
-  CemsDialogContent, 
-  CemsDialogHeader, 
-  CemsDialogTitle, 
-  CemsDialogDescription,
-} from '@/components/cems/CemsDialog';
-import { ModalFooter } from '@/components/shared/ModalFooter';
+import { MessageSquare, Send, User, Clock, ShieldCheck, Hash, CheckCircle, Loader2, Lock } from 'lucide-react';
+import { CemsSheet } from '@/components/cems/CemsSheet';
 import { CemsButton } from '@/components/cems/CemsButton';
-import { useTicketDetails, useReplyTicket } from '../api';
+import { CemsBadge } from '@/components/cems/CemsBadge';
+import { useTicketDetails, useReplyTicket, useUpdateStatus } from '../api';
+import { useSupportSocket } from '../hooks/useSupportSocket';
 import { ToastController } from '@/components/shared/ToastController';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +19,11 @@ interface TicketReplyModalProps {
 export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyModalProps) {
     const { data: ticket, isLoading } = useTicketDetails(ticketId || '');
     const replyTicket = useReplyTicket(ticketId || '');
+    const updateStatus = useUpdateStatus(ticketId || '');
     const [replyMessage, setReplyMessage] = useState('');
+    
+    // Enable real-time updates
+    useSupportSocket(ticketId);
 
     const handleReply = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,92 +38,186 @@ export function TicketReplyModal({ ticketId, open, onOpenChange }: TicketReplyMo
         }
     };
 
+    const handleResolve = async () => {
+        try {
+            await updateStatus.mutateAsync('RESOLVED');
+            ToastController.success({ message: "Ticket marked as resolved!" });
+            onOpenChange(false);
+        } catch (error) {
+            ToastController.error({ message: "Failed to update ticket status." });
+        }
+    };
+
+    const handleClose = async () => {
+        try {
+            await updateStatus.mutateAsync('CLOSED');
+            ToastController.success({ message: "Ticket marked as closed!" });
+            onOpenChange(false);
+        } catch (error) {
+            ToastController.error({ message: "Failed to update ticket status." });
+        }
+    };
+
     return (
-        <CemsDialog open={open} onOpenChange={onOpenChange}>
-            <CemsDialogContent size="lg" className="max-h-[85vh] flex flex-col">
-                <CemsDialogHeader icon={<MessageSquare />}>
-                    <CemsDialogTitle>
-                        {ticket?.subject || 'Loading Ticket...'}
-                    </CemsDialogTitle>
-                    <CemsDialogDescription>
-                        Ticket ID: {ticketId?.slice(0, 8)}... • Category: {ticket?.category}
-                    </CemsDialogDescription>
-                </CemsDialogHeader>
-
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
-                    {/* Ticket Description */}
-                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-6 h-6 rounded-full bg-brand/10 flex items-center justify-center text-brand">
-                                <User className="w-3.5 h-3.5" />
-                            </div>
-                            <span className="text-xs font-black text-gray-900 uppercase tracking-widest">{ticket?.user?.fullName}</span>
-                            <span className="text-[10px] text-gray-400 ml-auto">{ticket?.createdAt && new Date(ticket.createdAt).toLocaleString()}</span>
-                        </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                            {ticket?.description || "No description provided."}
-                        </p>
+        <CemsSheet 
+            open={open} 
+            onOpenChange={onOpenChange}
+            className="max-w-md"
+            scrollable={false}
+        >
+            <div className="flex flex-col h-[100dvh] max-h-[100dvh] bg-gray-50 dark:bg-gray-950 overflow-hidden relative">
+                {isLoading ? (
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-4 opacity-50">
+                        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+                        <p className="text-[10px] font-black uppercase tracking-widest">Loading Conversation</p>
                     </div>
-
-                    {/* Messages/Replies */}
-                    <div className="space-y-4">
-                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Conversation</h4>
-                        {ticket?.messages?.length === 0 ? (
-                            <div className="text-center py-8">
-                                <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300 mx-auto mb-3">
-                                    <Clock className="w-6 h-6" />
-                                </div>
-                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No replies yet</p>
+                ) : ticket ? (
+                    <>
+                        {/* Fixed Header */}
+                        <div className="bg-brand p-8 text-white relative overflow-hidden shrink-0 z-30 shadow-lg">
+                            <div className="absolute -bottom-4 -right-4 opacity-10">
+                                <MessageSquare size={120} />
                             </div>
-                        ) : (
-                            ticket?.messages?.map((msg: any) => (
-                                <div 
-                                    key={msg.id}
-                                    className={cn(
-                                        "max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm",
-                                        msg.userId === ticket.userId 
-                                            ? "bg-white border border-gray-100 mr-auto" 
-                                            : "bg-brand text-white ml-auto"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-2 mb-1 opacity-70">
-                                        <span className="text-[10px] font-black uppercase tracking-widest">
-                                            {msg.userId === ticket.userId ? ticket.user.fullName : "Support Team"}
-                                        </span>
-                                        <span className="text-[9px] ml-auto">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                            <div className="relative z-10 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
+                                        Support Request
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        {ticket.status !== 'RESOLVED' && ticket.status !== 'CLOSED' && (
+                                            <button 
+                                                onClick={handleResolve}
+                                                className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5"
+                                            >
+                                                <CheckCircle size={12} />
+                                                Resolve
+                                            </button>
+                                        )}
+                                        {ticket.status !== 'CLOSED' && (
+                                            <button 
+                                                onClick={handleClose}
+                                                className="bg-red-500/20 hover:bg-red-500/30 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 border border-red-500/20"
+                                            >
+                                                <Lock size={12} />
+                                                Close
+                                            </button>
+                                        )}
                                     </div>
-                                    {msg.message}
                                 </div>
-                            ))
-                        )}
-                    </div>
-                </div>
+                                <h3 className="text-xl font-black tracking-tight leading-tight max-w-[90%]">
+                                    {ticket.subject}
+                                </h3>
+                                <div className="flex items-center gap-2 pt-1">
+                                    <CemsBadge className={cn(
+                                        "rounded-lg px-3 py-0.5 text-[8px] font-black uppercase tracking-widest border-none bg-white/20 text-white",
+                                        ticket.status === 'RESOLVED' ? "bg-white/40" : 
+                                        ticket.status === 'CLOSED' ? "bg-black/40" : "bg-emerald-500/40"
+                                    )}>
+                                        {ticket.status}
+                                    </CemsBadge>
+                                    <span className="text-[9px] font-bold text-white/60 flex items-center gap-1.5 ml-2">
+                                        <Hash size={10} />
+                                        {ticketId?.slice(0, 8)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-                <form onSubmit={handleReply} className="p-6 border-t border-gray-100 bg-white">
-                    <div className="relative">
-                        <textarea
-                            value={replyMessage}
-                            onChange={(e) => setReplyMessage(e.target.value)}
-                            placeholder="Type your reply here..."
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100 text-sm font-medium focus:ring-2 focus:ring-brand/10 focus:border-brand/30 outline-none transition-all resize-none pr-14"
-                        />
-                        <button
-                            type="submit"
-                            disabled={!replyMessage.trim() || replyTicket.isPending}
-                            className="absolute bottom-3 right-3 w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
-                        >
-                            <Send className="w-4 h-4" />
-                        </button>
-                    </div>
-                </form>
+                        {/* Scrollable Conversation History */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide z-10 min-h-0 bg-transparent">
+                            {/* Requester Info */}
+                            <div className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 border border-gray-100 dark:border-gray-800">
+                                        <User size={20} />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Requester</p>
+                                        <p className="text-sm font-black text-gray-900 dark:text-white truncate">
+                                            {ticket.user?.fullName || ticket.guestName || "Guest User"}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="h-px bg-gray-50 dark:bg-gray-800" />
+                                <div className="space-y-1">
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Original Message</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
+                                        {ticket.description}
+                                    </p>
+                                </div>
+                            </div>
 
-                <ModalFooter 
-                    onCancel={() => onOpenChange(false)}
-                    onSave={() => {/* Handle resolve logic if needed, or just close */ onOpenChange(false)}}
-                    saveText="Mark as Resolved"
-                />
-            </CemsDialogContent>
-        </CemsDialog>
+                            {/* Thread section */}
+                            <div className="space-y-4 pb-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-px flex-1 bg-gray-100 dark:bg-gray-800" />
+                                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Live Thread</span>
+                                    <div className="h-px flex-1 bg-gray-100 dark:bg-gray-800" />
+                                </div>
+
+                                {ticket.messages?.length === 0 ? (
+                                    <div className="text-center py-10 opacity-30">
+                                        <Clock className="w-8 h-8 mx-auto mb-2" />
+                                        <p className="text-[10px] font-black uppercase tracking-widest">Waiting for response</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {ticket.messages?.map((msg: any) => (
+                                            <div 
+                                                key={msg.id}
+                                                className={cn(
+                                                    "max-w-[95%] p-4 rounded-2xl text-sm leading-relaxed",
+                                                    msg.userId === ticket.userId 
+                                                        ? "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 mr-auto" 
+                                                        : "bg-brand text-white ml-auto shadow-lg shadow-brand/10"
+                                                )}
+                                            >
+                                                <div className="flex items-center gap-2 mb-1.5 opacity-70">
+                                                    <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                        {msg.userId !== ticket.userId && <ShieldCheck className="w-3 h-3" />}
+                                                        {msg.userId === ticket.userId 
+                                                            ? (ticket.user?.fullName || ticket.guestName || "Guest") 
+                                                            : "Support Team"}
+                                                    </span>
+                                                    <span className="text-[9px] ml-auto font-bold opacity-60">
+                                                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                                <p className="font-medium">{msg.message}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Fixed Reply Area */}
+                        <div className="shrink-0 p-6 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                            <form onSubmit={handleReply} className="relative group">
+                                <textarea
+                                    value={replyMessage}
+                                    onChange={(e) => setReplyMessage(e.target.value)}
+                                    placeholder={ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? "Ticket is resolved/closed" : "Type a reply..."}
+                                    rows={3}
+                                    disabled={ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'}
+                                    className="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-transparent text-sm font-bold focus:bg-white dark:focus:bg-black focus:ring-4 focus:ring-brand/5 focus:border-brand/20 outline-none transition-all resize-none pr-16 disabled:opacity-50"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!replyMessage.trim() || replyTicket.isPending || ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'}
+                                    className="absolute bottom-4 right-4 w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                                >
+                                    <Send className="w-4 h-4" />
+                                </button>
+                            </form>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex-1 flex items-center justify-center opacity-30">
+                        <p className="text-xs font-black uppercase tracking-widest">Ticket not found</p>
+                    </div>
+                )}
+            </div>
+        </CemsSheet>
     );
 }

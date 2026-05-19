@@ -24,6 +24,7 @@ import { InviteGuestsDto } from './dto/invitation.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { FeedbackService } from '../feedback/feedback.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -50,6 +51,7 @@ export class EventsService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly auditLogsService: AuditLogsService,
+    private readonly feedbackService: FeedbackService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -447,6 +449,13 @@ export class EventsService {
       this.logger.error(`Failed to create audit log: ${e.message}`);
     }
 
+    // Dispatch feedback request emails to all attendees
+    try {
+      await this.feedbackService.dispatchFeedbackEmails(eventId);
+    } catch (e) {
+      this.logger.error(`Failed to dispatch feedback emails for event ${eventId}: ${e.message}`);
+    }
+
     return updated;
   }
 
@@ -557,6 +566,7 @@ export class EventsService {
       status,
       eventType,
       tag,
+      categoryId,
       venueId,
       createdById,
       upcomingOnly,
@@ -572,6 +582,8 @@ export class EventsService {
       // Admins see whatever they specifically filter for, or everything if no filter
       if (status) {
         where.status = { statusName: status };
+      } else {
+        where.status = { statusName: { not: 'ARCHIVED' } };
       }
     } else {
       // Non-Admins: Students, Organizers, or Guests (undefined user)
@@ -641,6 +653,10 @@ export class EventsService {
 
     if (tag) {
       where.tags = { some: { tagId: tag } };
+    }
+
+    if (categoryId) {
+      where.eventCategories = { some: { categoryId: categoryId } };
     }
 
     if (date) {
@@ -738,6 +754,8 @@ export class EventsService {
 
     if (status) {
       where.status = { statusName: status };
+    } else {
+      where.status = { statusName: { not: 'ARCHIVED' } };
     }
 
     const skip = (page - 1) * limit;
@@ -749,7 +767,7 @@ export class EventsService {
           ...this.defaultIncludes(),
           _count: { select: { registrations: true } },
         },
-        orderBy: { startTime: 'desc' },
+        orderBy: { startTime: 'asc' },
         skip,
         take: limit,
       }),
@@ -1025,6 +1043,6 @@ export class EventsService {
   private resolveOrderBy(sortBy?: string): any {
     if (sortBy === 'date') return { startTime: 'asc' };
     if (sortBy === 'popularity') return { registrations: { _count: 'desc' } };
-    return { createdAt: 'desc' };
+    return { startTime: 'asc' };
   }
 }

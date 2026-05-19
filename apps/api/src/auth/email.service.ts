@@ -324,4 +324,63 @@ export class EmailService {
 
     this.logger.log(`Parent QR email sent to ${parentEmail} for student ${studentName}`);
   }
+
+  async sendSupportReplyEmail(email: string, ticketId: string, ticketSubject: string, replyMessage: string) {
+    const html = this.getHtmlLayout(
+      'New Support Reply.',
+      `Re: ${ticketSubject}`,
+      `<p>You have received a new reply from the support team regarding your ticket: <strong>"${ticketSubject}"</strong>.</p>
+       <div style="background-color:#f1f5f9; padding:16px; border-radius:12px; margin:24px 0; color:#475569; font-size:15px; border-left:4px solid #38bdf8;">
+         ${replyMessage}
+       </div>
+       <p>If you are a registered user, you can view the full conversation in your dashboard. If you raised this as a guest, please raise a new ticket if you have further questions.</p>`,
+      {
+        text: 'View Support',
+        url:
+          (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001') +
+          `/support/track?ticketId=${ticketId}&email=${email}`,
+      },
+    );
+
+    await this.sendMail(email, `[SUPPORT] New reply: ${ticketSubject}`, html);
+  }
+
+  async sendFeedbackRequestEmail(
+    email: string,
+    firstName: string,
+    eventTitle: string,
+    feedbackUrl: string,
+  ) {
+    const html = this.getHtmlLayout(
+      'Share your feedback',
+      `How was ${eventTitle}?`,
+      `<p>Hi <strong>${firstName}</strong>,</p>
+       <p>Thank you for attending <strong>"${eventTitle}"</strong>! We hope you had a great experience.</p>
+       <p>We'd love to hear what you thought. Your feedback helps us improve future events and takes less than 2 minutes to complete.</p>
+       <p style="color:#94a3b8; font-size:12px; margin-top:24px;">This link is personal to you and expires in 14 days. Please do not share it with others.</p>`,
+      { text: 'Share My Feedback', url: feedbackUrl },
+    );
+
+    await this.sendMail(email, `[FEEDBACK] How was "${eventTitle}"? — CEMS`, html);
+    this.logger.log(`Feedback request email sent to ${email} for event: ${eventTitle}`);
+  }
+
+  async sendTicketAcknowledgementEmail(email: string, ticketId: string, ticketSubject: string) {
+    const html = this.getHtmlLayout(
+      'Support Ticket Received',
+      `Confirmation: ${ticketSubject}`,
+      `<p>We have received your support request regarding <strong>"${ticketSubject}"</strong>.</p>
+       <p>Our team will review it and get back to you as soon as possible.</p>
+       <p><strong>Your Ticket ID:</strong> <code>${ticketId}</code></p>
+       <p>You can use this ID to track your ticket status and add more information at any time.</p>`,
+      {
+        text: 'Track My Ticket',
+        url:
+          (this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001') +
+          `/support/track?ticketId=${ticketId}&email=${email}`,
+      },
+    );
+
+    await this.sendMail(email, `[SUPPORT] Ticket Received: ${ticketSubject}`, html);
+  }
 }

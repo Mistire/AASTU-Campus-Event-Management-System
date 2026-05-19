@@ -19,7 +19,7 @@ export const useRegistrationStatus = (eventId: string) => {
     });
 };
 
-export const useMyRegistrations = () => {
+export const useMyRegistrations = (options?: { enabled?: boolean }) => {
     return useQuery({
         queryKey: ["my-registrations"],
         queryFn: async () => {
@@ -28,6 +28,7 @@ export const useMyRegistrations = () => {
             const result = await res.json();
             return result.data ?? result;
         },
+        enabled: options?.enabled,
     });
 };
 

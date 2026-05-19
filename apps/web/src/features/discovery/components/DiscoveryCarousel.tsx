@@ -97,7 +97,7 @@ export function DiscoveryCarousel({ children }: DiscoveryCarouselProps) {
                 variant="outline"
                 size="icon"
                 onClick={() => scroll("left")}
-                className="rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 text-gray-900 transition-all duration-300 w-14 h-14 hover:border-brand hover:text-brand hover:scale-110 active:scale-95"
+                className="rounded-full bg-white dark:bg-gray-800 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-none border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white transition-all duration-300 w-14 h-14 hover:border-brand hover:text-brand hover:scale-110 active:scale-95"
               >
                 <ChevronLeft size={24} />
               </Button>
@@ -117,7 +117,7 @@ export function DiscoveryCarousel({ children }: DiscoveryCarouselProps) {
                 variant="outline"
                 size="icon"
                 onClick={() => scroll("right")}
-                className="rounded-full bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 text-gray-900 transition-all duration-300 w-14 h-14 hover:border-brand hover:text-brand hover:scale-110 active:scale-95"
+                className="rounded-full bg-white dark:bg-gray-800 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-none border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white transition-all duration-300 w-14 h-14 hover:border-brand hover:text-brand hover:scale-110 active:scale-95"
               >
                 <ChevronRight size={24} />
               </Button>
@@ -128,7 +128,7 @@ export function DiscoveryCarousel({ children }: DiscoveryCarouselProps) {
 
       {/* Progress Bar - Minimal context */}
       <div className="mt-6 flex flex-col items-center">
-        <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-48 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
           <motion.div 
             className="h-full bg-brand"
             initial={{ width: 0 }}

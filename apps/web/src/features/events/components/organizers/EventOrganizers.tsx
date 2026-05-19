@@ -64,7 +64,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <div className="w-12 h-12 rounded-2xl border-4 border-brand/10 border-t-brand animate-spin" />
+        <div className="w-12 h-12 rounded-lg border-4 border-brand/10 border-t-brand animate-spin" />
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Loading Management Team</p>
       </div>
     );
@@ -75,7 +75,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
              <Shield className="text-brand" size={32} />
              Management <span className="text-brand">Team</span>
           </h2>
@@ -87,7 +87,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
         {canEdit && (
           <CemsButton 
             onClick={() => setIsInviteOpen(true)}
-            className="h-14 px-8 rounded-2xl bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3 active:scale-95 transition-all"
+            className="h-14 px-8 rounded-lg bg-brand hover:bg-brand/80 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3 active:scale-95 transition-all"
           >
             <UserPlus size={18} />
             Invite Co-Organizer
@@ -104,7 +104,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
           return (
             <div 
               key={org.id}
-              className="group relative flex items-center justify-between p-6 bg-white rounded-3xl border border-gray-100 hover:border-brand/20 hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 overflow-hidden"
+              className="group relative flex items-center justify-between p-6 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-brand/20 hover:shadow-2xl hover:shadow-brand/5 transition-all duration-500 overflow-hidden"
             >
               {/* Status Indicator Bar */}
               <div className={`absolute left-0 top-0 bottom-0 w-1 ${
@@ -115,7 +115,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
               <div className="flex items-center gap-5">
                 {/* Avatar */}
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-brand/5 flex items-center justify-center text-brand font-black text-lg">
+                  <div className="w-14 h-14 rounded-lg bg-brand/5 flex items-center justify-center text-brand font-black text-lg">
                     {org.user.fullName.substring(0, 2).toUpperCase()}
                   </div>
                   {isOrgCreator && (
@@ -128,7 +128,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
                 {/* Info */}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-base font-black text-gray-900 tracking-tight uppercase leading-none">
+                    <h4 className="text-base font-black text-gray-900 dark:text-white tracking-tight uppercase leading-none">
                       {org.user.fullName}
                       {isSelf && <span className="ml-2 text-[10px] text-brand opacity-50">(You)</span>}
                     </h4>
@@ -139,7 +139,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
                       <Mail size={12} />
                       {org.user.email}
                     </div>
-                    <div className={`px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${getStatusStyles(org.status)}`}>
+                    <div className={`px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${getStatusStyles(org.status)}`}>
                       {getStatusIcon(org.status)}
                       {org.status}
                     </div>
@@ -152,7 +152,7 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
                 {isCreator && !isOrgCreator && (
                   <button
                     onClick={() => handleRemove(org.id, org.user.fullName)}
-                    className="p-3 rounded-xl bg-gray-50 text-gray-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                    className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-500 transition-all active:scale-90"
                     title="Remove from team"
                   >
                     <Trash2 size={16} />
@@ -170,12 +170,12 @@ export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrgan
       </div>
 
       {organizers?.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-gray-100 rounded-3xl bg-gray-50/30">
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-xl shadow-gray-200/50 mb-4">
-            <Users size={32} className="text-gray-200" />
+        <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg bg-gray-50/30 dark:bg-gray-800/30">
+          <div className="w-16 h-16 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-xl shadow-gray-200/50 dark:shadow-none mb-4">
+            <Users size={32} className="text-gray-200 dark:text-gray-800" />
           </div>
-          <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight mb-1">The team is empty</h3>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Invite co-organizers to start collaborating</p>
+          <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight mb-1">The team is empty</h3>
+          <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Invite co-organizers to start collaborating</p>
         </div>
       )}
 

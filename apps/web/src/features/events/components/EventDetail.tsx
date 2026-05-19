@@ -85,13 +85,13 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
           
           {/* Graduation Indicator if applicable */}
           {event.eventType?.name?.toUpperCase() === "GRADUATION" && (
-            <div className="p-6 bg-brand/5 rounded-xl border border-brand/10 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-white shadow-lg shadow-brand/20">
+            <div className="p-6 bg-brand/5 rounded-lg border border-brand/10 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-white shadow-lg shadow-brand/20">
                 <GraduationCap size={20} />
               </div>
               <div>
                 <p className="text-[10px] font-black text-brand uppercase tracking-widest">Event Protocol</p>
-                <h4 className="text-sm font-black text-gray-900 tracking-tight">Official Graduation</h4>
+                <h4 className="text-sm font-black text-gray-900 dark:text-white tracking-tight">Official Graduation</h4>
               </div>
             </div>
           )}
@@ -105,19 +105,19 @@ export const EventDetail = ({ eventId }: EventDetailProps) => {
           )}
 
           {/* Description card */}
-          <div className="bg-white rounded-xl shadow-xl shadow-gray-200/40 border border-gray-50 overflow-hidden p-10">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl shadow-gray-200/40 dark:shadow-none border border-gray-50 dark:border-gray-800 overflow-hidden p-10">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
+              <div className="w-12 h-12 rounded-lg bg-brand/5 flex items-center justify-center text-brand">
                 <Info size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">Event Description</h3>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Overview of the upcoming event</p>
+                <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Event Description</h3>
+                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Overview of the upcoming event</p>
               </div>
             </div>
             
-            <div className="bg-gray-50/50 rounded-xl p-8 border border-gray-100">
-              <p className="text-gray-600 leading-relaxed font-medium whitespace-pre-wrap">
+            <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-lg p-8 border border-gray-100 dark:border-gray-800">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed font-medium whitespace-pre-wrap">
                 {event.description || "No description provided for this event."}
               </p>
             </div>

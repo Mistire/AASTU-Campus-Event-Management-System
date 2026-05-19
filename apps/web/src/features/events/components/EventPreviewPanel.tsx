@@ -36,7 +36,7 @@ export const EventPreviewPanel = ({
       className="max-w-md"
     >
       {event && (
-        <div className="flex flex-col h-full bg-gray-50">
+        <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-950">
           {/* Panel Header */}
           <div className="bg-brand p-6 text-white relative overflow-hidden shrink-0">
             <div className="absolute -top-6 -right-6 opacity-10">
@@ -50,7 +50,7 @@ export const EventPreviewPanel = ({
                 {event.title}
               </h3>
               <CemsBadge
-                className={`${getStatusColor(event.status.statusName)} rounded-full px-3 py-0.5 text-[8px] font-black uppercase tracking-widest mt-1 border-none bg-white/20 text-white`}
+                className={`${getStatusColor(event.status.statusName)} rounded-lg px-3 py-0.5 text-[8px] font-black uppercase tracking-widest mt-1 border-none bg-white/20 text-white`}
               >
                 {event.status.statusName}
               </CemsBadge>
@@ -61,31 +61,31 @@ export const EventPreviewPanel = ({
           <div className="p-5 space-y-4 flex-1 overflow-y-auto">
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none">
                 <div className="flex items-center gap-2 mb-1.5">
                   <MapPin className="w-3.5 h-3.5 text-brand" />
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     Venue
                   </span>
                 </div>
-                <p className="text-sm font-black text-gray-900 truncate">
+                <p className="text-sm font-black text-gray-900 dark:text-white truncate">
                   {event.venue.name}
                 </p>
-                <p className="text-[9px] text-gray-400 truncate">
+                <p className="text-[9px] text-gray-400 dark:text-gray-500 truncate">
                   {event.venue.location}
                 </p>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+              <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Users className="w-3.5 h-3.5 text-brand" />
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     Capacity
                   </span>
                 </div>
-                <p className="text-sm font-black text-gray-900">
+                <p className="text-sm font-black text-gray-900 dark:text-white">
                   {event._count?.registrations || 0} / {event.capacity}
                 </p>
-                <p className="text-[9px] text-gray-400">Registrations</p>
+                <p className="text-[9px] text-gray-400 dark:text-gray-500">Registrations</p>
               </div>
             </div>
 
@@ -95,21 +95,21 @@ export const EventPreviewPanel = ({
                 <Clock className="w-3.5 h-3.5 text-brand" />
                 Schedule
               </h4>
-              <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm space-y-3">
+              <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
                     Start
                   </span>
-                  <span className="text-xs font-black text-gray-900">
+                  <span className="text-xs font-black text-gray-900 dark:text-white">
                     {format(new Date(event.startTime), "MMM d, yyyy · h:mm a")}
                   </span>
                 </div>
-                <div className="h-px bg-gray-50" />
+                <div className="h-px bg-gray-50 dark:bg-gray-800" />
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
                     End
                   </span>
-                  <span className="text-xs font-black text-gray-900">
+                  <span className="text-xs font-black text-gray-900 dark:text-white">
                     {format(new Date(event.endTime), "MMM d, yyyy · h:mm a")}
                   </span>
                 </div>
@@ -122,8 +122,8 @@ export const EventPreviewPanel = ({
                 <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
                   Description
                 </h4>
-                <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
-                  <p className="text-xs text-gray-600 font-medium leading-relaxed">
+                <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
                     {event.description}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export const EventPreviewPanel = ({
                 <span className="text-gray-400 font-bold uppercase tracking-widest">
                   Event ID
                 </span>
-                <span className="ml-auto text-gray-500 font-mono text-[9px]">
+                <span className="ml-auto text-gray-500 dark:text-gray-400 font-mono text-[9px]">
                   {event.id.slice(0, 12)}…
                 </span>
               </div>
@@ -146,14 +146,14 @@ export const EventPreviewPanel = ({
                 <span className="text-gray-400 font-bold uppercase tracking-widest">
                   Created
                 </span>
-                <span className="ml-auto text-gray-500">
+                <span className="ml-auto text-gray-500 dark:text-gray-400">
                   {format(new Date(event.createdAt), "MMM d, yyyy")}
                 </span>
               </div>
               <div className="p-5">
                 <CemsButton
                   cemsVariant="brand"
-                  className="w-full rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-11 gap-3 group active:scale-95 transition-all"
+                  className="w-full rounded-lg font-black text-[10px] uppercase tracking-[0.2em] h-11 gap-3 group active:scale-95 transition-all"
                   onClick={() => router.push(`/dashboard/events/${event.id}`)}
                 >
                   View Full Details

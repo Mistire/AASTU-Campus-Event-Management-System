@@ -24,10 +24,10 @@ export default function PastEventsPage() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-12 w-64 rounded-xl" />
+        <Skeleton className="h-12 w-64 rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-48 rounded-3xl" />
+            <Skeleton key={i} className="h-48 rounded-lg" />
           ))}
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function PastEventsPage() {
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-4xl font-brand font-black text-gray-900 tracking-tighter mb-4 uppercase"
+          className="text-4xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-4 uppercase"
         >
           No <span className="text-gray-400">Past Events</span>
         </motion.h1>
@@ -60,7 +60,7 @@ export default function PastEventsPage() {
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-gray-500 text-lg max-w-md mx-auto mb-10"
+          className="text-gray-500 dark:text-gray-400 text-lg max-w-md mx-auto mb-10"
         >
           You haven&apos;t attended any events yet. Once you complete an event, it will appear here!
         </motion.p>
@@ -68,7 +68,7 @@ export default function PastEventsPage() {
         <Link href="/discovery">
           <Button
             size="lg"
-            className="rounded-2xl h-14 px-8 bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3"
+            className="rounded-lg h-14 px-8 bg-brand hover:bg-brand-hover text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-brand/20 flex items-center gap-3"
           >
             <Search size={18} />
             Explore Feed
@@ -80,9 +80,9 @@ export default function PastEventsPage() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 px-6">
       <div className="space-y-2">
-        <h1 className="text-5xl font-black tracking-tight text-gray-900 uppercase leading-none">
+        <h1 className="text-5xl font-black tracking-tight text-gray-900 dark:text-white uppercase leading-none">
           Event <span className="text-gray-400">History</span>
         </h1>
         <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">

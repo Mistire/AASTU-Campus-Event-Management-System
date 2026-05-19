@@ -35,23 +35,24 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex flex-col">
-        <Toaster 
+        <Toaster
           position="top-right"
           richColors
+          theme="system"
           toastOptions={{
             style: {
-              background: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid var(--border)',
-              borderRadius: '1rem',
-              fontFamily: 'var(--font-brand)',
-              color: 'var(--primary)',
+              background: "var(--background)",
+              backdropFilter: "blur(8px)",
+              border: "1px solid var(--border)",
+              borderRadius: "1rem",
+              fontFamily: "var(--font-brand)",
+              color: "var(--color-brand)",
             },
-            className: 'font-brand font-bold',
+            className: "font-brand font-bold",
           }}
         />
         <Providers>
-          <SmoothScroll>{children}</SmoothScroll>
+          {children}
           <SupportFAB />
         </Providers>
       </body>

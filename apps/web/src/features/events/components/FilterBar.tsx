@@ -2,10 +2,9 @@
 
 import { useCategories } from "../api/useCategories";
 import { cn } from "@/lib/utils";
-import { Search, SlidersHorizontal, ChevronRight, X } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Search, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 
 interface FilterBarProps {
   onFilterChange: (filters: {
@@ -13,12 +12,28 @@ interface FilterBarProps {
     categoryId: string | null;
   }) => void;
   isLoading?: boolean;
+  initialSearch?: string;
+  initialCategoryId?: string | null;
 }
 
-export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
+export function FilterBar({ 
+  onFilterChange, 
+  isLoading,
+  initialSearch = "",
+  initialCategoryId = null
+}: FilterBarProps) {
   const { data: categories } = useCategories();
-  const [search, setSearch] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [search, setSearch] = useState(initialSearch);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCategoryId);
+
+  // Sync with external state changes (e.g. reset)
+  useEffect(() => {
+    setSearch(initialSearch);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    setSelectedCategoryId(initialCategoryId);
+  }, [initialCategoryId]);
 
   // Debounce search
   useEffect(() => {
@@ -32,13 +47,8 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
     setSelectedCategoryId(id);
   };
 
-  const clearFilters = () => {
-    setSearch("");
-    setSelectedCategoryId(null);
-  };
-
   return (
-    <div className="sticky top-16 z-[45] bg-gray-50/80 backdrop-blur-md border-b border-gray-100/50 py-4 mb-8">
+    <div className="sticky top-16 z-[45] bg-gray-50/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-100/50 dark:border-gray-800/50 py-4 mb-8">
       <div className="space-y-4">
         {/* Search & Main Filters */}
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -49,7 +59,7 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                 placeholder="Find events, workshops, hackathons..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-12 py-3.5 rounded-2xl border border-gray-100 bg-white text-sm font-semibold text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all shadow-sm"
+                className="w-full pl-12 pr-12 py-3.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 text-sm font-semibold text-gray-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all shadow-sm"
               />
               <AnimatePresence>
                 {search && (
@@ -58,18 +68,13 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     onClick={() => setSearch("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
                   >
                     <X size={14} />
                   </motion.button>
                 )}
               </AnimatePresence>
            </div>
-           
-           <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white border border-gray-100 text-sm font-black uppercase tracking-widest text-gray-400 hover:border-brand hover:text-brand transition-all shadow-sm shrink-0">
-             <SlidersHorizontal size={16} />
-             <span>Refine</span>
-           </button>
         </div>
 
         {/* Category Horizontal Rail */}
@@ -78,10 +83,10 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
              <button
                 onClick={() => selectCategory(null)}
                 className={cn(
-                  "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
+                  "px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
                   selectedCategoryId === null
                     ? "bg-brand border-brand text-white shadow-lg shadow-brand/20"
-                    : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                    : "bg-white dark:bg-gray-950 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500 hover:border-gray-200 dark:hover:border-gray-700"
                 )}
              >
                All Events
@@ -92,17 +97,16 @@ export function FilterBar({ onFilterChange, isLoading }: FilterBarProps) {
                   key={cat.id}
                   onClick={() => selectCategory(cat.id)}
                   className={cn(
-                    "px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
+                    "px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border-2",
                     selectedCategoryId === cat.id
                       ? "bg-brand border-brand text-white shadow-lg shadow-brand/20"
-                      : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
+                      : "bg-white dark:bg-gray-950 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500 hover:border-gray-200 dark:hover:border-gray-700"
                   )}
                >
                  {cat.name}
                </button>
              ))}
            </div>
-
         </div>
       </div>
     </div>

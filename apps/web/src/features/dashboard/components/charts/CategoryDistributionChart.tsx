@@ -16,7 +16,7 @@ export function CategoryDistributionChart() {
   const { data, isLoading } = useCategoryAnalytics("30d");
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[220px] rounded-xl" />;
+    return <Skeleton className="w-full h-[220px] rounded-lg" />;
   }
 
   const chartData = (data || [])

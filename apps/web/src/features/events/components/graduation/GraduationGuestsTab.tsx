@@ -13,15 +13,15 @@ import { CemsButton } from "@/components/cems/CemsButton";
 // ─── Tier Config ──────────────────────────────────────────────────────────────
 
 const TIER = {
-  DISTINGUISHED: { label: "Distinguished", icon: Star, bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", dot: "bg-amber-400" },
-  HONORS:        { label: "Honors",        icon: Medal, bg: "bg-violet-50", text: "text-violet-700", border: "border-violet-200", dot: "bg-violet-400" },
-  GRADUATE:      { label: "Graduate",      icon: GraduationCap, bg: "bg-sky-50",    text: "text-sky-700",    border: "border-sky-200",    dot: "bg-sky-400"    },
+  DISTINGUISHED: { label: "Distinguished", icon: Star, bg: "bg-amber-50 dark:bg-amber-950/20", text: "text-amber-700 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800", dot: "bg-amber-400" },
+  HONORS:        { label: "Honors",        icon: Medal, bg: "bg-violet-50 dark:bg-violet-950/20", text: "text-violet-700 dark:text-violet-400", border: "border-violet-200 dark:border-violet-800", dot: "bg-violet-400" },
+  GRADUATE:      { label: "Graduate",      icon: GraduationCap, bg: "bg-sky-50 dark:bg-sky-950/20",    text: "text-sky-700 dark:text-sky-400",    border: "border-sky-200 dark:border-sky-800",    dot: "bg-sky-400"    },
 };
 
 // ─── API Calls ────────────────────────────────────────────────────────────────
 
 async function fetchStudents(eventId: string) {
-  const res = await apiFetch(`/graduation/${eventId}/students`);
+  const res = await apiFetch(`/api/graduation/${eventId}/students`);
   const data = await res.json();
   return data.data ?? data;
 }
@@ -36,7 +36,7 @@ function AddStudentForm({ eventId, onSuccess }: { eventId: string; onSuccess: ()
     if (!form.email || !form.fullName || !form.gpa) return;
     setLoading(true);
     try {
-      const res = await apiFetch(`/graduation/${eventId}/add-student`, {
+      const res = await apiFetch(`/api/graduation/${eventId}/add-student`, {
         method: "POST",
         body: JSON.stringify({
           email: form.email,
@@ -59,18 +59,18 @@ function AddStudentForm({ eventId, onSuccess }: { eventId: string; onSuccess: ()
   };
 
   return (
-    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
-      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Add Student Manually</p>
+    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 space-y-3">
+      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Add Student Manually</p>
       <div className="grid grid-cols-3 gap-2">
         <input placeholder="Full Name" value={form.fullName} onChange={(e) => setForm(s => ({ ...s, fullName: e.target.value }))}
-          className="px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-900 placeholder-gray-300 outline-none focus:border-brand/40" />
+          className="px-3 py-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 outline-none focus:border-brand/40" />
         <input placeholder="Email" value={form.email} onChange={(e) => setForm(s => ({ ...s, email: e.target.value }))}
-          className="px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-900 placeholder-gray-300 outline-none focus:border-brand/40" />
+          className="px-3 py-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 outline-none focus:border-brand/40" />
         <input placeholder="GPA" type="number" step="0.01" min="0" max="5" value={form.gpa} onChange={(e) => setForm(s => ({ ...s, gpa: e.target.value }))}
-          className="px-3 py-2 bg-white rounded-lg border border-gray-200 text-xs text-gray-900 placeholder-gray-300 outline-none focus:border-brand/40" />
+          className="px-3 py-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 outline-none focus:border-brand/40" />
       </div>
       <button onClick={handleSubmit} disabled={loading}
-        className="w-full py-2.5 rounded-xl bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+        className="w-full py-2.5 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
         {loading ? <><Loader2 size={12} className="animate-spin" /> Adding...</> : <><Plus size={12} /> Add & Send Email</>}
       </button>
     </div>
@@ -92,7 +92,7 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await apiFetch(`/graduation/${eventId}/import-csv`, {
+      const res = await apiFetch(`/api/graduation/${eventId}/import-csv`, {
         method: "POST",
         body: formData,
       });
@@ -111,15 +111,15 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
   };
 
   return (
-    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
-      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Import from CSV</p>
-      <p className="text-[10px] text-gray-400">Required columns: <code className="bg-gray-200 px-1 rounded">email, fullName, gpa</code></p>
+    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 space-y-3">
+      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Import from CSV</p>
+      <p className="text-[10px] text-gray-400 dark:text-gray-500">Required columns: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">email, fullName, gpa</code></p>
       <div
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) setFile(f); setResult(null); }}
         onClick={() => fileRef.current?.click()}
-        className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isDragging ? "border-brand bg-brand/5" : file ? "border-emerald-400 bg-emerald-50" : "border-gray-200 hover:border-brand/30 hover:bg-white"}`}
+        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${isDragging ? "border-brand bg-brand/5 dark:bg-brand/10" : file ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10" : "border-gray-200 dark:border-gray-800 hover:border-brand/30 hover:bg-white dark:hover:bg-gray-800"}`}
       >
         {file ? (
           <div className="flex items-center justify-center gap-2">
@@ -140,16 +140,16 @@ function CsvUpload({ eventId, onSuccess }: { eventId: string; onSuccess: () => v
       </div>
 
       {result && (
-        <div className="p-3 bg-white rounded-xl border border-gray-100 flex gap-4 text-xs">
-          <span className="font-black text-emerald-600">✓ {result.imported} imported</span>
-          {result.skipped > 0 && <span className="font-black text-gray-400">↷ {result.skipped} skipped</span>}
+        <div className="p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 flex gap-4 text-xs">
+          <span className="font-black text-emerald-600 dark:text-emerald-400">✓ {result.imported} imported</span>
+          {result.skipped > 0 && <span className="font-black text-gray-400 dark:text-gray-500">↷ {result.skipped} skipped</span>}
           {result.errors.length > 0 && <span className="font-black text-red-500">✗ {result.errors.length} errors</span>}
         </div>
       )}
 
       {file && (
         <button onClick={handleUpload} disabled={uploading}
-          className="w-full py-2.5 rounded-xl bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+          className="w-full py-2.5 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
           {uploading ? <><Loader2 size={12} className="animate-spin" /> Importing...</> : <><Upload size={12} /> Import & Send Emails</>}
         </button>
       )}
@@ -167,7 +167,7 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
   const handleResend = async (guestPassId: string) => {
     setResending(guestPassId);
     try {
-      const res = await apiFetch(`/graduation/guest-pass/${guestPassId}/resend`, {
+      const res = await apiFetch(`/api/graduation/guest-pass/${guestPassId}/resend`, {
         method: "POST"
       });
       const data = await res.json();
@@ -192,34 +192,34 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
   const totalPasses = student.guestPasses?.length ?? 0;
 
   return (
-    <div className={`rounded-xl border ${tier.border} overflow-hidden`}>
+    <div className={`rounded-lg border ${tier.border} overflow-hidden`}>
       {/* Main Row */}
       <div className={`flex items-center gap-4 p-4 ${tier.bg} cursor-pointer`} onClick={() => setExpanded(!expanded)}>
         {/* Tier badge */}
-        <div className={`shrink-0 w-8 h-8 rounded-xl flex items-center justify-center ${tier.text} ${tier.bg} border ${tier.border}`}>
+        <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${tier.text} ${tier.bg} border ${tier.border}`}>
           <tier.icon size={16} />
         </div>
 
         {/* Name + email */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-black text-gray-900 truncate">{student.fullName}</p>
-          <p className="text-[10px] font-bold text-gray-400 truncate">{student.email}</p>
+          <p className="text-sm font-black text-gray-900 dark:text-white truncate">{student.fullName}</p>
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 truncate">{student.email}</p>
         </div>
 
         {/* GPA */}
         <div className="text-center shrink-0">
-          <p className="text-xs font-black text-gray-900">{student.gpa.toFixed(2)}</p>
+          <p className="text-xs font-black text-gray-900 dark:text-white">{student.gpa.toFixed(2)}</p>
           <p className={`text-[9px] font-black uppercase ${tier.text}`}>{tier.label}</p>
         </div>
 
         {/* Claim status */}
         <div className="shrink-0 text-center">
           {student.claimed ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[9px] font-black">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 rounded-lg text-[9px] font-black">
               <Check size={9} /> Claimed
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full text-[9px] font-black">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-lg text-[9px] font-black">
               Pending
             </span>
           )}
@@ -227,8 +227,8 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
 
         {/* QR delivery */}
         <div className="shrink-0 text-center">
-          <p className="text-xs font-black text-gray-900">{deliveredCount}/{student.guestSlots}</p>
-          <p className="text-[9px] font-bold text-gray-400">QR Delivered</p>
+          <p className="text-xs font-black text-gray-900 dark:text-white">{deliveredCount}/{student.guestSlots}</p>
+          <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500">QR Delivered</p>
         </div>
 
         {/* Expand toggle */}
@@ -239,27 +239,27 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
 
       {/* Expanded guest passes */}
       {expanded && student.guestPasses?.length > 0 && (
-        <div className="border-t border-gray-100 divide-y divide-gray-50">
+        <div className="border-t border-gray-100 dark:border-gray-800 divide-y divide-gray-50 dark:divide-gray-800">
           {student.guestPasses.map((gp: any) => (
-            <div key={gp.id} className="flex items-center gap-3 px-4 py-3 bg-white">
-              <div className="w-6 h-6 rounded-lg bg-gray-100 flex items-center justify-center">
+            <div key={gp.id} className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 {gp.deliveryMethod === "TELEGRAM" ? <Send size={10} className="text-sky-500" /> : <Mail size={10} className="text-violet-500" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-gray-700">{gp.parentLabel}</p>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{gp.deliveryMethod}</p>
+                <p className="text-xs font-black text-gray-700 dark:text-gray-300">{gp.parentLabel}</p>
+                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{gp.deliveryMethod}</p>
               </div>
               {gp.delivered ? (
-                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg flex items-center gap-1">
                   <Check size={9} /> Delivered
                 </span>
               ) : (
-                <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Pending</span>
+                <span className="text-[9px] font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-lg">Pending</span>
               )}
               <button
                 onClick={() => handleResend(gp.id)}
                 disabled={resending === gp.id}
-                className="shrink-0 w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors disabled:opacity-50"
+                className="shrink-0 w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors disabled:opacity-50"
                 title={gp.deliveryMethod === "TELEGRAM" ? "Copy deep link" : "Resend email"}
               >
                 {resending === gp.id ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
@@ -270,8 +270,8 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
       )}
 
       {expanded && (!student.guestPasses || student.guestPasses.length === 0) && (
-        <div className="px-4 py-3 bg-white border-t border-gray-50 text-center">
-          <p className="text-[10px] text-gray-400 font-bold">Student hasn&apos;t claimed their passes yet.</p>
+        <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-50 dark:border-gray-800 text-center">
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">Student hasn&apos;t claimed their passes yet.</p>
         </div>
       )}
     </div>
@@ -299,14 +299,14 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
       {/* Stats bar */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: "Total Students", value: students.length, color: "text-gray-900" },
-          { label: "Invitations Sent", value: students.length, color: "text-sky-600" },
-          { label: "Passes Claimed", value: `${claimed}/${students.length}`, color: "text-violet-600" },
-          { label: "QR Delivered", value: `${deliveredPasses}/${totalPasses}`, color: "text-emerald-600" },
+          { label: "Total Students", value: students.length, color: "text-gray-900 dark:text-white" },
+          { label: "Invitations Sent", value: students.length, color: "text-sky-600 dark:text-sky-400" },
+          { label: "Passes Claimed", value: `${claimed}/${students.length}`, color: "text-violet-600 dark:text-violet-400" },
+          { label: "QR Delivered", value: `${deliveredPasses}/${totalPasses}`, color: "text-emerald-600 dark:text-emerald-400" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-center">
+          <div key={label} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 text-center">
             <p className={`text-xl font-black ${color}`}>{value}</p>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{label}</p>
+            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">{label}</p>
           </div>
         ))}
       </div>
@@ -314,15 +314,15 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
       {/* Action buttons */}
       <div className="flex gap-2">
         <CemsButton onClick={() => { setShowCsv(!showCsv); setShowAdd(false); }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${showCsv ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${showCsv ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
           <Upload size={12} /> CSV Import
         </CemsButton>
         <CemsButton onClick={() => { setShowAdd(!showAdd); setShowCsv(false); }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${showAdd ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${showAdd ? "bg-brand text-white shadow-lg shadow-brand/20" : "bg-brand/5 text-brand hover:bg-brand/10"}`}>
           <Plus size={12} /> Add Student
         </CemsButton>
         <CemsButton onClick={() => refetch()}
-          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+          className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
           <RefreshCw size={12} /> Refresh
         </CemsButton>
       </div>
@@ -336,10 +336,10 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
           <Loader2 className="animate-spin text-brand" size={32} />
         </div>
       ) : students.length === 0 ? (
-        <div className="py-16 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-3 text-center">
-          <GraduationCap className="text-gray-200" size={40} />
-          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No students imported yet</p>
-          <p className="text-[10px] text-gray-300">Use CSV Import or Add Student to get started</p>
+        <div className="py-16 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg flex flex-col items-center justify-center gap-3 text-center">
+          <GraduationCap className="text-gray-200 dark:text-gray-800" size={40} />
+          <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">No students imported yet</p>
+          <p className="text-[10px] text-gray-300 dark:text-gray-600">Use CSV Import or Add Student to get started</p>
         </div>
       ) : (
         <div className="space-y-3">

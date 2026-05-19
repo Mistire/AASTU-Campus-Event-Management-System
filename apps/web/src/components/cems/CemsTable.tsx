@@ -203,7 +203,7 @@ export function CemsTable<TData>({
     return (
       <div className="flex flex-col items-center justify-center p-16 space-y-3">
         <Loader2 className="w-8 h-8 text-brand animate-spin" />
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
           Loading...
         </p>
       </div>
@@ -220,15 +220,15 @@ export function CemsTable<TData>({
     <div className={cn("w-full flex flex-col", className)}>
       {/* Toolbar */}
       {!hideToolbar && (enableGlobalFilter || enableColumnVisibility) && (
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50 dark:border-gray-800">
           {enableGlobalFilter && (
             <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               <input
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 placeholder="Search..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand/30 transition-all"
+                className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-200 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand/30 transition-all"
               />
             </div>
           )}
@@ -249,15 +249,15 @@ export function CemsTable<TData>({
       {/* Table */}
       <div className="overflow-x-auto">
         <Table className="table-fixed w-full">
-          <TableHeader className="bg-gray-50/50 border-b border-gray-100">
+          <TableHeader className="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent border-none">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={cn(
-                      "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 px-2 first:pl-5 first:pr-1 last:pr-5",
-                      header.column.getCanSort() && "cursor-pointer select-none hover:text-gray-800 transition-colors"
+                      "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-2 first:pl-5 first:pr-1 last:pr-5",
+                      header.column.getCanSort() && "cursor-pointer select-none hover:text-gray-800 dark:hover:text-white transition-colors"
                     )}
                     style={header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined}
                     onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
@@ -281,10 +281,10 @@ export function CemsTable<TData>({
                 <TableRow
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
-                  className={cn("border-b border-gray-100 hover:bg-brand/6 transition-colors duration-150", onRowClick && "cursor-pointer")}
+                  className={cn("border-b border-gray-100 dark:border-gray-800 hover:bg-brand/6 transition-colors duration-150", onRowClick && "cursor-pointer")}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-2 py-3 text-sm text-gray-700 whitespace-nowrap first:pl-5 first:pr-1 last:pr-5">
+                    <TableCell key={cell.id} className="px-2 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap first:pl-5 first:pr-1 last:pr-5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -293,7 +293,7 @@ export function CemsTable<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-40 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2 text-gray-400">
+                  <div className="flex flex-col items-center justify-center space-y-2 text-gray-400 dark:text-gray-600">
                     <Search size={32} className="opacity-20" />
                     <p className="text-xs font-semibold">{emptyMessage}</p>
                   </div>
@@ -305,10 +305,10 @@ export function CemsTable<TData>({
       </div>
 
       {/* Pagination Footer */}
-      <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 gap-3 bg-gray-50/40">
+      <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 dark:border-gray-800 gap-3 bg-gray-50/40 dark:bg-gray-800/30">
         <div className="flex items-center gap-4 text-[10px]">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-400 uppercase tracking-widest">Rows</span>
+            <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Rows</span>
             <select
               value={currentPageSize}
               onChange={(e) => {
@@ -316,23 +316,23 @@ export function CemsTable<TData>({
                 table.setPageSize(newSize);
                 onPageSizeChange?.(newSize);
               }}
-              className="bg-white border border-gray-200 rounded-md text-[10px] font-semibold px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-brand/20"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-[10px] font-semibold px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-brand/20 dark:text-gray-200"
             >
               {[5, 10, 20, 30, 50].map((size) => (
                 <option key={size} value={size}>{size}</option>
               ))}
             </select>
           </div>
-          <div className="font-bold text-gray-400 uppercase tracking-widest hidden sm:block">
+          <div className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest hidden sm:block">
             {totalItems !== undefined ? (
               <>
-                <span className="text-gray-700">{Math.min(currentPageIndex * currentPageSize + 1, totalItems)}</span>
+                <span className="text-gray-700 dark:text-gray-300">{Math.min(currentPageIndex * currentPageSize + 1, totalItems)}</span>
                 –
-                <span className="text-gray-700">{Math.min((currentPageIndex + 1) * currentPageSize, totalItems)}</span>
-                {" "}of <span className="text-gray-700">{totalItems}</span>
+                <span className="text-gray-700 dark:text-gray-300">{Math.min((currentPageIndex + 1) * currentPageSize, totalItems)}</span>
+                {" "}of <span className="text-gray-700 dark:text-gray-300">{totalItems}</span>
               </>
             ) : (
-              <>Page <span className="text-gray-700">{currentPageIndex + 1}</span> of <span className="text-gray-700">{table.getPageCount()}</span></>
+              <>Page <span className="text-gray-700 dark:text-gray-300">{currentPageIndex + 1}</span> of <span className="text-gray-700 dark:text-gray-300">{table.getPageCount()}</span></>
             )}
           </div>
         </div>
@@ -345,9 +345,9 @@ export function CemsTable<TData>({
             <ChevronLeft size={14} />
           </PaginationButton>
           <div className="flex items-center gap-1 px-2 min-w-[60px] justify-center">
-            <span className="text-[10px] font-black text-brand bg-brand/5 px-1.5 py-0.5 rounded">{currentPageIndex + 1}</span>
-            <span className="text-[10px] font-bold text-gray-300">/</span>
-            <span className="text-[10px] font-bold text-gray-400">{table.getPageCount()}</span>
+            <span className="text-[10px] font-black text-brand bg-brand/5 dark:bg-brand/10 px-1.5 py-0.5 rounded">{currentPageIndex + 1}</span>
+            <span className="text-[10px] font-bold text-gray-300 dark:text-gray-700">/</span>
+            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">{table.getPageCount()}</span>
           </div>
           <PaginationButton onClick={() => { table.nextPage(); onPageChange?.(currentPageIndex + 1); }} disabled={!table.getCanNextPage()}>
             <ChevronRight size={14} />
@@ -380,22 +380,22 @@ function ColumnVisibilityPopover({ columns }: { columns: any[] }) {
         onClick={() => setOpen(!open)}
         className={cn(
           "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border text-[10px] font-bold uppercase tracking-wider transition-all",
-          open ? "border-brand/30 text-brand bg-brand/5" : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-600"
+          open ? "border-brand/30 text-brand bg-brand/5" : "border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-600 dark:hover:text-gray-300"
         )}
       >
         <Columns3 size={14} />
         Columns
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-xl bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95 duration-150">
-          <p className="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-1">Toggle Columns</p>
+        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-xl shadow-gray-200/50 dark:shadow-none ring-1 ring-gray-100 dark:ring-gray-800 animate-in fade-in-0 zoom-in-95 duration-150">
+          <p className="px-3 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Toggle Columns</p>
           {columns.map((column) => (
             <button
               key={column.id}
               onClick={() => column.toggleVisibility(!column.getIsVisible())}
-              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-brand/5 dark:hover:bg-brand/10 hover:text-brand transition-colors"
             >
-              <div className={cn("w-4 h-4 rounded border flex items-center justify-center transition-colors", column.getIsVisible() ? "bg-brand border-brand text-white" : "border-gray-300 bg-white")}>
+              <div className={cn("w-4 h-4 rounded border flex items-center justify-center transition-colors", column.getIsVisible() ? "bg-brand border-brand text-white" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800")}>
                 {column.getIsVisible() && <Check size={12} />}
               </div>
               <span className="capitalize">{typeof column.columnDef.header === "string" ? column.columnDef.header : column.id.replace(/_/g, " ")}</span>
@@ -411,7 +411,7 @@ function PaginationButton({ children, onClick, disabled }: { children: React.Rea
   return (
     <Button
       variant="outline"
-      className="w-7 h-7 p-0 rounded-md border-gray-200 transition-all hover:bg-brand hover:text-white hover:border-brand disabled:opacity-20"
+      className="w-7 h-7 p-0 rounded-md border-gray-200 dark:border-gray-800 transition-all hover:bg-brand hover:text-white hover:border-brand dark:bg-gray-900 disabled:opacity-20"
       onClick={onClick}
       disabled={disabled}
     >

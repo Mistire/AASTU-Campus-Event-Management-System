@@ -157,4 +157,10 @@ export class AnalyticsController {
   getOrganizerArchive(@GetUser() user: AuthUser) {
     return this.analyticsService.getOrganizerArchive(user.id);
   }
+
+  @Get('top-organizer')
+  @Roles('Admin', 'Organizer')
+  getTopOrganizer() {
+    return this.analyticsService.getTopOrganizer();
+  }
 }

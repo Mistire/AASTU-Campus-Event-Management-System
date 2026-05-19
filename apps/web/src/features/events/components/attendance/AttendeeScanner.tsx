@@ -29,6 +29,11 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
   useEffect(() => {
     // Load script dynamically from CDN to avoid build-time dependency issues in Docker
+    if ((window as any).Html5Qrcode) {
+      setIsLibraryLoaded(true);
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://unpkg.com/html5-qrcode";
     script.async = true;
@@ -36,68 +41,94 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch((err: any) => console.error("Failed to clear scanner", err));
-      }
+      // Keep the script cached for instant reuse on subsequent mounts
     };
   }, []);
+
+  const stateRef = useRef({ isPending, lastScanStatus: lastScan?.status });
+  useEffect(() => {
+    stateRef.current = { isPending, lastScanStatus: lastScan?.status };
+  }, [isPending, lastScan?.status]);
+
+  const handleScan = (decodedText: string) => {
+    const { isPending: pending, lastScanStatus } = stateRef.current;
+    if (pending || lastScanStatus === "loading") return;
+
+    setLastScan({ status: "loading", message: "Verifying ticket..." });
+    
+    checkIn(
+      { eventId, ticketToken: decodedText },
+      {
+        onSuccess: (data) => {
+          setLastScan({ 
+            status: "success", 
+            message: data.message || "Attendee successfully checked in!" 
+          });
+          toast.success("Check-in successful");
+          setTimeout(() => setLastScan(null), 3000);
+        },
+        onError: (error: any) => {
+          setLastScan({ 
+            status: "error", 
+            message: error.message || "Invalid or already used ticket" 
+          });
+          toast.error(error.message || "Failed to check in");
+          setTimeout(() => setLastScan(null), 5000);
+        }
+      }
+    );
+  };
 
   useEffect(() => {
     if (!isLibraryLoaded) return;
 
-    // Initialize scanner using the global object from the script
-    const Html5QrcodeScanner = (window as any).Html5QrcodeScanner;
-    if (!Html5QrcodeScanner) return;
+    const Html5Qrcode = (window as any).Html5Qrcode;
+    if (!Html5Qrcode) return;
+    
+    if (scannerRef.current) return; // Prevent double init
 
-    const config = {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-      aspectRatio: 1.0,
-      rememberLastUsedCamera: true,
-      supportedScanTypes: [0], // Camera only
-    };
+    const html5QrCode = new Html5Qrcode("reader");
+    scannerRef.current = html5QrCode;
 
-    const scanner = new Html5QrcodeScanner("reader", config, false);
-    scannerRef.current = scanner;
+    let isCameraActive = false;
 
-    const onScanSuccess = (decodedText: string) => {
-      if (isPending || lastScan?.status === "loading") return;
-
-      setLastScan({ status: "loading", message: "Verifying ticket..." });
-      
-      checkIn(
-        { eventId, ticketToken: decodedText },
-        {
-          onSuccess: (data) => {
-            setLastScan({ 
-              status: "success", 
-              message: data.message || "Attendee successfully checked in!" 
-            });
-            toast.success("Check-in successful");
-            // Clear status after 3 seconds to allow next scan
-            setTimeout(() => setLastScan(null), 3000);
-          },
-          onError: (error: any) => {
-            setLastScan({ 
-              status: "error", 
-              message: error.message || "Invalid or already used ticket" 
-            });
-            toast.error(error.message || "Failed to check in");
-            setTimeout(() => setLastScan(null), 5000);
-          }
-        }
-      );
-    };
-
-    scanner.render(onScanSuccess, (err: any) => {
-      // Ignore scan errors as they happen constantly when no QR is present
+    html5QrCode.start(
+      { facingMode: "environment" }, // Prefer back camera, falls back to webcam on PC
+      {
+        fps: 15, // Slightly higher framerate for better capture
+        // Removed qrbox and aspectRatio to scan the entire video feed natively
+      },
+      handleScan,
+      (err: any) => {
+        // Ignore scan frame errors
+      }
+    ).then(() => {
+      isCameraActive = true;
+    }).catch((err: any) => {
+      console.error("Camera failed to start:", err);
+      toast.error("Failed to access camera. Please check permissions.");
     });
 
     return () => {
-      scanner.clear().catch((error: any) => console.error("Failed to clear scanner", error));
+      const scannerInstance = scannerRef.current;
+      if (scannerInstance) {
+        // Nullify the global ref immediately to prevent any concurrent triggers
+        scannerRef.current = null;
+        
+        if (scannerInstance.isScanning) {
+          // Stop the camera feed safely on unmount before clearing
+          scannerInstance.stop().then(() => {
+            scannerInstance.clear().catch((err: any) => {});
+          }).catch((err: any) => {
+            console.error("Failed to stop scanner cleanly:", err);
+            try { scannerInstance.clear().catch((err: any) => {}); } catch (e) {}
+          });
+        } else {
+          try { scannerInstance.clear().catch((err: any) => {}); } catch (e) {}
+        }
+      }
     };
-  }, [eventId, checkIn, isPending, isLibraryLoaded, lastScan?.status]);
+  }, [isLibraryLoaded]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -115,34 +146,34 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
         initial={{ scale: 0.9, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.9, y: 20, opacity: 0 }}
-        className="relative w-full max-w-lg bg-white rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Header */}
         <div className="p-8 pb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center">
               <Camera className="text-brand" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-black text-gray-900 tracking-tight leading-none">
+              <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
                 QR Scanner
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mt-1">
                 AASTU Check-in System
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-colors"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Scanner Window */}
         <div className="flex-1 p-6 flex flex-col items-center">
-          <div className="relative w-full aspect-square rounded-[32px] overflow-hidden bg-gray-900 shadow-inner group">
+          <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-900 shadow-inner group">
              <div id="reader" className="w-full h-full border-none" />
              
              {!isLibraryLoaded && (
@@ -154,7 +185,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
              {/* Scan Overlay UI */}
              <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20">
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-3xl" />
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-lg" />
                <motion.div 
                  animate={{ scaleX: [1, 1.1, 1] }}
                  transition={{ repeat: Infinity, duration: 2 }}
@@ -194,22 +225,22 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
           <div className="mt-8 grid grid-cols-3 gap-4 w-full">
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <QrCode size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Auto Scan</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Auto Scan</span>
             </div>
-            <div className="flex flex-col items-center gap-2 border-x border-gray-100">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+            <div className="flex flex-col items-center gap-2 border-x border-gray-100 dark:border-gray-800">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <ShieldCheck size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Secure JWT</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Secure JWT</span>
             </div>
             <div className="flex flex-col items-center gap-2">
-               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400">
+               <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
                  <History size={20} />
                </div>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Live Logs</span>
+               <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">Live Logs</span>
             </div>
           </div>
         </div>

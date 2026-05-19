@@ -23,11 +23,11 @@ interface CemsCardProps extends React.ComponentProps<"div"> {
 
 const variantStyles: Record<CemsCardVariant, string> = {
   default:
-    "bg-white rounded-xl shadow-sm shadow-gray-200/60 ring-1 ring-gray-100",
+    "bg-white dark:bg-gray-900 rounded-lg shadow-sm shadow-gray-200/60 dark:shadow-none ring-1 ring-gray-100 dark:ring-gray-800",
   glass:
-    "bg-white/60 backdrop-blur-xl rounded-xl shadow-sm ring-1 ring-white/40",
-  flat: "bg-gray-50/60 rounded-xl ring-0 shadow-none",
-  outlined: "bg-white rounded-xl ring-1 ring-gray-200 shadow-none",
+    "bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-lg shadow-sm ring-1 ring-white/40 dark:ring-gray-800",
+  flat: "bg-gray-50/60 dark:bg-gray-800/40 rounded-lg ring-0 shadow-none",
+  outlined: "bg-white dark:bg-transparent rounded-lg ring-1 ring-gray-200 dark:ring-gray-800 shadow-none",
 };
 
 /**
@@ -51,7 +51,7 @@ export function CemsCard({
       className={cn(
         variantStyles[variant],
         hoverable &&
-          "transition-all duration-300 hover:shadow-md hover:shadow-gray-200/80 hover:-translate-y-0.5",
+          "transition-all duration-300 hover:shadow-md hover:shadow-gray-200/80 dark:hover:shadow-brand/5 hover:-translate-y-0.5",
         "overflow-hidden",
         className,
       )}
@@ -88,25 +88,25 @@ export function CemsCardHeader({
     <CardHeader
       className={cn(
         "px-5 py-4",
-        bordered && "border-b border-gray-100",
+        bordered && "border-b border-gray-100 dark:border-gray-800",
         className,
       )}
       {...props}
     >
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="w-9 h-9 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
             {icon}
           </div>
         )}
         <div className="flex-1 min-w-0">
           {title && (
-            <CardTitle className="text-sm font-bold text-gray-900 tracking-tight leading-tight">
+            <CardTitle className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
               {title}
             </CardTitle>
           )}
           {description && (
-            <CardDescription className="text-xs text-gray-400 mt-0.5">
+            <CardDescription className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               {description}
             </CardDescription>
           )}
@@ -134,7 +134,7 @@ export function CemsCardFooter({
   return (
     <CardFooter
       className={cn(
-        "px-5 py-3 border-t border-gray-50 bg-gray-50/30",
+        "px-5 py-3 border-t border-gray-50 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/30",
         className,
       )}
       {...props}

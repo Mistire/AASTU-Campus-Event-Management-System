@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guard';
+import { Public } from '../auth/decorator';
 import { GraduationService } from './graduation.service';
 import { AddStudentDto, ClaimSubmissionDto } from './dto/graduation.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -58,12 +59,14 @@ export class GraduationController {
   }
 
   // ── PUBLIC: Get Claim Status ──────────────────────────────────────────────
+  @Public()
   @Get('claim/:token')
   getClaimStatus(@Param('token') token: string) {
     return this.graduationService.getClaimStatus(token);
   }
 
   // ── PUBLIC: Submit Claim ──────────────────────────────────────────────────
+  @Public()
   @Post('claim/:token')
   submitClaim(@Param('token') token: string, @Body() dto: ClaimSubmissionDto) {
     return this.graduationService.submitClaim(token, dto);

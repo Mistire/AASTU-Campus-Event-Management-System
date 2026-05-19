@@ -27,11 +27,11 @@ export const cemsColors = {
 
   /** Semantic status colors */
   status: {
-    success: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100", dot: "bg-emerald-500" },
-    warning: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100", dot: "bg-amber-500" },
-    danger:  { bg: "bg-red-50", text: "text-red-600", border: "border-red-100", dot: "bg-red-500" },
-    info:    { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100", dot: "bg-blue-500" },
-    neutral: { bg: "bg-gray-50", text: "text-gray-500", border: "border-gray-100", dot: "bg-gray-400" },
+    success: { bg: "bg-emerald-50 dark:bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-100 dark:border-emerald-500/20", dot: "bg-emerald-500" },
+    warning: { bg: "bg-amber-50 dark:bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", border: "border-amber-100 dark:border-amber-500/20", dot: "bg-amber-500" },
+    danger:  { bg: "bg-red-50 dark:bg-red-500/10", text: "text-red-600 dark:text-red-400", border: "border-red-100 dark:border-red-500/20", dot: "bg-red-500" },
+    info:    { bg: "bg-blue-50 dark:bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-blue-100 dark:border-blue-500/20", dot: "bg-blue-500" },
+    neutral: { bg: "bg-gray-50 dark:bg-gray-800", text: "text-gray-500 dark:text-gray-400", border: "border-gray-100 dark:border-gray-700", dot: "bg-gray-400" },
   },
 } as const;
 

@@ -92,7 +92,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
            animate={{ y: 0, opacity: 1 }}
            className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/5 border border-brand/10 text-brand font-brand font-black uppercase tracking-[0.3em] mb-6 text-[10px]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand/5 border border-brand/10 text-brand font-brand font-black uppercase tracking-[0.3em] mb-6 text-[10px]">
             <Zap size={14} className="text-brand" />
             Personalize Your Portal
           </div>
@@ -118,7 +118,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
             placeholder="Search interests..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-100 focus:border-brand/40 focus:ring-4 focus:ring-brand/10 rounded-2xl py-4 pl-14 pr-6 text-gray-900 font-medium placeholder:text-gray-300 transition-all outline-none"
+            className="w-full bg-gray-50 border border-gray-100 focus:border-brand/40 focus:ring-4 focus:ring-brand/10 rounded-lg py-4 pl-14 pr-6 text-gray-900 font-medium placeholder:text-gray-300 transition-all outline-none"
           />
         </motion.div>
 
@@ -127,7 +127,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {isLoadingCategories ? (
                Array.from({ length: 8 }).map((_, i) => (
-                 <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse" />
+                 <div key={i} className="h-32 bg-white/5 rounded-lg animate-pulse" />
                ))
             ) : filteredCategories.length === 0 ? (
                <div className="col-span-full py-20 text-center text-gray-300 font-black uppercase tracking-widest">
@@ -150,7 +150,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
-                      "group relative h-40 p-6 rounded-xl border-2 transition-all duration-500 overflow-hidden text-left",
+                      "group relative h-40 p-6 rounded-lg border-2 transition-all duration-500 overflow-hidden text-left",
                       isSelected 
                         ? "border-brand bg-brand/10 shadow-2xl shadow-brand/20 ring-4 ring-brand/10"
                         : "border-gray-100 bg-white hover:bg-gray-50 hover:border-gray-200"
@@ -164,7 +164,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
 
                     <div className="relative z-10 flex flex-col justify-between h-full">
                        <div className={cn(
-                         "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500",
+                         "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-500",
                          isSelected ? "bg-brand text-white shadow-lg" : "bg-gray-100 text-gray-400"
                        )}>
                           <Icon size={20} />
@@ -239,7 +239,7 @@ export function CategoryPicker({ onComplete }: CategoryPickerProps) {
                   onClick={handleContinue}
                   disabled={isUpdating || selectedIds.length < 3}
                   className={cn(
-                    "h-16 px-10 rounded-xl font-brand font-black uppercase tracking-[0.2em] text-xs flex items-center gap-4 transition-all duration-500",
+                    "h-16 px-10 rounded-lg font-brand font-black uppercase tracking-[0.2em] text-xs flex items-center gap-4 transition-all duration-500",
                     selectedIds.length >= 3 
                       ? "bg-brand text-white shadow-xl shadow-brand/20 hover:scale-105 active:scale-95" 
                       : "bg-gray-100 text-gray-300 border border-gray-200"

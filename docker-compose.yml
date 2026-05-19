@@ -5,15 +5,15 @@ services:
     container_name: cems-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: cems
-      POSTGRES_PASSWORD: cems_secret
-      POSTGRES_DB: cems_db
+      POSTGRES_USER: ${POSTGRES_USER:-cems}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cems_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cems_db}
     ports:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cems -d cems_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cems} -d ${POSTGRES_DB:-cems_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,15 +22,15 @@ services:
     container_name: cems-postgres-test
     restart: unless-stopped
     environment:
-      POSTGRES_USER: cems
-      POSTGRES_PASSWORD: cems_secret
-      POSTGRES_DB: cems_db
+      POSTGRES_USER: ${POSTGRES_USER:-cems}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cems_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cems_db}
     ports:
       - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cems -d cems_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cems} -d ${POSTGRES_DB:-cems_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,26 +62,25 @@ services:
       - "4000:4000"
       - "9229:9229" # debug port
     environment:
-      DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cems}:${POSTGRES_PASSWORD:-cems_secret}@postgres:5432/${POSTGRES_DB:-cems_db}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: dev-jwt-secret-change-in-production
-      JWT_EXPIRATION: 2h
-      JWT_REFRESH_EXPIRATION: 7d
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-2h}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
       PORT: 4000
-      NODE_ENV: development
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: 465
-      SMTP_USER: nasifayc11@gmail.com
-      SMTP_PASS: wkdxinxnmgzwucws
-      SMTP_FROM: nasifayc11@gmail.com
-      BACKEND_URL: http://localhost
-      FRONTEND_URL: http://localhost:3001
-      TELEGRAM_BOT_TOKEN: 8616602222:AAEPzO2_5gWCLONks2EkGdGBlHcAZn9DbSA
-      TELEGRAM_BOT_USERNAME: aastu_cems_bot
-      # TELEGRAM_WEBHOOK_URL: https://your-domain.com/api/telegram/webhook  ← set in production
-
-      ML_SERVICE_URL: http://ml-service:8000
+      NODE_ENV: ${NODE_ENV:-development}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      BACKEND_URL: ${BACKEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
+      ML_SERVICE_URL: ${ML_SERVICE_URL:-http://ml-service:8000}
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
       - ./apps/api/src:/usr/src/app/src:delegated
@@ -105,10 +104,10 @@ services:
     ports:
       - "3001:3001"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost
-      NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:-your_cloud_name}
-      NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: ${NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:-your_upload_preset}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:4000}
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+      NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: ${NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
       PORT: 3001
       WATCHPACK_POLLING: "true"
     volumes:
@@ -142,7 +141,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://cems:cems_secret@postgres:5432/cems_db
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cems}:${POSTGRES_PASSWORD:-cems_secret}@postgres:5432/${POSTGRES_DB:-cems_db}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       MODEL_PATH: ./trained_models
