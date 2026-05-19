@@ -241,9 +241,11 @@ model Event {
   feedbackTokens        FeedbackToken[]
   feedbackResponses     FeedbackResponse[]
   feedbackTemplates     EventFeedbackTemplate[]
+  graduationConfig      GraduationConfig?
 
   @@map("events")
 }
+
 
 model EventBookmark {
   id        String   @id @default(uuid()) @db.Uuid
@@ -653,6 +655,28 @@ enum OneTimeTokenType {
 }
 
 // ─── Graduation Feature ───────────────────────────────────────────────────────
+
+model GraduationConfig {
+  id                  String   @id @default(uuid()) @db.Uuid
+  eventId             String   @unique @map("event_id") @db.Uuid
+
+  /// GPA lower bounds for each tier (inclusive)
+  distinguishedMinGpa Float    @default(3.75) @map("distinguished_min_gpa")
+  honorsMinGpa        Float    @default(3.50) @map("honors_min_gpa")
+
+  /// Guest-pass slots awarded per tier
+  distinguishedSlots  Int      @default(3)    @map("distinguished_slots")
+  honorsSlots         Int      @default(2)    @map("honors_slots")
+  graduateSlots       Int      @default(1)    @map("graduate_slots")
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  event               Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("graduation_configs")
+}
+
 
 model GraduationRecord {
   id          String       @id @default(uuid()) @db.Uuid

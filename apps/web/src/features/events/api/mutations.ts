@@ -134,6 +134,26 @@ export const useGoLiveEvent = () => {
   });
 };
 
+export const useArchiveEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/api/events/${id}/archive`, {
+        method: "PATCH",
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to archive event");
+      return result.data || result;
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["my-organized-events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+      queryClient.invalidateQueries({ queryKey: ["archive"] });
+    },
+  });
+};
+
 
 export const useCheckIn = () => {
   const queryClient = useQueryClient();

@@ -33,8 +33,9 @@ export class ParentEntryDto {
   @IsNotEmpty()
   parentLabel: string; // "Parent 1", "Parent 2", etc.
 
-  @IsEnum(['TELEGRAM', 'EMAIL'])
-  deliveryMethod: 'TELEGRAM' | 'EMAIL';
+  /** TELEGRAM — send deep link; EMAIL — send PDF to parentEmail; STUDENT_EMAIL — bundle to student */
+  @IsEnum(['TELEGRAM', 'EMAIL', 'STUDENT_EMAIL'])
+  deliveryMethod: 'TELEGRAM' | 'EMAIL' | 'STUDENT_EMAIL';
 
   @IsOptional()
   @IsString()
@@ -52,4 +53,41 @@ export class ClaimSubmissionDto {
   @ValidateNested({ each: true })
   @Type(() => ParentEntryDto)
   parents: ParentEntryDto[];
+
+  /**
+   * Used when any parent has deliveryMethod === 'STUDENT_EMAIL'.
+   * If omitted the student's own invitation email is used.
+   */
+  @IsOptional()
+  @IsEmail()
+  deliveryEmail?: string;
+}
+
+// ─── Graduation Tier Config ────────────────────────────────────────────────────
+
+export class SaveGraduationConfigDto {
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  distinguishedMinGpa: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  honorsMinGpa: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  distinguishedSlots: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  honorsSlots: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  graduateSlots: number;
 }

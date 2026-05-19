@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Event, EventStatusName } from "../types";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 
-import { Pencil, Trash2, Send, Check, X, Play, Users } from "lucide-react";
+import { Pencil, Trash2, Send, Check, X, Play, Users, Archive } from "lucide-react";
 import { truncate } from "@/lib/utils";
 
 export const getStatusColor = (status: EventStatusName) => {
@@ -12,7 +12,7 @@ export const getStatusColor = (status: EventStatusName) => {
     case "PENDING": return "bg-amber-50 text-amber-600 border-amber-100";
     case "DRAFT": return "bg-gray-50 text-gray-400 border-gray-100";
     case "CANCELLED": return "bg-red-50 text-red-600 border-red-100";
-    case "ARCHIVED": return "bg-purple-50 text-purple-600 border-purple-100";
+    case "ARCHIVED": return "bg-brand-50 text-brand-600 border-brand-100";
     default: return "bg-gray-50 text-gray-400 border-gray-100";
   }
 };
@@ -25,6 +25,7 @@ export const getEventsColumns = (
   onApprove: (event: Event) => void,
   onReject: (event: Event) => void,
   onGoLive: (event: Event) => void,
+  onArchive: (event: Event) => void,
   onManageAttendees: (event: Event) => void
 ): ColumnDef<Event>[] => [
 
@@ -173,6 +174,18 @@ export const getEventsColumns = (
               title="Go Live"
             >
               <Play size={18} />
+            </button>
+          )}
+
+          {/* Organizer: Archive Approved or Live */}
+          {isOrganizer && (status === "APPROVED" || status === "LIVE") && (
+            <button 
+              type="button" 
+              onClick={() => onArchive(event)}
+              className="p-2 text-brand hover:bg-brand/5 rounded-lg transition-all"
+              title="Archive Event"
+            >
+              <Archive size={18} />
             </button>
           )}
 

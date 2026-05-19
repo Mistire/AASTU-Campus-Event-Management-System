@@ -13,7 +13,6 @@ import { RegistrationSidebar } from "@/features/events/components/RegistrationSi
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Share2, CalendarPlus } from "lucide-react";
-import { generateICS } from "@/lib/ics";
 import { toast } from "sonner";
 import { EventDetailSkeleton, EventErrorState } from "@/features/events/components/EventDetailUIStates";
 import { useMemo } from "react";
@@ -62,14 +61,19 @@ export default function EventDetailPage() {
 
   const handleAddToCalendar = () => {
     if (!event) return;
-    generateICS({
-      title: event.title,
-      description: event.description || "",
-      startTime: event.startTime,
-      endTime: event.endTime,
-      location: event.venue?.name || "AASTU Campus",
-    });
-    toast.success("Calendar file generated");
+    
+    const formatDate = (dateStr: string) => 
+      new Date(dateStr).toISOString().replace(/-|:|\.\d\d\d/g, "");
+      
+    const start = formatDate(event.startTime);
+    const end = formatDate(event.endTime);
+    const title = encodeURIComponent(event.title);
+    const details = encodeURIComponent(event.description || "");
+    const location = encodeURIComponent(event.venue?.name || "AASTU Campus");
+    
+    const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+    
+    window.open(gCalUrl, "_blank");
   };
 
   const capacityPercent = Math.min(
