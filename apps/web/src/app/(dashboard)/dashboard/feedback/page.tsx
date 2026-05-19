@@ -3,15 +3,25 @@
 import { useState } from "react";
 import { MessageSquare, Star, Users, ShieldCheck, BarChart3 } from "lucide-react";
 import { CemsTable } from "@/components/cems/CemsTable";
-import { useFeedback } from "@/features/feedback/api";
-import { useAllFeedbackResponses } from "@/features/feedback/api";
+import { useFeedback, useAllFeedbackResponses } from "@/features/feedback/api";
 import { getFeedbackColumns } from "@/features/feedback/components/FeedbackTableConfig";
 import { getFeedbackResponseColumns } from "@/features/feedback/components/FeedbackResponsesTable";
+import { FeedbackResponse } from "@/features/feedback/types";
+import { CemsButton } from "@/components/cems/CemsButton";
+import { 
+  CemsDialog, 
+  CemsDialogContent, 
+  CemsDialogHeader, 
+  CemsDialogTitle, 
+  CemsDialogDescription, 
+  CemsDialogFooter 
+} from "@/components/cems/CemsDialog";
 
 type Tab = "legacy" | "structured";
 
 export default function FeedbackPage() {
     const [tab, setTab] = useState<Tab>("structured");
+    const [selectedResponse, setSelectedResponse] = useState<FeedbackResponse | null>(null);
 
     const legacyColumns = getFeedbackColumns();
     const structuredColumns = getFeedbackResponseColumns();
@@ -107,6 +117,7 @@ export default function FeedbackPage() {
                         enableSorting
                         enableGlobalFilter
                         enableColumnVisibility
+                        onRowClick={(row) => setSelectedResponse(row)}
                     />
                 ) : (
                     <CemsTable
@@ -120,6 +131,126 @@ export default function FeedbackPage() {
                     />
                 )}
             </div>
+
+            {/* Response Detail Dialog */}
+            <CemsDialog open={!!selectedResponse} onOpenChange={(open) => !open && setSelectedResponse(null)}>
+                <CemsDialogContent size="lg" className="max-h-[85vh]">
+                    <CemsDialogHeader icon={<MessageSquare />}>
+                        <CemsDialogTitle>Feedback Details</CemsDialogTitle>
+                        <CemsDialogDescription>
+                            Review response details submitted for {selectedResponse?.event.title}
+                        </CemsDialogDescription>
+                    </CemsDialogHeader>
+
+                    {selectedResponse && (
+                        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                            {/* Attendee Info Card */}
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-xl">
+                                <div className="space-y-1">
+                                    <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block">Submitted By</span>
+                                    <h3 className="text-base font-black text-gray-900 dark:text-white">{selectedResponse.attendee.displayName}</h3>
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{selectedResponse.attendee.displayEmail}</span>
+                                </div>
+                                <div className="space-y-1 md:text-right shrink-0">
+                                    <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block">Date Submitted</span>
+                                    <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                                        {new Date(selectedResponse.createdAt).toLocaleDateString("en-US", {
+                                            month: "long",
+                                            day: "numeric",
+                                            year: "numeric",
+                                            hour: "numeric",
+                                            minute: "2-digit"
+                                        })}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Answers List */}
+                            <div className="space-y-4">
+                                <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Questions & Responses</h4>
+                                <div className="space-y-3">
+                                    {selectedResponse.answers.map((ans, idx) => (
+                                        <div 
+                                            key={ans.id} 
+                                            className="p-5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl space-y-3 shadow-sm hover:border-brand/10 dark:hover:border-brand/10 transition-colors"
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-brand/5 dark:bg-brand/10 text-brand text-[10px] font-black shrink-0">
+                                                    {idx + 1}
+                                                </span>
+                                                <span className="text-sm font-bold text-gray-800 dark:text-gray-200 leading-snug">
+                                                    {ans.question.label}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="pl-8">
+                                                {ans.question.type === "RATING" ? (
+                                                    <div className="flex items-center gap-1">
+                                                        {Array.from({ length: 5 }).map((_, i) => {
+                                                            const val = parseInt(ans.value) || 0;
+                                                            return (
+                                                                <Star 
+                                                                    key={i} 
+                                                                    size={16} 
+                                                                    className={i < val ? "text-amber-500 fill-amber-500" : "text-gray-200 dark:text-gray-700"} 
+                                                                />
+                                                            );
+                                                        })}
+                                                        <span className="ml-2 text-xs font-black text-gray-700 dark:text-gray-300">
+                                                            ({ans.value} / 5)
+                                                        </span>
+                                                    </div>
+                                                ) : ans.question.type === "SCALE" ? (
+                                                    <div className="space-y-1.5 max-w-md">
+                                                        <div className="flex items-center justify-between text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                                            <span>Strongly Disagree</span>
+                                                            <span>Strongly Agree</span>
+                                                        </div>
+                                                        <div className="grid grid-cols-10 gap-1">
+                                                            {Array.from({ length: 10 }).map((_, i) => {
+                                                                const val = parseInt(ans.value) || 0;
+                                                                const active = i + 1 === val;
+                                                                return (
+                                                                    <div 
+                                                                        key={i} 
+                                                                        className={`h-6 rounded flex items-center justify-center text-[10px] font-black transition-all ${
+                                                                            active 
+                                                                                ? "bg-brand text-white shadow-md shadow-brand/20 scale-105" 
+                                                                                : i < val 
+                                                                                    ? "bg-brand/10 text-brand dark:bg-brand/5 dark:text-brand" 
+                                                                                    : "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-600"
+                                                                        }`}
+                                                                    >
+                                                                        {i + 1}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50/50 dark:bg-gray-800/30 p-3 rounded-lg border border-gray-50 dark:border-gray-800/50 whitespace-pre-wrap leading-relaxed">
+                                                        {ans.value}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <CemsDialogFooter>
+                        <CemsButton 
+                            variant="outline" 
+                            onClick={() => setSelectedResponse(null)}
+                            className="rounded-lg font-bold text-xs uppercase tracking-widest px-6 h-10 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-900"
+                        >
+                            Close Details
+                        </CemsButton>
+                    </CemsDialogFooter>
+                </CemsDialogContent>
+            </CemsDialog>
         </div>
     );
 }

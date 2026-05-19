@@ -276,7 +276,7 @@ export function ProfileView() {
           variants={itemVariants}
           className="bg-white dark:bg-gray-900 p-10 rounded-lg border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-none relative overflow-hidden group"
         >
-          <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full -ml-32 -mt-32 blur-3xl group-hover:bg-emerald-500/10 transition-colors duration-700" />
+          <div className="absolute top-0 left-0 w-64 h-64 rounded-full -ml-32 -mt-32 blur-3xl  transition-colors duration-700" />
           <UserInterests />
         </motion.div>
       )}

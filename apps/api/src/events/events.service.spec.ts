@@ -71,10 +71,7 @@ describe('EventsService', () => {
   let service: EventsService;
   let prisma: typeof mockPrismaService;
   let venuesService: typeof mockVenuesService;
-<<<<<<< HEAD
-=======
   let emailService: typeof mockEmailService;
->>>>>>> dev
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -82,10 +79,7 @@ describe('EventsService', () => {
         EventsService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: VenuesService, useValue: mockVenuesService },
-<<<<<<< HEAD
-=======
         { provide: EmailService, useValue: mockEmailService },
->>>>>>> dev
       ],
     }).compile();
 

@@ -70,6 +70,54 @@ export class FeedbackService {
     ];
   }
 
+  private async getOrCreateDefaultTemplate(createdBy: string) {
+    let template = await this.prisma.feedbackFormTemplate.findFirst({
+      where: { isDefault: true },
+      include: { questions: { orderBy: { order: 'asc' } } },
+    });
+
+    if (!template) {
+      template = await this.prisma.feedbackFormTemplate.create({
+        data: {
+          name: 'Default Event Feedback Template',
+          isDefault: true,
+          createdBy,
+          questions: {
+            create: [
+              {
+                label: 'How would you rate this event overall?',
+                type: 'RATING',
+                isRequired: true,
+                order: 0,
+              },
+              {
+                label: 'What did you enjoy most about the event?',
+                type: 'TEXT',
+                isRequired: false,
+                order: 1,
+              },
+              {
+                label: 'What could be improved?',
+                type: 'TEXT',
+                isRequired: false,
+                order: 2,
+              },
+              {
+                label: 'How likely are you to attend future events?',
+                type: 'SCALE',
+                isRequired: true,
+                order: 3,
+              },
+            ],
+          },
+        },
+        include: { questions: { orderBy: { order: 'asc' } } },
+      });
+    }
+
+    return template;
+  }
+
   // ─── Token helpers ────────────────────────────────────────────────────────
 
   private hashToken(token: string): string {
@@ -222,16 +270,27 @@ export class FeedbackService {
 
     // Resolve questions: prefer event-specific template, else default
     const eventTemplate = tokenRecord.event.feedbackTemplates[0]?.template;
-    const questions = eventTemplate
-      ? eventTemplate.questions.map((q) => ({
-          id: q.id,
-          label: q.label,
-          type: q.type,
-          options: q.options,
-          isRequired: q.isRequired,
-          order: q.order,
-        }))
-      : this.defaultQuestions;
+    let questions;
+    if (eventTemplate) {
+      questions = eventTemplate.questions.map((q) => ({
+        id: q.id,
+        label: q.label,
+        type: q.type,
+        options: q.options,
+        isRequired: q.isRequired,
+        order: q.order,
+      }));
+    } else {
+      const defaultTemplate = await this.getOrCreateDefaultTemplate(tokenRecord.event.createdBy);
+      questions = defaultTemplate.questions.map((q) => ({
+        id: q.id,
+        label: q.label,
+        type: q.type,
+        options: q.options,
+        isRequired: q.isRequired,
+        order: q.order,
+      }));
+    }
 
     return {
       alreadySubmitted,
@@ -250,6 +309,7 @@ export class FeedbackService {
 
     const tokenRecord = await this.prisma.feedbackToken.findUnique({
       where: { id: payload.sub },
+      include: { event: true },
     });
 
     if (!tokenRecord) throw new BadRequestException('Invalid feedback token');
@@ -268,13 +328,29 @@ export class FeedbackService {
 
     const isDefaultForm = !eventTemplate;
 
-    // For custom templates, validate questionIds
+    let validIds: Set<string>;
+    let defaultTemplate: any = null;
+
     if (!isDefaultForm && eventTemplate) {
-      const validIds = new Set(eventTemplate.template.questions.map((q) => q.id));
-      for (const answer of dto.answers) {
-        if (!validIds.has(answer.questionId)) {
-          throw new BadRequestException(`Unknown question id: ${answer.questionId}`);
+      validIds = new Set(eventTemplate.template.questions.map((q) => q.id));
+    } else {
+      defaultTemplate = await this.getOrCreateDefaultTemplate(tokenRecord.event.createdBy);
+      validIds = new Set(defaultTemplate.questions.map((q) => q.id));
+    }
+
+    // Validate and map questionIds
+    for (const answer of dto.answers) {
+      if (!validIds.has(answer.questionId)) {
+        // Fallback mapping for clients sending static default question IDs (e.g. default-q1)
+        if (isDefaultForm && answer.questionId.startsWith('default-q')) {
+          const idx = parseInt(answer.questionId.split('-q')[1]) - 1;
+          const dbQ = defaultTemplate.questions[idx];
+          if (dbQ) {
+            answer.questionId = dbQ.id;
+            continue;
+          }
         }
+        throw new BadRequestException(`Unknown question id: ${answer.questionId}`);
       }
     }
 
@@ -288,24 +364,13 @@ export class FeedbackService {
         },
       });
 
-      // For default forms, filter out non-UUID questionIds and store as text
-      if (isDefaultForm) {
-        await tx.feedbackAnswer.createMany({
-          data: dto.answers.map((a) => ({
-            responseId: response.id,
-            questionId: '00000000-0000-0000-0000-000000000000', // placeholder for default
-            value: `${a.questionId}::${a.value}`, // encode question label + value
-          })),
-        });
-      } else {
-        await tx.feedbackAnswer.createMany({
-          data: dto.answers.map((a) => ({
-            responseId: response.id,
-            questionId: a.questionId,
-            value: a.value,
-          })),
-        });
-      }
+      await tx.feedbackAnswer.createMany({
+        data: dto.answers.map((a) => ({
+          responseId: response.id,
+          questionId: a.questionId,
+          value: a.value,
+        })),
+      });
 
       await tx.feedbackToken.update({
         where: { id: tokenRecord.id },

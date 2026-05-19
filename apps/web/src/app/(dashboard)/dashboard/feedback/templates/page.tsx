@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import {
-    LayoutTemplate, Plus, Pencil, Trash2, Link2, CheckCircle,
+    LayoutTemplate, Plus, Pencil, Trash2, Link2,
     Star, Scale, AlignLeft, Type, List, Loader2, AlertCircle, X
 } from "lucide-react";
+import { toast } from "sonner";
 import {
     useFeedbackTemplates,
     useCreateTemplate,
@@ -31,17 +32,11 @@ export default function FeedbackTemplatesPage() {
     const [mode, setMode] = useState<"list" | "create" | "edit">("list");
     const [editing, setEditing] = useState<FeedbackTemplate | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [toast, setToast] = useState<string | null>(null);
-
-    const showToast = (msg: string) => {
-        setToast(msg);
-        setTimeout(() => setToast(null), 3000);
-    };
 
     const handleCreate = async (name: string, questions: any[]) => {
         await createTemplate({ name, questions });
         setMode("list");
-        showToast("Template created successfully");
+        toast.success("Template created successfully");
     };
 
     const handleUpdate = async (name: string, questions: any[]) => {
@@ -49,14 +44,14 @@ export default function FeedbackTemplatesPage() {
         await updateTemplate({ id: editing.id, payload: { name, questions } });
         setMode("list");
         setEditing(null);
-        showToast("Template updated successfully");
+        toast.success("Template updated successfully");
     };
 
     const handleDelete = async (id: string) => {
         setDeletingId(id);
         try {
             await deleteTemplate(id);
-            showToast("Template deleted");
+            toast.success("Template deleted");
         } finally {
             setDeletingId(null);
         }
@@ -102,13 +97,7 @@ export default function FeedbackTemplatesPage() {
     // ── List mode ─────────────────────────────────────────────────────────────
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
-            {/* Toast */}
-            {toast && (
-                <div className="fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 animate-in slide-in-from-top-2 duration-300">
-                    <CheckCircle size={16} className="text-emerald-500" />
-                    <span className="text-sm font-black text-gray-800 dark:text-white">{toast}</span>
-                </div>
-            )}
+
 
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
