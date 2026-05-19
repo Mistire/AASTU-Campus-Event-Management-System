@@ -15,7 +15,7 @@ import { CreateFeedbackTemplateDto } from './dto/create-template.dto';
 import { SubmitFeedbackDto } from './dto/submit-feedback.dto';
 
 interface FeedbackJwtPayload {
-  sub: string;    // feedbackToken record id
+  sub: string; // feedbackToken record id
   userId: string;
   eventId: string;
 }
@@ -70,18 +70,33 @@ export class FeedbackService {
     ];
   }
 
-  private async getOrCreateDefaultTemplate(createdBy: string) {
+  private async getOrCreateDefaultTemplate(createdBy: string | null) {
     let template = await this.prisma.feedbackFormTemplate.findFirst({
       where: { isDefault: true },
       include: { questions: { orderBy: { order: 'asc' } } },
     });
 
     if (!template) {
+      let finalCreatedBy = createdBy;
+      if (!finalCreatedBy) {
+        const fallbackUser =
+          (await this.prisma.user.findFirst({
+            where: { role: { roleName: { in: ['ADMIN', 'ORGANIZER'] } } },
+          })) || (await this.prisma.user.findFirst());
+        finalCreatedBy = fallbackUser?.id || null;
+      }
+
+      if (!finalCreatedBy) {
+        throw new Error(
+          'Cannot create default feedback template: No user found to assign as creator.',
+        );
+      }
+
       template = await this.prisma.feedbackFormTemplate.create({
         data: {
           name: 'Default Event Feedback Template',
           isDefault: true,
-          createdBy,
+          createdBy: finalCreatedBy,
           questions: {
             create: [
               {
@@ -422,10 +437,7 @@ export class FeedbackService {
       select: { id: true },
     });
     const eventIds = [
-      ...new Set([
-        ...organizerEvents.map((e) => e.eventId),
-        ...createdEvents.map((e) => e.id),
-      ]),
+      ...new Set([...organizerEvents.map((e) => e.eventId), ...createdEvents.map((e) => e.id)]),
     ];
 
     if (eventIds.length === 0) return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
@@ -467,7 +479,7 @@ export class FeedbackService {
         where: { id: eventId, createdBy: requesterId },
       });
       if (!isOrganizer && !isCreator) {
-        throw new ForbiddenException('You do not have access to this event\'s feedback');
+        throw new ForbiddenException("You do not have access to this event's feedback");
       }
     }
 
