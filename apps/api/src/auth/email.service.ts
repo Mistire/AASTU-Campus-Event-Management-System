@@ -383,4 +383,73 @@ export class EmailService {
 
     await this.sendMail(email, `[SUPPORT] Ticket Received: ${ticketSubject}`, html);
   }
+
+  /**
+   * Sends ALL parent QR-pass PDFs in a single bundled email to the student's chosen address.
+   * Called when the student selects the "Bundle all to my email" delivery mode.
+   */
+  async sendBulkParentQREmail(
+    studentEmail: string,
+    studentName: string,
+    tier: string,
+    event: {
+      title: string;
+      startTime: Date;
+      venue?: { name: string; building?: string | null } | null;
+    },
+    passes: Array<{ parentLabel: string; pdfBuffer: Buffer }>,
+  ) {
+    const icons = this.getMailIcons();
+    const tierLabels: Record<string, { label: string; icon: string; color: string }> = {
+      DISTINGUISHED: { label: 'Distinguished Graduate', icon: icons.star, color: '#d97706' },
+      HONORS:        { label: 'Honors Graduate',        icon: icons.medal, color: '#7c3aed' },
+      GRADUATE:      { label: 'Graduate',               icon: icons.cap,   color: '#0284c7' },
+    };
+    const tierInfo = tierLabels[tier] ?? { label: 'Graduate', icon: '', color: '#64748b' };
+    const tierLabel = `<span style="color:${tierInfo.color}; font-weight:800;">${tierInfo.icon} ${tierInfo.label}</span>`;
+
+    const dateStr = new Date(event.startTime).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    });
+    const venueName = event.venue?.name ?? 'Campus Venue';
+
+    const passListHtml = passes
+      .map(
+        (p) =>
+          `<li style="margin:4px 0; font-weight:600; color:#374151;">${p.parentLabel}</li>`,
+      )
+      .join('');
+
+    const html = this.getHtmlLayout(
+      'Your Guest Passes — All in One',
+      `Graduation guest passes for ${studentName}`,
+      `<p>Congratulations, <strong>${studentName}</strong> — <strong>${tierLabel}</strong>!</p>
+       <p>All of your parent guest-pass QR tickets for <strong>${event.title}</strong> are attached to this email as PDFs.</p>
+       <p><strong>Event:</strong> ${event.title}<br/>
+          <strong>Date:</strong> ${dateStr}<br/>
+          <strong>Venue:</strong> ${venueName}</p>
+       <p><strong>Passes included (${passes.length}):</strong></p>
+       <ul style="padding-left:20px; margin:0 0 16px;">${passListHtml}</ul>
+       <p style="color:#94a3b8; font-size:12px;">Please print or save each PDF and distribute it to the respective guest. Each QR code is unique and can only be used once.</p>`,
+    );
+
+    const attachments = passes.map((p) => ({
+      filename: `GuestPass_${studentName.replace(/[^a-z0-9]/gi, '_')}_${p.parentLabel.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+      content: p.pdfBuffer,
+      contentType: 'application/pdf' as const,
+    }));
+
+    await this.transporter.sendMail({
+      from: `"AASTU Campus Event Management System" <${this.configService.get<string>('SMTP_FROM')}>`,
+      to: studentEmail,
+      subject: `[GRADUATION] Your ${passes.length} Guest Pass${passes.length > 1 ? 'es' : ''} — ${event.title}`,
+      html,
+      attachments,
+    });
+
+    this.logger.log(
+      `Bulk graduation pass email sent to ${studentEmail} (${passes.length} passes) for student ${studentName}`,
+    );
+  }
 }
+

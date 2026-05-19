@@ -21,9 +21,9 @@ export function SpeakerChip({ fullName, title, bio, profileImage }: SpeakerChipP
       <Tooltip>
         <TooltipTrigger>
           <div className="flex items-center gap-2 group cursor-help transition-all">
-            <Avatar className="w-8 h-8 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm group-hover:scale-110 group-hover:border-brand/20 transition-all">
-              {profileImage && <AvatarImage src={profileImage} alt={fullName} />}
-              <AvatarFallback className="bg-brand/5 text-[10px] font-black text-brand uppercase tracking-widest border-none">
+            <Avatar className="w-8 h-8 rounded-lg after:rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm group-hover:scale-110 group-hover:border-brand/20 transition-all">
+              {profileImage && <AvatarImage className="rounded-lg" src={profileImage} alt={fullName} />}
+              <AvatarFallback className="bg-brand/5 text-[10px] font-black text-brand uppercase tracking-widest border-none rounded-lg">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -42,9 +42,9 @@ export function SpeakerChip({ fullName, title, bio, profileImage }: SpeakerChipP
         <TooltipContent className="p-4 w-64 rounded-lg shadow-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
            <div className="space-y-2">
               <div className="flex items-center gap-3">
-                 <Avatar className="w-12 h-12 rounded-lg">
-                    {profileImage && <AvatarImage src={profileImage} alt={fullName} />}
-                    <AvatarFallback className="bg-brand/10 text-brand font-black">{initials}</AvatarFallback>
+                 <Avatar className="w-12 h-12 rounded-lg after:rounded-lg">
+                    {profileImage && <AvatarImage className="rounded-lg" src={profileImage} alt={fullName} />}
+                    <AvatarFallback className="bg-brand/10 text-brand font-black rounded-lg">{initials}</AvatarFallback>
                  </Avatar>
                  <div>
                     <p className="text-sm font-black text-gray-900 dark:text-white leading-none mb-1">{fullName}</p>
