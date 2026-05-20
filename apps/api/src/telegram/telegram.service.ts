@@ -188,6 +188,162 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  // ─── Channel broadcast helpers (event announcements) ──────────────────────
+
+  /**
+   * Post a rich announcement to the configured Telegram channel when an event
+   * is APPROVED (registration open). Silently skips if no channel is configured.
+   */
+  async sendEventAnnouncement(event: {
+    id: string;
+    title: string;
+    description: string | null;
+    startTime: Date;
+    endTime: Date;
+    capacity: number | null;
+    venue?: { name: string } | null;
+    eventType?: { name: string } | null;
+    access?: { accessType: string } | null;
+    media?: Array<{ fileUrl: string; mediaType: string }> | null;
+    creator?: { fullName: string } | null;
+    tags?: Array<{ tag: { name: string } }> | null;
+  }): Promise<void> {
+    if (!this.bot) return;
+    const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
+    if (!channelId) return;
+    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? '').replace(/\/$/, '');
+
+    const date = new Date(event.startTime).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    });
+    const time = new Date(event.startTime).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
+    const endTime = new Date(event.endTime).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
+
+    const accessLabel = event.access?.accessType === 'INVITE_ONLY' ? '🔒 Invite Only' : '🌐 Open to All';
+    const capacityLine = event.capacity ? `\n*Capacity:* ${event.capacity} seats` : '';
+    const organizerLine = event.creator?.fullName ? `\n👥 *Organized by:* ${event.creator.fullName}` : '';
+    const descLine = event.description
+      ? `\n\n${event.description.length > 200 ? event.description.slice(0, 197) + '...' : event.description}`
+      : '';
+
+    // Convert tags to CamelCase hashtags (e.g. "Tech & Innovation" -> "#TechAndInnovation")
+    const hashTags = event.tags?.length
+      ? '\n\n' + event.tags
+          .map((t) => `#${t.tag.name.replace(/[^a-zA-Z0-9]/g, '')}`)
+          .filter((tag) => tag.length > 1)
+          .join(' ')
+      : '';
+
+    const message =
+      `📢 *New Event Announced!*\n\n` +
+      `*${event.title}*${descLine}\n\n` +
+      `📅 *Date:* ${date}\n` +
+      `🕐 *Time:* ${time} – ${endTime}\n` +
+      `📍 *Venue:* ${event.venue?.name ?? 'Campus Venue'}\n` +
+      `🏷 *Type:* ${event.eventType?.name ?? 'General'}${organizerLine}\n` +
+      `${accessLabel}${capacityLine}${hashTags}`;
+
+    const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
+    const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+
+    // Try to send with cover image if available
+    const imageMedia = event.media?.find((m) => m.fileUrl);
+    if (imageMedia?.fileUrl) {
+      try {
+        await this.bot.telegram.sendPhoto(channelId, imageMedia.fileUrl, {
+          caption: message,
+          parse_mode: 'Markdown',
+          ...(hasValidUrl && {
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  { text: '📋 View Event Details', url: eventUrl },
+                  { text: '✅ Register Now', url: eventUrl },
+                ],
+              ],
+            },
+          }),
+        });
+        this.logger.log(`Event announcement (with image) sent to channel for: "${event.title}"`);
+        return;
+      } catch (err: any) {
+        this.logger.warn(`Failed to send event announcement with image: ${err.message}. Falling back to text message.`);
+      }
+    }
+
+    // Text fallback
+    try {
+      await this.bot.telegram.sendMessage(channelId, message, {
+        parse_mode: 'Markdown',
+        ...(hasValidUrl && {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '📋 View Event Details', url: eventUrl },
+                { text: '✅ Register Now', url: eventUrl },
+              ],
+            ],
+          },
+        }),
+      });
+      this.logger.log(`Event announcement (text-only) sent to channel for: "${event.title}"`);
+    } catch (err: any) {
+      this.logger.error(`Failed to send event announcement to channel: ${err.message}`);
+    }
+  }
+
+  /**
+   * Post a "starting now" alert to the Telegram channel when an event goes LIVE.
+   * Silently skips if no channel is configured.
+   */
+  async sendEventLiveAlert(event: {
+    id: string;
+    title: string;
+    startTime: Date;
+    venue?: { name: string } | null;
+  }): Promise<void> {
+    if (!this.bot) return;
+    const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
+    if (!channelId) return;
+    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? '').replace(/\/$/, '');
+
+    const time = new Date(event.startTime).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
+
+    const message =
+      `🚀 *Event is LIVE Now!*\n\n` +
+      `*${event.title}* has officially started.\n\n` +
+      `📍 *Venue:* ${event.venue?.name ?? 'Campus Venue'}\n` +
+      `🕐 *Started at:* ${time}\n\n` +
+      `_Head over now — don't miss it!_`;
+
+    const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
+    const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+
+    try {
+      await this.bot.telegram.sendMessage(channelId, message, {
+        parse_mode: 'Markdown',
+        ...(hasValidUrl && {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '🎟 Join Now →', url: eventUrl },
+              ],
+            ],
+          },
+        }),
+      });
+      this.logger.log(`Live alert sent to channel for: "${event.title}"`);
+    } catch (err: any) {
+      this.logger.error(`Failed to send live alert to channel: ${err.message}`);
+    }
+  }
+
   // ─── Private helpers ──────────────────────────────────────────────────────
 
   private buildCaption(

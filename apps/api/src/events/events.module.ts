@@ -6,6 +6,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 import { FeedbackModule } from '../feedback/feedback.module';
+import { TelegramModule } from '../telegram/telegram.module';
 import { EventsService } from './events.service';
 import { EventsController } from './events.controller';
 import { VenuesService } from './venues.service';
@@ -32,7 +33,7 @@ import { HackathonsService } from './hackathons.service';
 import { HackathonsController } from './hackathons.controller';
 
 @Module({
-  imports: [ConfigModule, JwtModule.register({}), PrismaModule, AuthModule, NotificationsModule, AuditLogsModule, forwardRef(() => FeedbackModule)],
+  imports: [ConfigModule, JwtModule.register({}), PrismaModule, AuthModule, NotificationsModule, AuditLogsModule, forwardRef(() => FeedbackModule), TelegramModule],
   controllers: [
     EventsController,
     VenuesController,

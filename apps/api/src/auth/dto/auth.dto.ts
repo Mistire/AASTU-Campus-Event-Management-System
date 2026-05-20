@@ -60,3 +60,23 @@ export class VerifyCampusIdDto {
   @IsString()
   qrPayload: string;
 }
+
+export class TelegramLoginDto {
+  @IsString()
+  initData: string;
+}
+
+export class TelegramRegisterDto {
+  @IsString()
+  initData: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  fullName: string;
+
+  @IsString()
+  departmentId: string;
+}
+
