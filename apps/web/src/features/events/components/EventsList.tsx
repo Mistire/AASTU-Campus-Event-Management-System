@@ -246,7 +246,7 @@ export const EventsList = () => {
             columns={columns}
             data={(eventsData as PaginatedEventsResponse)?.data || []}
             loading={isLoading}
-            emptyMessage="No events found matching your criteria."
+            emptyMessage="No events found. Active and upcoming events will appear here."
             onRowClick={(event) => setPreviewEvent(event)}
             enableSorting
             enableGlobalFilter

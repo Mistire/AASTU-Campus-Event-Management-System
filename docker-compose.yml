@@ -80,6 +80,8 @@ services:
       FRONTEND_URL: ${FRONTEND_URL}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
+      TELEGRAM_CHANNEL_ID: ${TELEGRAM_CHANNEL_ID}
+      CEMS_WEB_URL: ${FRONTEND_URL}
       ML_SERVICE_URL: ${ML_SERVICE_URL:-http://ml-service:8000}
     volumes:
       # Mount source for live-reload (node_modules stays inside container)
@@ -169,6 +171,9 @@ services:
 networks:
   default:
     name: aastu-campus-event-management-system_default
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1200"
 
 volumes:
   pgdata:

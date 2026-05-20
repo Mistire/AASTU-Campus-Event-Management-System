@@ -23,6 +23,8 @@ import {
   SignUpDto,
   VerifyCampusIdDto,
   VerifyEmailDto,
+  TelegramLoginDto,
+  TelegramRegisterDto,
 } from './dto';
 import { Public } from './decorator';
 import { JwtAuthGuard } from './guard';
@@ -48,6 +50,26 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
     return this.authService.login(dto, { ip, userAgent });
+  }
+
+  @Public()
+  @Post('telegram/login')
+  telegramLogin(
+    @Body() dto: TelegramLoginDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.telegramLogin(dto, { ip, userAgent });
+  }
+
+  @Public()
+  @Post('telegram/register')
+  telegramRegister(
+    @Body() dto: TelegramRegisterDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.telegramRegister(dto, { ip, userAgent });
   }
   @Public()
   @Post('refresh')

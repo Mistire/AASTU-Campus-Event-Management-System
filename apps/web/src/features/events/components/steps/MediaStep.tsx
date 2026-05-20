@@ -79,7 +79,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
                 alt="Thumbnail Preview" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
+              <div className="absolute inset-0 bg-brand opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
                 <button 
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -163,7 +163,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
 
         <div className="p-8 bg-gray-50/50 rounded-lg border border-gray-100 space-y-4 flex flex-col justify-center">
            <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gray-900 text-white flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center shadow-sm">
               <FileCode size={14} />
             </div>
             <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Technical Specs</h4>

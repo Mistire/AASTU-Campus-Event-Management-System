@@ -80,7 +80,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       title: "New Event",
       desc: "Draft a new proposal",
       icon: Plus,
-      href: "/dashboard/events/new",
+      href: "/dashboard/events/create",
       color: "bg-brand text-white shadow-brand/20",
       featured: true,
     },

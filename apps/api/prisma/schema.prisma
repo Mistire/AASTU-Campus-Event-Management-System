@@ -43,8 +43,9 @@ model User {
   id                  String                    @id @default(uuid()) @db.Uuid
   fullName            String                    @map("full_name") @db.VarChar
   email               String                    @unique @db.VarChar
-  passwordHash        String                    @map("password_hash") @db.VarChar
+  passwordHash        String?                   @map("password_hash") @db.VarChar
   roleId              String                    @map("role_id") @db.Uuid
+  telegramId          String?                   @unique @map("telegram_id") @db.VarChar
   departmentId        String?                   @map("department_id") @db.Uuid
   phone               String?                   @db.VarChar
   profileImage        String?                   @map("profile_image") @db.VarChar
