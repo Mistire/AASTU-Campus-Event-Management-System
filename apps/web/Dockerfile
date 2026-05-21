@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-# Compile Next.js production bundle inside Docker (prevents missing .next errors)
+# Compile Next.js production bundle inside Docker (outputs standalone build)
 RUN npm run build
 
 # ─── Stage 2: Production ──────────────────────────────────────────────────────
@@ -19,16 +19,12 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-
-# Install only production dependencies (keeps image lightweight and avoids ENOSPC)
-RUN npm install --omit=dev --prefer-offline 2>/dev/null || npm install --omit=dev
-
-# Copy compiled files and configuration
-COPY --from=builder /usr/src/app/next.config.ts ./
-COPY --from=builder /usr/src/app/public ./public
-COPY --from=builder /usr/src/app/.next ./.next
+# Copy the standalone server and static assets from builder (no npm install required here!)
+COPY --from=builder /usr/src/app/.next/standalone ./
+COPY --from=builder /usr/src/app/public ./apps/web/public
+COPY --from=builder /usr/src/app/.next/static ./apps/web/.next/static
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+# Start Next.js using the standalone server script
+CMD ["node", "apps/web/server.js"]
