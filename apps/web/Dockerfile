@@ -1,6 +1,8 @@
 # ─── Stage 1: Build ──────────────────────────────────────────────────────────
 FROM node:20-slim AS builder
 
+ENV NODE_OPTIONS="--max-old-space-size=512"
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
