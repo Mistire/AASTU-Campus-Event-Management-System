@@ -54,7 +54,7 @@ export default function ArchivePage() {
             const isCancelled = status.toUpperCase() === "CANCELLED";
             return (
               <CemsBadge
-                variant={isCancelled ? "danger" : "success"}
+                status={isCancelled ? "danger" : "success"}
                 className="rounded-lg px-2 py-0.5 text-[9px] font-black uppercase tracking-widest"
               >
                 {status}

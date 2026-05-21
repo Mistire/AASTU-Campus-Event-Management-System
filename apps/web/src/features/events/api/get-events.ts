@@ -42,7 +42,7 @@ const getMyOrganizedEvents = async (query: EventQuery): Promise<PaginatedEventsR
 };
 
 export const useEvents = (query: EventQuery, options?: any) => {
-  return useQuery({
+  return useQuery<PaginatedEventsResponse, Error>({
     queryKey: ["events", query],
     queryFn: () => getEvents(query),
     placeholderData: (previousData) => previousData,
@@ -51,7 +51,7 @@ export const useEvents = (query: EventQuery, options?: any) => {
 };
 
 export const useMyOrganizedEvents = (query: EventQuery, options?: any) => {
-  return useQuery({
+  return useQuery<PaginatedEventsResponse, Error>({
     queryKey: ["my-organized-events", query],
     queryFn: () => getMyOrganizedEvents(query),
     placeholderData: (previousData) => previousData,

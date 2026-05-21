@@ -36,14 +36,14 @@ import {
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CemsButton } from "@/components/cems/CemsButton";
 import Image from "next/image";
 
-export default function EventAttendeesPage() {
+function EventAttendeesContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -330,5 +330,18 @@ export default function EventAttendeesPage() {
         </CemsCardContent>
       </CemsCard>
     </div>
+  );
+}
+
+export default function EventAttendeesPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48 rounded-lg" />
+        <Skeleton className="h-[500px] w-full rounded-lg" />
+      </div>
+    }>
+      <EventAttendeesContent />
+    </Suspense>
   );
 }

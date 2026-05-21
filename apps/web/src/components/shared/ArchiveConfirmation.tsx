@@ -61,7 +61,7 @@ export function ArchiveConfirmation({
                   Feedback Template
                 </label>
               </div>
-              <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+              <Select value={selectedTemplateId} onValueChange={(val) => setSelectedTemplateId(val ?? "")}>
                 <SelectTrigger className="h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full">
                   <SelectValue placeholder="Select Feedback Template" />
                 </SelectTrigger>

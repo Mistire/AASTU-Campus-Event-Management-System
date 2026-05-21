@@ -103,10 +103,12 @@ export default function UsersPage() {
             </div>
 
             {/* Detail Panel Overlay */}
-            <UserPreviewPanel 
-                user={previewUser} 
-                onClose={() => setPreviewUser(null)} 
-            />
+            {previewUser && (
+                <UserPreviewPanel 
+                    user={previewUser} 
+                    onClose={() => setPreviewUser(null)} 
+                />
+            )}
         </div>
     );
 }

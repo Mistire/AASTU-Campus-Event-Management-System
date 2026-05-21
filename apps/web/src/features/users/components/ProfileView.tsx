@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserInterests } from "./UserInterests";
 import { EditProfileModal } from "./EditProfileModal";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -59,7 +59,7 @@ export function ProfileView() {
     window.location.href = "/login";
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -69,7 +69,7 @@ export function ProfileView() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -104,7 +104,7 @@ export function ProfileView() {
             <div className="w-40 h-40 relative rounded-lg bg-white/10 backdrop-blur-xl flex items-center justify-center border-2 border-white/20 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-700">
               {profile?.profileImage ? (
                 <Image
-                  src={profile.profileImage}
+                  src={profile.profileImage as string}
                   alt="Profile"
                   fill
                   className="object-cover"

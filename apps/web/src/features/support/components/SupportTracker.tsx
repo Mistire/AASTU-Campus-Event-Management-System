@@ -85,7 +85,7 @@ export function SupportTracker() {
                             {error instanceof Error ? error.message : "Ticket not found or invalid details."}
                         </p>
                     )}
-                    <CemsButton type="submit" className="w-full h-12 text-sm uppercase tracking-widest font-black" variant="brand">
+                    <CemsButton type="submit" className="w-full h-12 text-sm uppercase tracking-widest font-black" cemsVariant="brand">
                         Search Ticket
                     </CemsButton>
                 </form>

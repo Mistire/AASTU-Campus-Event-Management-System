@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import AuthShell from "@/features/auth/components/AuthShell";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
@@ -19,7 +20,13 @@ export default function LoginPage() {
       }
       subtitle="Sign in to discover, manage, and participate in every campus experience at AASTU."
     >
-      <LoginForm />
+      <Suspense fallback={
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin w-6 h-6 border-2 border-brand border-t-transparent rounded-full" />
+        </div>
+      }>
+        <LoginForm />
+      </Suspense>
     </AuthShell>
   );
 }
