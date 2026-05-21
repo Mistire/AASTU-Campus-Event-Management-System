@@ -53,26 +53,34 @@ jobs:
             FRONTEND_URL=${{ secrets.FRONTEND_URL }}
             ENVEOF
 
-            echo "==> Cleaning system logs and temporary files..."
-            sudo journalctl --vacuum-size=50M || true
+            echo "==> Reclaiming disk space from logs, cache and apt..."
+            sudo journalctl --vacuum-time=1s || true
+            sudo find /var/log -type f -regex '.*\.gz\|.*\.1' -delete || true
+            sudo apt-get autoremove -y || true
             sudo apt-get clean || true
+            sudo rm -rf /tmp/* || true
 
-            echo "==> Pruning all unused Docker containers, images, volumes, and builder cache..."
+            echo "==> Pruning Docker resources..."
             docker system prune -af --volumes
             docker builder prune -af
 
-            echo "==> Ensuring swap space exists (prevents OOM during nest build on small EC2)..."
-            if [ ! -f /swapfile ]; then
-              sudo fallocate -l 2G /swapfile
-              sudo chmod 600 /swapfile
-              sudo mkswap /swapfile
-              sudo swapon /swapfile
-              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-              echo "Swap created: $(free -h | grep Swap)"
-            else
-              sudo swapon /swapfile 2>/dev/null || true
-              echo "Swap already exists: $(free -h | grep Swap)"
+            echo "==> Configuring 1.5G swap space (optimized for disk and memory balancing)..."
+            if [ -f /swapfile ]; then
+              sudo swapoff /swapfile 2>/dev/null || true
+              sudo rm -f /swapfile || true
             fi
+            sudo fallocate -l 1.5G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            echo "Swap status: $(free -h | grep Swap)"
+
+            echo "==> Host disk space usage before build:"
+            df -h
+            echo "==> Largest folders in /var/log:"
+            sudo du -sh /var/log/* 2>/dev/null | sort -hr | head -n 5 || true
+            echo "==> Largest folders in /var/lib/docker:"
+            sudo du -sh /var/lib/docker/* 2>/dev/null | sort -hr | head -n 5 || true
 
             echo "==> Truncating container logs to reclaim space..."
             sudo sh -c 'truncate -s 0 /var/lib/docker/containers/*/*-json.log' 2>/dev/null || true
