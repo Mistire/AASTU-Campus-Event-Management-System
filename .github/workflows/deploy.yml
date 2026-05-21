@@ -64,15 +64,17 @@ jobs:
             docker system prune -af --volumes
             docker builder prune -af
 
-            echo "==> Configuring 1.5G swap space (optimized for disk and memory balancing)..."
+            echo "==> Configuring swap space (reusing if exists to prevent OOM / text busy errors)..."
             if [ -f /swapfile ]; then
-              sudo swapoff /swapfile 2>/dev/null || true
-              sudo rm -f /swapfile || true
+              echo "Swap file already exists. Ensuring it is active..."
+              sudo swapon /swapfile 2>/dev/null || true
+            else
+              echo "Swap file does not exist. Creating 1.5G swap space..."
+              sudo fallocate -l 1.5G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
             fi
-            sudo fallocate -l 1.5G /swapfile
-            sudo chmod 600 /swapfile
-            sudo mkswap /swapfile
-            sudo swapon /swapfile
             echo "Swap status: $(free -h | grep Swap)"
 
             echo "==> Host disk space usage before build:"
