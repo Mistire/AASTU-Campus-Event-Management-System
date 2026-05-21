@@ -7,6 +7,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WaitlistService } from './waitlist.service';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { EmailService } from '../auth/email.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -41,6 +45,23 @@ const mockAnalytics = {
   invalidateEventCache: jest.fn().mockResolvedValue(undefined),
 };
 
+const mockEmail = {
+  sendRegistrationTicket: jest.fn().mockResolvedValue(null),
+};
+
+const mockJwt = {
+  sign: jest.fn().mockReturnValue('token'),
+  verify: jest.fn().mockReturnValue({}),
+};
+
+const mockConfig = {
+  get: jest.fn((key: string, defaultVal?: unknown) => defaultVal),
+};
+
+const mockAuditLogs = {
+  createLog: jest.fn().mockResolvedValue(null),
+};
+
 async function buildService(
   mockPrisma: ReturnType<typeof buildMockPrisma>,
   mockWaitlist: Record<string, jest.Mock>,
@@ -52,6 +73,10 @@ async function buildService(
       { provide: NotificationsService, useValue: mockNotifications },
       { provide: WaitlistService, useValue: mockWaitlist },
       { provide: AnalyticsService, useValue: mockAnalytics },
+      { provide: EmailService, useValue: mockEmail },
+      { provide: JwtService, useValue: mockJwt },
+      { provide: ConfigService, useValue: mockConfig },
+      { provide: AuditLogsService, useValue: mockAuditLogs },
     ],
   }).compile();
   return module.get(RegistrationService);
