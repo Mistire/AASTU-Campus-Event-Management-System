@@ -5,6 +5,7 @@ import { AnalyticsService } from './analytics.service';
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { AdminOverviewDto, EventAnalyticsDto } from './dto/response.dto';
+import { ROLES_KEY } from '../auth/decorator/roles.decorator';
 
 // ─── Mock AnalyticsService ────────────────────────────────────────────────────
 
@@ -70,27 +71,18 @@ describe('AnalyticsController', () => {
     jest.clearAllMocks();
   });
 
-  // ── a. 401 for missing JWT ──────────────────────────────────────────────────
+  // ── a. Guard registration checks ───────────────────────────────────────────
 
-  describe('401 — unauthenticated requests', () => {
-    it('JwtAuthGuard rejects unauthenticated requests with 401', async () => {
-      const module = await buildModule(rejectingJwtGuard, allowingGuard);
-      const controller = module.get<AnalyticsController>(AnalyticsController);
-
-      await expect(controller.getAdminOverview({}, undefined)).rejects.toThrow(
-        UnauthorizedException,
-      );
+  describe('Controller Guards & Roles Decorators', () => {
+    it('should be decorated with JwtAuthGuard and RolesGuard', () => {
+      const guards = Reflect.getMetadata('__guards__', AnalyticsController);
+      expect(guards).toContain(JwtAuthGuard);
+      expect(guards).toContain(RolesGuard);
     });
-  });
 
-  // ── b. 403 for wrong role ───────────────────────────────────────────────────
-
-  describe('403 — wrong role', () => {
-    it('RolesGuard rejects non-Admin users on admin endpoints with 403', async () => {
-      const module = await buildModule(allowingGuard, rejectingRolesGuard);
-      const controller = module.get<AnalyticsController>(AnalyticsController);
-
-      await expect(controller.getAdminOverview({}, undefined)).rejects.toThrow(ForbiddenException);
+    it('getAdminOverview should be decorated with Roles("Admin")', () => {
+      const roles = Reflect.getMetadata(ROLES_KEY, AnalyticsController.prototype.getAdminOverview);
+      expect(roles).toEqual(['Admin']);
     });
   });
 
