@@ -56,8 +56,22 @@ jobs:
             echo "==> Pruning unused Docker resources to free disk space..."
             docker system prune -f --filter "until=48h"
 
+            echo "==> Ensuring swap space exists (prevents OOM during nest build on small EC2)..."
+            if [ ! -f /swapfile ]; then
+              sudo fallocate -l 2G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+              echo "Swap created: $(free -h | grep Swap)"
+            else
+              sudo swapon /swapfile 2>/dev/null || true
+              echo "Swap already exists: $(free -h | grep Swap)"
+            fi
+
             echo "==> Building and starting production containers..."
-            docker compose -f docker-compose.prod.yml up --build -d
+            DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build --no-cache
+            docker compose -f docker-compose.prod.yml up -d
 
             echo "==> Waiting for API container to be healthy..."
             sleep 10
