@@ -6,7 +6,9 @@ ENV NODE_OPTIONS="--max-old-space-size=512"
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install --prefer-offline 2>/dev/null || npm install
+# Cache npm downloads to prevent fetching all packages from scratch
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --prefer-offline 2>/dev/null || npm install
 
 COPY . .
 
