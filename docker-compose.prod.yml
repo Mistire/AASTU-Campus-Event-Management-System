@@ -15,6 +15,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 192M
 
   # ─── Redis ───────────────────────────────────────────────
   redis:
@@ -28,6 +32,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 64M
 
   # ─── NestJS API (Production) ──────────────────────────────
   api:
@@ -60,6 +68,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   # ─── Next.js Web App (Production) ────────────────────────
   web:
@@ -79,6 +91,10 @@ services:
       HOSTNAME: 0.0.0.0
     depends_on:
       - api
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   # ─── Nginx Reverse Proxy ──────────────────────────────────
   nginx:
@@ -92,6 +108,10 @@ services:
     depends_on:
       - api
       - web
+    deploy:
+      resources:
+        limits:
+          memory: 32M
 
 networks:
   default:

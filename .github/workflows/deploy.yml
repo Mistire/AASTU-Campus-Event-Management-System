@@ -87,15 +87,20 @@ jobs:
             echo "==> Truncating container logs to reclaim space..."
             sudo sh -c 'truncate -s 0 /var/lib/docker/containers/*/*-json.log' 2>/dev/null || true
 
-            echo "==> Building and starting production containers..."
+            echo "==> Building production container images..."
             DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build
-            docker compose -f docker-compose.prod.yml up -d
+
+            echo "==> Starting backend services (postgres, redis, api) first to save memory..."
+            docker compose -f docker-compose.prod.yml up -d postgres redis api
 
             echo "==> Waiting for API container to be healthy..."
-            sleep 10
+            sleep 12
 
             echo "==> Running Prisma migrations..."
             docker exec cems-api npx prisma migrate deploy
+
+            echo "==> Starting frontend and reverse proxy services (web, nginx)..."
+            docker compose -f docker-compose.prod.yml up -d web nginx
 
             echo "==> Deployment complete! Container status:"
             docker compose -f docker-compose.prod.yml ps
