@@ -111,6 +111,10 @@ jobs:
             # Build a corrected DATABASE_URL using the postgres Docker service name
             # (replaces localhost/127.0.0.1 with the compose service hostname 'postgres')
             MIGRATION_DB_URL=$(grep '^DATABASE_URL=' $APP_DIR/.env | cut -d= -f2- | sed 's|localhost|postgres|g; s|127\.0\.0\.1|postgres|g')
+            if [ -z "$MIGRATION_DB_URL" ]; then
+              echo "ERROR: DATABASE_URL is missing or empty in .env"
+              exit 1
+            fi
             echo "Migration DB host: $(echo $MIGRATION_DB_URL | sed 's|:.*@|:***@|')"
             docker run --rm \
               --network cems_prod_network \
