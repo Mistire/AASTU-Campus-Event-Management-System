@@ -5,6 +5,7 @@ on:
     branches:
       - dev
       - feat/aws-deployment
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -82,8 +83,8 @@ jobs:
             sudo apt-get clean || true
             sudo rm -rf /tmp/* || true
 
-            echo "==> Pruning Docker resources..."
-            docker system prune -af --volumes
+            echo "==> Pruning Docker resources (keeping database volumes)..."
+            docker system prune -af
             docker builder prune -af
 
             echo "==> Configuring swap space (reusing if exists to prevent OOM / text busy errors)..."
@@ -145,7 +146,40 @@ jobs:
             docker inspect --format='{{.State.Status}}' cems-api
 
             echo "==> Starting frontend and reverse proxy (web + nginx)..."
-            docker compose -f docker-compose.prod.yml up -d web nginx
+            docker compose -f docker-compose.prod.yml up -d --force-recreate web nginx
+
+            echo "==> Waiting for services to become healthy..."
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+              NGINX_OK=0
+              API_OK=0
+              WEB_OK=0
+              curl -sf http://127.0.0.1/nginx-health > /dev/null && NGINX_OK=1 || true
+              curl -sf http://127.0.0.1/api/health > /dev/null && API_OK=1 || true
+              curl -sf http://127.0.0.1/ > /dev/null && WEB_OK=1 || true
+              if [ "$NGINX_OK" = "1" ] && [ "$API_OK" = "1" ] && [ "$WEB_OK" = "1" ]; then
+                echo "All health checks passed!"
+                break
+              fi
+              echo "  waiting for nginx/api/web... ($i/12)"
+              sleep 10
+            done
 
             echo "==> Deployment complete! Container status:"
             docker compose -f docker-compose.prod.yml ps
+
+            if ! curl -sf http://127.0.0.1/api/health > /dev/null; then
+              echo "ERROR: API health check failed after deploy"
+              docker compose -f docker-compose.prod.yml logs --tail=80 api web nginx
+              exit 1
+            fi
+
+            if ! curl -sf http://127.0.0.1/ > /dev/null; then
+              echo "ERROR: Web health check failed after deploy"
+              docker compose -f docker-compose.prod.yml logs --tail=80 api web nginx
+              exit 1
+            fi
+
+            echo "==> Public URLs:"
+            echo "  App:    http://${{ secrets.EC2_HOST }}"
+            echo "  API:    http://${{ secrets.EC2_HOST }}/api"
+            echo "  Health: http://${{ secrets.EC2_HOST }}/api/health"

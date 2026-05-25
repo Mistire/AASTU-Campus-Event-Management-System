@@ -28,6 +28,8 @@ ENV NODE_OPTIONS="--max-old-space-size=512"
 
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache wget
+
 COPY package*.json ./
 
 # Copy compiled app, pruned production node_modules, and Prisma schemas

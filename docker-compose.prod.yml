@@ -76,10 +76,16 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:4000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 384M
 
   # ─── Next.js Web App (Production) ────────────────────────
   web:
@@ -108,14 +114,15 @@ services:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3001/ || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 384M
 
   # ─── Nginx Reverse Proxy ──────────────────────────────────
   nginx:
@@ -127,8 +134,10 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - api
-      - web
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
     deploy:
       resources:
         limits:
