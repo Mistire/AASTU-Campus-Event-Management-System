@@ -159,6 +159,9 @@ jobs:
               exit 1
             fi
 
+            echo "==> Running production database seeding..."
+            docker exec cems-api sh -c 'npm run script_roles:prod --prefix /usr/src/app && npm run script_users:prod --prefix /usr/src/app'
+
             echo "==> Starting frontend and reverse proxy (web + nginx)..."
             docker compose -f docker-compose.prod.yml up -d web nginx
 
