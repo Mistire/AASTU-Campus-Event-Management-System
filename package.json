@@ -36,7 +36,8 @@
         "db:up": "docker compose up postgres -d",
         "db:rm": "docker compose rm postgres -s -f -v",
         "db:reset": "npm run db:rm && npm run db:up",
-        "db:sync": "npx prisma generate && npx prisma db push && npm run script_roles && npm run script_users"
+        "db:sync": "npm run prisma:generate --prefix apps/api && npm run prisma:deploy --prefix apps/api && npm run script_roles --prefix apps/api && npm run script_users --prefix apps/api",
+        "db:sync:docker": "docker compose exec api sh -c 'npx prisma generate && npx prisma db push && npm run script_roles && npm run script_users'"
     },
     "dependencies": {
         "class-validator": "^0.15.1"
