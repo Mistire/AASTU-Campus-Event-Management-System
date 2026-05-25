@@ -14,8 +14,12 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
   const sessions = data.sessions || [];
 
   const addSession = () => {
+    const newId = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : Math.random().toString(36).substring(2, 15);
+      
     const newSession = {
-      id: crypto.randomUUID(),
+      id: newId,
       title: "",
       description: "",
       startTime: data.startTime || "",
