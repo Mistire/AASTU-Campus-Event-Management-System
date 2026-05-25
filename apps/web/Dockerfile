@@ -5,14 +5,23 @@ ENV NODE_OPTIONS="--max-old-space-size=512"
 
 WORKDIR /usr/src/app
 
+# NEXT_PUBLIC_* are inlined at build time — pass via docker compose build args
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+ARG NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+ARG NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+ENV NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=$NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+
 COPY package*.json ./
-# Cache the npm downloads to prevent downloading packages from scratch every build
 RUN --mount=type=cache,target=/root/.npm \
     npm install
 
 COPY . .
 
-# Cache the Next.js compilation cache (speeds up successive builds from 11m to under 1m)
 RUN --mount=type=cache,target=/usr/src/app/.next/cache \
     npm run build
 
@@ -21,15 +30,15 @@ FROM node:20-slim AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+ENV PORT=3001
+ENV HOSTNAME=0.0.0.0
 
 WORKDIR /usr/src/app
 
-# Copy the standalone server and static assets from builder (no npm install required here!)
 COPY --from=builder /usr/src/app/.next/standalone ./
 COPY --from=builder /usr/src/app/public ./apps/web/public
 COPY --from=builder /usr/src/app/.next/static ./apps/web/.next/static
 
-EXPOSE 3000
+EXPOSE 3001
 
-# Start Next.js using the standalone server script
 CMD ["node", "apps/web/server.js"]
