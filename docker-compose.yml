@@ -98,8 +98,8 @@ services:
   # ─── Next.js Web App (Development – live reload) ──────────
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
       target: development
     container_name: cems-web
     restart: unless-stopped
