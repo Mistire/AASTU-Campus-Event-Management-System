@@ -141,12 +141,26 @@ jobs:
             echo "==> Migrations complete. Starting API container..."
             docker compose -f docker-compose.prod.yml up -d api
 
-            echo "==> Waiting for API to stabilize (30s)..."
-            sleep 30
-            docker inspect --format='{{.State.Status}}' cems-api
+            echo "==> Waiting for API to become healthy..."
+            API_HEALTH="unknown"
+            for i in $(seq 1 18); do
+              API_HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' cems-api 2>/dev/null || echo "missing")
+              if [ "$API_HEALTH" = "healthy" ]; then
+                echo "API is healthy!"
+                break
+              fi
+              echo "  API health status: $API_HEALTH ($i/18)"
+              sleep 10
+            done
+
+            if [ "$API_HEALTH" != "healthy" ]; then
+              echo "ERROR: API did not become healthy in time"
+              docker compose -f docker-compose.prod.yml logs --tail=80 api
+              exit 1
+            fi
 
             echo "==> Starting frontend and reverse proxy (web + nginx)..."
-            docker compose -f docker-compose.prod.yml up -d --force-recreate web nginx
+            docker compose -f docker-compose.prod.yml up -d web nginx
 
             echo "==> Waiting for services to become healthy..."
             for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
