@@ -29,7 +29,7 @@ export default function Features() {
   });
 
 
-  const events = data?.data || [];
+  const events = (data as any)?.data || [];
   const featuredEvent = events[0];
   const sideEvents = events.slice(1, 3);
   const bottomEvents = events.slice(3);
@@ -190,7 +190,7 @@ export default function Features() {
           )}
 
           <div className="lg:col-span-4 flex flex-col gap-8">
-            {sideEvents.map((event, i) => (
+            {sideEvents.map((event: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: 20 }}
@@ -239,7 +239,7 @@ export default function Features() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {bottomEvents.map((event, i) => (
+          {bottomEvents.map((event: any, i: number) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}

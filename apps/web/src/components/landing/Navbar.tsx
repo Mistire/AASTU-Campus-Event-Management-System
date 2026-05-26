@@ -98,7 +98,7 @@ export default function Navbar() {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-2xl font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-4"
+              className="text-lg font-black uppercase tracking-widest text-gray-900 dark:text-white border-b border-gray-100/50 dark:border-gray-800/50 pb-4"
             >
               {link.name}
             </Link>
@@ -107,14 +107,14 @@ export default function Navbar() {
             <Link
               href="/login"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-4 text-gray-900 dark:text-white font-bold border border-gray-200 dark:border-gray-800 rounded-lg"
+              className="w-full text-center py-3.5 text-gray-900 dark:text-white font-black uppercase tracking-widest text-xs border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
             >
               Login to Portal
             </Link>
             <Link
               href="/signup"
               onClick={() => setIsOpen(false)}
-              className="w-full text-center py-4 bg-brand text-white font-bold rounded-lg shadow-xl shadow-brand/20"
+              className="w-full text-center py-3.5 bg-brand text-white font-black uppercase tracking-widest text-xs rounded-lg shadow-xl shadow-brand/20 hover:bg-brand/90 transition-all"
             >
               Get Started Now
             </Link>

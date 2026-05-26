@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Event } from "../types";
+import { Event, EventFormModalProps } from "../types";
 import { 
   CemsDialog, 
   CemsDialogContent, 
@@ -29,6 +29,7 @@ import {
   CemsDialogFooter,
   CemsDialogDescription
 } from "@/components/cems/CemsDialog";
+
 
 export function EventFormModal({
   open,
@@ -163,7 +164,7 @@ export function EventFormModal({
                      <Tag size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors">Category</label>
                   </div>
-                  <Select value={formData.eventTypeId} onValueChange={(val) => setFormData({...formData, eventTypeId: val})}>
+                  <Select value={formData.eventTypeId} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
                     <SelectTrigger className={cn(
                       "h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full",
                       errors.eventTypeId && "border-red-200 ring-1 ring-red-100"
@@ -214,7 +215,7 @@ export function EventFormModal({
                      <MapPin size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors">Physical Venue</label>
                   </div>
-                  <Select value={formData.venueId} onValueChange={(val) => setFormData({...formData, venueId: val})}>
+                  <Select value={formData.venueId} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
                     <SelectTrigger className={cn(
                       "h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full",
                       errors.venueId && "border-red-200 ring-1 ring-red-100"

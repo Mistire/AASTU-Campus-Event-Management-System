@@ -112,7 +112,7 @@ export default function FeedbackPage() {
                     <CemsTable
                         data={structuredFeedback}
                         columns={structuredColumns}
-                        isLoading={structuredLoading}
+                        loading={structuredLoading}
                         emptyMessage="No structured feedback responses yet."
                         enableSorting
                         enableGlobalFilter
@@ -123,7 +123,7 @@ export default function FeedbackPage() {
                     <CemsTable
                         data={legacyFeedback || []}
                         columns={legacyColumns}
-                        isLoading={legacyLoading}
+                        loading={legacyLoading}
                         emptyMessage="No legacy feedback records found."
                         enableSorting
                         enableGlobalFilter

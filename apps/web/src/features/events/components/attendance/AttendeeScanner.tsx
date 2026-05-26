@@ -25,7 +25,15 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
   const scannerRef = useRef<any>(null);
   const [lastScan, setLastScan] = useState<{ status: "success" | "error" | "loading"; message: string } | null>(null);
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
+  const [isSecure, setIsSecure] = useState(true);
   const { mutate: checkIn, isPending } = useCheckIn();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      setIsSecure(window.isSecureContext || isLocal);
+    }
+  }, []);
 
   useEffect(() => {
     // Load script dynamically from CDN to avoid build-time dependency issues in Docker
@@ -80,7 +88,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
   };
 
   useEffect(() => {
-    if (!isLibraryLoaded) return;
+    if (!isLibraryLoaded || !isSecure) return;
 
     const Html5Qrcode = (window as any).Html5Qrcode;
     if (!Html5Qrcode) return;
@@ -92,22 +100,54 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
 
     let isCameraActive = false;
 
-    html5QrCode.start(
-      { facingMode: "environment" }, // Prefer back camera, falls back to webcam on PC
-      {
-        fps: 15, // Slightly higher framerate for better capture
-        // Removed qrbox and aspectRatio to scan the entire video feed natively
-      },
-      handleScan,
-      (err: any) => {
-        // Ignore scan frame errors
-      }
-    ).then(() => {
-      isCameraActive = true;
-    }).catch((err: any) => {
-      console.error("Camera failed to start:", err);
-      toast.error("Failed to access camera. Please check permissions.");
-    });
+    Html5Qrcode.getCameras()
+      .then((devices: any[]) => {
+        if (devices && devices.length > 0) {
+          // Look for a back/rear camera
+          const backCamera = devices.find((device) => {
+            const label = device.label.toLowerCase();
+            return label.includes("back") || label.includes("rear") || label.includes("environment");
+          });
+          const cameraId = backCamera ? backCamera.id : devices[0].id;
+          
+          return html5QrCode.start(
+            cameraId,
+            {
+              fps: 15,
+              qrbox: (width: number, height: number) => {
+                const minEdge = Math.min(width, height);
+                const size = Math.floor(minEdge * 0.7);
+                return { width: size, height: size };
+              },
+              aspectRatio: 1.0,
+            },
+            handleScan,
+            (err: any) => {}
+          );
+        } else {
+          return html5QrCode.start(
+            { facingMode: "environment" },
+            {
+              fps: 15,
+              qrbox: (width: number, height: number) => {
+                const minEdge = Math.min(width, height);
+                const size = Math.floor(minEdge * 0.7);
+                return { width: size, height: size };
+              },
+              aspectRatio: 1.0,
+            },
+            handleScan,
+            (err: any) => {}
+          );
+        }
+      })
+      .then(() => {
+        isCameraActive = true;
+      })
+      .catch((err: any) => {
+        console.error("Camera failed to start:", err);
+        toast.error("Failed to access camera. Please check permissions.");
+      });
 
     return () => {
       const scannerInstance = scannerRef.current;
@@ -128,7 +168,7 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
         }
       }
     };
-  }, [isLibraryLoaded]);
+  }, [isLibraryLoaded, isSecure]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -175,8 +215,20 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
         <div className="flex-1 p-6 flex flex-col items-center">
           <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-900 shadow-inner group">
              <div id="reader" className="w-full h-full border-none" />
+
+             {!isSecure && (
+               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-950 text-white p-6 text-center gap-4 z-30">
+                 <AlertCircle className="text-rose-500" size={48} />
+                 <div>
+                   <h3 className="text-white font-black text-sm uppercase tracking-widest">Insecure Context</h3>
+                   <p className="text-gray-400 text-xs font-bold mt-2 leading-relaxed max-w-xs mx-auto">
+                     Camera access is restricted in HTTP. Please access this page over HTTPS or localhost to use the scanner.
+                   </p>
+                 </div>
+               </div>
+             )}
              
-             {!isLibraryLoaded && (
+             {isSecure && !isLibraryLoaded && (
                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-white gap-4">
                  <Loader2 className="animate-spin text-brand" size={32} />
                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Initializing Scanner...</span>
@@ -184,14 +236,16 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
              )}
 
              {/* Scan Overlay UI */}
-             <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20">
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-lg" />
-               <motion.div 
-                 animate={{ scaleX: [1, 1.1, 1] }}
-                 transition={{ repeat: Infinity, duration: 2 }}
-                 className="absolute top-1/2 left-0 right-0 h-0.5 bg-brand shadow-[0_0_15px_rgba(255,51,102,0.5)] z-10" 
-               />
-             </div>
+             {isSecure && (
+               <div className="absolute inset-0 pointer-events-none border-[40px] border-black/20">
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-brand/50 rounded-lg" />
+                 <motion.div 
+                   animate={{ scaleX: [1, 1.1, 1] }}
+                   transition={{ repeat: Infinity, duration: 2 }}
+                   className="absolute top-1/2 left-0 right-0 h-0.5 bg-brand shadow-[0_0_15px_rgba(255,51,102,0.5)] z-10" 
+                 />
+               </div>
+             )}
 
              {/* Real-time Status Overlay */}
              <AnimatePresence mode="wait">

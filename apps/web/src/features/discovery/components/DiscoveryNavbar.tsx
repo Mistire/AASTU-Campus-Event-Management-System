@@ -10,7 +10,8 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-  ArrowRight
+  ArrowRight,
+  Menu
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,8 @@ import Logo from "@/components/ui/Logo";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import Image from "next/image";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { SIDEBAR_ITEMS } from "./DiscoverySidebar";
 
 export function DiscoveryNavbar() {
   const { profile, clearAuth } = useAuthStore();
@@ -33,7 +36,55 @@ export function DiscoveryNavbar() {
     <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 h-16">
       <div className="max-w-[1400px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-4 lg:gap-10">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg outline-none">
+                <Menu size={20} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center h-16 px-6 border-b border-gray-100 dark:border-gray-800">
+                  <Logo />
+                </div>
+                <div className="flex-1 py-6 px-4 overflow-y-auto">
+                  <p className="px-4 mb-4 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Menu</p>
+                  <nav className="space-y-2">
+                    {SIDEBAR_ITEMS.map((item) => {
+                      const isActive = pathname === item.href;
+                      const Icon = item.icon;
+                      return (
+                        <SheetClose asChild key={item.href}>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "group flex items-center gap-4 px-4 py-3.5 rounded-lg transition-all duration-300",
+                              isActive 
+                                ? "bg-brand text-white shadow-xl shadow-brand/20 scale-[1.02]" 
+                                : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-300",
+                              isActive ? "bg-white/20" : "bg-gray-50 dark:bg-gray-800 group-hover:bg-brand/5"
+                            )}>
+                              <Icon size={18} className={isActive ? "text-white" : "text-gray-400 group-hover:text-brand"} />
+                            </div>
+                            
+                            <div className="flex-1">
+                              <p className="text-xs font-black tracking-tight">{item.label}</p>
+                            </div>
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
           <Logo />
 
           <div className="h-8 w-px bg-gray-100 dark:bg-gray-800 hidden md:block" />

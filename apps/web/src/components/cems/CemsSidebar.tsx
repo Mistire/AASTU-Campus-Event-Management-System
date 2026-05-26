@@ -80,7 +80,7 @@ export function CemsSidebar() {
   }, {} as Record<string, any[]>)
 
   // Prepare groups for rendering
-  const renderGroups = Object.entries(sections).map(([sectionName, items]) => {
+  const renderGroups = (Object.entries(sections) as [string, any[]][]).map(([sectionName, items]) => {
     // Custom nesting logic for "System Metadata" to keep it clean
     if (sectionName === "System Metadata" && items.length > 0) {
       return {

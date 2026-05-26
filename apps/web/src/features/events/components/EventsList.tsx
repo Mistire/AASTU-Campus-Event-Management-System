@@ -240,7 +240,7 @@ export const EventsList = () => {
       <div className="flex gap-6">
         {/* Table */}
         <div className={cn(
-          "bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+          "bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 flex-1 min-w-0 px-4",
         )}>
           <CemsTable
             columns={columns}
@@ -262,7 +262,7 @@ export const EventsList = () => {
                 setPage(1);
             }}
             renderToolbarActions={() => (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ">
                 {!isOrganizer && (
                   <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
                     <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
