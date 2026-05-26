@@ -42,7 +42,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
   );
 
   const nearestEventId = useMemo(() => {
-    const events = organizedEventsData?.data || [];
+    const events = (organizedEventsData as any)?.data || [];
     if (events.length === 0) return null;
 
     const now = new Date();
@@ -75,7 +75,17 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
 
     return null;
   }, [organizedEventsData]);
-  const commonActions = [
+  interface ActionItem {
+    title: string;
+    desc: string;
+    icon: React.ComponentType<any>;
+    href: string;
+    color: string;
+    featured?: boolean;
+    onClick?: (e: React.MouseEvent) => void;
+  }
+
+  const commonActions: ActionItem[] = [
     {
       title: "New Event",
       desc: "Draft a new proposal",
@@ -85,8 +95,8 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       featured: true,
     },
   ];
-
-  const adminActions = [
+ 
+  const adminActions: ActionItem[] = [
     {
       title: "Manage Users",
       desc: "Audit user permissions",
@@ -102,8 +112,8 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
       color: "bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400",
     },
   ];
-
-  const organizerActions = [
+ 
+  const organizerActions: ActionItem[] = [
     ...commonActions,
     {
       title: "My Events",

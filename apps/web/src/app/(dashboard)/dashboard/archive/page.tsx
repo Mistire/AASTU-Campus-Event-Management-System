@@ -35,6 +35,7 @@ export default function ArchivePage() {
         {
           accessorKey: "title",
           header: "Event",
+          size: 320,
           cell: ({ row }: any) => (
             <div className="flex flex-col">
               <span className="font-black text-gray-900 dark:text-white tracking-tight">
@@ -49,12 +50,13 @@ export default function ArchivePage() {
         {
           accessorKey: "status",
           header: "Status",
+          size: 110,
           cell: ({ row }: any) => {
             const status = row.original.status;
             const isCancelled = status.toUpperCase() === "CANCELLED";
             return (
               <CemsBadge
-                variant={isCancelled ? "danger" : "success"}
+                status={isCancelled ? "danger" : "success"}
                 className="rounded-lg px-2 py-0.5 text-[9px] font-black uppercase tracking-widest"
               >
                 {status}
@@ -65,6 +67,7 @@ export default function ArchivePage() {
         {
           accessorKey: "totalRegistrations",
           header: "Registrations",
+          size: 130,
           cell: ({ row }: any) => (
             <div className="flex items-center gap-2">
               <Users className="w-3.5 h-3.5 text-gray-400" />
@@ -77,6 +80,7 @@ export default function ArchivePage() {
         {
           accessorKey: "attendanceRate",
           header: "Turnout",
+          size: 100,
           cell: ({ row }: any) => {
             const rate = Math.round(row.original.attendanceRate);
             return (
@@ -95,6 +99,7 @@ export default function ArchivePage() {
         {
           accessorKey: "averageRating",
           header: "Rating",
+          size: 90,
           cell: ({ row }: any) => (
             <div className="flex items-center gap-1.5">
               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />

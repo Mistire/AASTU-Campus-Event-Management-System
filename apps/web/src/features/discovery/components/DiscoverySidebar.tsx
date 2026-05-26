@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const SIDEBAR_ITEMS = [
+export const SIDEBAR_ITEMS = [
   {
     label: "Discovery",
     href: "/discovery",

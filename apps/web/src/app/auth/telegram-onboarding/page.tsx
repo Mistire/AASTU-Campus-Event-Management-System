@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { apiFetch } from "@/lib/api-client";
@@ -13,7 +13,7 @@ interface Department {
   name: string;
 }
 
-export default function TelegramOnboardingPage() {
+function TelegramOnboardingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
@@ -251,5 +251,20 @@ export default function TelegramOnboardingPage() {
         </form>
       </motion.div>
     </div>
+  );
+}
+
+export default function TelegramOnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center p-4 bg-radial from-gray-900 via-black to-black">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Loading Registration...</p>
+        </div>
+      </div>
+    }>
+      <TelegramOnboardingForm />
+    </Suspense>
   );
 }

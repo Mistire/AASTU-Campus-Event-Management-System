@@ -36,7 +36,8 @@ export function Header() {
   return (
     <div className="flex items-center justify-between w-full h-full bg-white dark:bg-gray-900 px-2">
       <div className="flex items-center gap-2">
-        <h1 className="font-brand font-black text-2xl tracking-tighter text-gray-900 dark:text-white pl-4">
+        <SidebarTrigger className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" />
+        <h1 className="font-brand font-black text-2xl tracking-tighter text-gray-900 dark:text-white pl-2 md:pl-4">
           Dashboard
         </h1>
       </div>

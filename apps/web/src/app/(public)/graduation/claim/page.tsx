@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   GraduationCap, CheckCircle, Mail, Send, Copy, Check,
@@ -70,7 +70,7 @@ interface ClaimResult {
   bulkEmailSent: string | null;
 }
 
-export default function GraduationClaimPage() {
+function GraduationClaimForm() {
   const params = useSearchParams();
   const token = params.get("token");
 
@@ -503,5 +503,17 @@ export default function GraduationClaimPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function GraduationClaimPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center">
+        <Loader2 className="animate-spin text-sky-500" size={40} />
+      </div>
+    }>
+      <GraduationClaimForm />
+    </Suspense>
   );
 }

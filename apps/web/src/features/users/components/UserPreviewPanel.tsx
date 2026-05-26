@@ -4,11 +4,6 @@ import { Users as UsersIcon, Mail, Shield, Calendar, Hash, X } from 'lucide-reac
 import { UserRecord } from '../types';
 import { cn } from '@/lib/utils';
 
-interface UserPreviewPanelProps {
-  user: UserRecord;
-  onClose: () => void;
-}
-
 import { CemsSheet } from "@/components/cems/CemsSheet";
 import { CemsBadge } from "@/components/cems/CemsBadge";
 
