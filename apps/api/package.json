@@ -32,6 +32,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "test:ci": "jest --ci --coverage --passWithNoTests",
+    "test:integration": "npm run test-db:up && dotenv -e .env.test -- prisma migrate deploy && dotenv -e .env.test -- jest --config ./test/jest-e2e.json --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:auth": "npm run test-db:up && dotenv -e .env.test -- prisma migrate deploy && dotenv -e .env.test -- jest --config ./test/jest-e2e.json --runInBand test/auth.e2e-spec.ts",
@@ -123,9 +125,20 @@
       "^src/(.*)$": "<rootDir>/$1"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.module.ts",
+      "!**/*.dto.ts",
+      "!main.ts"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "statements": 85,
+        "branches": 80,
+        "functions": 85,
+        "lines": 85
+      }
+    }
   }
 }
