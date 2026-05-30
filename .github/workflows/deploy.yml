@@ -35,7 +35,7 @@ jobs:
             echo "==> Pulling latest code..."
             cd $APP_DIR
             git fetch origin
-            git reset --hard origin/dev
+            git reset --hard origin/${{ github.ref_name }}
 
             echo "==> Writing .env file from GitHub Secrets..."
             {
