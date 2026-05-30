@@ -4,7 +4,7 @@ import { IsArray, IsString, IsUUID, ValidateNested } from 'class-validator';
 
 export class FeedbackAnswerDto {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   questionId: string;
 
   @ApiProperty()

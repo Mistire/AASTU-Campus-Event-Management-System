@@ -7,6 +7,12 @@ import { VenuesService } from './venues.service';
 import { BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AuthUser } from '../auth/jwt.strategy';
 import { EmailService } from '../auth/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { FeedbackService } from '../feedback/feedback.service';
+import { TelegramService } from '../telegram/telegram.service';
 
 const mockPrismaService = {
   event: {
@@ -52,6 +58,33 @@ const mockEmailService = {
   sendEventLiveEmail: jest.fn(),
 };
 
+const mockNotificationsService = {
+  enqueueNotification: jest.fn().mockResolvedValue(null),
+  enqueueBulkNotifications: jest.fn().mockResolvedValue(null),
+};
+
+const mockJwtService = {
+  sign: jest.fn().mockReturnValue('token'),
+  verify: jest.fn().mockReturnValue({}),
+};
+
+const mockConfigService = {
+  get: jest.fn((key: string, defaultVal?: unknown) => defaultVal),
+};
+
+const mockAuditLogsService = {
+  createLog: jest.fn().mockResolvedValue(null),
+};
+
+const mockFeedbackService = {
+  dispatchFeedbackEmails: jest.fn().mockResolvedValue(null),
+};
+
+const mockTelegramService = {
+  sendEventAnnouncement: jest.fn().mockResolvedValue(null),
+  sendEventLiveAlert: jest.fn().mockResolvedValue(null),
+};
+
 const mockUser: AuthUser = {
   id: 'user-id',
   email: 'organizer@aastu.edu.et',
@@ -80,6 +113,12 @@ describe('EventsService', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: VenuesService, useValue: mockVenuesService },
         { provide: EmailService, useValue: mockEmailService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: JwtService, useValue: mockJwtService },
+        { provide: ConfigService, useValue: mockConfigService },
+        { provide: AuditLogsService, useValue: mockAuditLogsService },
+        { provide: FeedbackService, useValue: mockFeedbackService },
+        { provide: TelegramService, useValue: mockTelegramService },
       ],
     }).compile();
 
@@ -150,7 +189,7 @@ describe('EventsService', () => {
 
   describe('approve', () => {
     it('should transition from PENDING to APPROVED', async () => {
-      const mockEvent = { id: 'evt-id', statusId: pendingStatus.id, status: pendingStatus };
+      const mockEvent = { id: 'evt-id', statusId: pendingStatus.id, status: pendingStatus, createdBy: 'user-id' };
       prisma.event.findUnique.mockResolvedValue(mockEvent);
       prisma.eventStatus.findUnique
         .mockResolvedValueOnce(pendingStatus) // current status lookup
@@ -192,12 +231,12 @@ describe('EventsService', () => {
 
       expect(prisma.event.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: {
+          where: expect.objectContaining({
             OR: [
               { createdBy: 'user-id' },
               { organizers: { some: { userId: 'user-id', status: 'ACCEPTED' } } },
             ],
-          },
+          }),
         }),
       );
       expect(result).toEqual({

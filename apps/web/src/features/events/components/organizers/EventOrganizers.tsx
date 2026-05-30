@@ -17,7 +17,7 @@ interface EventOrganizersProps {
 }
 
 export function EventOrganizers({ eventId, canEdit, eventCreatorId }: EventOrganizersProps) {
-  const { user } = useAuthStore();
+  const { profile: user } = useAuthStore();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const { data: organizers, isLoading } = useEventOrganizers(eventId);
   const removeMutation = useRemoveOrganizer();

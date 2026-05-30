@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 import { SupportFAB } from "@/features/support/components/SupportFAB";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -34,6 +35,12 @@ export default function RootLayout({
       className={`${sans.variable} ${brand.variable} antialiased font-sans`}
       suppressHydrationWarning
     >
+      <head>
+        <Script
+          src="https://telegram.org/js/telegram-web-app.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className="flex flex-col">
         <Toaster
           position="top-right"

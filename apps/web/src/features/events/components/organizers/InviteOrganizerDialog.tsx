@@ -33,7 +33,7 @@ export function InviteOrganizerDialog({
 
   const filteredUsers = users?.filter(
     (user) =>
-      user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   ).slice(0, 8);
 
@@ -100,11 +100,11 @@ export function InviteOrganizerDialog({
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-brand/5 flex items-center justify-center text-brand font-black text-xs uppercase">
-                        {user.fullName?.substring(0, 2) || "??"}
+                        {user.full_name?.substring(0, 2) || "??"}
                       </div>
                       <div>
                         <p className="text-sm font-black text-gray-900 dark:text-white leading-none mb-1">
-                          {user.fullName}
+                          {user.full_name}
                         </p>
                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-tight">
                           <Mail size={10} />

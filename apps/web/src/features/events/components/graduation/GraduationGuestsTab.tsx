@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   GraduationCap, Upload, Plus, RefreshCw, Check, X, Star, Medal,
-  AlertCircle, Loader2, Send, Mail, ChevronDown, ChevronUp, FileText
+  Loader2, Send, Mail, ChevronDown, ChevronUp, FileText, Settings2, Package
 } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { toast } from "sonner";
 import { CemsButton } from "@/components/cems/CemsButton";
 
-// ─── Tier Config ──────────────────────────────────────────────────────────────
+// ─── Tier Display Config ──────────────────────────────────────────────────────
 
 const TIER = {
   DISTINGUISHED: { label: "Distinguished", icon: Star, bg: "bg-amber-50 dark:bg-amber-950/20", text: "text-amber-700 dark:text-amber-400", border: "border-amber-200 dark:border-amber-800", dot: "bg-amber-400" },
@@ -18,12 +18,29 @@ const TIER = {
   GRADUATE:      { label: "Graduate",      icon: GraduationCap, bg: "bg-sky-50 dark:bg-sky-950/20",    text: "text-sky-700 dark:text-sky-400",    border: "border-sky-200 dark:border-sky-800",    dot: "bg-sky-400"    },
 };
 
+interface TierConfig {
+  distinguishedMinGpa: number;
+  honorsMinGpa: number;
+  distinguishedSlots: number;
+  honorsSlots: number;
+  graduateSlots: number;
+}
+
+const DEFAULT_CFG: TierConfig = { distinguishedMinGpa: 3.75, honorsMinGpa: 3.50, distinguishedSlots: 3, honorsSlots: 2, graduateSlots: 1 };
+
 // ─── API Calls ────────────────────────────────────────────────────────────────
 
 async function fetchStudents(eventId: string) {
   const res = await apiFetch(`/api/graduation/${eventId}/students`);
   const data = await res.json();
   return data.data ?? data;
+}
+
+async function fetchConfig(eventId: string): Promise<TierConfig> {
+  const res = await apiFetch(`/api/graduation/${eventId}/config`);
+  const data = await res.json();
+  const payload = data.data ?? data;
+  return payload.distinguishedMinGpa !== undefined ? payload : DEFAULT_CFG;
 }
 
 // ─── Add Student Form ─────────────────────────────────────────────────────────
@@ -243,11 +260,17 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
           {student.guestPasses.map((gp: any) => (
             <div key={gp.id} className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900">
               <div className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                {gp.deliveryMethod === "TELEGRAM" ? <Send size={10} className="text-sky-500" /> : <Mail size={10} className="text-violet-500" />}
+                {gp.deliveryMethod === "TELEGRAM"
+                  ? <Send size={10} className="text-sky-500" />
+                  : gp.deliveryMethod === "STUDENT_EMAIL"
+                  ? <Package size={10} className="text-emerald-500" />
+                  : <Mail size={10} className="text-violet-500" />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-gray-700 dark:text-gray-300">{gp.parentLabel}</p>
-                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{gp.deliveryMethod}</p>
+                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                  {gp.deliveryMethod === "STUDENT_EMAIL" ? "Bundle → Student" : gp.deliveryMethod}
+                </p>
               </div>
               {gp.delivered ? (
                 <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg flex items-center gap-1">
@@ -260,11 +283,12 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
                 onClick={() => handleResend(gp.id)}
                 disabled={resending === gp.id}
                 className="shrink-0 w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-colors disabled:opacity-50"
-                title={gp.deliveryMethod === "TELEGRAM" ? "Copy deep link" : "Resend email"}
+                title={gp.deliveryMethod === "TELEGRAM" ? "Copy deep link" : gp.deliveryMethod === "STUDENT_EMAIL" ? "Resend bundle to student" : "Resend email"}
               >
                 {resending === gp.id ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
               </button>
             </div>
+
           ))}
         </div>
       )}
@@ -272,6 +296,132 @@ function StudentRow({ student, eventId, onRefresh }: { student: any; eventId: st
       {expanded && (!student.guestPasses || student.guestPasses.length === 0) && (
         <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-50 dark:border-gray-800 text-center">
           <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">Student hasn&apos;t claimed their passes yet.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Inline Tier Config Panel ──────────────────────────────────────────────────
+
+function TierConfigInline({ eventId }: { eventId: string }) {
+  const [open, setOpen] = useState(false);
+  const [cfg, setCfg] = useState<TierConfig>(DEFAULT_CFG);
+  const [draft, setDraft] = useState<TierConfig>(DEFAULT_CFG);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchConfig(eventId).then((c) => { setCfg(c); setDraft(c); });
+  }, [eventId]);
+
+  const update = (field: keyof TierConfig, val: number) =>
+    setDraft((d) => ({ ...d, [field]: val }));
+
+  const handleSave = async () => {
+    if (draft.honorsMinGpa >= draft.distinguishedMinGpa) {
+      toast.error("Honors GPA must be less than Distinguished GPA.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await apiFetch(`/api/graduation/${eventId}/config`, {
+        method: "PUT",
+        body: JSON.stringify(draft),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setCfg(draft);
+      toast.success("Tier configuration updated");
+      setOpen(false);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save config");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const preview = [
+    { label: "Graduate",      gpa: `< ${cfg.honorsMinGpa}`,                         slots: cfg.graduateSlots,      icon: GraduationCap, text: "text-sky-700 dark:text-sky-400",       bg: "bg-sky-50 dark:bg-sky-950/20",       border: "border-sky-100 dark:border-sky-800"       },
+    { label: "Honors",        gpa: `${cfg.honorsMinGpa}–${cfg.distinguishedMinGpa}`, slots: cfg.honorsSlots,        icon: Medal,         text: "text-violet-700 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/20", border: "border-violet-100 dark:border-violet-800" },
+    { label: "Distinguished", gpa: `≥ ${cfg.distinguishedMinGpa}`,                   slots: cfg.distinguishedSlots, icon: Star,           text: "text-amber-700 dark:text-amber-400",  bg: "bg-amber-50 dark:bg-amber-950/20",   border: "border-amber-100 dark:border-amber-800"   },
+  ];
+
+  return (
+    <div className="rounded-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <button type="button" onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+        <div className="flex items-center gap-2">
+          <Settings2 size={13} className="text-brand" />
+          <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Tier Configuration</span>
+          <span className="text-[9px] text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-full font-bold">
+            D≥{cfg.distinguishedMinGpa} · H≥{cfg.honorsMinGpa}
+          </span>
+        </div>
+        {open ? <ChevronUp size={13} className="text-gray-400" /> : <ChevronDown size={13} className="text-gray-400" />}
+      </button>
+
+      {open && (
+        <div className="p-4 bg-white dark:bg-gray-900 space-y-4 border-t border-gray-100 dark:border-gray-800">
+          <div className="grid grid-cols-3 gap-2">
+            {preview.map((t) => (
+              <div key={t.label} className={`p-3 rounded-lg border ${t.bg} ${t.border} text-center flex flex-col items-center`}>
+                <t.icon size={15} className={`${t.text} mb-1`} />
+                <p className={`text-[9px] font-black uppercase tracking-widest ${t.text}`}>{t.label}</p>
+                <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 mt-0.5">GPA {t.gpa}</p>
+                <p className={`text-[9px] font-black mt-1 ${t.text}`}>{t.slots} guest{t.slots !== 1 ? "s" : ""}</p>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">GPA Thresholds</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block mb-1">Honors Min GPA</label>
+                <input type="number" step="0.01" min="0" max="5" value={draft.honorsMinGpa}
+                  onChange={(e) => update("honorsMinGpa", parseFloat(e.target.value))}
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-xs font-bold text-gray-900 dark:text-white outline-none focus:border-brand/40" />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block mb-1">Distinguished Min GPA</label>
+                <input type="number" step="0.01" min="0" max="5" value={draft.distinguishedMinGpa}
+                  onChange={(e) => update("distinguishedMinGpa", parseFloat(e.target.value))}
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-xs font-bold text-gray-900 dark:text-white outline-none focus:border-brand/40" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Guest Slots Per Tier</p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { key: "graduateSlots" as const,     label: "Graduate",      color: "text-sky-600 dark:text-sky-400" },
+                { key: "honorsSlots" as const,        label: "Honors",        color: "text-violet-600 dark:text-violet-400" },
+                { key: "distinguishedSlots" as const, label: "Distinguished", color: "text-amber-600 dark:text-amber-400" },
+              ]).map(({ key, label, color }) => (
+                <div key={key}>
+                  <label className={`text-[9px] font-black ${color} uppercase tracking-widest block mb-1`}>{label}</label>
+                  <input type="number" min="0" max="10" value={draft[key]}
+                    onChange={(e) => update(key, parseInt(e.target.value, 10))}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-xs font-bold text-gray-900 dark:text-white outline-none focus:border-brand/40" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-[9px] text-amber-600 dark:text-amber-400 font-bold">
+            ⚠ Config changes only apply to newly imported students — existing records are not recomputed.
+          </p>
+
+          <div className="flex gap-2">
+            <button type="button" onClick={() => { setDraft(cfg); setOpen(false); }}
+              className="flex-1 py-2 rounded-lg border border-gray-100 dark:border-gray-700 text-[10px] font-black text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              Cancel
+            </button>
+            <button type="button" onClick={handleSave} disabled={saving}
+              className="flex-1 py-2 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+              {saving ? <><Loader2 size={11} className="animate-spin" /> Saving...</> : <><Check size={11} /> Save Config</>}
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -299,10 +449,10 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
       {/* Stats bar */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: "Total Students", value: students.length, color: "text-gray-900 dark:text-white" },
-          { label: "Invitations Sent", value: students.length, color: "text-sky-600 dark:text-sky-400" },
-          { label: "Passes Claimed", value: `${claimed}/${students.length}`, color: "text-violet-600 dark:text-violet-400" },
-          { label: "QR Delivered", value: `${deliveredPasses}/${totalPasses}`, color: "text-emerald-600 dark:text-emerald-400" },
+          { label: "Total Students",  value: students.length,                        color: "text-gray-900 dark:text-white"           },
+          { label: "Invitations Sent",value: students.length,                        color: "text-sky-600 dark:text-sky-400"           },
+          { label: "Passes Claimed",  value: `${claimed}/${students.length}`,        color: "text-violet-600 dark:text-violet-400"     },
+          { label: "QR Delivered",    value: `${deliveredPasses}/${totalPasses}`,    color: "text-emerald-600 dark:text-emerald-400"   },
         ].map(({ label, value, color }) => (
           <div key={label} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 text-center">
             <p className={`text-xl font-black ${color}`}>{value}</p>
@@ -330,6 +480,9 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
       {showCsv && <CsvUpload eventId={eventId} onSuccess={() => refetch()} />}
       {showAdd && <AddStudentForm eventId={eventId} onSuccess={() => refetch()} />}
 
+      {/* Tier config panel */}
+      <TierConfigInline eventId={eventId} />
+
       {/* Student list */}
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
@@ -351,3 +504,4 @@ export function GraduationGuestsTab({ eventId }: { eventId: string }) {
     </div>
   );
 }
+

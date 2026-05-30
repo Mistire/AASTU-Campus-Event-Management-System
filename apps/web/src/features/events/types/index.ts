@@ -71,3 +71,12 @@ export interface PaginatedEventsResponse {
     stats: Record<EventStatusName, number>;
   };
 }
+
+export interface EventFormModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  event?: Event | null;
+  onSave: (data: any) => void;
+  isSaving?: boolean;
+}
+

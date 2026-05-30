@@ -101,7 +101,7 @@ export function TemplateBuilder({
         const payload = questions.map((q, i) => ({
             label: q.label || `Question ${i + 1}`,
             type: q.type,
-            options: q.type === "MULTIPLE_CHOICE" ? q.options : undefined,
+            options: q.type === "MULTIPLE_CHOICE" ? q.options : null,
             isRequired: q.isRequired,
             order: i,
         }));

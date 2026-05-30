@@ -43,8 +43,9 @@ model User {
   id                  String                    @id @default(uuid()) @db.Uuid
   fullName            String                    @map("full_name") @db.VarChar
   email               String                    @unique @db.VarChar
-  passwordHash        String                    @map("password_hash") @db.VarChar
+  passwordHash        String?                   @map("password_hash") @db.VarChar
   roleId              String                    @map("role_id") @db.Uuid
+  telegramId          String?                   @unique @map("telegram_id") @db.VarChar
   departmentId        String?                   @map("department_id") @db.Uuid
   phone               String?                   @db.VarChar
   profileImage        String?                   @map("profile_image") @db.VarChar
@@ -241,9 +242,11 @@ model Event {
   feedbackTokens        FeedbackToken[]
   feedbackResponses     FeedbackResponse[]
   feedbackTemplates     EventFeedbackTemplate[]
+  graduationConfig      GraduationConfig?
 
   @@map("events")
 }
+
 
 model EventBookmark {
   id        String   @id @default(uuid()) @db.Uuid
@@ -653,6 +656,28 @@ enum OneTimeTokenType {
 }
 
 // ─── Graduation Feature ───────────────────────────────────────────────────────
+
+model GraduationConfig {
+  id                  String   @id @default(uuid()) @db.Uuid
+  eventId             String   @unique @map("event_id") @db.Uuid
+
+  /// GPA lower bounds for each tier (inclusive)
+  distinguishedMinGpa Float    @default(3.75) @map("distinguished_min_gpa")
+  honorsMinGpa        Float    @default(3.50) @map("honors_min_gpa")
+
+  /// Guest-pass slots awarded per tier
+  distinguishedSlots  Int      @default(3)    @map("distinguished_slots")
+  honorsSlots         Int      @default(2)    @map("honors_slots")
+  graduateSlots       Int      @default(1)    @map("graduate_slots")
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  event               Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("graduation_configs")
+}
+
 
 model GraduationRecord {
   id          String       @id @default(uuid()) @db.Uuid

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -125,7 +126,7 @@ const SidebarProvider = React.forwardRef<
 
     return (
       <SidebarContext.Provider value={contextValue}>
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider delay={0}>
           <div
             style={
               {
@@ -436,7 +437,7 @@ const SidebarGroupLabel = React.forwardRef<
           "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
           className
         ),
-      },
+      } as any,
       props
     ),
     render,
@@ -461,7 +462,7 @@ const SidebarGroupAction = React.forwardRef<
           "group-data-[collapsible=icon]:hidden",
           className
         ),
-      },
+      } as any,
       props
     ),
     render,
@@ -562,7 +563,7 @@ const SidebarMenuButton = React.forwardRef<
           "data-size": size,
           "data-active": isActive,
           className: cn(sidebarMenuButtonVariants({ variant, size }), className),
-        },
+        } as any,
         props as any
       ),
       render,
@@ -580,7 +581,7 @@ const SidebarMenuButton = React.forwardRef<
 
     return (
       <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipTrigger render={button} />
         <TooltipContent
           side="right"
           align="center"
@@ -615,7 +616,7 @@ const SidebarMenuAction = React.forwardRef<
             "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
           className
         ),
-      },
+      } as any,
       props
     ),
     render,
@@ -724,7 +725,7 @@ const SidebarMenuSubButton = React.forwardRef<
           size === "md" && "text-sm",
           className
         ),
-      },
+      } as any,
       props as any
     ),
     render,

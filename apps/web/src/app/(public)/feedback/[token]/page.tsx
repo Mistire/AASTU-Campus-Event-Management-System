@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, use } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useFeedbackForm, useSubmitFeedback } from "@/features/feedback/api";
 import { FeedbackFormRenderer } from "@/features/feedback/components/FeedbackFormRenderer";
@@ -119,7 +119,7 @@ function FeedbackFormContent({ token }: { token: string }) {
     return (
         <div className="max-w-2xl mx-auto space-y-6">
             {/* Event Header */}
-            <div className="relative bg-gradient-to-br from-brand via-sky-500 to-indigo-600 rounded-2xl p-8 text-white shadow-2xl overflow-hidden">
+            <div className="relative bg-brand rounded-2xl p-8 text-white shadow-2xl overflow-hidden">
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                 <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
                 <p className="text-xs font-black uppercase tracking-[0.25em] text-white/60 mb-2">
@@ -173,7 +173,8 @@ function FeedbackFormContent({ token }: { token: string }) {
     );
 }
 
-export default function FeedbackPage({ params }: { params: { token: string } }) {
+export default function FeedbackPage({ params }: { params: Promise<{ token: string }> }) {
+    const { token } = use(params);
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
             <DiscoveryNavbar />
@@ -188,7 +189,7 @@ export default function FeedbackPage({ params }: { params: { token: string } }) 
                         </div>
                     }
                 >
-                    <FeedbackFormContent token={params.token} />
+                    <FeedbackFormContent token={token} />
                 </Suspense>
             </div>
         </div>

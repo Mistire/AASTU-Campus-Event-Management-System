@@ -6,7 +6,8 @@ import { Event, EventStatusName, PaginatedEventsResponse } from "../types";
 import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent } from "../api/mutations";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent, useArchiveEvent } from "../api/mutations";
+import { useAttachTemplate } from "@/features/feedback/api";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { CemsTable } from "@/components/cems/CemsTable";
 import { CemsButton } from "@/components/cems/CemsButton";
@@ -19,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToastController } from "@/components/shared/ToastController";
 import { EventFormModal } from "./EventFormModal";
 import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
+import { ArchiveConfirmation } from "@/components/shared/ArchiveConfirmation";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { STATUS_OPTIONS } from "../constants";
@@ -37,6 +39,7 @@ export const EventsList = () => {
 
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
 
@@ -68,6 +71,8 @@ export const EventsList = () => {
   const approveEvent = useApproveEvent();
   const rejectEvent = useRejectEvent();
   const goLiveEvent = useGoLiveEvent();
+  const archiveEvent = useArchiveEvent();
+  const attachTemplate = useAttachTemplate();
 
   useEffect(() => {
     if (isError && error) {
@@ -159,12 +164,37 @@ export const EventsList = () => {
     });
   };
 
+  const handleArchive = (event: Event) => {
+    setSelectedEvent(event);
+    setIsArchiveModalOpen(true);
+  };
+
+  const handleConfirmArchive = async (templateId: string) => {
+    if (!selectedEvent) return;
+    try {
+      if (templateId) {
+        await attachTemplate.mutateAsync({ templateId, eventId: selectedEvent.id });
+      }
+      archiveEvent.mutate(selectedEvent.id, {
+        onSuccess: () => {
+          setIsArchiveModalOpen(false);
+          ToastController.success({ message: "Event archived successfully" });
+        },
+        onError: (err) => {
+          ToastController.error({ message: "Failed to archive event", description: err.message });
+        }
+      });
+    } catch (err: any) {
+      ToastController.error({ message: "Failed to attach template", description: err.message });
+    }
+  };
+
   const handleManageAttendees = (event: Event) => {
     router.push(`/dashboard/events/${event.id}/attendees`);
   };
 
   const columns = useMemo(() => 
-    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleManageAttendees), 
+    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleArchive, handleManageAttendees), 
   [userRole]);
 
   const totalPages = (eventsData as PaginatedEventsResponse)?.meta?.totalPages || 1;
@@ -210,13 +240,13 @@ export const EventsList = () => {
       <div className="flex gap-6">
         {/* Table */}
         <div className={cn(
-          "bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+          "bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 flex-1 min-w-0 px-4",
         )}>
           <CemsTable
             columns={columns}
             data={(eventsData as PaginatedEventsResponse)?.data || []}
             loading={isLoading}
-            emptyMessage="No events found matching your criteria."
+            emptyMessage="No events found. Active and upcoming events will appear here."
             onRowClick={(event) => setPreviewEvent(event)}
             enableSorting
             enableGlobalFilter
@@ -232,7 +262,7 @@ export const EventsList = () => {
                 setPage(1);
             }}
             renderToolbarActions={() => (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ">
                 {!isOrganizer && (
                   <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
                     <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
@@ -297,6 +327,14 @@ export const EventsList = () => {
         itemName={selectedEvent?.title || "Unknown Event"}
         onConfirm={handleConfirmDelete}
         isDeleting={deleteEvent.isPending}
+      />
+
+      <ArchiveConfirmation
+        open={isArchiveModalOpen}
+        onOpenChange={setIsArchiveModalOpen}
+        itemName={selectedEvent?.title || "Unknown Event"}
+        onConfirm={handleConfirmArchive}
+        isArchiving={archiveEvent.isPending || attachTemplate.isPending}
       />
     </div>
   );

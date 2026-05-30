@@ -12,27 +12,15 @@ import { PrismaModule } from '../src/prisma/prisma.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AuthModule } from '../src/auth/auth.module';
 import { UsersModule } from '../src/users/users.module';
+import { DatabaseCleaner } from '../utils/database.util';
 
 describe('Users Module (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let dbCleaner: DatabaseCleaner;
   let testEmailCounter = Date.now();
 
   const makeEmail = (prefix: string) => `${prefix}-${testEmailCounter++}@aastu.edu.et`;
-
-  const cleanUsersDomainTables = async () => {
-    await prisma.userCategoryPreferences.deleteMany();
-    await prisma.userInterests.deleteMany();
-    await prisma.oneTimeToken.deleteMany();
-    await prisma.authSession.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.category.deleteMany();
-    await prisma.interest.deleteMany();
-    await prisma.department.deleteMany();
-    await prisma.rolePermission.deleteMany();
-    await prisma.permission.deleteMany();
-    await prisma.role.deleteMany();
-  };
 
   const seedRoleData = async () => {
     const permissions = [
@@ -128,15 +116,16 @@ describe('Users Module (e2e)', () => {
     request.setBaseUrl(`http://127.0.0.1:${address.port}`);
 
     prisma = app.get(PrismaService);
+    dbCleaner = new DatabaseCleaner(prisma);
   });
 
   beforeEach(async () => {
-    await cleanUsersDomainTables();
+    await dbCleaner.cleanDatabase();
     await seedRoleData();
   });
 
   afterAll(async () => {
-    await cleanUsersDomainTables();
+    await dbCleaner.cleanDatabase();
     await app.close();
   });
 

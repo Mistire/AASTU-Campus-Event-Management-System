@@ -23,12 +23,16 @@ import {
   SignUpDto,
   VerifyCampusIdDto,
   VerifyEmailDto,
+  TelegramLoginDto,
+  TelegramRegisterDto,
 } from './dto';
 import { Public } from './decorator';
 import { JwtAuthGuard } from './guard';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
+
+import { Throttle } from '@nestjs/throttler';
 
 type AuthenticatedRequest = Request & { user?: AuthUser };
 
@@ -40,14 +44,36 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('signup')
   signup(@Body() dto: SignUpDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
     return this.authService.signUp(dto, { ip, userAgent });
   }
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('login')
   login(@Body() dto: LoginDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
     return this.authService.login(dto, { ip, userAgent });
+  }
+
+  @Public()
+  @Post('telegram/login')
+  telegramLogin(
+    @Body() dto: TelegramLoginDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.telegramLogin(dto, { ip, userAgent });
+  }
+
+  @Public()
+  @Post('telegram/register')
+  telegramRegister(
+    @Body() dto: TelegramRegisterDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.authService.telegramRegister(dto, { ip, userAgent });
   }
   @Public()
   @Post('refresh')

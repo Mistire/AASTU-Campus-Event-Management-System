@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,13 +14,30 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guard';
 import { Public } from '../auth/decorator';
 import { GraduationService } from './graduation.service';
-import { AddStudentDto, ClaimSubmissionDto } from './dto/graduation.dto';
+import { AddStudentDto, ClaimSubmissionDto, SaveGraduationConfigDto } from './dto/graduation.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Graduation')
 @Controller('graduation')
 export class GraduationController {
   constructor(private readonly graduationService: GraduationService) {}
+
+  // ── Organizer: Tier Config ────────────────────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Get(':eventId/config')
+  getConfig(@Param('eventId') eventId: string) {
+    return this.graduationService.getConfig(eventId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':eventId/config')
+  saveConfig(
+    @Param('eventId') eventId: string,
+    @Body() dto: SaveGraduationConfigDto,
+    @Req() req: any,
+  ) {
+    return this.graduationService.saveConfig(eventId, req.user.id, dto);
+  }
 
   // ── Organizer: Import CSV ─────────────────────────────────────────────────
   @UseGuards(JwtAuthGuard)

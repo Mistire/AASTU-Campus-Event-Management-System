@@ -25,6 +25,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { FeedbackService } from '../feedback/feedback.service';
+import { TelegramService } from '../telegram/telegram.service';
 
 // Allowed status transitions
 const STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -52,6 +53,7 @@ export class EventsService {
     private readonly configService: ConfigService,
     private readonly auditLogsService: AuditLogsService,
     private readonly feedbackService: FeedbackService,
+    private readonly telegramService: TelegramService,
   ) {}
 
   private async getStatusByName(name: string) {
@@ -297,6 +299,11 @@ export class EventsService {
       this.logger.error(`Failed to create audit log: ${e.message}`);
     }
 
+    // Post announcement to Telegram channel (fire-and-forget)
+    this.telegramService.sendEventAnnouncement(updated).catch((err) =>
+      this.logger.error(`Telegram announce failed for "${event.title}": ${err.message}`),
+    );
+
     return updated;
   }
 
@@ -401,6 +408,11 @@ export class EventsService {
       // 2. Email notifications
       await this.emailService.sendEventLiveEmail(attendeeEmails, event.title);
     }
+
+    // Post live alert to Telegram channel (fire-and-forget)
+    this.telegramService.sendEventLiveAlert(updated).catch((err) =>
+      this.logger.error(`Telegram live alert failed for "${event.title}": ${err.message}`),
+    );
 
     return updated;
   }
@@ -1029,6 +1041,7 @@ export class EventsService {
       eventType: true,
       venue: true,
       media: true,
+      creator: true,
       tags: { include: { tag: true } },
       eventCategories: { include: { category: true } },
       sessions: {

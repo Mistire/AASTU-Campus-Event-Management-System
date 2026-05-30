@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+<<<<<<< HEAD
   output: 'standalone',
+=======
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+>>>>>>> 35b2c63239f8d44c0b7efbe1b11b1926199b82e9
   turbopack: {
     root: "../../",
   },

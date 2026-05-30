@@ -15,7 +15,7 @@ import { CreateFeedbackTemplateDto } from './dto/create-template.dto';
 import { SubmitFeedbackDto } from './dto/submit-feedback.dto';
 
 interface FeedbackJwtPayload {
-  sub: string;    // feedbackToken record id
+  sub: string; // feedbackToken record id
   userId: string;
   eventId: string;
 }
@@ -68,6 +68,69 @@ export class FeedbackService {
         order: 3,
       },
     ];
+  }
+
+  private async getOrCreateDefaultTemplate(createdBy: string | null) {
+    let template = await this.prisma.feedbackFormTemplate.findFirst({
+      where: { isDefault: true },
+      include: { questions: { orderBy: { order: 'asc' } } },
+    });
+
+    if (!template) {
+      let finalCreatedBy = createdBy;
+      if (!finalCreatedBy) {
+        const fallbackUser =
+          (await this.prisma.user.findFirst({
+            where: { role: { roleName: { in: ['ADMIN', 'ORGANIZER'] } } },
+          })) || (await this.prisma.user.findFirst());
+        finalCreatedBy = fallbackUser?.id || null;
+      }
+
+      if (!finalCreatedBy) {
+        throw new Error(
+          'Cannot create default feedback template: No user found to assign as creator.',
+        );
+      }
+
+      template = await this.prisma.feedbackFormTemplate.create({
+        data: {
+          name: 'Default Event Feedback Template',
+          isDefault: true,
+          createdBy: finalCreatedBy,
+          questions: {
+            create: [
+              {
+                label: 'How would you rate this event overall?',
+                type: 'RATING',
+                isRequired: true,
+                order: 0,
+              },
+              {
+                label: 'What did you enjoy most about the event?',
+                type: 'TEXT',
+                isRequired: false,
+                order: 1,
+              },
+              {
+                label: 'What could be improved?',
+                type: 'TEXT',
+                isRequired: false,
+                order: 2,
+              },
+              {
+                label: 'How likely are you to attend future events?',
+                type: 'SCALE',
+                isRequired: true,
+                order: 3,
+              },
+            ],
+          },
+        },
+        include: { questions: { orderBy: { order: 'asc' } } },
+      });
+    }
+
+    return template;
   }
 
   // ─── Token helpers ────────────────────────────────────────────────────────
@@ -222,16 +285,27 @@ export class FeedbackService {
 
     // Resolve questions: prefer event-specific template, else default
     const eventTemplate = tokenRecord.event.feedbackTemplates[0]?.template;
-    const questions = eventTemplate
-      ? eventTemplate.questions.map((q) => ({
-          id: q.id,
-          label: q.label,
-          type: q.type,
-          options: q.options,
-          isRequired: q.isRequired,
-          order: q.order,
-        }))
-      : this.defaultQuestions;
+    let questions;
+    if (eventTemplate) {
+      questions = eventTemplate.questions.map((q) => ({
+        id: q.id,
+        label: q.label,
+        type: q.type,
+        options: q.options,
+        isRequired: q.isRequired,
+        order: q.order,
+      }));
+    } else {
+      const defaultTemplate = await this.getOrCreateDefaultTemplate(tokenRecord.event.createdBy);
+      questions = defaultTemplate.questions.map((q) => ({
+        id: q.id,
+        label: q.label,
+        type: q.type,
+        options: q.options,
+        isRequired: q.isRequired,
+        order: q.order,
+      }));
+    }
 
     return {
       alreadySubmitted,
@@ -250,6 +324,7 @@ export class FeedbackService {
 
     const tokenRecord = await this.prisma.feedbackToken.findUnique({
       where: { id: payload.sub },
+      include: { event: true },
     });
 
     if (!tokenRecord) throw new BadRequestException('Invalid feedback token');
@@ -268,13 +343,29 @@ export class FeedbackService {
 
     const isDefaultForm = !eventTemplate;
 
-    // For custom templates, validate questionIds
+    let validIds: Set<string>;
+    let defaultTemplate: any = null;
+
     if (!isDefaultForm && eventTemplate) {
-      const validIds = new Set(eventTemplate.template.questions.map((q) => q.id));
-      for (const answer of dto.answers) {
-        if (!validIds.has(answer.questionId)) {
-          throw new BadRequestException(`Unknown question id: ${answer.questionId}`);
+      validIds = new Set(eventTemplate.template.questions.map((q) => q.id));
+    } else {
+      defaultTemplate = await this.getOrCreateDefaultTemplate(tokenRecord.event.createdBy);
+      validIds = new Set(defaultTemplate.questions.map((q) => q.id));
+    }
+
+    // Validate and map questionIds
+    for (const answer of dto.answers) {
+      if (!validIds.has(answer.questionId)) {
+        // Fallback mapping for clients sending static default question IDs (e.g. default-q1)
+        if (isDefaultForm && answer.questionId.startsWith('default-q')) {
+          const idx = parseInt(answer.questionId.split('-q')[1]) - 1;
+          const dbQ = defaultTemplate.questions[idx];
+          if (dbQ) {
+            answer.questionId = dbQ.id;
+            continue;
+          }
         }
+        throw new BadRequestException(`Unknown question id: ${answer.questionId}`);
       }
     }
 
@@ -288,24 +379,13 @@ export class FeedbackService {
         },
       });
 
-      // For default forms, filter out non-UUID questionIds and store as text
-      if (isDefaultForm) {
-        await tx.feedbackAnswer.createMany({
-          data: dto.answers.map((a) => ({
-            responseId: response.id,
-            questionId: '00000000-0000-0000-0000-000000000000', // placeholder for default
-            value: `${a.questionId}::${a.value}`, // encode question label + value
-          })),
-        });
-      } else {
-        await tx.feedbackAnswer.createMany({
-          data: dto.answers.map((a) => ({
-            responseId: response.id,
-            questionId: a.questionId,
-            value: a.value,
-          })),
-        });
-      }
+      await tx.feedbackAnswer.createMany({
+        data: dto.answers.map((a) => ({
+          responseId: response.id,
+          questionId: a.questionId,
+          value: a.value,
+        })),
+      });
 
       await tx.feedbackToken.update({
         where: { id: tokenRecord.id },
@@ -357,10 +437,7 @@ export class FeedbackService {
       select: { id: true },
     });
     const eventIds = [
-      ...new Set([
-        ...organizerEvents.map((e) => e.eventId),
-        ...createdEvents.map((e) => e.id),
-      ]),
+      ...new Set([...organizerEvents.map((e) => e.eventId), ...createdEvents.map((e) => e.id)]),
     ];
 
     if (eventIds.length === 0) return { data: [], meta: { total: 0, page, limit, totalPages: 0 } };
@@ -402,7 +479,7 @@ export class FeedbackService {
         where: { id: eventId, createdBy: requesterId },
       });
       if (!isOrganizer && !isCreator) {
-        throw new ForbiddenException('You do not have access to this event\'s feedback');
+        throw new ForbiddenException("You do not have access to this event's feedback");
       }
     }
 

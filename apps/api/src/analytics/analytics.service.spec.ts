@@ -88,6 +88,8 @@ describe('AnalyticsService', () => {
         totalUsers: 10,
         totalRegistrations: 20,
         totalAttendance: 15,
+        approvedRegistrations: 12,
+        pendingRegistrations: 8,
       };
       mockRedisInstance.get.mockResolvedValue(JSON.stringify(cached));
 
@@ -121,6 +123,8 @@ describe('AnalyticsService', () => {
         totalUsers: 7,
         totalRegistrations: 12,
         totalAttendance: 9,
+        approvedRegistrations: 12,
+        pendingRegistrations: 12,
       });
 
       expect(mockRedisInstance.set).toHaveBeenCalledWith(
@@ -169,7 +173,7 @@ describe('AnalyticsService', () => {
 
       // Ownership check passes
       mockPrisma.event.findUnique.mockResolvedValue({ id: eventId, title: 'Zero Event' });
-      mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+      mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
 
       // No cached value
       mockRedisInstance.get.mockResolvedValue(null);
