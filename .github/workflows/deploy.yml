@@ -57,16 +57,16 @@ jobs:
               echo "SEED_SUPERUSER_EMAIL=${{ secrets.SEED_SUPERUSER_EMAIL }}"
               echo "SEED_SUPERUSER_PASSWORD=${{ secrets.SEED_SUPERUSER_PASSWORD }}"
               echo "SEED_SUPERUSER_FULL_NAME=${{ secrets.SEED_SUPERUSER_FULL_NAME }}"
-              echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}"
-              echo "NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}"
+              echo "NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com"
+              echo "NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com"
               echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}"
               echo "NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=${{ secrets.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET }}"
-              echo "BACKEND_URL=${{ secrets.BACKEND_URL }}"
-              echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}"
+              echo "BACKEND_URL=http://api:4000"
+              echo "FRONTEND_URL=https://cems-aastu.ooguy.com"
               echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}"
               echo "TELEGRAM_BOT_USERNAME=${{ secrets.TELEGRAM_BOT_USERNAME }}"
               echo "TELEGRAM_CHANNEL_ID=${{ secrets.TELEGRAM_CHANNEL_ID }}"
-              echo "TELEGRAM_WEBHOOK_URL=${{ secrets.TELEGRAM_WEBHOOK_URL }}"
+              echo "TELEGRAM_WEBHOOK_URL=https://cems-aastu.ooguy.com/api/telegram/webhook"
               echo "NODE_ENV=production"
               echo "PORT=4000"
               echo "REDIS_HOST=redis"
@@ -98,7 +98,9 @@ jobs:
             echo "Swap status: $(free -h | grep Swap)"
 
             echo "==> Building production container images..."
-            DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build
+            DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build \
+              --build-arg NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com \
+              --build-arg NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com
 
             echo "==> Starting database services (postgres + redis)..."
             docker compose -f docker-compose.prod.yml up -d postgres redis
