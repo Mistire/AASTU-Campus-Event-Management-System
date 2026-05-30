@@ -52,6 +52,15 @@ export function EventFormModal({
     capacity: 100,
   });
 
+  const toLocalISOString = (dateStr: string | undefined) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const offset = d.getTimezoneOffset();
+    const localDate = new Date(d.getTime() - offset * 60 * 1000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
     if (event) {
       setFormData({
@@ -59,8 +68,8 @@ export function EventFormModal({
         description: event.description || "",
         eventTypeId: event.eventType?.id || "",
         venueId: event.venue?.id || "",
-        startTime: event.startTime ? new Date(event.startTime).toISOString().slice(0, 16) : "",
-        endTime: event.endTime ? new Date(event.endTime).toISOString().slice(0, 16) : "",
+        startTime: toLocalISOString(event.startTime),
+        endTime: toLocalISOString(event.endTime),
         capacity: event.capacity || 100,
       });
     } else {
