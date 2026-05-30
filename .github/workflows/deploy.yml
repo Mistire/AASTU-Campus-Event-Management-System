@@ -39,7 +39,7 @@ jobs:
 
             echo "==> Writing .env file from GitHub Secrets..."
             {
-              echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+              echo "DATABASE_URL=postgresql://cems:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/cems_db"
               echo "POSTGRES_USER=cems"
               echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}"
               echo "POSTGRES_DB=cems_db"
@@ -111,15 +111,10 @@ jobs:
             echo "postgres is healthy!"
 
             echo "==> Running Prisma migrations..."
-            MIGRATION_DB_URL=$(grep '^DATABASE_URL=' $APP_DIR/.env | cut -d= -f2- | sed 's|localhost|postgres|g; s|127\.0\.0\.1|postgres|g')
-            if [ -z "$MIGRATION_DB_URL" ]; then
-              echo "ERROR: DATABASE_URL is missing or empty in .env"
-              exit 1
-            fi
             docker run --rm \
               --network cems_prod_network \
-              -e DATABASE_URL="$MIGRATION_DB_URL" \
-              cems-api \
+              -e DATABASE_URL="postgresql://cems:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/cems_db" \
+              data-pipeline-api \
               npx prisma migrate deploy
 
             echo "==> Migrations complete. Starting API..."
