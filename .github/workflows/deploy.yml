@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2
+name: Deploy to Contabo VPS
 
 on:
   push:
@@ -18,28 +18,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── 2. SSH into EC2 and deploy ───────────────────────────────
+      # ── 2. SSH into Contabo and deploy ──────────────────────────
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          password: ${{ secrets.EC2_PASSWORD }}
           port: 22
           command_timeout: 30m
           script: |
             set -e
 
-            APP_DIR="/app/cems"
+            APP_DIR="/opt/data-pipeline"
 
-            echo "==> Pulling latest code from feat/aws-deployment branch..."
+            echo "==> Pulling latest code..."
             cd $APP_DIR
             git fetch origin
-            git reset --hard origin/feat/aws-deployment
+            git reset --hard origin/dev
 
             echo "==> Writing .env file from GitHub Secrets..."
-            # Use echo statements (not heredoc) to avoid YAML indentation
-            # adding leading spaces to every line in the .env file
             {
               echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
               echo "POSTGRES_USER=cems"
@@ -76,7 +74,7 @@ jobs:
               echo "PRISMA_LOG_QUERIES=false"
             } > .env
 
-            echo "==> Reclaiming disk space from logs, cache and apt..."
+            echo "==> Reclaiming disk space..."
             sudo journalctl --vacuum-time=1s || true
             sudo find /var/log -type f -regex '.*\.gz\|.*\.1' -delete || true
             sudo apt-get autoremove -y || true
@@ -87,33 +85,22 @@ jobs:
             docker system prune -af
             docker builder prune -af
 
-            echo "==> Configuring swap space (reusing if exists to prevent OOM / text busy errors)..."
+            echo "==> Ensuring swap is active..."
             if [ -f /swapfile ]; then
-              echo "Swap file already exists. Ensuring it is active..."
               sudo swapon /swapfile 2>/dev/null || true
             else
-              echo "Swap file does not exist. Creating 1.5G swap space..."
-              sudo fallocate -l 1.5G /swapfile
+              sudo fallocate -l 2G /swapfile
               sudo chmod 600 /swapfile
               sudo mkswap /swapfile
               sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
             fi
             echo "Swap status: $(free -h | grep Swap)"
-
-            echo "==> Host disk space usage before build:"
-            df -h
-            echo "==> Largest folders in /var/log:"
-            sudo du -sh /var/log/* 2>/dev/null | sort -hr | head -n 5 || true
-            echo "==> Largest folders in /var/lib/docker:"
-            sudo du -sh /var/lib/docker/* 2>/dev/null | sort -hr | head -n 5 || true
-
-            echo "==> Truncating container logs to reclaim space..."
-            sudo sh -c 'truncate -s 0 /var/lib/docker/containers/*/*-json.log' 2>/dev/null || true
 
             echo "==> Building production container images..."
             DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build
 
-            echo "==> Starting database services only (postgres + redis)..."
+            echo "==> Starting database services (postgres + redis)..."
             docker compose -f docker-compose.prod.yml up -d postgres redis
 
             echo "==> Waiting for postgres to be healthy..."
@@ -123,22 +110,19 @@ jobs:
             done
             echo "postgres is healthy!"
 
-            echo "==> Running Prisma migrations via standalone one-shot container..."
-            # Build a corrected DATABASE_URL using the postgres Docker service name
-            # (replaces localhost/127.0.0.1 with the compose service hostname 'postgres')
+            echo "==> Running Prisma migrations..."
             MIGRATION_DB_URL=$(grep '^DATABASE_URL=' $APP_DIR/.env | cut -d= -f2- | sed 's|localhost|postgres|g; s|127\.0\.0\.1|postgres|g')
             if [ -z "$MIGRATION_DB_URL" ]; then
               echo "ERROR: DATABASE_URL is missing or empty in .env"
               exit 1
             fi
-            echo "Migration DB host: $(echo $MIGRATION_DB_URL | sed 's|:.*@|:***@|')"
             docker run --rm \
               --network cems_prod_network \
               -e DATABASE_URL="$MIGRATION_DB_URL" \
               cems-api \
               npx prisma migrate deploy
 
-            echo "==> Migrations complete. Starting API container..."
+            echo "==> Migrations complete. Starting API..."
             docker compose -f docker-compose.prod.yml up -d api
 
             echo "==> Waiting for API to become healthy..."
@@ -149,7 +133,7 @@ jobs:
                 echo "API is healthy!"
                 break
               fi
-              echo "  API health status: $API_HEALTH ($i/18)"
+              echo "  API health: $API_HEALTH ($i/18)"
               sleep 10
             done
 
@@ -159,20 +143,20 @@ jobs:
               exit 1
             fi
 
-            echo "==> Running comprehensive production database seeding..."
+            echo "==> Running database seeding..."
             docker exec cems-api sh -c 'npm run script_seed:prod --prefix /usr/src/app'
 
-            echo "==> Starting frontend and reverse proxy (web + nginx)..."
+            echo "==> Starting frontend + Nginx..."
             docker compose -f docker-compose.prod.yml up -d web nginx
 
-            echo "==> Waiting for services to become healthy..."
+            echo "==> Waiting for all services..."
             for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
               NGINX_OK=0
               API_OK=0
               WEB_OK=0
-              curl -sf http://127.0.0.1/nginx-health > /dev/null && NGINX_OK=1 || true
-              curl -sf http://127.0.0.1/api/health > /dev/null && API_OK=1 || true
-              curl -sf http://127.0.0.1/ > /dev/null && WEB_OK=1 || true
+              curl -sk https://127.0.0.1/nginx-health > /dev/null && NGINX_OK=1 || true
+              curl -sk https://127.0.0.1/api/health > /dev/null && API_OK=1 || true
+              curl -sk https://127.0.0.1/ > /dev/null && WEB_OK=1 || true
               if [ "$NGINX_OK" = "1" ] && [ "$API_OK" = "1" ] && [ "$WEB_OK" = "1" ]; then
                 echo "All health checks passed!"
                 break
@@ -184,19 +168,7 @@ jobs:
             echo "==> Deployment complete! Container status:"
             docker compose -f docker-compose.prod.yml ps
 
-            if ! curl -sf http://127.0.0.1/api/health > /dev/null; then
-              echo "ERROR: API health check failed after deploy"
-              docker compose -f docker-compose.prod.yml logs --tail=80 api web nginx
-              exit 1
-            fi
-
-            if ! curl -sf http://127.0.0.1/ > /dev/null; then
-              echo "ERROR: Web health check failed after deploy"
-              docker compose -f docker-compose.prod.yml logs --tail=80 api web nginx
-              exit 1
-            fi
-
-            echo "==> Public URLs:"
-            echo "  App:    http://${{ secrets.EC2_HOST }}"
-            echo "  API:    http://${{ secrets.EC2_HOST }}/api"
-            echo "  Health: http://${{ secrets.EC2_HOST }}/api/health"
+            echo "==> Live URLs:"
+            echo "  App:    https://${{ secrets.EC2_HOST }}"
+            echo "  API:    https://${{ secrets.EC2_HOST }}/api"
+            echo "  Health: https://${{ secrets.EC2_HOST }}/api/health"

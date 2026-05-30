@@ -133,6 +133,10 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/nginx-auth/.htpasswd:/etc/nginx-auth/.htpasswd:ro
     depends_on:
       api:
         condition: service_healthy
@@ -141,7 +145,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 32M
+          memory: 48M
 
 networks:
   default:
