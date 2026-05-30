@@ -32,6 +32,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
 
+import { Throttle } from '@nestjs/throttler';
+
 type AuthenticatedRequest = Request & { user?: AuthUser };
 
 @ApiTags('Auth')
@@ -42,11 +44,13 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('signup')
   signup(@Body() dto: SignUpDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
     return this.authService.signUp(dto, { ip, userAgent });
   }
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('login')
   login(@Body() dto: LoginDto, @Ip() ip: string, @Headers('user-agent') userAgent?: string) {
     return this.authService.login(dto, { ip, userAgent });
