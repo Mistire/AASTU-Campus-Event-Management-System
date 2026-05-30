@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserInterests } from "./UserInterests";
 import { EditProfileModal } from "./EditProfileModal";
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -59,7 +59,7 @@ export function ProfileView() {
     window.location.href = "/login";
   };
 
-  const containerVariants: Variants = {
+  const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -67,9 +67,9 @@ export function ProfileView() {
         staggerChildren: 0.1,
       },
     },
-  };
+  } as const;
 
-  const itemVariants: Variants = {
+  const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -79,7 +79,15 @@ export function ProfileView() {
         stiffness: 100,
       },
     },
-  };
+  } as const;
+
+  const profileImageSrc = (() => {
+    if (!profile?.profileImage) return null;
+    if (profile.profileImage instanceof Blob) {
+      return URL.createObjectURL(profile.profileImage);
+    }
+    return profile.profileImage;
+  })();
 
   return (
     <motion.div
@@ -98,13 +106,13 @@ export function ProfileView() {
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl animate-pulse" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl" />
         </div>
-
+ 
         <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-10">
           <div className="relative">
             <div className="w-40 h-40 relative rounded-lg bg-white/10 backdrop-blur-xl flex items-center justify-center border-2 border-white/20 shadow-2xl overflow-hidden group-hover:scale-105 transition-transform duration-700">
-              {profile?.profileImage ? (
+              {profileImageSrc ? (
                 <Image
-                  src={profile.profileImage as string}
+                  src={profileImageSrc}
                   alt="Profile"
                   fill
                   className="object-cover"

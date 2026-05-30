@@ -229,7 +229,7 @@ function EventAttendeesContent() {
 
   return (
     <div className="space-y-8 pb-20 animate-in fade-in duration-700">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex flex-col gap-1">
           <Button
             variant="ghost"
@@ -243,7 +243,7 @@ function EventAttendeesContent() {
                <Users size={24} />
              </div>
              <div>
-               <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Attendee <span className="text-brand">Management</span></h1>
+               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Attendee <span className="text-brand">Management</span></h1>
                <p className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                  Control access and manage the guest list for this event
                </p>
@@ -253,7 +253,7 @@ function EventAttendeesContent() {
 
         <Button 
           onClick={() => setIsScannerOpen(true)}
-          className="h-16 px-8 rounded-lg bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all"
+          className="h-14 md:h-16 w-full md:w-auto px-6 md:px-8 rounded-lg bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all justify-center"
         >
           <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
             <ScanLine size={18} />

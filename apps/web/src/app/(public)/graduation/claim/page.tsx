@@ -70,7 +70,7 @@ interface ClaimResult {
   bulkEmailSent: string | null;
 }
 
-function GraduationClaimContent() {
+function GraduationClaimForm() {
   const params = useSearchParams();
   const token = params.get("token");
 
@@ -513,7 +513,7 @@ export default function GraduationClaimPage() {
         <Loader2 className="animate-spin text-sky-500" size={40} />
       </div>
     }>
-      <GraduationClaimContent />
+      <GraduationClaimForm />
     </Suspense>
   );
 }

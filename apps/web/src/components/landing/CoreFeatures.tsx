@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Headset,
   Star,
-  Trophy,
   CalendarClock,
   Bell,
   Send,
@@ -205,32 +204,6 @@ const organizerFeatures = [
             ))}
           </div>
           <span className="text-[10px] text-gray-400 font-medium">+1,200 registered</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    icon: Trophy,
-    iconBg: "bg-brand/10",
-    iconColor: "text-brand",
-    title: "Run competitions end-to-end",
-    story:
-      "From team formation to final judging — manage hackathons with built-in submission tracking, deadlines, and multi-criteria scoring.",
-    tag: "Competition ready",
-    tagColor: "bg-brand/10 text-brand",
-    micro: (
-      <div className="mt-5 flex flex-col gap-2">
-        <div className="flex items-center gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-          <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse shrink-0" />
-          <span className="text-[10px] font-black text-red-500">Submission closes: 02:44:12</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex -space-x-2 flex-1">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-500/10 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[8px] font-black text-amber-600">T{i}</div>
-            ))}
-          </div>
-          <span className="text-[9px] text-gray-400 font-medium">24 teams registered</span>
         </div>
       </div>
     ),

@@ -97,7 +97,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
         <div className="space-y-4">
           <div className="space-y-2 max-w-lg">
             <h3 className="text-2xl sm:text-4xl font-black tracking-tight leading-[1.1] group-hover:text-brand-subtle transition-colors drop-shadow-lg">
-              {event.title}
+              {event.title.length > 20 ? `${event.title.slice(0, 20)}...` : event.title}
             </h3>
             <p className="text-white/50 text-sm sm:text-base font-medium line-clamp-2 leading-relaxed">
               {event.description || "Be part of this exclusive campus event designed for our students."}

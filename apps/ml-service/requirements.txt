@@ -132,3 +132,6 @@ webencodings==0.5.1
 websocket-client==1.9.0
 websockets==16.0
 widgetsnbextension==4.0.15
+pytest==8.3.5
+pytest-cov==6.0.0
+pytest-mock==3.14.0

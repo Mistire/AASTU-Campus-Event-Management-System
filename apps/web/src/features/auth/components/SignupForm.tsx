@@ -223,7 +223,7 @@ export function SignupForm() {
             label="Department"
             placeholder="Select your department"
             value={form.departmentId}
-            onValueChange={(val: any) => setForm(p => ({ ...p, departmentId: val }))}
+            onValueChange={(val: any) => setForm(p => ({ ...p, departmentId: val || "" }))}
             options={departments?.map(dept => ({ value: dept.id, label: dept.name })) || []}
             className="animate-in slide-in-from-top-2 duration-300"
           />

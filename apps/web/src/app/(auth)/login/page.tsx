@@ -21,8 +21,9 @@ export default function LoginPage() {
       subtitle="Sign in to discover, manage, and participate in every campus experience at AASTU."
     >
       <Suspense fallback={
-        <div className="flex items-center justify-center p-8">
-          <div className="animate-spin w-6 h-6 border-2 border-brand border-t-transparent rounded-full" />
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="w-8 h-8 rounded-lg border-4 border-brand/10 border-t-brand animate-spin" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Loading Form...</p>
         </div>
       }>
         <LoginForm />

@@ -25,8 +25,17 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { GraduationModule } from './graduation/graduation.module';
 import { TelegramModule } from './telegram/telegram.module';
 
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100, // Global limit: 100 requests per minute
+      },
+    ]),
     PrismaModule,
     AppConfigModule,
     ScheduleModule.forRoot(),
@@ -60,6 +69,12 @@ import { TelegramModule } from './telegram/telegram.module';
     BookmarksModule,
     GraduationModule,
     TelegramModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

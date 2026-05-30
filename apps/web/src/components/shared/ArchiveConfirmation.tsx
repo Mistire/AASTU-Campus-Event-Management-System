@@ -27,6 +27,10 @@ export function ArchiveConfirmation({
   const [selectedTemplateId, setSelectedTemplateId] = useState("default");
   const { data: templates = [] } = useFeedbackTemplates();
 
+  const selectedLabel = selectedTemplateId === "default"
+    ? "Default Feedback Form"
+    : templates.find((t) => t.id === selectedTemplateId)?.name || "Select Feedback Template";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
@@ -61,9 +65,11 @@ export function ArchiveConfirmation({
                   Feedback Template
                 </label>
               </div>
-              <Select value={selectedTemplateId} onValueChange={(val) => setSelectedTemplateId(val ?? "")}>
+              <Select value={selectedTemplateId} onValueChange={(val) => setSelectedTemplateId(val || "default")}>
                 <SelectTrigger className="h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full">
-                  <SelectValue placeholder="Select Feedback Template" />
+                  <SelectValue placeholder="Select Feedback Template">
+                    {selectedLabel}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl p-1 bg-white dark:bg-gray-900 z-50">
                   <SelectItem value="default" className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 dark:focus:bg-brand/10 focus:text-brand transition-colors">

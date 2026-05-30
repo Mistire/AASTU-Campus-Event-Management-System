@@ -111,6 +111,17 @@ export function CemsTable<TData>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
+  const [localPagination, setLocalPagination] = useState({
+    pageIndex: 0,
+    pageSize: initialPageSize,
+  });
+
+  const paginationState = useMemo(() => {
+    return {
+      pageIndex: controlledPageIndex !== undefined ? controlledPageIndex : localPagination.pageIndex,
+      pageSize: controlledPageIndex !== undefined ? initialPageSize : localPagination.pageSize,
+    };
+  }, [controlledPageIndex, initialPageSize, localPagination.pageIndex, localPagination.pageSize]);
 
   /* ── Prepend selection column if enabled ─────────────────────── */
   const columns = useMemo(() => {
@@ -151,12 +162,7 @@ export function CemsTable<TData>({
       columnVisibility,
       globalFilter,
       rowSelection,
-      ...(controlledPageIndex !== undefined && {
-        pagination: {
-          pageIndex: controlledPageIndex,
-          pageSize: initialPageSize,
-        },
-      }),
+      pagination: paginationState,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -174,13 +180,12 @@ export function CemsTable<TData>({
       }
     },
     onPaginationChange: (updater) => {
-      if (typeof updater === "function" && controlledPageIndex !== undefined && onPageChange) {
-        const nextState = updater({
-          pageIndex: controlledPageIndex ?? 0,
-          pageSize: initialPageSize,
-        });
-        onPageChange(nextState.pageIndex);
+      const nextState = typeof updater === "function" ? updater(paginationState) : updater;
+      if (controlledPageIndex !== undefined) {
+        onPageChange?.(nextState.pageIndex);
         onPageSizeChange?.(nextState.pageSize);
+      } else {
+        setLocalPagination(nextState);
       }
     },
     getCoreRowModel: getCoreRowModel(),

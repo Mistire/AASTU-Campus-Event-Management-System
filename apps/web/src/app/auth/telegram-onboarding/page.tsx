@@ -13,7 +13,7 @@ interface Department {
   name: string;
 }
 
-function TelegramOnboardingContent() {
+function TelegramOnboardingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
@@ -257,11 +257,14 @@ function TelegramOnboardingContent() {
 export default function TelegramOnboardingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-950">
-        <Loader2 className="animate-spin text-blue-500" size={40} />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-radial from-gray-900 via-black to-black">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Loading Registration...</p>
+        </div>
       </div>
     }>
-      <TelegramOnboardingContent />
+      <TelegramOnboardingForm />
     </Suspense>
   );
 }
