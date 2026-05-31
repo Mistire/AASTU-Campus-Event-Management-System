@@ -1,0 +1,162 @@
+[
+  {
+    "icon": "Dashboard",
+    "title": "Dashboard",
+    "parent": "/dashboard",
+    "to": "/dashboard",
+    "section": "Overview",
+    "allowed": ["ADMIN", "ORGANIZER", "STAFF"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Compass",
+    "title": "Discover",
+    "parent": "/discovery",
+    "to": "/discovery",
+    "section": "Overview",
+    "allowed": ["STUDENT"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Events",
+    "title": "Events",
+    "parent": "/dashboard/events",
+    "to": "/dashboard/events",
+    "section": "Management",
+    "allowed": ["ADMIN", "ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "FileDown",
+    "title": "Archive",
+    "parent": "/dashboard/archive",
+    "to": "/dashboard/archive",
+    "section": "Management",
+    "allowed": ["ADMIN", "ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Users",
+    "title": "Users",
+    "parent": "/dashboard/users",
+    "to": "/dashboard/users",
+    "section": "Management",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Feedback",
+    "title": "Feedback",
+    "parent": "/dashboard/feedback",
+    "to": "/dashboard/feedback",
+    "section": "Management",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "FeedbackEvents",
+    "title": "Event Feedback",
+    "parent": "/dashboard/feedback/my-events",
+    "to": "/dashboard/feedback/my-events",
+    "section": "Management",
+    "allowed": ["ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "FeedbackTemplates",
+    "title": "FB Templates",
+    "parent": "/dashboard/feedback/templates",
+    "to": "/dashboard/feedback/templates",
+    "section": "Management",
+    "allowed": ["ORGANIZER"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Attendance",
+    "title": "Attendance",
+    "parent": "/dashboard/attendance",
+    "to": "/dashboard/attendance",
+    "section": "Management",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Activity",
+    "title": "Activity",
+    "parent": "/dashboard/activity",
+    "to": "/dashboard/activity",
+    "section": "Management",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Headset",
+    "title": "Support",
+    "parent": "/dashboard/support",
+    "to": "/dashboard/support",
+    "section": "Management",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Categories",
+    "title": "Categories",
+    "parent": "/dashboard/categories",
+    "to": "/dashboard/categories",
+    "section": "System Metadata",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Tags",
+    "title": "Tags",
+    "parent": "/dashboard/tags",
+    "to": "/dashboard/tags",
+    "section": "System Metadata",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Venues",
+    "title": "Venues",
+    "parent": "/dashboard/venues",
+    "to": "/dashboard/venues",
+    "section": "System Metadata",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "Categories",
+    "title": "Event Types",
+    "parent": "/dashboard/event-types",
+    "to": "/dashboard/event-types",
+    "section": "System Metadata",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  },
+  {
+    "icon": "LayoutGrid",
+    "title": "Departments",
+    "parent": "/dashboard/departments",
+    "to": "/dashboard/departments",
+    "section": "System Metadata",
+    "allowed": ["ADMIN"],
+    "hasBadge": false,
+    "children": []
+  }
+]

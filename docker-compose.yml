@@ -1,0 +1,182 @@
+services:
+  # ─── PostgreSQL ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: cems-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cems}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cems_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cems_db}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cems"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: cems-postgres-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cems}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cems_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cems_db}
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cems"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ─── Redis ───────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: cems-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── NestJS API (Development – live reload) ──────────────
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: development # use the "development" stage → npm run start:dev
+    container_name: cems-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+      - "9229:9229" # debug port
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cems}:${POSTGRES_PASSWORD:-cems_secret}@postgres:5432/${POSTGRES_DB:-cems_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-2h}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      PORT: 4000
+      NODE_ENV: ${NODE_ENV:-development}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      BACKEND_URL: ${BACKEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
+      TELEGRAM_CHANNEL_ID: ${TELEGRAM_CHANNEL_ID}
+      CEMS_WEB_URL: ${FRONTEND_URL}
+      ML_SERVICE_URL: ${ML_SERVICE_URL:-http://ml-service:8000}
+    volumes:
+      # Mount source for live-reload (node_modules stays inside container)
+      - ./apps/api/src:/usr/src/app/src:delegated
+      - ./apps/api/prisma:/usr/src/app/prisma:delegated
+      - /usr/src/app/node_modules # anonymous volume keeps container node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run start:dev
+
+  # ─── Next.js Web App (Development – live reload) ──────────
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: development
+    container_name: cems-web
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost}
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://localhost:4000}
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+      NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: ${NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+      PORT: 3001
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./apps/web/src:/usr/src/app/src:delegated
+      - ./apps/web/public:/usr/src/app/public:delegated
+      - /usr/src/app/node_modules
+    depends_on:
+      - api
+
+  # ─── Nginx Reverse Proxy ────────────────────────────────
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: cems-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+      - web
+      - ml-service
+
+  # ─── ML Recommendation Service ──────────────────────────
+  ml-service:
+    build:
+      context: ./apps/ml-service
+      dockerfile: Dockerfile
+    container_name: cems-ml-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cems}:${POSTGRES_PASSWORD:-cems_secret}@postgres:5432/${POSTGRES_DB:-cems_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MODEL_PATH: ./trained_models
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./apps/ml-service/app:/app/app:delegated
+      - ./apps/ml-service/trained_models:/app/trained_models:delegated
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Maildev (Local Email Catcher) ───────────────────────
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: cems-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080" # Web UI
+      - "1025:1025" # SMTP Port (Inside container network)
+    networks:
+      - default
+
+networks:
+  default:
+    name: aastu-campus-event-management-system_default
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1200"
+
+volumes:
+  pgdata:
+  redisdata:

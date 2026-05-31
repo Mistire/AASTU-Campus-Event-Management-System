@@ -1,0 +1,209 @@
+"use client";
+
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { 
+  User, 
+  Search, 
+  Bell, 
+  Calendar, 
+  LayoutGrid,
+  Settings,
+  LogOut,
+  ChevronDown,
+  ArrowRight,
+  Menu
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { usePathname } from "next/navigation";
+import Logo from "@/components/ui/Logo";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import Image from "next/image";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { SIDEBAR_ITEMS } from "./DiscoverySidebar";
+
+export function DiscoveryNavbar() {
+  const { profile, clearAuth } = useAuthStore();
+  const pathname = usePathname();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
+
+  return (
+    <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 h-16">
+      <div className="max-w-[1400px] mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        
+        <div className="flex items-center gap-4 lg:gap-10">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg outline-none">
+                <Menu size={20} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-72 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center h-16 px-6 border-b border-gray-100 dark:border-gray-800">
+                  <Logo />
+                </div>
+                <div className="flex-1 py-6 px-4 overflow-y-auto">
+                  <p className="px-4 mb-4 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Menu</p>
+                  <nav className="space-y-2">
+                    {SIDEBAR_ITEMS.map((item) => {
+                      const isActive = pathname === item.href;
+                      const Icon = item.icon;
+                      return (
+                        <SheetClose asChild key={item.href}>
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "group flex items-center gap-4 px-4 py-3.5 rounded-lg transition-all duration-300",
+                              isActive 
+                                ? "bg-brand text-white shadow-xl shadow-brand/20 scale-[1.02]" 
+                                : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-brand"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-300",
+                              isActive ? "bg-white/20" : "bg-gray-50 dark:bg-gray-800 group-hover:bg-brand/5"
+                            )}>
+                              <Icon size={18} className={isActive ? "text-white" : "text-gray-400 group-hover:text-brand"} />
+                            </div>
+                            
+                            <div className="flex-1">
+                              <p className="text-xs font-black tracking-tight">{item.label}</p>
+                            </div>
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
+                  </nav>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <Logo />
+
+          <div className="h-8 w-px bg-gray-100 dark:bg-gray-800 hidden md:block" />
+
+          <div className="hidden md:flex flex-col">
+             <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] leading-none mb-1">Current View</p>
+             <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                {pathname === "/discovery" ? "Event Discovery" : 
+                 pathname === "/my-events" ? "My Schedule" : 
+                 pathname === "/my-events/past" ? "Event History" :
+                 pathname === "/my-events/bookmarks" ? "Saved Events" :
+                 pathname === "/profile" ? "User Profile" : "Campus Events"}
+             </h2>
+          </div>
+        </div>
+
+        {/* Right: Actions & Profile */}
+        <div className="flex items-center gap-3">
+          <ThemeToggle className="w-8 h-8 rounded-lg" />
+
+          {profile ? (
+            <>
+              <button className="p-2 text-gray-400 hover:text-brand rounded-lg">
+                <Bell size={20} />
+              </button>
+              
+              <div className="h-6 w-px bg-gray-100 dark:bg-gray-800 mx-2" />
+
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-brand/5 flex items-center justify-center border border-brand/10 overflow-hidden relative">
+                    {profile?.profileImage ? (
+                      <Image src={profile.profileImage as string} alt="Profile" fill className="object-cover" />
+                    ) : (
+                      <User className="text-brand" size={16} />
+                    )}
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-xs font-black text-gray-900 dark:text-white leading-none truncate max-w-[100px]">{profile?.full_name}</p>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{profile?.role?.toLowerCase() || 'User'}</p>
+                  </div>
+                  <ChevronDown size={14} className={cn("text-gray-400 transition-transform", isProfileOpen && "rotate-180")} />
+                </button>
+
+                <AnimatePresence>
+                  {isProfileOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl p-2 z-50 overflow-hidden"
+                    >
+                      <div className="p-3 border-b border-gray-50 dark:border-gray-800 mb-1">
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Authenticated as</p>
+                        <p className="text-[11px] font-bold text-gray-900 dark:text-white truncate">{profile?.email}</p>
+                      </div>
+                      <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
+                        <ProfileItem icon={User} label="My Profile" onClick={() => {}} />
+                      </Link>
+                      {(profile?.role === "ADMIN" || profile?.role === "ORGANIZER") && (
+                        <ProfileItem 
+                          icon={LayoutGrid} 
+                          label="Go to Dashboard" 
+                          onClick={() => {
+                            window.location.href = "/dashboard";
+                          }}
+                        />
+                      )}
+                      <div className="h-px bg-gray-50 dark:bg-gray-800 my-1" />
+                      <ProfileItem 
+                        icon={LogOut} 
+                        label="Sign Out" 
+                        danger
+                        onClick={() => {
+                          clearAuth();
+                          window.location.href = "/login";
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
+          ) : (
+            <Link href={`/login?redirectTo=${encodeURIComponent(pathname)}`}>
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                Sign In
+                <ArrowRight size={12} />
+              </button>
+            </Link>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+
+interface ProfileItemProps {
+  icon: any;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+}
+
+const ProfileItem = ({ icon: Icon, label, onClick, danger }: ProfileItemProps) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all",
+      danger
+        ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+    )}
+  >
+    <Icon size={18} />
+    {label}
+  </button>
+);

@@ -1,0 +1,218 @@
+
+> web@0.1.0 lint
+> eslint
+
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(auth)/auth/verify-email/page.tsx
+  22:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(auth)/auth/verify-email/page.tsx:22:7
+  20 |   useEffect(() => {
+  21 |     if (!token) {
+> 22 |       setStatus("error");
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |       setMessage("Missing verification token.");
+  24 |       return;
+  25 |     }  react-hooks/set-state-in-effect
+  39:16  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(dashboard)/events/page.tsx
+  3:10  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(dashboard)/export-logs/page.tsx
+  35:65  warning  'color' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(dashboard)/feedback/page.tsx
+  43:136  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  43:150  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/app/(discovery)/events/[id]/page.tsx
+  34:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/shared/DeleteConfirmation.tsx
+  47:22  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  47:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/shared/TableController.tsx
+  19:29  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-explicit-any
+  37:24  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/shared/TableController.tsx:37:24
+  35 | }: TableControllerProps<TData>) {
+  36 |   // Use the provided tableInstance or create one locally
+> 37 |   const defaultTable = useReactTable({
+     |                        ^^^^^^^^^^^^^ TanStack Table's `useReactTable()` API returns functions that cannot be memoized safely
+  38 |     data,
+  39 |     columns,
+  40 |     getCoreRowModel: getCoreRowModel(),  react-hooks/incompatible-library
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/ui/data-table/data-table.tsx
+    3:17  warning  'ReactNode' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+    8:10  warning  'Input' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   11:39  warning  'TableAction' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   12:10  warning  'ColumnTypes' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   18:31  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+   23:3   warning  'selectedRowKey' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   32:3   warning  'selectable' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   33:3   warning  'onSelectionChange' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   34:3   warning  'selectedKeys' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   80:13  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/ui/data-table/data-table.tsx:80:13
+  78 |     const endIndex = startIndex + safePageSize
+  79 |     return data.slice(startIndex, endIndex)
+> 80 |   }, [data, safeCurrent, safePageSize, pagination])
+     |             ^^^^^^^^^^^ This dependency may be modified later
+  81 |
+  82 |   // Pagination handlers
+  83 |   const handlePageChange = (page: number) => {                react-hooks/preserve-manual-memoization
+   80:26  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/ui/data-table/data-table.tsx:80:26
+  78 |     const endIndex = startIndex + safePageSize
+  79 |     return data.slice(startIndex, endIndex)
+> 80 |   }, [data, safeCurrent, safePageSize, pagination])
+     |                          ^^^^^^^^^^^^ This dependency may be modified later
+  81 |
+  82 |   // Pagination handlers
+  83 |   const handlePageChange = (page: number) => {  react-hooks/preserve-manual-memoization
+   99:23  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  127:39  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  130:49  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/components/ui/data-table/data-table.types.ts
+   3:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/auth/components/SignupForm.tsx
+  79:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/dashboard/components/DashboardLayout.tsx
+  6:16  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/dashboard/components/Header.tsx
+  6:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/dashboard/components/RolesList.tsx
+  25:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/discovery/components/DiscoveryNavbar.tsx
+  126:92  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/api/mutations.ts
+  26:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/EventDetail.tsx
+  240:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/EventFormModal.tsx
+  14:11  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  15:18  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  43:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/EventFormModal.tsx:43:7
+  41 |   useEffect(() => {
+  42 |     if (event) {
+> 43 |       setFormData({
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  44 |         title: event.title || "",
+  45 |         description: event.description || "",
+  46 |         eventTypeId: event.eventType?.id || "",  react-hooks/set-state-in-effect
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/EventInfoGrid.tsx
+   3:35  warning  'Building2' is defined but never used      @typescript-eslint/no-unused-vars
+   8:9   error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  47:3   warning  'organizerName' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/EventsList.tsx
+  30:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  72:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/FilterBar.tsx
+   5:37  warning  'ChevronRight' is defined but never used           @typescript-eslint/no-unused-vars
+   6:20  warning  'useRef' is defined but never used                 @typescript-eslint/no-unused-vars
+   8:10  warning  'Badge' is defined but never used                  @typescript-eslint/no-unused-vars
+  18:45  warning  'isLoading' is defined but never used              @typescript-eslint/no-unused-vars
+  35:9   warning  'clearFilters' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/events/components/StatsSummary.tsx
+  2:10  warning  'BadgeController' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/onboarding/components/CategoryPicker.tsx
+  37:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/onboarding/components/CategoryPicker.tsx:37:5
+  35 |
+  36 |   useEffect(() => {
+> 37 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |   }, []);
+  39 |
+  40 |   const toggleCategory = (id: string) => {  react-hooks/set-state-in-effect
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/permissions/components/ProtectedRoute.tsx
+  22:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/permissions/components/ProtectedRoute.tsx:22:9
+  20 |         router.push("/discovery");
+  21 |       } else {
+> 22 |         setIsAuthorized(true);
+     |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |       }
+  24 |       return;
+  25 |     }  react-hooks/set-state-in-effect
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/features/permissions/config/routes.ts
+  11:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web/src/lib/api-client.ts
+  30:7  error  'response' is never reassigned. Use 'const' instead  prefer-const
+
+✖ 60 problems (38 errors, 22 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path /home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web
+npm error workspace web@0.1.0
+npm error location /home/mistire/Projects/CEMS/AASTU-Campus-Event-Management-System/apps/web
+npm error command failed
+npm error command sh -c eslint

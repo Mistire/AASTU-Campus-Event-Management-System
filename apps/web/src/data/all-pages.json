@@ -1,0 +1,92 @@
+[
+    {
+        "name": "dashboard",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STUDENT",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "events",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STUDENT",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "users",
+        "allowed": [
+            "ADMIN"
+        ]
+    },
+    {
+        "name": "profile",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STUDENT",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "configs",
+        "allowed": [
+            "ADMIN"
+        ]
+    },
+    {
+        "name": "organizers",
+        "allowed": [
+            "ADMIN"
+        ]
+    },
+    {
+        "name": "registrations",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "attendance",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "feedback",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STUDENT"
+        ]
+    },
+    {
+        "name": "support",
+        "allowed": [
+            "ADMIN",
+            "STAFF"
+        ]
+    },
+    {
+        "name": "activity",
+        "allowed": [
+            "ADMIN"
+        ]
+    },
+    {
+        "name": "invitations",
+        "allowed": [
+            "ADMIN",
+            "ORGANIZER",
+            "STAFF"
+        ]
+    }
+]

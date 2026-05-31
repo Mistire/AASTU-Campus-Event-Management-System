@@ -1,0 +1,30 @@
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* Host localhost:80 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:80...
+* Connected to localhost (::1) port 80
+> POST /api/auth/signup HTTP/1.1
+> Host: localhost
+> User-Agent: curl/8.5.0
+> Accept: */*
+> Content-Type: application/json
+> Content-Length: 178
+> 
+} [178 bytes data]
+100   178    0     0  100   178      0    148  0:00:01  0:00:01 --:--:--   148100   178    0     0  100   178      0     80  0:00:02  0:00:02 --:--:--    80< HTTP/1.1 201 Created
+< Server: nginx/1.29.6
+< Date: Fri, 24 Apr 2026 20:49:01 GMT
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 1105
+< Connection: keep-alive
+< X-Powered-By: Express
+< Access-Control-Allow-Origin: *
+< ETag: W/"451-wjDcZO+CzhBkQtJ5z/pOscHl71A"
+< 
+{ [1105 bytes data]
+100  1283  100  1105  100   178    392     63  0:00:02  0:00:02 --:--:--   456100  1283  100  1105  100   178    392     63  0:00:02  0:00:02 --:--:--   456
+* Connection #0 to host localhost left intact
+{"statusCode":201,"timestamp":"2026-04-24T20:49:01.668Z","data":{"user":{"id":"10adcc4c-1fe8-41ad-887a-ffa15fcc35a3","fullName":"Test Organizer","email":"test_org_1777063738@aastu.edu.et","role":"ORGANIZER","permissions":["event:create","event:read","event:update","event:register"],"isEmailVerified":false,"isCampusIdVerified":false,"studentId":null,"academicProgram":null},"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMGFkY2M0Yy0xZmU4LTQxYWQtODg3YS1mZmExNWZjYzM1YTMiLCJlbWFpbCI6InRlc3Rfb3JnXzE3NzcwNjM3MzhAYWFzdHUuZWR1LmV0Iiwic2lkIjoiODg3OWRkMWUtOWE3Ni00ZDVjLWJlNWYtNTIxOTZlMmEwNzRiIiwiaWF0IjoxNzc3MDYzNzQxLCJleHAiOjE3NzcwNzA5NDF9.60v2W8-LMZaMVt67XOZ4nXgBWKNjF0OXnmncvSz6XpY","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMGFkY2M0Yy0xZmU4LTQxYWQtODg3YS1mZmExNWZjYzM1YTMiLCJlbWFpbCI6InRlc3Rfb3JnXzE3NzcwNjM3MzhAYWFzdHUuZWR1LmV0Iiwic2lkIjoiODg3OWRkMWUtOWE3Ni00ZDVjLWJlNWYtNTIxOTZlMmEwNzRiIiwiaWF0IjoxNzc3MDYzNzQxLCJleHAiOjE3Nzc2Njg1NDF9.1Ijbf_NGeAlQH6tB4qtyv6pHDAWunquEXC_hd24-MKo","message":"Signup successful. Please verify your email to complete registration."}}
