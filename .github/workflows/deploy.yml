@@ -102,6 +102,10 @@ jobs:
               --build-arg NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com \
               --build-arg NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com
 
+            echo "==> Stopping old containers and removing any name conflicts..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            docker rm -f cems-postgres cems-postgres-test cems-redis cems-api cems-ml-service cems-web cems-nginx cems-maildev || true
+
             echo "==> Starting database services (postgres + redis)..."
             docker compose -f docker-compose.prod.yml up -d postgres redis
 
