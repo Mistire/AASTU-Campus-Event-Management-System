@@ -63,7 +63,7 @@ export default function StudentHomePage() {
 
   return (
     <OnboardingGate>
-      <div className="max-w-[1400px] mx-auto ml-3 space-y-12 pb-20">
+      <div className="w-full max-w-[1400px] mx-auto space-y-12 pb-20 overflow-x-hidden">
         <DiscoveryHeader />
 
         {!hasFilters && (

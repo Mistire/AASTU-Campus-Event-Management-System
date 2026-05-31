@@ -84,7 +84,7 @@ export function DiscoveryCarousel({ children }: DiscoveryCarouselProps) {
       </div>
 
       {/* Navigation Buttons - Balanced "Goldilocks" Design: Visible, Elegant, Premium */}
-      <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between pointer-events-none px-4 sm:-mx-8 z-20">
+      <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between pointer-events-none px-2 sm:px-0 sm:-mx-8 z-20">
         <AnimatePresence>
           {canScrollLeft && (
             <motion.div

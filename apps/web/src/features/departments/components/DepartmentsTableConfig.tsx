@@ -1,5 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
+<<<<<<< HEAD
+import { Department } from '../types';
+=======
 import { Department } from '../api';
+>>>>>>> efa4fee340bcb2cab6cc6f3b4692ad277750b3c7
 import { GraduationCap } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
@@ -23,7 +27,8 @@ export const getDepartmentsColumns = (): ColumnDef<Department>[] => [
         cell: ({ row }) => <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{truncate(row.original.faculty || 'N/A', 25)}</span>,
     },
     {
-        accessorKey: "studentCount",
+        id: "studentCount",
+        accessorFn: (row) => row._count?.users || 0,
         header: "Students",
         cell: ({ row }) => (
             <div>

@@ -15,14 +15,14 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
   const thumbnailUrl = getThumbnailUrl(event);
 
   return (
-    <section className="relative rounded-lg overflow-hidden bg-gray-900 aspect-21/9 sm:aspect-video md:aspect-3/1 shadow-2xl group">
+    <section className="relative rounded-lg overflow-hidden bg-gray-900 aspect-[4/3] sm:aspect-video md:aspect-[3/1] shadow-2xl group">
       {thumbnailUrl ? (
         <Image
           src={thumbnailUrl}
           alt={event.title}
           fill
           priority
-          className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-60"
+          className="object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-60"
         />
       ) : (
         <div className="absolute inset-0 bg-linear-to-br from-brand/80 via-blue-600/60 to-purple-800/80 group-hover:scale-105 transition-transform duration-700" />
@@ -35,9 +35,9 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
 
       <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/20 to-transparent z-0" />
 
-      <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end text-white z-10">
-        <div className="flex flex-col gap-4 max-w-4xl">
-          <div className="flex items-center gap-3">
+      <div className="absolute inset-0 p-5 sm:p-8 md:p-12 flex flex-col justify-end text-white z-10">
+        <div className="flex flex-col gap-3 max-w-4xl">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge
               className={cn(
                 "px-3 py-1.5 rounded-lg border border-white/20 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md",
@@ -63,19 +63,19 @@ export function EventHeroHeader({ event }: EventHeroHeaderProps) {
               </Badge>
             )}
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-white drop-shadow-2xl leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-white drop-shadow-2xl leading-tight">
             {event.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-6 mt-2">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-1">
             <div className="flex items-center gap-2 text-sm font-bold text-white/80">
-              <div className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">
                 <MapPin size={14} className="text-brand-subtle" />
               </div>
-              {event.venue?.name}
+              <span className="truncate max-w-[160px] sm:max-w-none">{event.venue?.name}</span>
             </div>
             {event.requiresApproval && (
               <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
-                <div className="p-2 rounded-lg bg-emerald-500/10 backdrop-blur-sm border border-emerald-500/20">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 backdrop-blur-sm border border-emerald-500/20">
                   <ShieldCheck size={14} />
                 </div>
                 Fast Pass Required

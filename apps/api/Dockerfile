@@ -15,6 +15,7 @@ COPY . .
 # Generate Prisma Client and build the app
 RUN npx prisma generate
 RUN npm run build
+RUN ls -R dist
 
 # Prune devDependencies (leaves only production packages in node_modules)
 RUN npm prune --production
