@@ -70,14 +70,14 @@ export default function Hero() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 bg-brand/10 dark:bg-brand/20 border border-brand/20 rounded-full px-4 py-1.5 mb-6 text-brand dark:text-brand-subtle font-semibold text-xs md:text-sm hover:scale-105 transition-transform cursor-pointer"
+          className="inline-flex items-center gap-3 bg-brand/5 dark:bg-brand/10 hover:bg-brand/10 dark:hover:bg-brand/20 border border-brand/20 rounded-lg pl-2 pr-4 py-2 mb-8 text-brand dark:text-brand-subtle font-brand font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 hover:border-brand/45 cursor-pointer"
         >
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
-          </span>
-          <Send size={14} className="text-brand shrink-0" />
-          Join AASTU CEMS on Telegram for instant event alerts!
+          <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+            <Send size={14} className="text-white fill-white -translate-x-[0.5px] translate-y-[0.5px]" />
+          </div>
+          <span className="hidden md:inline">Join the CEMS Telegram Channel</span>
+          <span className="inline md:hidden">Telegram Channel</span>
+          <ArrowRight size={12} className="opacity-60 ml-1 shrink-0" />
         </motion.a>
 
         <motion.h1
