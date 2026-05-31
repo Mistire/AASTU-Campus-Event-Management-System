@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "CEMS",
     description:
       "Discover, organize, and participate in campus events at Addis Ababa Science and Technology University.",
-    start_url: "/discovery",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",

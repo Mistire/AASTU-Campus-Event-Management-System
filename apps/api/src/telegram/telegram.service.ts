@@ -211,7 +211,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     if (!this.bot) return;
     const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
     if (!channelId) return;
-    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? '').replace(/\/$/, '');
+    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? this.configService.get<string>('FRONTEND_URL') ?? '').replace(/\/$/, '');
 
     const date = new Date(event.startTime).toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
@@ -309,7 +309,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     if (!this.bot) return;
     const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
     if (!channelId) return;
-    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? '').replace(/\/$/, '');
+    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? this.configService.get<string>('FRONTEND_URL') ?? '').replace(/\/$/, '');
 
     const time = new Date(event.startTime).toLocaleTimeString('en-US', {
       hour: 'numeric', minute: '2-digit',

@@ -96,8 +96,8 @@ export default function EventDetailPage() {
   if (isError || !event) return <EventErrorState onBack={() => router.back()} />;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20">
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-20 overflow-x-hidden">
+      <div className="flex items-center justify-between gap-2">
         <Button
           variant="ghost"
           onClick={() => router.back()}

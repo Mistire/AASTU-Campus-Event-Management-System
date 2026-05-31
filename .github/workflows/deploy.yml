@@ -119,8 +119,35 @@ jobs:
               data-pipeline-api \
               npx prisma migrate deploy
 
-            echo "==> Migrations complete. Starting API..."
-            docker compose -f docker-compose.prod.yml up -d api
+            echo "==> Migrations complete. Starting API and ML services..."
+            docker compose -f docker-compose.prod.yml up -d api ml-service
+
+            echo "==> Waiting for ML service to become healthy..."
+            ML_HEALTH="unknown"
+            for i in $(seq 1 12); do
+              ML_HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' cems-ml-service 2>/dev/null || echo "missing")
+              if [ "$ML_HEALTH" = "healthy" ]; then
+                echo "ML service is healthy!"
+                break
+              fi
+              echo "  ML health: $ML_HEALTH ($i/12)"
+              sleep 10
+            done
+
+            if [ "$ML_HEALTH" = "healthy" ]; then
+              echo "==> Checking if ML models are loaded..."
+              MODELS_LOADED=$(curl -s http://localhost:8000/health | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(d.get('models_loaded','false')).lower())" 2>/dev/null || echo "false")
+              if [ "$MODELS_LOADED" != "true" ]; then
+                echo "==> No models found — triggering /retrain from production DB..."
+                curl -s -X POST http://localhost:8000/retrain | python3 -m json.tool || true
+                echo "==> Retrain request completed."
+              else
+                echo "==> Models already loaded, skipping retrain."
+              fi
+            else
+              echo "WARNING: ML service did not become healthy in time — skipping retrain."
+              docker compose -f docker-compose.prod.yml logs --tail=50 ml-service
+            fi
 
             echo "==> Waiting for API to become healthy..."
             API_HEALTH="unknown"

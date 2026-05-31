@@ -14,16 +14,16 @@ interface InfoCardProps {
 
 function InfoCard({ icon: Icon, label, value, subValue, className }: InfoCardProps) {
   return (
-    <div className={cn("p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
-      <div className="flex flex-col gap-4">
-        <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
-          <Icon size={20} />
+    <div className={cn("p-4 sm:p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
+      <div className="flex flex-col gap-3">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all shrink-0">
+          <Icon size={18} />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">{label}</p>
-          <p className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{value}</p>
+          <p className="text-xs sm:text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors truncate">{value}</p>
           {subValue && (
-            <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{subValue}</p>
+            <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate">{subValue}</p>
           )}
         </div>
       </div>
