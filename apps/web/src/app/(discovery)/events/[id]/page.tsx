@@ -31,7 +31,7 @@ export default function EventDetailPage() {
     try {
       await register(id);
       toast.success("Registration Successful", {
-        description: `You are now registered for ${event.title}.`,
+        description: `You are now registered for ${event?.title}.`,
       });
     } catch (err: unknown) {
       const error = err as { message?: string };
@@ -78,7 +78,7 @@ export default function EventDetailPage() {
 
   const capacityPercent = Math.min(
     100,
-    Math.round((event?._count.registrations || 0) / (event?.capacity || 1) * 100)
+    Math.round((event?._count?.registrations || 0) / (event?.capacity || 1) * 100)
   );
 
   const regStatus = useMemo(() => {
@@ -96,8 +96,8 @@ export default function EventDetailPage() {
   if (isError || !event) return <EventErrorState onBack={() => router.back()} />;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20">
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 pb-20 overflow-x-hidden">
+      <div className="flex items-center justify-between gap-2">
         <Button
           variant="ghost"
           onClick={() => router.back()}

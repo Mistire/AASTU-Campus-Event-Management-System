@@ -22,5 +22,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true
-  }
+  },
+  "include": ["src/**/*", "prisma/seed/**/*"],
+  "exclude": ["node_modules", "dist", "test", "scratch"]
 }

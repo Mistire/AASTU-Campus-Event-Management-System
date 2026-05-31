@@ -31,13 +31,19 @@ interface BuilderQuestion {
     isRequired: boolean;
 }
 
-const emptyQuestion = (): BuilderQuestion => ({
-    id: crypto.randomUUID(),
-    label: "",
-    type: "RATING",
-    options: ["Option A", "Option B", "Option C"],
-    isRequired: true,
-});
+const emptyQuestion = (): BuilderQuestion => {
+    const newId = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : Math.random().toString(36).substring(2, 15);
+      
+    return {
+        id: newId,
+        label: "",
+        type: "RATING",
+        options: ["Option A", "Option B", "Option C"],
+        isRequired: true,
+    };
+};
 
 export function TemplateBuilder({
     initialName = "",

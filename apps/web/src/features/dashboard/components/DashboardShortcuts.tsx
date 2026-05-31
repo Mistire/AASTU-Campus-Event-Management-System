@@ -151,7 +151,7 @@ export function DashboardShortcuts({ isAdmin }: DashboardShortcutsProps) {
         />
         <CemsCardContent className="p-4">
           <div className="grid grid-cols-1 gap-3">
-            {actions.map((action, idx) => (
+            {(actions as any[]).map((action, idx) => (
               <motion.div
                 key={action.title}
                 initial={{ opacity: 0, x: 20 }}

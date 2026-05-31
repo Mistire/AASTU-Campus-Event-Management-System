@@ -1,0 +1,204 @@
+name: Deploy to Contabo VPS
+
+on:
+  push:
+    branches:
+      - dev
+      - feat/aws-deployment
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. SSH into Contabo and deploy ──────────────────────────
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          password: ${{ secrets.EC2_PASSWORD }}
+          port: 22
+          command_timeout: 30m
+          script: |
+            set -e
+
+            APP_DIR="/opt/data-pipeline"
+
+            echo "==> Pulling latest code..."
+            cd $APP_DIR
+            git fetch origin
+            git reset --hard origin/${{ github.ref_name }}
+
+            echo "==> Writing .env file from GitHub Secrets..."
+            {
+              echo "DATABASE_URL=postgresql://cems:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/cems_db"
+              echo "POSTGRES_USER=cems"
+              echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}"
+              echo "POSTGRES_DB=cems_db"
+              echo "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+              echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}"
+              echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}"
+              echo "JWT_REFRESH_EXPIRATION=${{ secrets.JWT_REFRESH_EXPIRATION }}"
+              echo "SMTP_HOST=${{ secrets.SMTP_HOST }}"
+              echo "SMTP_PORT=${{ secrets.SMTP_PORT }}"
+              echo "SMTP_USER=${{ secrets.SMTP_USER }}"
+              echo "SMTP_PASS=${{ secrets.SMTP_PASS }}"
+              echo "SMTP_FROM=${{ secrets.SMTP_FROM }}"
+              echo "EMAIL_VERIFICATION_TOKEN_TTL=${{ secrets.EMAIL_VERIFICATION_TOKEN_TTL }}"
+              echo "RESET_TOKEN_TTL_MINUTES=${{ secrets.RESET_TOKEN_TTL_MINUTES }}"
+              echo "SEED_SUPERUSER_EMAIL=${{ secrets.SEED_SUPERUSER_EMAIL }}"
+              echo "SEED_SUPERUSER_PASSWORD=${{ secrets.SEED_SUPERUSER_PASSWORD }}"
+              echo "SEED_SUPERUSER_FULL_NAME=${{ secrets.SEED_SUPERUSER_FULL_NAME }}"
+              echo "NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com"
+              echo "NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com"
+              echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}"
+              echo "NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=${{ secrets.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET }}"
+              echo "BACKEND_URL=http://api:4000"
+              echo "FRONTEND_URL=https://cems-aastu.ooguy.com"
+              echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}"
+              echo "TELEGRAM_BOT_USERNAME=${{ secrets.TELEGRAM_BOT_USERNAME }}"
+              echo "TELEGRAM_CHANNEL_ID=${{ secrets.TELEGRAM_CHANNEL_ID }}"
+              echo "TELEGRAM_WEBHOOK_URL=https://cems-aastu.ooguy.com/api/telegram/webhook"
+              echo "NODE_ENV=production"
+              echo "PORT=4000"
+              echo "REDIS_HOST=redis"
+              echo "REDIS_PORT=6379"
+              echo "PRISMA_LOG_QUERIES=false"
+            } > .env
+
+            echo "==> Reclaiming disk space..."
+            sudo journalctl --vacuum-time=1s || true
+            sudo find /var/log -type f -regex '.*\.gz\|.*\.1' -delete || true
+            sudo apt-get autoremove -y || true
+            sudo apt-get clean || true
+            sudo rm -rf /tmp/* || true
+
+            echo "==> Pruning Docker resources (keeping database volumes)..."
+            docker system prune -af
+            docker builder prune -af
+
+            echo "==> Ensuring swap is active..."
+            if [ -f /swapfile ]; then
+              sudo swapon /swapfile 2>/dev/null || true
+            else
+              sudo fallocate -l 2G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            fi
+            echo "Swap status: $(free -h | grep Swap)"
+
+            echo "==> Building production container images..."
+            DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build \
+              --build-arg NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com \
+              --build-arg NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com
+
+            echo "==> Stopping old containers and removing any name conflicts..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            docker rm -f cems-postgres cems-postgres-test cems-redis cems-api cems-ml-service cems-web cems-nginx cems-maildev || true
+            sudo fuser -k 8000/tcp || true
+
+            echo "==> Starting database services (postgres + redis)..."
+            docker compose -f docker-compose.prod.yml up -d postgres redis
+
+            echo "==> Waiting for postgres to be healthy..."
+            until docker exec cems-postgres pg_isready -U cems -d cems_db; do
+              echo "  postgres not ready yet, waiting..."
+              sleep 3
+            done
+            echo "postgres is healthy!"
+
+            echo "==> Running Prisma migrations..."
+            docker run --rm \
+              --network cems_prod_network \
+              -e DATABASE_URL="postgresql://cems:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/cems_db" \
+              data-pipeline-api \
+              npx prisma migrate deploy
+
+            echo "==> Migrations complete. Starting API and ML services..."
+            docker compose -f docker-compose.prod.yml up -d api ml-service
+
+            echo "==> Waiting for ML service to become healthy..."
+            ML_HEALTH="unknown"
+            for i in $(seq 1 12); do
+              ML_HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' cems-ml-service 2>/dev/null || echo "missing")
+              if [ "$ML_HEALTH" = "healthy" ]; then
+                echo "ML service is healthy!"
+                break
+              fi
+              echo "  ML health: $ML_HEALTH ($i/12)"
+              sleep 10
+            done
+
+            if [ "$ML_HEALTH" = "healthy" ]; then
+              echo "==> Checking if ML models are loaded..."
+              MODELS_LOADED=$(docker exec cems-ml-service python -c "import urllib.request, json; d=json.loads(urllib.request.urlopen('http://127.0.0.1:8000/health').read().decode()); print(str(d.get('models_loaded','false')).lower())" 2>/dev/null || echo "false")
+              if [ "$MODELS_LOADED" != "true" ]; then
+                echo "==> No models found — triggering /retrain from production DB..."
+                docker exec cems-ml-service python -c "import urllib.request; print(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/retrain', method='POST')).read().decode())" || true
+                echo "==> Retrain request completed."
+              else
+                echo "==> Models already loaded, skipping retrain."
+              fi
+            else
+              echo "WARNING: ML service did not become healthy in time — skipping retrain."
+              docker compose -f docker-compose.prod.yml logs --tail=50 ml-service
+            fi
+
+            echo "==> Waiting for API to become healthy..."
+            API_HEALTH="unknown"
+            for i in $(seq 1 18); do
+              API_HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' cems-api 2>/dev/null || echo "missing")
+              if [ "$API_HEALTH" = "healthy" ]; then
+                echo "API is healthy!"
+                break
+              fi
+              echo "  API health: $API_HEALTH ($i/18)"
+              sleep 10
+            done
+
+            if [ "$API_HEALTH" != "healthy" ]; then
+              echo "ERROR: API did not become healthy in time"
+              docker compose -f docker-compose.prod.yml logs --tail=80 api
+              exit 1
+            fi
+
+            echo "==> Running database seeding..."
+            docker exec cems-api sh -c 'npm run script_seed:prod --prefix /usr/src/app'
+
+            echo "==> Starting frontend + Nginx..."
+            docker compose -f docker-compose.prod.yml up -d web nginx
+
+            echo "==> Waiting for all services..."
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+              NGINX_OK=0
+              API_OK=0
+              WEB_OK=0
+              curl -sk https://127.0.0.1/nginx-health > /dev/null && NGINX_OK=1 || true
+              curl -sk https://127.0.0.1/api/health > /dev/null && API_OK=1 || true
+              curl -sk https://127.0.0.1/ > /dev/null && WEB_OK=1 || true
+              if [ "$NGINX_OK" = "1" ] && [ "$API_OK" = "1" ] && [ "$WEB_OK" = "1" ]; then
+                echo "All health checks passed!"
+                break
+              fi
+              echo "  waiting for nginx/api/web... ($i/12)"
+              sleep 10
+            done
+
+            echo "==> Deployment complete! Container status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "==> Live URLs:"
+            echo "  App:    https://${{ secrets.EC2_HOST }}"
+            echo "  API:    https://${{ secrets.EC2_HOST }}/api"
+            echo "  Health: https://${{ secrets.EC2_HOST }}/api/health"
