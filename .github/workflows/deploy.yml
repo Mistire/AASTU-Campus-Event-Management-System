@@ -105,6 +105,7 @@ jobs:
             echo "==> Stopping old containers and removing any name conflicts..."
             docker compose -f docker-compose.prod.yml down --remove-orphans || true
             docker rm -f cems-postgres cems-postgres-test cems-redis cems-api cems-ml-service cems-web cems-nginx cems-maildev || true
+            sudo fuser -k 8000/tcp || true
 
             echo "==> Starting database services (postgres + redis)..."
             docker compose -f docker-compose.prod.yml up -d postgres redis
@@ -140,10 +141,10 @@ jobs:
 
             if [ "$ML_HEALTH" = "healthy" ]; then
               echo "==> Checking if ML models are loaded..."
-              MODELS_LOADED=$(curl -s http://localhost:8000/health | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(d.get('models_loaded','false')).lower())" 2>/dev/null || echo "false")
+              MODELS_LOADED=$(docker exec cems-ml-service python -c "import urllib.request, json; d=json.loads(urllib.request.urlopen('http://127.0.0.1:8000/health').read().decode()); print(str(d.get('models_loaded','false')).lower())" 2>/dev/null || echo "false")
               if [ "$MODELS_LOADED" != "true" ]; then
                 echo "==> No models found — triggering /retrain from production DB..."
-                curl -s -X POST http://localhost:8000/retrain | python3 -m json.tool || true
+                docker exec cems-ml-service python -c "import urllib.request; print(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/retrain', method='POST')).read().decode())" || true
                 echo "==> Retrain request completed."
               else
                 echo "==> Models already loaded, skipping retrain."
