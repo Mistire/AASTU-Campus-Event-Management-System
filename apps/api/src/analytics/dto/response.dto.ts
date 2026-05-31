@@ -27,6 +27,15 @@ export class TopEventDto {
   attendanceRate: number;
 }
 
+export class TopOrganizerDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  profileImage?: string;
+  totalEvents: number;
+  totalRegistrations: number;
+}
+
 export class CategoryAnalyticsDto {
   categoryId: string;
   name: string;
@@ -68,4 +77,17 @@ export class FeedbackAnalyticsDto {
   averageRating: number;
   totalFeedback: number;
   distribution: { score: number; count: number }[];
+}
+
+export class ArchivedEventDto {
+  id: string;
+  title: string;
+  startTime: Date;
+  endTime: Date;
+  status: string;
+  totalRegistrations: number;
+  attendanceCount: number;
+  attendanceRate: number;
+  averageRating: number;
+  organizerName?: string;
 }

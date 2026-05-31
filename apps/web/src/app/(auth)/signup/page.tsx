@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import AuthShell from "@/features/auth/components/AuthShell";
 import { SignupForm } from "@/features/auth/components/SignupForm";
 
@@ -19,7 +20,13 @@ export default function SignupPage() {
       }
       subtitle="Join thousands of AASTU students and organizers already building the future of campus engagement."
     >
-      <SignupForm />
+      <Suspense fallback={
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin w-6 h-6 border-2 border-brand border-t-transparent rounded-full" />
+        </div>
+      }>
+        <SignupForm />
+      </Suspense>
     </AuthShell>
   );
 }

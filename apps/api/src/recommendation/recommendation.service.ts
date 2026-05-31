@@ -48,7 +48,10 @@ export class RecommendationService {
 
       // 3. Fetch full event details from Prisma
       const events = await this.prisma.event.findMany({
-        where: { id: { in: eventIds } },
+        where: { 
+          id: { in: eventIds },
+          endTime: { gte: new Date() }
+        },
         include: {
           ...this.defaultIncludes(),
           _count: { select: { registrations: true } },
@@ -99,7 +102,10 @@ export class RecommendationService {
 
       // 3. Fetch full event details from Prisma
       const events = await this.prisma.event.findMany({
-        where: { id: { in: eventIds } },
+        where: { 
+          id: { in: eventIds },
+          endTime: { gte: new Date() }
+        },
         include: {
           ...this.defaultIncludes(),
           _count: { select: { registrations: true } },

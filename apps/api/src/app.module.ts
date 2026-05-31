@@ -18,9 +18,24 @@ import { RoleModule } from './role/role.module';
 import { PermissionModule } from './permission/permission.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { SupportModule } from './support/support.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { GraduationModule } from './graduation/graduation.module';
+import { TelegramModule } from './telegram/telegram.module';
+
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100, // Global limit: 100 requests per minute
+      },
+    ]),
     PrismaModule,
     AppConfigModule,
     ScheduleModule.forRoot(),
@@ -48,6 +63,18 @@ import { DepartmentsModule } from './departments/departments.module';
     PermissionModule,
     AttendanceModule,
     DepartmentsModule,
+    AuditLogsModule,
+    SupportModule,
+    FeedbackModule,
+    BookmarksModule,
+    GraduationModule,
+    TelegramModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

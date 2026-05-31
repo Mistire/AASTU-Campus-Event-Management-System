@@ -41,9 +41,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   ) {}
 
   async handleConnection(client: Socket) {
+    this.logger.log(`Connection attempt from client: ${client.id}`);
     try {
-      // Extract token from handshake query or headers
+      // Extract token from handshake auth, query or headers
       const token =
+        client.handshake.auth?.token ||
         client.handshake.query?.token?.toString() ||
         client.handshake.headers?.authorization?.split(' ')[1];
 

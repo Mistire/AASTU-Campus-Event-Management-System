@@ -5,13 +5,35 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateVenueDto, UpdateVenueDto } from './dto/venue.dto';
 import { VenueQueryDto, VenueAvailabilityQueryDto } from './dto/venue-query.dto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 @Injectable()
 export class VenuesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogsService: AuditLogsService,
+  ) {}
 
-  async create(dto: CreateVenueDto) {
-    return this.prisma.venue.create({ data: dto });
+  async create(dto: CreateVenueDto, userId?: string) {
+    const venue = await this.prisma.venue.create({ data: dto });
+
+    if (userId) {
+      try {
+        await this.auditLogsService.createLog({
+          userId,
+          action: 'CREATE_VENUE',
+          entityType: 'VENUE',
+          entityId: venue.id,
+          outcome: 'SUCCESS',
+          details: `Venue created: "${venue.name}"`,
+          afterState: venue,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+    }
+
+    return venue;
   }
 
   async findAll(query: VenueQueryDto) {
@@ -98,17 +120,23 @@ export class VenuesService {
     });
   }
 
-  async checkAvailability(venueId: string, startTime: Date, endTime: Date): Promise<boolean> {
+  async checkAvailability(
+    venueId: string,
+    startTime: Date,
+    endTime: Date,
+    excludeEventId?: string,
+  ): Promise<boolean> {
     await this.findOne(venueId);
 
     const conflict = await this.prisma.event.findFirst({
       where: {
         venueId,
         status: {
-          statusName: { in: ['APPROVED', 'LIVE'] },
+          statusName: { in: ['APPROVED', 'LIVE', 'PENDING'] },
         },
         startTime: { lt: endTime },
         endTime: { gt: startTime },
+        ...(excludeEventId && { id: { not: excludeEventId } }),
       },
     });
 
@@ -141,12 +169,31 @@ export class VenuesService {
     return venue;
   }
 
-  async update(id: string, dto: UpdateVenueDto) {
-    await this.findOne(id);
-    return this.prisma.venue.update({ where: { id }, data: dto });
+  async update(id: string, dto: UpdateVenueDto, userId?: string) {
+    const before = await this.findOne(id);
+    const venue = await this.prisma.venue.update({ where: { id }, data: dto });
+
+    if (userId) {
+      try {
+        await this.auditLogsService.createLog({
+          userId,
+          action: 'UPDATE_VENUE',
+          entityType: 'VENUE',
+          entityId: venue.id,
+          outcome: 'SUCCESS',
+          details: `Venue updated: "${venue.name}"`,
+          beforeState: before,
+          afterState: venue,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+    }
+
+    return venue;
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId?: string) {
     await this.findOne(id);
 
     const upcomingEvents = await this.prisma.event.count({
@@ -165,6 +212,24 @@ export class VenuesService {
       );
     }
 
-    return this.prisma.venue.delete({ where: { id } });
+    const venue = await this.prisma.venue.delete({ where: { id } });
+
+    if (userId) {
+      try {
+        await this.auditLogsService.createLog({
+          userId,
+          action: 'DELETE_VENUE',
+          entityType: 'VENUE',
+          entityId: id,
+          outcome: 'SUCCESS',
+          details: `Venue deleted: "${venue.name}"`,
+          beforeState: venue,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
+    }
+
+    return venue;
   }
 }

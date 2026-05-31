@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { truncate } from "@/lib/utils";
 import { AttendanceRecord } from "../../types/attendance";
 import { format } from "date-fns";
 import { CheckCircle2 } from "lucide-react";
@@ -14,11 +15,11 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
           {row.original.user.fullName[0].toUpperCase()}
         </div>
         <div>
-          <p className="font-black text-sm text-gray-900 tracking-tight leading-none mb-1">
-            {row.original.user.fullName}
+          <p className="font-black text-sm text-gray-900 dark:text-white tracking-tight leading-none mb-1">
+            {truncate(row.original.user.fullName, 25)}
           </p>
-          <p className="text-[10px] font-bold text-gray-400">
-            {row.original.user.email}
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500">
+            {truncate(row.original.user.email, 25)}
           </p>
         </div>
       </div>
@@ -28,7 +29,7 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
     accessorKey: "user.studentId",
     header: "ID",
     cell: ({ row }) => (
-      <CemsBadge className="font-bold text-[10px] bg-gray-50 border-gray-100 uppercase tracking-widest px-3 py-1">
+      <CemsBadge className="font-bold text-[10px] bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white uppercase tracking-widest px-3 py-1">
         {row.original.user.studentId || "EXTERNAL"}
       </CemsBadge>
     ),
@@ -39,8 +40,8 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-        <span className="font-bold text-sm text-gray-700">
-          {row.original.session?.title || "Main Event"}
+        <span className="font-bold text-sm text-gray-700 dark:text-gray-300">
+          {truncate(row.original.session?.title || "Main Event", 25)}
         </span>
       </div>
     ),
@@ -50,10 +51,10 @@ export const attendanceColumns: ColumnDef<AttendanceRecord>[] = [
     header: "Check-in Time",
     cell: ({ row }) => (
       <div className="flex flex-col">
-        <span className="font-black text-sm text-gray-900 tracking-tighter">
+        <span className="font-black text-sm text-gray-900 dark:text-white tracking-tighter">
           {format(new Date(row.original.checkInTime), "p")}
         </span>
-        <span className="text-[10px] font-bold text-gray-400 capitalize">
+        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 capitalize">
           {format(new Date(row.original.checkInTime), "MMM d, yyyy")}
         </span>
       </div>

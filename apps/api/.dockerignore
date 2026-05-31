@@ -1,3 +1,4 @@
+node_modules
 dist
 .git
 .gitignore
@@ -7,3 +8,4 @@ coverage
 .env
 .env.*
 !.env.example
+.next

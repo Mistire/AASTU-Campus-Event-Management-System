@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
+import * as htmlToImage from "html-to-image";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,7 @@ import {
   User,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 
 interface TicketModalProps {
   open: boolean;
@@ -31,6 +33,37 @@ export const TicketModal = ({
   event,
   ticketToken,
 }: TicketModalProps) => {
+  const ticketRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const ticketId = event.id?.slice(-8)?.toUpperCase() || "XXXXXXXX";
+
+  const handleDownload = async () => {
+    if (!ticketRef.current) return;
+    try {
+      setIsDownloading(true);
+      const dataUrl = await htmlToImage.toPng(ticketRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        style: {
+          transform: 'scale(1)',
+          transformOrigin: 'top left',
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `CEMS-Ticket-${ticketId}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Ticket saved successfully!");
+    } catch (err) {
+      console.error("Failed to save ticket", err);
+      toast.error("Failed to save ticket image");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const formattedDate = useMemo(() => {
     return new Date(event.startTime).toLocaleDateString("en-US", {
       weekday: "short",
@@ -47,10 +80,9 @@ export const TicketModal = ({
     });
   }, [event.startTime]);
 
-  const ticketId = event.id?.slice(-8)?.toUpperCase() || "XXXXXXXX";
-
   // Generate QR Code URL using a public API
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketToken)}&color=0c4a6e&bgcolor=FFFFFF&format=svg`;
+  // Using pure black (000000) for maximum contrast to ensure webcams can easily binarize and scan the code.
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(ticketToken)}&color=000000&bgcolor=FFFFFF&format=svg`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,7 +94,7 @@ export const TicketModal = ({
           className="relative"
         >
           {/* ─── Outer Ticket Shell ─── */}
-          <div className="bg-white rounded-[28px] overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/[0.04]">
+          <div ref={ticketRef} className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] ring-1 ring-black/4 dark:ring-gray-800">
 
             {/* ─── Header: Brand Gradient ─── */}
             <div className="relative overflow-hidden">
@@ -71,7 +103,7 @@ export const TicketModal = ({
 
               {/* Decorative circles */}
               <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-white/[0.07]" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/[0.05]" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5" />
               <div className="absolute top-6 right-12 w-2 h-2 rounded-full bg-white/30 animate-pulse" />
               <div className="absolute top-16 right-24 w-1.5 h-1.5 rounded-full bg-white/20" />
 
@@ -80,7 +112,7 @@ export const TicketModal = ({
                 {/* Top row: Logo + Ticket ID */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center ring-1 ring-white/10">
+                    <div className="w-9 h-9 rounded-lg bg-white/15 backdrop-blur-md flex items-center justify-center ring-1 ring-white/10">
                       <Ticket className="text-white" size={16} />
                     </div>
                     <div>
@@ -117,9 +149,9 @@ export const TicketModal = ({
 
             {/* ─── Perforated Edge ─── */}
             <div className="relative h-5">
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 shadow-inner" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 shadow-inner" />
-              <div className="absolute left-6 right-6 top-1/2 border-t-2 border-dashed border-gray-200/70" />
+              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 dark:bg-black/50 shadow-inner" />
+              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100/80 dark:bg-black/50 shadow-inner" />
+              <div className="absolute left-6 right-6 top-1/2 border-t-2 border-dashed border-gray-200/70 dark:border-gray-800" />
             </div>
 
             {/* ─── Info Grid ─── */}
@@ -131,7 +163,7 @@ export const TicketModal = ({
                     <Calendar size={10} className="text-brand" />
                     Date
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {formattedDate}
                   </p>
                 </div>
@@ -142,7 +174,7 @@ export const TicketModal = ({
                     <Clock size={10} className="text-brand" />
                     Time
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {formattedTime}
                   </p>
                 </div>
@@ -153,11 +185,11 @@ export const TicketModal = ({
                     <MapPin size={10} className="text-brand" />
                     Venue
                   </span>
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                  <p className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
                     {event.venue?.name || "Campus Venue"}
                   </p>
                   {(event.venue?.building || event.venue?.roomNumber) && (
-                    <p className="text-[11px] text-gray-400 font-medium">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
                       {[event.venue?.building, event.venue?.roomNumber].filter(Boolean).join(", ")}
                     </p>
                   )}
@@ -171,7 +203,7 @@ export const TicketModal = ({
                   <motion.div
                     whileHover={{ scale: 1.04 }}
                     transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="relative p-3 rounded-2xl bg-gradient-to-br from-gray-50 to-white ring-1 ring-gray-100 shadow-sm"
+                    className="relative p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 ring-1 ring-gray-100 dark:ring-gray-800 shadow-sm"
                   >
                     {/* Corner accent dots */}
                     <div className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-brand/40" />
@@ -185,42 +217,25 @@ export const TicketModal = ({
                       alt="Check-in QR Code"
                       width={150}
                       height={150}
-                      className="rounded-xl"
+                      className="rounded-lg"
                     />
                   </motion.div>
 
                   {/* Scan instruction */}
                   <div className="mt-4 flex items-center gap-2">
-                    <div className="h-px w-6 bg-gray-200" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300">
+                    <div className="h-px w-6 bg-gray-200 dark:bg-gray-800" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600">
                       Present at entrance
                     </span>
-                    <div className="h-px w-6 bg-gray-200" />
+                    <div className="h-px w-6 bg-gray-200 dark:bg-gray-800" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* ─── Footer ─── */}
-            <div className="px-7 pb-6 pt-1 flex gap-3">
-              <CemsButton
-                onClick={() => window.print()}
-                className="flex-1 h-12 rounded-2xl bg-gray-900 hover:bg-gray-800 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-gray-900/20 cursor-pointer"
-              >
-                <Download size={14} />
-                Save Ticket
-              </CemsButton>
-              <button
-                onClick={() => onOpenChange(false)}
-                className="h-12 px-5 rounded-2xl bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-600 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-
             {/* ─── Bottom Brand Strip ─── */}
             <div className="px-7 pb-5">
-              <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.2em] text-gray-300 font-bold">
+              <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 font-bold">
                 <span>Campus Event Management</span>
                 <div className="flex items-center gap-1">
                   <div className="w-1 h-1 rounded-full bg-brand/50" />
@@ -229,6 +244,24 @@ export const TicketModal = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* ─── Footer ─── */}
+          <div className="mt-4 flex gap-3">
+            <CemsButton
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex-1 h-12 rounded-lg bg-brand hover:bg-brand/80 active:scale-[0.98] text-white font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg shadow-brand/20 cursor-pointer disabled:opacity-70"
+            >
+              <Download size={14} className={isDownloading ? "animate-bounce" : ""} />
+              {isDownloading ? "Saving..." : "Save Ticket"}
+            </CemsButton>
+            <button
+              onClick={() => onOpenChange(false)}
+              className="h-12 px-5 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] text-gray-600 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm"
+            >
+              Close
+            </button>
           </div>
         </motion.div>
       </DialogContent>

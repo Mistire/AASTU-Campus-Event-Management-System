@@ -3,6 +3,9 @@ import { cn } from "@/lib/utils";
 import { useState, useRef } from "react";
 import { EventFormData } from "../EventCreateWizard";
 import { WizardSection } from "../wizard/WizardSection";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface MediaStepProps {
   data: EventFormData;
@@ -11,17 +14,24 @@ interface MediaStepProps {
 
 export function MediaStep({ data, onUpdate }: MediaStepProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnail = data.thumbnailUrl;
 
-  const handleFile = (file: File) => {
-    // In a real app, we'd upload to S3/Cloudinary here
-    // For now, we'll create a local preview URL to simulate success
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      onUpdate({ thumbnailUrl: e.target?.result as string });
-    };
-    reader.readAsDataURL(file);
+  const handleFile = async (file: File) => {
+    try {
+      setIsUploading(true);
+      toast.loading("Uploading thumbnail...", { id: "media-upload" });
+      
+      const uploadedUrl = await uploadToCloudinary(file);
+      
+      onUpdate({ thumbnailUrl: uploadedUrl });
+      toast.success("Thumbnail uploaded successfully", { id: "media-upload" });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload thumbnail", { id: "media-upload" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onDragOver = (e: React.DragEvent) => {
@@ -54,7 +64,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={cn(
-            "relative aspect-video rounded-xl border-2 border-dashed transition-all duration-500 overflow-hidden group",
+            "relative aspect-video rounded-lg border-2 border-dashed transition-all duration-500 overflow-hidden group",
             thumbnail 
               ? "border-brand shadow-2xl shadow-brand/10" 
               : isDragging 
@@ -69,42 +79,49 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
                 alt="Thumbnail Preview" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
+              <div className="absolute inset-0 bg-brand opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
                 <button 
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-12 h-12 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+                  className="w-12 h-12 rounded-lg bg-white text-gray-900 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
                 >
                   <Upload size={18} />
                 </button>
                 <button 
                   type="button"
                   onClick={() => onUpdate({ thumbnailUrl: "" })}
-                  className="w-12 h-12 rounded-2xl bg-red-500 text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+                  className="w-12 h-12 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
                 >
                   <X size={18} />
                 </button>
               </div>
-              <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-white/20">
+              <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-sm border border-white/20">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[9px] font-black text-gray-900 uppercase tracking-widest">Optimized & Ready</span>
               </div>
             </>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-24 h-24 rounded-xl bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
-                <Upload className="text-brand/40 group-hover:text-brand transition-colors" size={32} />
+              <div className="w-24 h-24 rounded-lg bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
+                {isUploading ? (
+                    <Loader2 className="text-brand animate-spin" size={32} />
+                ) : (
+                    <Upload className="text-brand/40 group-hover:text-brand transition-colors" size={32} />
+                )}
               </div>
-              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">Drop your masterpiece here</h4>
+              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">
+                  {isUploading ? "Uploading..." : "Drop your masterpiece here"}
+              </h4>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter max-w-[240px] leading-relaxed">
                 Supports High-Res PNG, JPG or WebP. <br/> Minimum 1280x720 recommended.
               </p>
               <button 
                 type="button"
+                disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-8 px-8 py-3.5 rounded-2xl bg-gray-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-brand transition-all shadow-xl shadow-gray-200 active:scale-95"
+                className="mt-8 px-8 py-3.5 rounded-lg bg-gray-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-brand transition-all shadow-xl shadow-gray-200 active:scale-95 disabled:opacity-50"
               >
-                Browse Files
+                {isUploading ? "Please Wait..." : "Browse Files"}
               </button>
             </div>
           )}
@@ -122,9 +139,9 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
       </WizardSection>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="p-8 bg-brand/5 rounded-xl border border-brand/10 space-y-4">
+        <div className="p-8 bg-brand/5 rounded-lg border border-brand/10 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-brand text-white flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center shadow-sm">
               <Info size={14} />
             </div>
             <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Visual Guidelines</h4>
@@ -144,9 +161,9 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           </ul>
         </div>
 
-        <div className="p-8 bg-gray-50/50 rounded-xl border border-gray-100 space-y-4 flex flex-col justify-center">
+        <div className="p-8 bg-gray-50/50 rounded-lg border border-gray-100 space-y-4 flex flex-col justify-center">
            <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gray-900 text-white flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-brand text-white flex items-center justify-center shadow-sm">
               <FileCode size={14} />
             </div>
             <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Technical Specs</h4>

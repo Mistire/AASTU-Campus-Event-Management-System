@@ -14,16 +14,16 @@ interface InfoCardProps {
 
 function InfoCard({ icon: Icon, label, value, subValue, className }: InfoCardProps) {
   return (
-    <div className={cn("p-6 rounded-xl bg-white border border-gray-100 shadow-sm transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
+    <div className={cn("p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm dark:shadow-none transition-all hover:bg-brand/5 hover:border-brand/10 group", className)}>
       <div className="flex flex-col gap-4">
-        <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
+        <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
           <Icon size={20} />
         </div>
         <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</p>
-          <p className="text-sm font-black text-gray-900 group-hover:text-brand transition-colors">{value}</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">{label}</p>
+          <p className="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors">{value}</p>
           {subValue && (
-            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{subValue}</p>
+            <p className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{subValue}</p>
           )}
         </div>
       </div>

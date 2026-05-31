@@ -10,7 +10,10 @@ import { EventCardFooter } from "./subcomponents/EventCardFooter";
 import { EventCardHoverPreview } from "./subcomponents/EventCardHoverPreview";
 
 import { useRegistration } from "../api/useRegistration";
+import { useBookmarkStatus, useToggleBookmark } from "../api/useBookmarks";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useMyRegistrations } from "../api/useRegistrationStatus";
 
 interface EventFeedCardProps {
   event: Event;
@@ -19,9 +22,17 @@ interface EventFeedCardProps {
 }
 
 export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: EventFeedCardProps) {
-  const [isSaved, setIsSaved] = useState(initialIsSaved);
-  
-  const capacityPercent = Math.min(100, Math.round((event._count.registrations / event.capacity) * 100));
+  const { profile } = useAuthStore();
+  const { data: isBookmarkedStatus } = useBookmarkStatus(event.id);
+  const { mutate: toggleBookmark } = useToggleBookmark();
+  const { data: myRegistrations } = useMyRegistrations({ enabled: !!profile });
+
+  const isRegistered = myRegistrations?.registrations?.some(
+    (reg: any) => reg.eventId === event.id && (reg.status?.name === 'PENDING' || reg.status?.name === 'CONFIRMED')
+  );
+  const isWaitlisted = myRegistrations?.waitlist?.some((wait: any) => wait.eventId === event.id);
+
+  const capacityPercent = Math.min(100, Math.round(((event._count?.registrations || 0) / event.capacity) * 100));
   const isAlmostFull = capacityPercent > 85 && capacityPercent < 100;
   const isFull = capacityPercent >= 100;
   const isEnded = new Date(event.endTime) < new Date();
@@ -31,8 +42,7 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsSaved(!isSaved);
-    onToggleSave?.(event.id);
+    toggleBookmark({ eventId: event.id, isBookmarked: !!isBookmarkedStatus });
   };
 
   const handleRegister = async (e: React.MouseEvent) => {
@@ -55,7 +65,7 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
-      className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-brand/5 transition-all duration-300 overflow-hidden"
+      className="group relative bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:shadow-brand/5 transition-all duration-300 overflow-hidden"
     >
       {/* Visual Header */}
       <EventCardImage event={event} />
@@ -64,13 +74,13 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
       <div className="p-6">
         <EventCardDetails 
           event={event} 
-          isSaved={!!isSaved} 
+          isSaved={!!isBookmarkedStatus} 
           onToggleSave={handleSave} 
         />
 
         <div className="mt-4">
           <EventCardFooter 
-            registrationsCount={event._count.registrations}
+            registrationsCount={event._count?.registrations || 0}
             capacity={event.capacity}
             isFull={isFull}
             isAlmostFull={isAlmostFull}
@@ -78,6 +88,8 @@ export function EventFeedCard({ event, isSaved: initialIsSaved, onToggleSave }: 
             onRegister={handleRegister}
             isRegistering={isRegistering}
             isEnded={isEnded}
+            isRegistered={isRegistered}
+            isWaitlisted={isWaitlisted}
           />
         </div>
       </div>

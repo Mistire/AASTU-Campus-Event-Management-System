@@ -69,6 +69,9 @@ interface CemsTableProps<TData> {
   /** External table instance (advanced usage) */
   tableInstance?: TableInstance<TData>;
 
+  /** Render additional items in the toolbar */
+  renderToolbarActions?: (table: TableInstance<TData>) => React.ReactNode;
+  
   /** Hide the toolbar */
   hideToolbar?: boolean;
 
@@ -77,14 +80,6 @@ interface CemsTableProps<TData> {
 
 /**
  * CEMS Table — full-featured branded data-table.
- *
- * Wraps shadcn Table + @tanstack/react-table with:
- *  - Sorting (click headers)
- *  - Global search
- *  - Column visibility toggle
- *  - Row selection (checkbox)
- *  - Compact, space-efficient rows
- *  - Branded pagination
  */
 export function CemsTable<TData>({
   data,
@@ -107,6 +102,7 @@ export function CemsTable<TData>({
   onSelectionChange,
   tableInstance: providedTable,
   hideToolbar = false,
+  renderToolbarActions,
   className,
 }: CemsTableProps<TData>) {
   /* ── Local state ────────────────────────────────────────────── */
@@ -115,6 +111,17 @@ export function CemsTable<TData>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
+  const [localPagination, setLocalPagination] = useState({
+    pageIndex: 0,
+    pageSize: initialPageSize,
+  });
+
+  const paginationState = useMemo(() => {
+    return {
+      pageIndex: controlledPageIndex !== undefined ? controlledPageIndex : localPagination.pageIndex,
+      pageSize: controlledPageIndex !== undefined ? initialPageSize : localPagination.pageSize,
+    };
+  }, [controlledPageIndex, initialPageSize, localPagination.pageIndex, localPagination.pageSize]);
 
   /* ── Prepend selection column if enabled ─────────────────────── */
   const columns = useMemo(() => {
@@ -155,12 +162,7 @@ export function CemsTable<TData>({
       columnVisibility,
       globalFilter,
       rowSelection,
-      ...(controlledPageIndex !== undefined && {
-        pagination: {
-          pageIndex: controlledPageIndex,
-          pageSize: initialPageSize,
-        },
-      }),
+      pagination: paginationState,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -168,36 +170,28 @@ export function CemsTable<TData>({
     onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: (updater) => {
       setRowSelection(updater);
-      // Fire selection callback
       if (onSelectionChange) {
         const next = typeof updater === "function" ? updater(rowSelection) : updater;
         const selectedRows = Object.keys(next)
-          .filter((k) => next[k as keyof typeof next])
+          .filter((k) => (next as any)[k])
           .map((idx) => data[Number(idx)])
           .filter(Boolean);
         onSelectionChange(selectedRows);
       }
     },
     onPaginationChange: (updater) => {
-      if (
-        typeof updater === "function" &&
-        controlledPageIndex !== undefined &&
-        onPageChange
-      ) {
-        const nextState = updater({
-          pageIndex: controlledPageIndex || 0,
-          pageSize: initialPageSize,
-        });
-        onPageChange(nextState.pageIndex);
+      const nextState = typeof updater === "function" ? updater(paginationState) : updater;
+      if (controlledPageIndex !== undefined) {
+        onPageChange?.(nextState.pageIndex);
         onPageSizeChange?.(nextState.pageSize);
+      } else {
+        setLocalPagination(nextState);
       }
     },
     getCoreRowModel: getCoreRowModel(),
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableFiltering && { getFilteredRowModel: getFilteredRowModel() }),
-    ...(!manualPagination && {
-      getPaginationRowModel: getPaginationRowModel(),
-    }),
+    ...(!manualPagination && { getPaginationRowModel: getPaginationRowModel() }),
     manualPagination,
     enableSorting,
     enableFilters: enableFiltering,
@@ -214,7 +208,7 @@ export function CemsTable<TData>({
     return (
       <div className="flex flex-col items-center justify-center p-16 space-y-3">
         <Loader2 className="w-8 h-8 text-brand animate-spin" />
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
           Loading...
         </p>
       </div>
@@ -222,134 +216,91 @@ export function CemsTable<TData>({
   }
 
   /* ── Render ───────────────────────────────────────────────────── */
-  const visibleColumns = table
-    .getAllColumns()
-    .filter((c) => c.getCanHide() && c.id !== "__select");
+  const visibleColumns = table.getAllColumns().filter((c) => c.getCanHide() && c.id !== "__select");
+
+  const currentPageIndex = controlledPageIndex ?? table.getState().pagination.pageIndex;
+  const currentPageSize = table.getState().pagination.pageSize;
 
   return (
     <div className={cn("w-full flex flex-col", className)}>
-      {/* ─── Toolbar ─────────────────────────────────────────── */}
+      {/* Toolbar */}
       {!hideToolbar && (enableGlobalFilter || enableColumnVisibility) && (
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50">
-          {/* Global Search */}
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50 dark:border-gray-800">
           {enableGlobalFilter && (
             <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               <input
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 placeholder="Search..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand/30 transition-all"
+                className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-200 placeholder:text-gray-400 outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand/30 transition-all"
               />
             </div>
           )}
+          
+          {renderToolbarActions && (
+             <div className="flex items-center gap-2">
+                {renderToolbarActions(table)}
+             </div>
+          )}
 
           <div className="flex-1" />
-
-          {/* Column Visibility Toggle — simple popover */}
           {enableColumnVisibility && (
             <ColumnVisibilityPopover columns={visibleColumns} />
           )}
         </div>
       )}
 
-      {/* ─── Table ───────────────────────────────────────────── */}
+      {/* Table */}
       <div className="overflow-x-auto">
         <Table className="table-fixed w-full">
-          <TableHeader className="bg-gray-50/50 border-b border-gray-100">
+          <TableHeader className="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="hover:bg-transparent border-none"
-              >
-                {headerGroup.headers.map((header) => {
-                  const canSort = header.column.getCanSort();
-                  const sorted = header.column.getIsSorted();
-
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={cn(
-                        "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 px-5",
-                        canSort &&
-                          "cursor-pointer select-none hover:text-gray-800 transition-colors",
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-none">
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      "h-10 text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-2 first:pl-5 first:pr-1 last:pr-5",
+                      header.column.getCanSort() && "cursor-pointer select-none hover:text-gray-800 dark:hover:text-white transition-colors"
+                    )}
+                    style={header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined}
+                    onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                  >
+                    <div className="flex items-center gap-1">
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.column.getCanSort() && (
+                        <span className="ml-0.5">
+                          {header.column.getIsSorted() === "asc" ? <ArrowUp size={12} /> : header.column.getIsSorted() === "desc" ? <ArrowDown size={12} /> : <ArrowUpDown size={12} className="opacity-30" />}
+                        </span>
                       )}
-                      style={
-                        header.column.columnDef.size
-                          ? { width: header.column.columnDef.size }
-                          : undefined
-                      }
-                      onClick={
-                        canSort
-                          ? header.column.getToggleSortingHandler()
-                          : undefined
-                      }
-                    >
-                      <div className="flex items-center gap-1">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        {canSort && (
-                          <span className="ml-0.5">
-                            {sorted === "asc" ? (
-                              <ArrowUp className="w-3 h-3" />
-                            ) : sorted === "desc" ? (
-                              <ArrowDown className="w-3 h-3" />
-                            ) : (
-                              <ArrowUpDown className="w-3 h-3 opacity-30" />
-                            )}
-                          </span>
-                        )}
-                      </div>
-                    </TableHead>
-                  );
-                })}
+                    </div>
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
-
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
                   onClick={() => onRowClick?.(row.original)}
-                  className={cn(
-                    "border-b border-gray-100 hover:bg-brand/[0.06] transition-colors duration-150",
-                    onRowClick && "cursor-pointer",
-                    row.getIsSelected() && "bg-brand/5",
-                  )}
+                  className={cn("border-b border-gray-100 dark:border-gray-800 hover:bg-brand/6 transition-colors duration-150", onRowClick && "cursor-pointer")}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="px-5 py-3 text-sm text-gray-700 whitespace-nowrap"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                    <TableCell key={cell.id} className="px-2 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap first:pl-5 first:pr-1 last:pr-5">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-40 text-center"
-                >
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                      <Search className="w-5 h-5 opacity-40" />
-                    </div>
-                    <p className="text-xs font-semibold text-gray-500">
-                      {emptyMessage}
-                    </p>
+                <TableCell colSpan={columns.length} className="h-40 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-2 text-gray-400 dark:text-gray-600">
+                    <Search size={32} className="opacity-20" />
+                    <p className="text-xs font-semibold">{emptyMessage}</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -358,127 +309,56 @@ export function CemsTable<TData>({
         </Table>
       </div>
 
-      {/* ─── Pagination Footer ───────────────────────────────── */}
-      <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 gap-3 bg-gray-50/40">
-        {/* Left: rows-per-page + info */}
+      {/* Pagination Footer */}
+      <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 dark:border-gray-800 gap-3 bg-gray-50/40 dark:bg-gray-800/30">
         <div className="flex items-center gap-4 text-[10px]">
-          {enableRowSelection && (
-            <span className="font-bold text-gray-400">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} selected
-            </span>
-          )}
-
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-400 uppercase tracking-widest">
-              Rows
-            </span>
+            <span className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Rows</span>
             <select
-              value={table.getState().pagination.pageSize}
+              value={currentPageSize}
               onChange={(e) => {
                 const newSize = Number(e.target.value);
                 table.setPageSize(newSize);
                 onPageSizeChange?.(newSize);
               }}
-              className="bg-white border border-gray-200 rounded-md text-[10px] font-semibold px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-brand/20 cursor-pointer"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md text-[10px] font-semibold px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-brand/20 dark:text-gray-200"
             >
               {[5, 10, 20, 30, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
+                <option key={size} value={size}>{size}</option>
               ))}
             </select>
           </div>
-
-          <div className="font-bold text-gray-400 uppercase tracking-widest hidden sm:block">
+          <div className="font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest hidden sm:block">
             {totalItems !== undefined ? (
               <>
-                <span className="text-gray-700">
-                  {Math.min(
-                    (controlledPageIndex || table.getState().pagination.pageIndex) *
-                      table.getState().pagination.pageSize +
-                      1,
-                    totalItems,
-                  )}
-                </span>
+                <span className="text-gray-700 dark:text-gray-300">{Math.min(currentPageIndex * currentPageSize + 1, totalItems)}</span>
                 –
-                <span className="text-gray-700">
-                  {Math.min(
-                    ((controlledPageIndex || table.getState().pagination.pageIndex) + 1) *
-                      table.getState().pagination.pageSize,
-                    totalItems,
-                  )}
-                </span>{" "}
-                of <span className="text-gray-700">{totalItems}</span>
+                <span className="text-gray-700 dark:text-gray-300">{Math.min((currentPageIndex + 1) * currentPageSize, totalItems)}</span>
+                {" "}of <span className="text-gray-700 dark:text-gray-300">{totalItems}</span>
               </>
             ) : (
-              <>
-                Page{" "}
-                <span className="text-gray-700">
-                  {table.getState().pagination.pageIndex + 1}
-                </span>{" "}
-                of{" "}
-                <span className="text-gray-700">{table.getPageCount()}</span>
-              </>
+              <>Page <span className="text-gray-700 dark:text-gray-300">{currentPageIndex + 1}</span> of <span className="text-gray-700 dark:text-gray-300">{table.getPageCount()}</span></>
             )}
           </div>
         </div>
 
-        {/* Right: pagination buttons */}
         <div className="flex items-center gap-1">
-          <PaginationButton
-            onClick={() => {
-              table.setPageIndex(0);
-              onPageChange?.(0);
-            }}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft className="w-3.5 h-3.5" />
+          <PaginationButton onClick={() => { table.setPageIndex(0); onPageChange?.(0); }} disabled={!table.getCanPreviousPage()}>
+            <ChevronsLeft size={14} />
           </PaginationButton>
-          <PaginationButton
-            onClick={() => {
-              table.previousPage();
-              onPageChange?.(
-                (controlledPageIndex ||
-                  table.getState().pagination.pageIndex) - 1,
-              );
-            }}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
+          <PaginationButton onClick={() => { table.previousPage(); onPageChange?.(currentPageIndex - 1); }} disabled={!table.getCanPreviousPage()}>
+            <ChevronLeft size={14} />
           </PaginationButton>
-
           <div className="flex items-center gap-1 px-2 min-w-[60px] justify-center">
-            <span className="text-[10px] font-black text-brand bg-brand/5 px-1.5 py-0.5 rounded">
-              {table.getState().pagination.pageIndex + 1}
-            </span>
-            <span className="text-[10px] font-bold text-gray-300">/</span>
-            <span className="text-[10px] font-bold text-gray-400">
-              {table.getPageCount()}
-            </span>
+            <span className="text-[10px] font-black text-brand bg-brand/5 dark:bg-brand/10 px-1.5 py-0.5 rounded">{currentPageIndex + 1}</span>
+            <span className="text-[10px] font-bold text-gray-300 dark:text-gray-700">/</span>
+            <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">{table.getPageCount()}</span>
           </div>
-
-          <PaginationButton
-            onClick={() => {
-              table.nextPage();
-              onPageChange?.(
-                (controlledPageIndex ||
-                  table.getState().pagination.pageIndex) + 1,
-              );
-            }}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
+          <PaginationButton onClick={() => { table.nextPage(); onPageChange?.(currentPageIndex + 1); }} disabled={!table.getCanNextPage()}>
+            <ChevronRight size={14} />
           </PaginationButton>
-          <PaginationButton
-            onClick={() => {
-              const lastPage = table.getPageCount() - 1;
-              table.setPageIndex(lastPage);
-              onPageChange?.(lastPage);
-            }}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight className="w-3.5 h-3.5" />
+          <PaginationButton onClick={() => { table.setPageIndex(table.getPageCount() - 1); onPageChange?.(table.getPageCount() - 1); }} disabled={!table.getCanNextPage()}>
+            <ChevronsRight size={14} />
           </PaginationButton>
         </div>
       </div>
@@ -486,17 +366,14 @@ export function CemsTable<TData>({
   );
 }
 
-/* ─── Internal: Column visibility popover ──────────────────────── */
 function ColumnVisibilityPopover({ columns }: { columns: any[] }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     if (!open) return;
     const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -508,41 +385,25 @@ function ColumnVisibilityPopover({ columns }: { columns: any[] }) {
         onClick={() => setOpen(!open)}
         className={cn(
           "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md border text-[10px] font-bold uppercase tracking-wider transition-all",
-          open
-            ? "border-brand/30 text-brand bg-brand/5"
-            : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-600",
+          open ? "border-brand/30 text-brand bg-brand/5" : "border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-600 dark:hover:text-gray-300"
         )}
       >
-        <Columns3 className="w-3.5 h-3.5" />
+        <Columns3 size={14} />
         Columns
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-xl bg-white p-1.5 shadow-xl shadow-gray-200/50 ring-1 ring-gray-100 animate-in fade-in-0 zoom-in-95 duration-150">
-          <p className="px-3 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-            Toggle Columns
-          </p>
-          <div className="h-px bg-gray-100 mx-1.5 my-1" />
+        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-[200px] rounded-lg bg-white dark:bg-gray-900 p-1.5 shadow-xl shadow-gray-200/50 dark:shadow-none ring-1 ring-gray-100 dark:ring-gray-800 animate-in fade-in-0 zoom-in-95 duration-150">
+          <p className="px-3 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Toggle Columns</p>
           {columns.map((column) => (
             <button
               key={column.id}
               onClick={() => column.toggleVisibility(!column.getIsVisible())}
-              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors cursor-pointer"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-brand/5 dark:hover:bg-brand/10 hover:text-brand transition-colors"
             >
-              <span
-                className={cn(
-                  "w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors",
-                  column.getIsVisible()
-                    ? "bg-brand border-brand text-white"
-                    : "border-gray-300 bg-white",
-                )}
-              >
-                {column.getIsVisible() && <Check className="w-3 h-3" />}
-              </span>
-              <span className="capitalize">
-                {typeof column.columnDef.header === "string"
-                  ? column.columnDef.header
-                  : column.id.replace(/_/g, " ")}
-              </span>
+              <div className={cn("w-4 h-4 rounded border flex items-center justify-center transition-colors", column.getIsVisible() ? "bg-brand border-brand text-white" : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800")}>
+                {column.getIsVisible() && <Check size={12} />}
+              </div>
+              <span className="capitalize">{typeof column.columnDef.header === "string" ? column.columnDef.header : column.id.replace(/_/g, " ")}</span>
             </button>
           ))}
         </div>
@@ -551,24 +412,11 @@ function ColumnVisibilityPopover({ columns }: { columns: any[] }) {
   );
 }
 
-/* ─── Internal: Pagination button ──────────────────────────────── */
-function PaginationButton({
-  children,
-  onClick,
-  disabled,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  disabled: boolean;
-}) {
+function PaginationButton({ children, onClick, disabled }: { children: React.ReactNode; onClick: () => void; disabled: boolean }) {
   return (
     <Button
       variant="outline"
-      className={cn(
-        "w-7 h-7 p-0 rounded-md border-gray-200 transition-all",
-        "hover:bg-brand hover:text-white hover:border-brand",
-        "disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-gray-400 disabled:hover:border-gray-200",
-      )}
+      className="w-7 h-7 p-0 rounded-md border-gray-200 dark:border-gray-800 transition-all hover:bg-brand hover:text-white hover:border-brand dark:bg-gray-900 disabled:opacity-20"
       onClick={onClick}
       disabled={disabled}
     >

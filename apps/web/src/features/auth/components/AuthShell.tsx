@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Logo from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function AuthShell({
   children,
@@ -16,7 +17,7 @@ export default function AuthShell({
   return (
     <div className="min-h-screen flex">
       {/* ── Left Panel: Brand Visual ── */}
-      <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-linear-to-br from-gray-950 via-gray-900 to-brand/20 flex-col justify-between p-16">
+      <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-[#111827] flex-col justify-between p-16">
         {/* Dot grid */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[40px_40px]" />
 
@@ -40,7 +41,7 @@ export default function AuthShell({
         {/* Center: Hero Text */}
         <div className="relative z-10">
           {badge && (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 text-[9px] font-brand font-black uppercase tracking-widest mb-8">
               {badge}
             </div>
           )}
@@ -57,7 +58,12 @@ export default function AuthShell({
       </div>
 
       {/* ── Right Panel: Form ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white dark:bg-gray-950 relative overflow-hidden">
+        {/* Theme Toggle */}
+        <div className="absolute top-8 right-8 z-50">
+          <ThemeToggle className="w-10 h-10 rounded-xl" />
+        </div>
+
         {/* Subtle dot grid */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[40px_40px]" />
         

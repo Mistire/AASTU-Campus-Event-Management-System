@@ -17,7 +17,7 @@ export function RegistrationTrendChart() {
   const { data, isLoading } = useAdminTrends("30d");
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[220px] rounded-xl" />;
+    return <Skeleton className="w-full h-[220px] rounded-lg" />;
   }
 
   const chartData = (data || []).map((d) => ({

@@ -1,69 +1,68 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { LogEntry } from '../types';
 import { Info, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { cn, truncate } from "@/lib/utils";
 
 export const getLogsColumns = (): ColumnDef<LogEntry>[] => [
+
     {
-        id: "index",
-        header: "No.",
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>,
-        size: 50,
-    },
-    {
-        accessorKey: "timestamp",
+        accessorKey: "createdAt",
         header: "Timestamp",
-        cell: ({ row }) => <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{row.original.timestamp}</span>,
+        cell: ({ row }) => <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{new Date(row.original.createdAt).toLocaleString()}</span>,
     },
     {
-        accessorKey: "level",
-        header: "Level",
+        accessorKey: "outcome",
+        header: "Outcome",
         cell: ({ row }) => {
-            const level = row.original.level;
-            let Icon = Info;
-            let variantClass = "bg-blue-50 text-blue-600 border-blue-100";
-
-            if (level === 'ERROR') { 
-                Icon = AlertCircle; 
-                variantClass = "bg-red-50 text-red-600 border-red-100";
-            }
-            if (level === 'WARNING') { 
-                Icon = AlertCircle; 
-                variantClass = "bg-amber-50 text-amber-600 border-amber-100";
-            }
-            if (level === 'SUCCESS') { 
-                Icon = CheckCircle2; 
-                variantClass = "bg-emerald-50 text-emerald-600 border-emerald-100";
-            }
-
+            const outcome = row.original.outcome;
+            const isSuccess = outcome === 'SUCCESS';
             return (
                 <div className={cn(
-                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded border uppercase tracking-widest shadow-sm",
-                    variantClass
+                    "flex items-center gap-1.5 font-black text-[9px] px-2 py-0.5 rounded-lg border uppercase tracking-widest shadow-sm w-fit",
+                    isSuccess 
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
+                        : "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
                 )}>
-                    <Icon className="w-3 h-3" />
-                    {level}
+                    {isSuccess ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                    {outcome}
                 </div>
             );
         },
     },
     {
-        accessorKey: "event",
-        header: "Event Name",
-        cell: ({ row }) => <span className="text-sm font-black text-gray-900 line-clamp-1">{row.original.event}</span>,
+        accessorKey: "ipAddress",
+        header: "IP Source",
+        cell: ({ row }) => <span className="text-[10px] font-medium text-gray-400 font-mono">{row.original.ipAddress || '—'}</span>,
+    },
+    {
+        accessorKey: "action",
+        header: "Action",
+        cell: ({ row }) => (
+            <div className="font-bold text-xs text-gray-900 dark:text-white">
+                {truncate(row.original.action, 25)}
+            </div>
+        ),
     },
     {
         accessorKey: "user",
-        header: "Performed By",
-        cell: ({ row }) => <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.05em]">{row.original.user}</span>,
+        header: "Actor",
+        cell: ({ row }) => (
+            <div className="flex flex-col">
+                <span className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tight">{truncate(row.original.user.fullName, 25)}</span>
+                <span className="text-[8px] font-medium text-gray-400">{row.original.role || 'User'}</span>
+            </div>
+        ),
     },
     {
-        accessorKey: "details",
-        header: "Description",
+        id: "actions",
+        header: "Audit Trail",
         cell: ({ row }) => (
-            <span className="text-sm font-medium text-gray-600 line-clamp-1 max-w-[300px]">
-                {row.original.details}
-            </span>
+            <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('view-log-detail', { detail: row.original.id }))}
+                className="text-[10px] font-black text-brand hover:underline uppercase tracking-widest"
+            >
+                View Details
+            </button>
         ),
     },
 ];

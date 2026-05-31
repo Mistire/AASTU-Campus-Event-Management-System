@@ -36,7 +36,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
-      className="group relative w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl overflow-hidden bg-gray-950 border border-white/10 shadow-2xl transition-all duration-300 shrink-0"
+      className="group relative w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-lg overflow-hidden bg-gray-950 border border-white/10 shadow-2xl transition-all duration-300 shrink-0"
     >
       {/* Absolute Background Image with Clear Gradient */}
       <div className="absolute inset-0 z-0">
@@ -63,7 +63,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
         {/* Top: Minimal Signals */}
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10 backdrop-blur-xl text-[8px] font-black uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 backdrop-blur-xl text-[8px] font-black uppercase tracking-[0.2em]">
               {isLive ? (
                 <span className="flex items-center gap-1.5 text-red-400">
                   <Circle size={8} fill="currentColor" className="animate-pulse" />
@@ -83,7 +83,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
           <button
             onClick={handleSave}
             className={cn(
-              "p-3 rounded-2xl transition-all border shrink-0 backdrop-blur-2xl",
+              "p-3 rounded-lg transition-all border shrink-0 backdrop-blur-2xl",
               isSaved
                 ? "bg-brand border-brand text-white shadow-lg shadow-brand/40 scale-105"
                 : "bg-white/5 border-white/10 text-white/50 hover:text-white hover:bg-white/10"
@@ -97,7 +97,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
         <div className="space-y-4">
           <div className="space-y-2 max-w-lg">
             <h3 className="text-2xl sm:text-4xl font-black tracking-tight leading-[1.1] group-hover:text-brand-subtle transition-colors drop-shadow-lg">
-              {event.title}
+              {event.title.length > 20 ? `${event.title.slice(0, 20)}...` : event.title}
             </h3>
             <p className="text-white/50 text-sm sm:text-base font-medium line-clamp-2 leading-relaxed">
               {event.description || "Be part of this exclusive campus event designed for our students."}
@@ -125,7 +125,7 @@ export function EventHeroCard({ event, isSaved: initialIsSaved }: EventHeroCardP
               </div>
             </div>
 
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-brand text-white flex items-center justify-center shadow-xl shadow-brand/20 group-hover:scale-110 transition-all duration-300 shrink-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-brand text-white flex items-center justify-center shadow-xl shadow-brand/20 group-hover:scale-110 transition-all duration-300 shrink-0">
               <ArrowUpRight size={24} />
             </div>
           </div>

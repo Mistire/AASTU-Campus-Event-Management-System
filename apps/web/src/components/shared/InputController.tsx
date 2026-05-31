@@ -27,7 +27,7 @@ export const InputController = forwardRef<HTMLInputElement, InputControllerProps
         <Input
           ref={ref}
           className={cn(
-            "h-12 rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold",
+            "h-12 rounded-lg border-gray-100 bg-gray-50/50 focus:bg-white transition-all font-semibold",
             className
           )}
           {...props}

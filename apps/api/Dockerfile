@@ -1,47 +1,44 @@
-# ─── Stage 1: Development ────────────────────────────────────────
-FROM node:20-alpine AS development
+# ─── Stage 1: Development / Build ────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+ENV NODE_OPTIONS="--max-old-space-size=512"
 
 WORKDIR /usr/src/app
 
-# Copy dependency manifests
 COPY package*.json ./
+# Cache npm downloads to prevent fetching all packages from scratch
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --prefer-offline 2>/dev/null || npm install
 
-# Install dependencies inside the build (Masterclass standard)
-RUN npm install
-
-# Copy source
 COPY . .
 
-# Generate Prisma client (uses the already-present @prisma/client)
+# Generate Prisma Client and build the app
 RUN npx prisma generate
-
-# Build the NestJS app
 RUN npm run build
 RUN ls -R dist
 
-# Default dev command (overridden by docker-compose command: field)
-CMD ["npm", "run", "start:dev"]
+# Prune devDependencies (leaves only production packages in node_modules)
+RUN npm prune --production
 
-# ─── Stage 2: Production ──────────────────────────────────────────
+# ─── Stage 2: Production ──────────────────────────────────────────────────────
 FROM node:20-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+ENV NODE_OPTIONS="--max-old-space-size=512"
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-# Copy only the prod-relevant node_modules from the development stage
-COPY --from=development /usr/src/app/node_modules ./node_modules
+RUN apk add --no-cache wget
 
-# Copy compiled output
-COPY --from=development /usr/src/app/dist ./dist
-# Copy generated Prisma client
-COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=development /usr/src/app/prisma ./prisma
-COPY start-prod.sh ./
-RUN chmod +x start-prod.sh
+COPY package*.json ./
+
+# Copy compiled app, pruned production node_modules, and Prisma schemas
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY prisma.config.js ./prisma.config.js
 
 EXPOSE 4000
 
-CMD ["./start-prod.sh"]
+CMD ["node", "dist/src/main.js"]

@@ -9,7 +9,7 @@ const getUsers = async (): Promise<AuthProfile[]> => {
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to fetch users");
   
-  return (result.data?.data || result.data) || [];
+  return result.data?.data || result.data || result || [];
 };
 
 export const useUsers = () => {

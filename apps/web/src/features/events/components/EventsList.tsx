@@ -6,7 +6,8 @@ import { Event, EventStatusName, PaginatedEventsResponse } from "../types";
 import { useEvents, useMyOrganizedEvents } from "../api/get-events";
 import { useVenues } from "../api/get-venues";
 import { useUsers } from "../api/get-users";
-import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent } from "../api/mutations";
+import { useCreateEvent, useUpdateEvent, useDeleteEvent, useSubmitEvent, useApproveEvent, useRejectEvent, useGoLiveEvent, useArchiveEvent } from "../api/mutations";
+import { useAttachTemplate } from "@/features/feedback/api";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import { CemsTable } from "@/components/cems/CemsTable";
 import { CemsButton } from "@/components/cems/CemsButton";
@@ -19,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ToastController } from "@/components/shared/ToastController";
 import { EventFormModal } from "./EventFormModal";
 import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
+import { ArchiveConfirmation } from "@/components/shared/ArchiveConfirmation";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { STATUS_OPTIONS } from "../constants";
@@ -37,6 +39,7 @@ export const EventsList = () => {
 
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
 
@@ -70,6 +73,8 @@ export const EventsList = () => {
   const approveEvent = useApproveEvent();
   const rejectEvent = useRejectEvent();
   const goLiveEvent = useGoLiveEvent();
+  const archiveEvent = useArchiveEvent();
+  const attachTemplate = useAttachTemplate();
 
   useEffect(() => {
     if (isError && error) {
@@ -161,20 +166,45 @@ export const EventsList = () => {
     });
   };
 
+  const handleArchive = (event: Event) => {
+    setSelectedEvent(event);
+    setIsArchiveModalOpen(true);
+  };
+
+  const handleConfirmArchive = async (templateId: string) => {
+    if (!selectedEvent) return;
+    try {
+      if (templateId) {
+        await attachTemplate.mutateAsync({ templateId, eventId: selectedEvent.id });
+      }
+      archiveEvent.mutate(selectedEvent.id, {
+        onSuccess: () => {
+          setIsArchiveModalOpen(false);
+          ToastController.success({ message: "Event archived successfully" });
+        },
+        onError: (err) => {
+          ToastController.error({ message: "Failed to archive event", description: err.message });
+        }
+      });
+    } catch (err: any) {
+      ToastController.error({ message: "Failed to attach template", description: err.message });
+    }
+  };
+
   const handleManageAttendees = (event: Event) => {
     router.push(`/dashboard/events/${event.id}/attendees`);
   };
 
   const columns = useMemo(() => 
-    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleManageAttendees), 
+    getEventsColumns(userRole, handleEdit, handleDelete, handleSubmit, handleApprove, handleReject, handleGoLive, handleArchive, handleManageAttendees), 
   [userRole]);
 
-  const totalPages = eventsData?.meta?.totalPages || 1;
-  const totalItems = eventsData?.meta?.total || 0;
+  const totalPages = (eventsData as PaginatedEventsResponse)?.meta?.totalPages || 1;
+  const totalItems = (eventsData as PaginatedEventsResponse)?.meta?.total || 0;
 
   if (isError) {
     return (
-      <div className="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
+      <div className="p-4 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-500/20">
         Error loading events: {error.message}
       </div>
     );
@@ -183,14 +213,14 @@ export const EventsList = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm">
+          <div className="w-14 h-14 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand border border-brand/10 dark:border-brand/20 shadow-sm">
             <Calendar size={28} />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-gray-900">Events</h1>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Create, edit and monitor campus events</p>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">Events</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Create, edit and monitor campus events</p>
           </div>
         </div>
         
@@ -198,7 +228,7 @@ export const EventsList = () => {
           <CemsButton 
             cemsVariant="brand"
             onClick={handleAddEvent}
-            className="rounded-xl px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
+            className="rounded-lg px-8 py-6 h-auto font-black text-xs uppercase tracking-widest shadow-xl shadow-brand/20 transition-all active:scale-95 flex items-center gap-3 group"
           >
             <Plus className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
             Create New Event
@@ -206,65 +236,19 @@ export const EventsList = () => {
         )}
       </div>
 
-      {/* Filter Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Organized By</label>
-          <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Organizers" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Organizers</SelectItem>
-              {users?.map((u) => (
-                <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
 
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Event Status</label>
-          <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Statuses" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Statuses</SelectItem>
-              {STATUS_OPTIONS.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 mb-2 block">Venue</label>
-          <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
-            <SelectTrigger className="h-12 bg-gray-50/50 border-transparent rounded-xl text-sm font-semibold text-gray-700 hover:bg-white transition-all">
-              <SelectValue placeholder="All Venues" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-2xl">
-              <SelectItem value="">All Venues</SelectItem>
-              {venues?.map((v) => (
-                <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
       {/* Master-Detail Layout */}
       <div className="flex gap-6">
         {/* Table */}
         <div className={cn(
-          "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex-1 min-w-0",
+          "bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-300 flex-1 min-w-0 px-4",
         )}>
           <CemsTable
             columns={columns}
-            data={eventsData?.data || []}
+            data={(eventsData as PaginatedEventsResponse)?.data || []}
             loading={isLoading}
-            emptyMessage="No events found matching your criteria."
+            emptyMessage="No events found. Active and upcoming events will appear here."
             onRowClick={(event) => setPreviewEvent(event)}
             enableSorting
             enableGlobalFilter
@@ -279,16 +263,56 @@ export const EventsList = () => {
                 setLimit(newSize);
                 setPage(1);
             }}
+            renderToolbarActions={() => (
+              <div className="flex items-center gap-2 ">
+                {!isOrganizer && (
+                  <Select value={createdById} onValueChange={(val) => { setCreatedById(val ?? ""); setPage(1); }}>
+                    <SelectTrigger className="h-8 min-w-[140px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
+                      <SelectValue placeholder="Organizer" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
+                      <SelectItem value="">All Organizers</SelectItem>
+                      {users?.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                <Select value={status} onValueChange={(val) => { setStatus(val ?? ""); setPage(1); }}>
+                  <SelectTrigger className="h-8 min-w-[120px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
+                    <SelectItem value="">All Statuses</SelectItem>
+                    {STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={venueId} onValueChange={(val) => { setVenueId(val ?? ""); setPage(1); }}>
+                  <SelectTrigger className="h-8 min-w-[130px] bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 transition-all">
+                    <SelectValue placeholder="Venue" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl bg-white dark:bg-gray-950">
+                    <SelectItem value="">All Venues</SelectItem>
+                    {venues?.map((v) => (
+                      <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
           />
         </div>
 
-        {/* Detail Panel */}
-        {previewEvent && (
-          <EventPreviewPanel 
-            event={previewEvent} 
-            onClose={() => setPreviewEvent(null)} 
-          />
-        )}
+        {/* Detail Panel Overlay */}
+        <EventPreviewPanel 
+          event={previewEvent} 
+          onClose={() => setPreviewEvent(null)} 
+        />
       </div>
 
       <EventFormModal 
@@ -305,6 +329,14 @@ export const EventsList = () => {
         itemName={selectedEvent?.title || "Unknown Event"}
         onConfirm={handleConfirmDelete}
         isDeleting={deleteEvent.isPending}
+      />
+
+      <ArchiveConfirmation
+        open={isArchiveModalOpen}
+        onOpenChange={setIsArchiveModalOpen}
+        itemName={selectedEvent?.title || "Unknown Event"}
+        onConfirm={handleConfirmArchive}
+        isArchiving={archiveEvent.isPending || attachTemplate.isPending}
       />
     </div>
   );

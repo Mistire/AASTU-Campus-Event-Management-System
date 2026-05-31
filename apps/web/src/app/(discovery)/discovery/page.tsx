@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { OnboardingGate } from "@/features/onboarding/components/OnboardingGate";
 import { useEvents, EventQueryParams } from "@/features/events/api/useEvents";
 import { useRecommendations } from "@/features/events/api/useRecommendations";
@@ -8,6 +8,7 @@ import { EventFeedCard } from "@/features/events/components/EventFeedCard";
 import { EventHeroCard } from "@/features/events/components/EventHeroCard";
 import { FilterBar } from "@/features/events/components/FilterBar";
 import { DiscoveryHeader } from "@/features/discovery/components/DiscoveryHeader";
+import { DiscoveryCarousel } from "@/features/discovery/components/DiscoveryCarousel";
 import { Button } from "@/components/ui/button";
 import {
   Compass,
@@ -37,7 +38,7 @@ export default function StudentHomePage() {
     5
   );
 
-  const handleFilterChange = (filters: {
+  const handleFilterChange = useCallback((filters: {
     search: string;
     categoryId: string | null;
   }) => {
@@ -47,7 +48,7 @@ export default function StudentHomePage() {
       categoryId: filters.categoryId || undefined,
       page: 1,
     }));
-  };
+  }, []);
 
   const loadMore = () => {
     if (eventsData && queryParams.page! < eventsData.meta.totalPages) {
@@ -62,7 +63,7 @@ export default function StudentHomePage() {
 
   return (
     <OnboardingGate>
-      <div className="max-w-[1400px] mx-auto space-y-12 pb-20">
+      <div className="max-w-[1400px] mx-auto ml-3 space-y-12 pb-20">
         <DiscoveryHeader />
 
         {!hasFilters && (
@@ -70,7 +71,7 @@ export default function StudentHomePage() {
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-3">
                 <Compass className="text-brand" size={24} />
-                <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
+                <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
                   Recommended for You
                 </h2>
               </div>
@@ -82,43 +83,43 @@ export default function StudentHomePage() {
               </Button>
             </div>
 
-            <div className="relative group">
-              <div className="flex items-center gap-6 overflow-x-auto pb-8 pt-2 px-2 scrollbar-hide">
-                {isLoadingRecs ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-2xl shrink-0"
-                    />
+            <DiscoveryCarousel>
+              {isLoadingRecs ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-[85vw] sm:w-[500px] aspect-[1.8/1] rounded-lg shrink-0"
+                  />
+                ))
+              ) : recommendations && recommendations.length > 0 ? (
+                Array.from(new Set(recommendations.map((e) => e.id)))
+                  .map((id) => recommendations.find((e) => e.id === id)!)
+                  .map((event) => (
+                    <EventHeroCard key={event.id} event={event} />
                   ))
-                ) : recommendations && recommendations.length > 0 ? (
-                  Array.from(new Set(recommendations.map((e) => e.id)))
-                    .map((id) => recommendations.find((e) => e.id === id)!)
-                    .map((event) => (
-                      <EventHeroCard key={event.id} event={event} />
-                    ))
-                ) : (
-                  <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
-                    <p className="text-sm font-bold uppercase tracking-widest">
-                      Feed is being personalized...
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+              ) : (
+                <div className="w-full py-12 flex flex-col items-center justify-center text-center text-gray-400 dark:text-gray-500 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg bg-gray-50/50 dark:bg-gray-900/50">
+                  <p className="text-sm font-bold uppercase tracking-widest">
+                    Feed is being personalized...
+                  </p>
+                </div>
+              )}
+            </DiscoveryCarousel>
           </section>
         )}
 
         <FilterBar
           onFilterChange={handleFilterChange}
           isLoading={isFetchingEvents}
+          initialSearch={queryParams.search}
+          initialCategoryId={queryParams.categoryId}
         />
 
         <section className="space-y-8">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
               <CalendarDays className="text-gray-400" size={24} />
-              <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
+              <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
                 {hasFilters ? "Search Results" : "All Upcoming Events"}
               </h2>
             </div>
@@ -127,7 +128,7 @@ export default function StudentHomePage() {
                 Showing{" "}
                 {Array.isArray(eventsData?.data) ? eventsData.data.length : 0} Events
               </span>
-              <div className="h-4 w-px bg-gray-200" />
+              <div className="h-4 w-px bg-gray-200 dark:bg-gray-800" />
               <span className="text-brand">Newest First</span>
             </div>
           </div>
@@ -135,13 +136,13 @@ export default function StudentHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {isLoadingEvents && !eventsData ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-40 w-full rounded-3xl" />
+                <Skeleton key={i} className="h-40 w-full rounded-lg" />
               ))
             ) : !Array.isArray(eventsData?.data) ||
               eventsData.data.length === 0 ? (
               <div className="lg:col-span-2 py-32 flex flex-col items-center justify-center text-center">
-                <SearchX className="text-gray-300" size={40} />
-                <h3 className="text-xl font-bold text-gray-900 mt-6">
+                <SearchX className="text-gray-300 dark:text-gray-700" size={40} />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-6">
                   No matching events
                 </h3>
                 <Button
@@ -149,7 +150,7 @@ export default function StudentHomePage() {
                   onClick={() =>
                     handleFilterChange({ search: "", categoryId: null })
                   }
-                  className="mt-8 rounded-xl font-black uppercase tracking-widest text-[10px]"
+                  className="mt-8 rounded-lg font-black uppercase tracking-widest text-[10px]"
                 >
                   Reset All Filters
                 </Button>
@@ -168,7 +169,7 @@ export default function StudentHomePage() {
               <Button
                 onClick={loadMore}
                 disabled={isFetchingEvents}
-                className="group h-12 px-10 rounded-2xl bg-white border border-gray-100 text-gray-900 font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
+                className="group h-12 px-10 rounded-lg bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 text-gray-900 dark:text-white font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-brand hover:text-brand transition-all"
               >
                 {isFetchingEvents ? (
                   <Loader2 className="animate-spin" size={14} />

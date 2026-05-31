@@ -14,7 +14,7 @@ interface AgendaTimelineProps {
 export function AgendaTimeline({ sessions }: AgendaTimelineProps) {
   if (!sessions || sessions.length === 0) {
     return (
-      <div className="py-20 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+      <div className="py-20 text-center text-gray-400 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
          <p className="text-sm font-black uppercase tracking-widest">No agenda available yet</p>
          <p className="text-xs mt-1 italic">Check back closer to the event start date.</p>
       </div>
@@ -77,12 +77,12 @@ export function AgendaTimeline({ sessions }: AgendaTimelineProps) {
                       {format(startTime, "h:mm aa")} — {format(endTime, "h:mm aa")}
                     </span>
                     {session.sessionType && (
-                       <span className="px-2 py-0.5 rounded-lg bg-gray-100 text-[8px] font-black uppercase tracking-widest text-gray-500">
+                       <span className="px-2 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-[8px] font-black uppercase tracking-widest text-gray-500">
                           {session.sessionType}
                        </span>
                     )}
                   </div>
-                  <h4 className="text-xl sm:text-2xl font-black text-gray-900 group-hover:text-brand transition-colors tracking-tight leading-tight">
+                  <h4 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white group-hover:text-brand transition-colors tracking-tight leading-tight">
                     {session.title}
                   </h4>
                 </div>
@@ -96,7 +96,7 @@ export function AgendaTimeline({ sessions }: AgendaTimelineProps) {
 
                 {/* Location Pill */}
                 {session.location && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:bg-brand/5 group-hover:text-brand transition-colors">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 group-hover:bg-brand/5 dark:group-hover:bg-brand/10 group-hover:text-brand transition-colors">
                     <MapPin size={12} className="shrink-0" />
                     <span>{session.location}</span>
                   </div>

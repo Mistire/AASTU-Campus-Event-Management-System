@@ -66,4 +66,10 @@ export class UpdateEventDto {
   @IsUUID('all', { each: true })
   @IsOptional()
   categoryIds?: string[];
+
+  @ApiPropertyOptional({ description: 'Number of guests allowed per registered student' })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  guestLimitPerUser?: number;
 }

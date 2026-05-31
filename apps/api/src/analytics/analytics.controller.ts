@@ -80,10 +80,12 @@ export class AnalyticsController {
     res.send(buffer);
   }
 
-  // ─── Organizer / Co-organizer event routes ───────────────────────────────
-  // @Roles('Organizer') ensures only users with the Organizer system role reach
-  // these endpoints. The service's assertEventOrganizer then further scopes
-  // access to events the user owns or has an ACCEPTED co-organizer invitation for.
+  @Get('admin/archive')
+  @Roles('Admin')
+  getAdminArchive() {
+    return this.analyticsService.getAdminArchive();
+  }
+
 
   @Get('events/:eventId')
   @Roles('Organizer')
@@ -148,5 +150,17 @@ export class AnalyticsController {
   @Roles('Organizer', 'Admin')
   getOrganizerRecentRegistrations(@GetUser() user: AuthUser) {
     return this.analyticsService.getOrganizerRecentRegistrations(user.id);
+  }
+
+  @Get('organizer/archive')
+  @Roles('Organizer', 'Admin')
+  getOrganizerArchive(@GetUser() user: AuthUser) {
+    return this.analyticsService.getOrganizerArchive(user.id);
+  }
+
+  @Get('top-organizer')
+  @Roles('Admin', 'Organizer')
+  getTopOrganizer() {
+    return this.analyticsService.getTopOrganizer();
   }
 }

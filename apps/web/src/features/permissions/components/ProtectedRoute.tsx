@@ -15,9 +15,28 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!_hasHydrated) return;
 
+    console.log("[ProtectedRoute] Checking:", pathname, "Role:", profile?.role);
+
     if (pathname === "/login" || pathname === "/register") {
       if (token) {
-        router.push("/discovery");
+        const searchParams = new URLSearchParams(window.location.search);
+        let redirectTo = searchParams.get("redirectTo");
+        const isDashboardUser = profile?.role === "ADMIN" || profile?.role === "ORGANIZER" || profile?.role === "STAFF";
+        
+        if (!redirectTo) {
+            redirectTo = isDashboardUser ? "/dashboard" : "/discovery";
+        } else {
+            // If user is being redirected to a public page, override it to their home base
+            const isDashboardRoute = redirectTo.startsWith('/dashboard') || redirectTo.startsWith('/api');
+            const isStudentRoute = redirectTo.startsWith('/discovery') || redirectTo.startsWith('/my-events') || redirectTo.startsWith('/profile');
+            
+            if (isDashboardUser && !isDashboardRoute) {
+                redirectTo = "/dashboard";
+            } else if (!isDashboardUser && !isStudentRoute) {
+                redirectTo = "/discovery";
+            }
+        }
+        router.push(redirectTo);
       } else {
         setIsAuthorized(true);
       }
@@ -25,7 +44,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
 
     if (!token) {
-      router.push("/login");
+      router.push(`/login?redirectTo=${encodeURIComponent(pathname)}`);
       return;
     }
 

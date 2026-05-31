@@ -14,7 +14,7 @@ export function AttendanceTable({ eventId }: AttendanceTableProps) {
     return (
       <div className="space-y-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-16 rounded-2xl bg-gray-50 animate-pulse" />
+          <div key={i} className="h-16 rounded-lg bg-gray-50 animate-pulse" />
         ))}
       </div>
     );
@@ -22,7 +22,7 @@ export function AttendanceTable({ eventId }: AttendanceTableProps) {
 
   if (!attendance || attendance.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-100 rounded-xl text-gray-300">
+      <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-100 rounded-lg text-gray-300">
         <Users className="h-16 w-16 mb-4 opacity-10" />
         <p className="font-black text-sm uppercase tracking-widest text-gray-400">
           No check-ins yet

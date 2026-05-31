@@ -47,7 +47,7 @@ export default function Testimonials() {
   const doubledTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section className="py-32 relative bg-linear-to-b from-white via-gray-50/20 to-white overflow-hidden">
+    <section className="py-32 relative bg-linear-to-b from-white dark:from-black via-gray-50/20 dark:via-gray-950/20 to-white dark:to-black overflow-hidden">
       
       {/* ── Background Decorations ── */}
       <div className="absolute inset-0 z-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] bg-size-[40px_40px]" />
@@ -62,7 +62,7 @@ export default function Testimonials() {
         className="relative z-10 text-center mb-20 px-6"
       >
         <div className="h-10" />
-        <h2 className="text-4xl md:text-6xl font-black mb-6 text-gray-900 tracking-tighter">What Students Say</h2>
+        <h2 className="text-4xl md:text-6xl font-black mb-6 text-gray-900 dark:text-white tracking-tighter">What Students Say</h2>
         <p className="text-gray-500 max-w-2xl mx-auto text-xl font-medium leading-relaxed">
           Trusted by student organizations and thousands of students across the AASTU campus.
         </p>
@@ -88,7 +88,7 @@ export default function Testimonials() {
           {doubledTestimonials.map((t, i) => (
             <div
               key={i}
-              className="w-[420px] shrink-0 p-10 bg-white/40 backdrop-blur-3xl rounded-xl border border-white/40 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
+              className="w-[420px] shrink-0 p-10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-lg border border-white/40 dark:border-white/10 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
             >
               {/* Card Meta Log */}
               <div className="absolute top-0 right-0 p-8">
@@ -103,22 +103,23 @@ export default function Testimonials() {
                     <span key={i} className="text-brand drop-shadow-[0_0_8px_rgba(14,165,233,0.4)]">★</span>
                   ))}
                 </div>
-                <p className="text-gray-600 mb-10 text-lg leading-relaxed font-medium italic whitespace-normal opacity-90">
+                <p className="text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed font-medium italic whitespace-normal opacity-90">
                   &ldquo;{t.quote}&rdquo;
                 </p>
               </div>
               
               <div className="flex items-center gap-5">
-                <div className="relative w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-white ring-4 ring-brand/5">
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 ring-4 ring-brand/5 dark:ring-brand/10">
                   <Image
                     src={t.img}
                     alt={t.name}
                     fill
+                    sizes="64px"
                     className="object-cover group-hover/card:scale-110 transition-transform duration-700"
                   />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-brand font-black text-gray-900 text-sm tracking-tight mb-1">{t.name}</h4>
+                  <h4 className="font-brand font-black text-gray-900 dark:text-white text-sm tracking-tight mb-1">{t.name}</h4>
                   <p className="text-[10px] text-brand font-brand font-black uppercase tracking-widest bg-brand/5 px-2 py-1 rounded-lg">
                     {t.role}
                   </p>
@@ -129,8 +130,8 @@ export default function Testimonials() {
         </motion.div>
 
         {/* Gradient Overlays for smooth edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-48 bg-linear-to-r from-white via-white/50 to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-48 bg-linear-to-l from-white via-white/50 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-48 bg-linear-to-r from-white dark:from-black via-white/50 dark:via-black/50 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-48 bg-linear-to-l from-white dark:from-black via-white/50 dark:via-black/50 to-transparent z-10" />
       </div>
     </section>
   );

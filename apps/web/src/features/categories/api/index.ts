@@ -21,8 +21,8 @@ export const useCategories = () => {
         queryFn: async (): Promise<Category[]> => {
             const res = await apiFetch('/api/categories');
             if (!res.ok) throw new Error('Failed to fetch categories');
-            const data = await res.json();
-            return (data.data || data) as Category[];
+            const result = await res.json();
+            return (result.data?.data || result.data || result || []) as Category[];
         },
     });
 };

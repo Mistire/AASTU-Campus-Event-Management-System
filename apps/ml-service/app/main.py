@@ -17,7 +17,7 @@ from app.services.recommendation_service import (
     get_similar_events,
     get_state,
 )
-from app.scheduler.jobs import get_scheduler_status
+from app.scheduler.jobs import get_scheduler_status, start_scheduler, stop_scheduler
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -33,8 +33,10 @@ async def lifespan(app: FastAPI):
         logger.info("Pre-trained models loaded")
     else:
         logger.info("No pre-trained models found. POST /retrain to train.")
+    start_scheduler()
     yield
     # Shutdown
+    stop_scheduler()
 
 
 app = FastAPI(

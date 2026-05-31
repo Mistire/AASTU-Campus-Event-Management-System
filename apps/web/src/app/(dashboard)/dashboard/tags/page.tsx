@@ -68,14 +68,14 @@ export default function TagsPage() {
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
                 <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 rounded-2xl bg-brand/5 flex items-center justify-center text-brand border border-brand/10 shadow-sm shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand border border-brand/10 dark:border-brand/20 shadow-sm shrink-0">
                         <Hash className="w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-gray-900">Metadata Tags</h1>
-                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">Metadata Tags</h1>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
                              <span className="w-2 h-2 rounded-full bg-brand" />
                              Manage keywords for event discovery.
                         </p>
@@ -84,13 +84,13 @@ export default function TagsPage() {
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger render={
-                        <CemsButton cemsVariant="brand" className="rounded-xl shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
+                        <CemsButton cemsVariant="brand" className="rounded-lg shadow-lg shadow-brand/20 h-12 px-6 font-black uppercase tracking-widest text-[11px]">
                             <Plus className="w-4 h-4 mr-2" />
                             New Tag
                         </CemsButton>
                     } />
                     <DialogContent showCloseButton={false} className="p-0 border-none bg-transparent shadow-none max-w-md">
-                        <div className="bg-white rounded-xl overflow-hidden shadow-2xl">
+                        <div className="bg-white dark:bg-gray-950 rounded-lg overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
                             <ModalHeader 
                                 title="New Tag" 
                             />
@@ -101,12 +101,12 @@ export default function TagsPage() {
                                     onChange={(e) => setTagName(e.target.value)}
                                     placeholder="e.g. Workshop (system adds # automatically)"
                                 />
-                                <div className="p-4 bg-brand/5 rounded-2xl border border-brand/10">
+                                <div className="p-4 bg-brand/5 dark:bg-brand/10 rounded-lg border border-brand/10 dark:border-brand/20">
                                     <p className="text-[10px] font-black text-brand uppercase tracking-widest mb-1 flex items-center gap-2">
                                         <TagIcon size={12} />
                                         Tag Preview
                                     </p>
-                                    <p className="text-sm font-black text-gray-900 lowercase italic">
+                                    <p className="text-sm font-black text-gray-900 dark:text-white lowercase italic">
                                         #{tagName.replace(/^#/, '') || 'tagname'}
                                     </p>
                                 </div>
@@ -123,7 +123,7 @@ export default function TagsPage() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100/50">
+            <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-none border border-gray-100/50 dark:border-gray-800">
                 <CemsTable
                     data={tags || []}
                     columns={allColumns}

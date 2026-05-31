@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { 
   useEventRegistrations, 
@@ -36,16 +36,17 @@ import {
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { CemsButton } from "@/components/cems";
+import { CemsButton } from "@/components/cems/CemsButton";
 import Image from "next/image";
 
-export default function EventAttendeesPage() {
+function EventAttendeesContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const eventId = params.id as string;
   const { data, isLoading } = useEventRegistrations(eventId);
   const approve = useApproveRegistration();
@@ -56,7 +57,9 @@ export default function EventAttendeesPage() {
   const { data: attendance } = useAttendance(eventId);
   
   const [searchTerm, setSearchTerm] = useState("");
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  
+  const autoOpenScanner = searchParams.get("scanner") === "true";
+  const [isScannerOpen, setIsScannerOpen] = useState(autoOpenScanner);
 
   const allAttendees = useMemo(() => {
     if (!data) return [];
@@ -86,16 +89,16 @@ export default function EventAttendeesPage() {
       header: "Attendee",
       cell: ({ row }) => (
         <div className="flex items-center gap-3 py-1">
-          <div className="w-9 h-9 rounded-xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 border border-brand/10 flex items-center justify-center text-brand font-black text-xs shrink-0">
             {row.original.user.profileImage ? (
-              <Image src={row.original.user.profileImage} alt="" className="w-full h-full object-cover rounded-xl" />
+              <Image src={row.original.user.profileImage} alt="" width={36} height={36} className="w-full h-full object-cover rounded-lg" />
             ) : (
               row.original.user.fullName.charAt(0)
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-black text-gray-900 truncate tracking-tight">{row.original.user.fullName}</p>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{row.original.user.email}</p>
+            <p className="text-sm font-black text-gray-900 dark:text-white truncate tracking-tight">{row.original.user.fullName}</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{row.original.user.email}</p>
           </div>
         </div>
       ),
@@ -215,8 +218,8 @@ export default function EventAttendeesPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-48 rounded-xl" />
-        <Skeleton className="h-[500px] w-full rounded-3xl" />
+        <Skeleton className="h-10 w-48 rounded-lg" />
+        <Skeleton className="h-[500px] w-full rounded-lg" />
       </div>
     );
   }
@@ -226,22 +229,22 @@ export default function EventAttendeesPage() {
 
   return (
     <div className="space-y-8 pb-20 animate-in fade-in duration-700">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex flex-col gap-1">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="w-fit text-gray-400 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-xl mb-2 -ml-2"
+            className="w-fit text-gray-400 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-lg mb-2 -ml-2"
           >
             <ArrowLeft size={14} /> Back to Dashboard
           </Button>
           <div className="flex items-center gap-3">
-             <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shadow-sm shadow-brand/20">
+             <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center text-brand shadow-sm shadow-brand/20">
                <Users size={24} />
              </div>
              <div>
-               <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase">Attendee <span className="text-brand">Management</span></h1>
-               <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Attendee <span className="text-brand">Management</span></h1>
+               <p className="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                  Control access and manage the guest list for this event
                </p>
              </div>
@@ -250,9 +253,9 @@ export default function EventAttendeesPage() {
 
         <Button 
           onClick={() => setIsScannerOpen(true)}
-          className="h-16 px-8 rounded-2xl bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all"
+          className="h-14 md:h-16 w-full md:w-auto px-6 md:px-8 rounded-lg bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest shadow-xl shadow-brand/20 gap-3 group transition-all justify-center"
         >
-          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
             <ScanLine size={18} />
           </div>
           Scan QR & Check-in
@@ -278,7 +281,7 @@ export default function EventAttendeesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <Input 
                 placeholder="Search by name or email..." 
-                className="pl-10 h-10 rounded-xl bg-gray-50/50 border-gray-100 text-[11px] font-bold"
+                className="pl-10 h-10 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-900 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -287,11 +290,11 @@ export default function EventAttendeesPage() {
         />
         <CemsCardContent>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6 bg-gray-50/50 p-1 rounded-xl h-auto">
-              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
-              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
-              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
+            <TabsList className="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-1 rounded-lg h-auto">
+              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
+              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
+              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all">
@@ -327,5 +330,18 @@ export default function EventAttendeesPage() {
         </CemsCardContent>
       </CemsCard>
     </div>
+  );
+}
+
+export default function EventAttendeesPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48 rounded-lg" />
+        <Skeleton className="h-[500px] w-full rounded-lg" />
+      </div>
+    }>
+      <EventAttendeesContent />
+    </Suspense>
   );
 }

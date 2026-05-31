@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail } from "lucide-react";
@@ -16,6 +16,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,10 +62,31 @@ export function LoginForm() {
         description: `Logged in as ${normalizedRole.toLowerCase()}`,
       });
 
-      if (normalizedRole === "STUDENT") {
-        router.push("/discovery");
+      const redirectTo = searchParams.get("redirectTo");
+      const isDashboardUser = normalizedRole === "ADMIN" || normalizedRole === "ORGANIZER" || normalizedRole === "STAFF";
+
+      console.log("[LoginForm] Redirecting user:", normalizedRole, "redirectTo:", redirectTo);
+
+      if (isDashboardUser) {
+        // Admins, Organizers and Staff should go to dashboard unless the redirectTo is specifically a dashboard route
+        if (redirectTo && (redirectTo.startsWith('/dashboard') || redirectTo.startsWith('/api'))) {
+          router.push(redirectTo);
+        } else {
+          router.push("/dashboard");
+        }
       } else {
-        router.push("/dashboard");
+        // Students should go to discovery unless the redirectTo is a protected student route
+        const isStudentRoute = redirectTo && (
+          redirectTo.startsWith('/discovery') || 
+          redirectTo.startsWith('/my-events') || 
+          redirectTo.startsWith('/profile')
+        );
+        
+        if (redirectTo && isStudentRoute) {
+          router.push(redirectTo);
+        } else {
+          router.push("/discovery");
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";
@@ -85,11 +107,11 @@ export function LoginForm() {
     >
       {/* Header */}
       <div className="mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/8 border border-brand/10 text-brand text-[9px] font-brand font-black uppercase tracking-widest mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand/8 border border-brand/10 text-brand text-[9px] font-brand font-black uppercase tracking-widest mb-6">
           <Lock size={10} />
           Secure Auth Gateway
         </div>
-        <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 tracking-tighter mb-3">
+        <h1 className="text-3xl md:text-4xl font-brand font-black text-gray-900 dark:text-white tracking-tighter mb-3">
           Welcome back.
         </h1>
         <p className="text-gray-500 text-sm font-medium leading-relaxed">
@@ -110,7 +132,7 @@ export function LoginForm() {
           <div className="relative">
             <Mail
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 group-focus-within:text-brand transition-colors"
             />
             <input
               id="login-email"
@@ -119,7 +141,7 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@aastu.edu.et"
               required
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-4 py-3.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 text-gray-900 dark:text-white text-sm font-medium placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand/30 dark:focus:bg-black transition-all"
             />
           </div>
         </div>
@@ -143,7 +165,7 @@ export function LoginForm() {
           <div className="relative">
             <Lock
               size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 group-focus-within:text-brand transition-colors"
             />
             <input
               id="login-password"
@@ -152,7 +174,7 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••"
               required
-              className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 text-gray-900 text-sm font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/30 transition-all"
+              className="w-full pl-11 pr-12 py-3.5 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 text-gray-900 dark:text-white text-sm font-medium placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-4 focus:ring-brand/10 focus:border-brand/30 dark:focus:bg-black transition-all"
             />
             <button
               type="button"
@@ -183,7 +205,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-xl shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden"
+          className="group relative w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand-hover text-white font-brand font-black text-[10px] uppercase tracking-[0.15em] py-4 rounded-lg shadow-xl shadow-brand/20 transition-all disabled:opacity-70 overflow-hidden"
         >
           <span className="relative z-10">
             {isLoading ? "Authenticating..." : "Sign In to Portal"}

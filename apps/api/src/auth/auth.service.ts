@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -15,9 +11,12 @@ import {
   SignUpDto,
   VerifyCampusIdDto,
   VerifyEmailDto,
+  TelegramLoginDto,
+  TelegramRegisterDto,
 } from './dto';
 import { EmailService } from './email.service';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHmac } from 'crypto';
+import { AuditLogsService } from '../audit-logs/audit-logs.service';
 
 type JwtPayload = {
   sub: string;
@@ -38,6 +37,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
+    private readonly auditLogsService: AuditLogsService,
   ) {}
 
   private async issueEmailVerificationToken(userId: string, email: string): Promise<boolean> {
@@ -86,7 +86,7 @@ export class AuthService {
   }
 
   private buildUserResponse(user: any) {
-    return {
+    const response = {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
@@ -96,7 +96,11 @@ export class AuthService {
       isCampusIdVerified: user.isCampusIdVerified,
       studentId: user.studentId,
       academicProgram: user.academicProgram,
+      profileImage: user.profileImage,
+      phone: user.phone,
     };
+    console.log('[AuthService] Built user response:', response);
+    return response;
   }
 
   private normalizeFullName(value: string) {
@@ -227,7 +231,8 @@ export class AuthService {
       const token = await this.consumeOneTimeToken('EMAIL_VERIFICATION', dto.token);
       if (!token) throw new BadRequestException('Invalid or expired token');
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: { isEmailVerified: true, emailVerifiedAt: new Date() },
@@ -238,6 +243,22 @@ export class AuthService {
           data: { usedAt: new Date() },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'EMAIL_VERIFICATION',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User verified email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Email verified successfully' };
     } catch (err) {
@@ -253,7 +274,8 @@ export class AuthService {
 
       const newHash = await argon.hash(dto.newPassword);
 
-      await this.prisma.$transaction([
+      const userBefore = await this.prisma.user.findUnique({ where: { id: token.userId } });
+      const [userAfter] = await this.prisma.$transaction([
         this.prisma.user.update({
           where: { id: token.userId },
           data: {
@@ -275,6 +297,22 @@ export class AuthService {
           },
         }),
       ]);
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: token.userId,
+          action: 'PASSWORD_RESET',
+          entityType: 'USER',
+          entityId: token.userId,
+          outcome: 'SUCCESS',
+          details: `User reset password for email: ${userBefore?.email}`,
+          beforeState: userBefore,
+          afterState: userAfter,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return { message: 'Password reset successfully. Please log in with your new password.' };
     } catch (err) {
@@ -368,7 +406,7 @@ export class AuthService {
         throw new BadRequestException('This campus ID is already linked to another account');
       }
 
-      await this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id: user.id },
         data: {
           studentId: parsed.studentId,
@@ -377,6 +415,22 @@ export class AuthService {
           campusIdVerifiedAt: new Date(),
         },
       });
+
+      // Audit Log
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'CAMPUS_ID_VERIFICATION',
+          entityType: 'USER',
+          entityId: user.id,
+          outcome: 'SUCCESS',
+          details: `User verified campus ID: ${parsed.studentId}`,
+          beforeState: user,
+          afterState: updated,
+        });
+      } catch (e) {
+        console.error(`Failed to create audit log: ${e.message}`);
+      }
 
       return {
         message: 'Campus ID verified successfully',
@@ -407,12 +461,19 @@ export class AuthService {
       if (!role) throw new BadRequestException('Role not found');
 
       const passwordHash = await argon.hash(dto.password);
+
+      // Ensure departmentId is a valid UUID or null (empty strings cause Prisma errors)
+      const sanitizedDepartmentId =
+        dto.departmentId && dto.departmentId.trim() !== '' ? dto.departmentId : null;
+
       const user = await this.prisma.user.create({
         data: {
           fullName: dto.fullName,
           email,
           passwordHash,
+          phone: dto.phone,
           roleId: role.id,
+          departmentId: sanitizedDepartmentId,
         },
         include: {
           role: {
@@ -433,7 +494,26 @@ export class AuthService {
 
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
 
-      console.log('Session and tokens created for:', user.email);
+      try {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'SIGNUP',
+          entityType: 'USER',
+          outcome: 'SUCCESS',
+          details: `New user signed up: ${user.email}`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
+          role: user.role.roleName,
+          afterState: {
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role.roleName,
+          },
+        });
+      } catch (logError) {
+        console.error('Non-critical error: Audit log creation failed during signup:', logError);
+      }
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,
@@ -442,10 +522,25 @@ export class AuthService {
           : 'Signup successful, but we could not send the verification email right now. Please try again later.',
       };
     } catch (err) {
+      console.error('AuthService.signUp failed:', {
+        email: dto.email,
+        error: err instanceof Error ? err.message : err,
+        code: err.code,
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+
       if (err.code === 'P2002') {
         throw new BadRequestException('Email already in use');
       }
-      console.error('AuthService.signUp error:', err);
+
+      if (err.code === 'P2003') {
+        throw new BadRequestException('Invalid department or role selection');
+      }
+
+      if (err.code === 'P2007') {
+        throw new BadRequestException('Invalid data format provided');
+      }
+
       throw err;
     }
   }
@@ -460,19 +555,47 @@ export class AuthService {
         },
       });
 
-      if (!user) throw new UnauthorizedException('Invalid credentials');
+      if (!user) {
+        // Cannot log: no valid userId (FK constraint). Just reject.
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      if (!user.passwordHash) {
+        throw new UnauthorizedException('Please log in via Telegram or set a password.');
+      }
+
       const pwMatches = await argon.verify(user.passwordHash, dto.password);
-      if (!pwMatches) throw new UnauthorizedException('Invalid credentials');
+      if (!pwMatches) {
+        await this.auditLogsService.createLog({
+          userId: user.id,
+          action: 'LOGIN',
+          entityType: 'USER',
+          outcome: 'FAILURE',
+          details: `Failed login attempt for email: ${email} (Invalid password)`,
+          ipAddress: meta?.ip,
+          userAgent: meta?.userAgent,
+          role: user.role.roleName,
+        });
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Please verify your email first');
       }
 
-      // if (user.role.roleName === 'Student' && !user.isCampusIdVerified) {
-      //   throw new UnauthorizedException('Please verify your campus ID QR first');
-      // }
-
       const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'LOGIN',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `User logged in successfully: ${email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+      });
+
       return {
         user: this.buildUserResponse(user),
         ...tokens,
@@ -533,5 +656,186 @@ export class AuthService {
       });
       throw err;
     }
+  }
+
+  verifyTelegramInitData(initData: string): {
+    telegramId: string;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+  } {
+    const botToken = this.config.get<string>('TELEGRAM_BOT_TOKEN');
+    if (!botToken) {
+      throw new BadRequestException('Telegram integration is not configured (missing bot token)');
+    }
+
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) {
+      throw new BadRequestException('Invalid initData: missing hash');
+    }
+
+    params.delete('hash');
+    const sortedKeys = Array.from(params.keys()).sort();
+    const dataCheckString = sortedKeys.map((key) => `${key}=${params.get(key)}`).join('\n');
+
+    const secretKey = createHmac('sha256', 'WebappData').update(botToken).digest();
+
+    const computedHash = createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
+    if (computedHash !== hash) {
+      throw new UnauthorizedException('Invalid Telegram authentication signature');
+    }
+
+    const rawUser = params.get('user');
+    if (!rawUser) {
+      throw new BadRequestException('Invalid initData: missing user object');
+    }
+
+    try {
+      const parsedUser = JSON.parse(rawUser);
+      if (!parsedUser.id) {
+        throw new BadRequestException('Invalid user object: missing id');
+      }
+
+      return {
+        telegramId: String(parsedUser.id),
+        username: parsedUser.username,
+        firstName: parsedUser.first_name,
+        lastName: parsedUser.last_name,
+      };
+    } catch {
+      throw new BadRequestException('Failed to parse Telegram user data');
+    }
+  }
+
+  async telegramLogin(dto: TelegramLoginDto, meta?: { ip?: string; userAgent?: string }) {
+    const tgUser = this.verifyTelegramInitData(dto.initData);
+
+    const user = await this.prisma.user.findUnique({
+      where: { telegramId: tgUser.telegramId },
+      include: {
+        role: { include: { permissions: { include: { permission: true } } } },
+      },
+    });
+
+    if (!user) {
+      return {
+        onboardingRequired: true,
+        telegramUser: tgUser,
+      };
+    }
+
+    const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+    try {
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'TELEGRAM_LOGIN',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `User logged in via Telegram: ${user.email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+      });
+    } catch (logError) {
+      console.error('Audit log failed during telegram login:', logError);
+    }
+
+    return {
+      onboardingRequired: false,
+      user: this.buildUserResponse(user),
+      ...tokens,
+    };
+  }
+
+  async telegramRegister(dto: TelegramRegisterDto, meta?: { ip?: string; userAgent?: string }) {
+    const tgUser = this.verifyTelegramInitData(dto.initData);
+    const email = dto.email.toLowerCase().trim();
+
+    const existingTg = await this.prisma.user.findUnique({
+      where: { telegramId: tgUser.telegramId },
+      include: {
+        role: { include: { permissions: { include: { permission: true } } } },
+      },
+    });
+    if (existingTg) {
+      const tokens = await this.createSessionAndTokens(existingTg.id, existingTg.email, meta);
+      return {
+        user: this.buildUserResponse(existingTg),
+        ...tokens,
+      };
+    }
+
+    const existingEmail = await this.prisma.user.findUnique({
+      where: { email },
+      include: {
+        role: { include: { permissions: { include: { permission: true } } } },
+      },
+    });
+
+    let user;
+    if (existingEmail) {
+      if (existingEmail.telegramId) {
+        throw new BadRequestException('This email is already linked to another Telegram account');
+      }
+
+      user = await this.prisma.user.update({
+        where: { id: existingEmail.id },
+        data: { telegramId: tgUser.telegramId },
+        include: {
+          role: { include: { permissions: { include: { permission: true } } } },
+        },
+      });
+    } else {
+      const role = await this.prisma.role.findFirst({
+        where: { roleName: { equals: 'STUDENT', mode: 'insensitive' } },
+      });
+      if (!role) throw new BadRequestException('Student role not found');
+
+      const sanitizedDepartmentId =
+        dto.departmentId && dto.departmentId.trim() !== '' ? dto.departmentId : null;
+
+      user = await this.prisma.user.create({
+        data: {
+          fullName: dto.fullName,
+          email,
+          roleId: role.id,
+          departmentId: sanitizedDepartmentId,
+          telegramId: tgUser.telegramId,
+        },
+        include: {
+          role: { include: { permissions: { include: { permission: true } } } },
+        },
+      });
+
+      const verificationEmailSent = await this.issueEmailVerificationToken(user.id, user.email);
+      if (verificationEmailSent) {
+        console.log('Telegram signup email verification issued for:', user.email);
+      }
+    }
+
+    const tokens = await this.createSessionAndTokens(user.id, user.email, meta);
+
+    try {
+      await this.auditLogsService.createLog({
+        userId: user.id,
+        action: 'TELEGRAM_SIGNUP',
+        entityType: 'USER',
+        outcome: 'SUCCESS',
+        details: `User signed up/linked via Telegram: ${user.email}`,
+        ipAddress: meta?.ip,
+        userAgent: meta?.userAgent,
+        role: user.role.roleName,
+      });
+    } catch (logError) {
+      console.error('Audit log failed during telegram registration:', logError);
+    }
+
+    return {
+      user: this.buildUserResponse(user),
+      ...tokens,
+    };
   }
 }

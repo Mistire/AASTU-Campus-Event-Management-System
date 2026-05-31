@@ -40,7 +40,7 @@ export function CemsDialogContent({
   return (
     <DialogContent
       className={cn(
-        "rounded-xl border-none bg-white shadow-2xl shadow-gray-300/40 p-0 gap-0 overflow-hidden",
+        "rounded-lg border-none bg-white dark:bg-gray-950 shadow-2xl shadow-gray-300/40 dark:shadow-none p-0 gap-0 overflow-hidden flex flex-col",
         sizeMap[size],
         className,
       )}
@@ -65,14 +65,14 @@ export function CemsDialogHeader({
   return (
     <DialogHeader
       className={cn(
-        "px-6 py-4 border-b border-gray-100",
+        "px-6 py-4 border-b border-gray-100 dark:border-gray-800",
         className,
       )}
       {...props}
     >
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="w-9 h-9 rounded-xl bg-brand/5 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
+          <div className="w-9 h-9 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
             {icon}
           </div>
         )}
@@ -89,7 +89,7 @@ export function CemsDialogTitle({
 }: React.ComponentProps<typeof DialogTitle>) {
   return (
     <DialogTitle
-      className={cn("text-sm font-bold text-gray-900 tracking-tight", className)}
+      className={cn("text-sm font-bold text-gray-900 dark:text-white tracking-tight", className)}
       {...props}
     />
   );
@@ -113,9 +113,9 @@ export function CemsDialogFooter({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <DialogFooter
+    <div
       className={cn(
-        "px-6 py-4 border-t border-gray-50 bg-gray-50/30",
+        "px-8 py-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-end gap-3 mt-auto shrink-0",
         className,
       )}
       {...props}

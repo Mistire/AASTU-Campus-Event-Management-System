@@ -14,8 +14,8 @@ export const useDepartments = () => {
     queryFn: async (): Promise<Department[]> => {
       const res = await apiFetch('/api/departments');
       if (!res.ok) throw new Error('Failed to fetch departments');
-      const data = await res.json();
-      return (data.data || data) as Department[];
+      const result = await res.json();
+      return (result.data?.data || result.data || result || []) as Department[];
     },
   });
 };

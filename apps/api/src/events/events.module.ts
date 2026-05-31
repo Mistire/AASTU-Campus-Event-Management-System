@@ -1,9 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { AuditLogsModule } from '../audit-logs/audit-logs.module';
+import { FeedbackModule } from '../feedback/feedback.module';
+import { TelegramModule } from '../telegram/telegram.module';
 import { EventsService } from './events.service';
 import { EventsController } from './events.controller';
 import { VenuesService } from './venues.service';
@@ -30,7 +33,7 @@ import { HackathonsService } from './hackathons.service';
 import { HackathonsController } from './hackathons.controller';
 
 @Module({
-  imports: [ConfigModule, JwtModule.register({}), PrismaModule, AuthModule, NotificationsModule],
+  imports: [ConfigModule, JwtModule.register({}), PrismaModule, AuthModule, NotificationsModule, AuditLogsModule, forwardRef(() => FeedbackModule), TelegramModule],
   controllers: [
     EventsController,
     VenuesController,

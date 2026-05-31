@@ -90,7 +90,7 @@ describe('Property 1 — Event analytics counts match DB state', () => {
           const eventId = 'evt-1';
           const userId = 'usr-1';
 
-          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
           mockPrisma.event.findUnique.mockResolvedValue({ id: eventId, title: 'Test Event' });
           mockPrisma.registration.findMany.mockResolvedValue(registrations);
           mockPrisma.attendance.count.mockResolvedValue(attendanceCount);
@@ -153,7 +153,7 @@ describe('Property 3 — Session completeness', () => {
 
     await fc.assert(
       fc.asyncProperty(sessionArb, async (sessions) => {
-        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
         mockPrisma.event.findUnique.mockResolvedValue({ id: 'evt-1' });
         mockPrisma.eventSessions.findMany.mockResolvedValue(sessions);
 
@@ -182,7 +182,7 @@ describe('Property 4 — Feedback consistency', () => {
           { minLength: 0, maxLength: 100 },
         ),
         async (feedbackRecords) => {
-          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
           mockPrisma.event.findUnique.mockResolvedValue({ id: 'evt-1' });
           mockPrisma.feedback.findMany.mockResolvedValue(feedbackRecords);
 
@@ -258,7 +258,7 @@ describe('Property 10 — Time range filtering', () => {
       fc.asyncProperty(fc.array(dateArb, { minLength: 0, maxLength: 50 }), async (dates) => {
         const inRange = dates.filter((d) => d >= rangeStart && d <= rangeEnd);
 
-        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
         mockPrisma.event.findUnique.mockResolvedValue({ id: 'evt-1', title: 'T' });
         mockPrisma.registration.findMany.mockResolvedValue(
           inRange.map(() => ({ status: { name: 'CONFIRMED' } })),
@@ -362,7 +362,7 @@ describe('Property 13 — Trend series completeness', () => {
         const start = new Date('2025-01-01T00:00:00Z');
         const end = new Date(start.getTime() + spanDays * 24 * 60 * 60 * 1000);
 
-        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
         mockPrisma.event.findUnique.mockResolvedValue({ id: 'evt-1' });
         mockPrisma.registration.findMany.mockResolvedValue([]);
 
@@ -386,7 +386,7 @@ describe('Property 13 — Trend series completeness', () => {
         const start = new Date('2024-01-01T00:00:00Z');
         const end = new Date(start.getTime() + spanDays * 24 * 60 * 60 * 1000);
 
-        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+        mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
         mockPrisma.event.findUnique.mockResolvedValue({ id: 'evt-1' });
         mockPrisma.registration.findMany.mockResolvedValue([]);
 
@@ -423,7 +423,7 @@ describe('Property 14 — Organizer trend scoping', () => {
         async (eventId, otherEventId, regs) => {
           fc.pre(eventId !== otherEventId);
 
-          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
           mockPrisma.event.findUnique.mockResolvedValue({ id: eventId });
           // Only return regs for the requested event (Prisma where clause is mocked)
           mockPrisma.registration.findMany.mockResolvedValue(regs);
@@ -553,7 +553,7 @@ describe('Property 18 — Content-Disposition filename pattern', () => {
     await fc.assert(
       fc.asyncProperty(scopeArb, formatArb, async (scope, format) => {
         if (scope !== 'admin') {
-          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1' });
+          mockPrisma.eventOrganizers.findUnique.mockResolvedValue({ id: 'org-1', status: 'ACCEPTED' });
           mockPrisma.event.findUnique.mockResolvedValue({ id: scope, title: 'T' });
           mockPrisma.registration.findMany.mockResolvedValue([]);
           mockPrisma.attendance.count.mockResolvedValue(0);

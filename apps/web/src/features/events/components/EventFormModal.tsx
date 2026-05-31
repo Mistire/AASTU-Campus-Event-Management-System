@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
-import { ModalHeader } from "@/components/shared/ModalHeader";
-import { ModalFooter } from "@/components/shared/ModalFooter";
 import { InputController } from "@/components/shared/InputController";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useVenues } from "../api/get-venues";
 import { useEventTypes } from "../api/get-event-types";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
+import { CemsButton } from "@/components/cems/CemsButton";
 import { 
   Type, 
   MapPin, 
@@ -21,15 +19,17 @@ import {
   Info 
 } from "lucide-react";
 
-import { Event } from "../types";
+import { cn } from "@/lib/utils";
+import { Event, EventFormModalProps } from "../types";
+import { 
+  CemsDialog, 
+  CemsDialogContent, 
+  CemsDialogHeader, 
+  CemsDialogTitle, 
+  CemsDialogFooter,
+  CemsDialogDescription
+} from "@/components/cems/CemsDialog";
 
-interface EventFormModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  event?: Event | null;
-  onSave: (data: any) => void;
-  isSaving?: boolean;
-}
 
 export function EventFormModal({
   open,
@@ -40,6 +40,7 @@ export function EventFormModal({
 }: EventFormModalProps) {
   const { data: venues } = useVenues();
   const { data: eventTypes } = useEventTypes();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   const [formData, setFormData] = useState({
     title: "",
@@ -51,6 +52,15 @@ export function EventFormModal({
     capacity: 100,
   });
 
+  const toLocalISOString = (dateStr: string | undefined) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    const offset = d.getTimezoneOffset();
+    const localDate = new Date(d.getTime() - offset * 60 * 1000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
   useEffect(() => {
     if (event) {
       setFormData({
@@ -58,8 +68,8 @@ export function EventFormModal({
         description: event.description || "",
         eventTypeId: event.eventType?.id || "",
         venueId: event.venue?.id || "",
-        startTime: event.startTime ? new Date(event.startTime).toISOString().slice(0, 16) : "",
-        endTime: event.endTime ? new Date(event.endTime).toISOString().slice(0, 16) : "",
+        startTime: toLocalISOString(event.startTime),
+        endTime: toLocalISOString(event.endTime),
         capacity: event.capacity || 100,
       });
     } else {
@@ -73,15 +83,34 @@ export function EventFormModal({
         capacity: 100,
       });
     }
+    setErrors({});
   }, [event, open]);
 
-  const handleSubmit = () => {
-    if (!formData.title || !formData.venueId || !formData.startTime || !formData.endTime) {
-      return;
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.eventTypeId) newErrors.eventTypeId = "Category is required";
+    if (!formData.venueId) newErrors.venueId = "Venue is required";
+    if (!formData.startTime) newErrors.startTime = "Start time is required";
+    if (!formData.endTime) newErrors.endTime = "End time is required";
+    
+    if (formData.startTime && formData.endTime) {
+      if (new Date(formData.startTime) >= new Date(formData.endTime)) {
+        newErrors.endTime = "End time must be after start time";
+      }
     }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (!validate()) return;
     
     const payload = {
       ...formData,
+      eventTypeId: formData.eventTypeId || undefined,
+      venueId: formData.venueId || undefined,
       startTime: new Date(formData.startTime).toISOString(),
       endTime: new Date(formData.endTime).toISOString(),
     };
@@ -93,7 +122,7 @@ export function EventFormModal({
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: 0.05 }
     }
   };
 
@@ -103,155 +132,181 @@ export function EventFormModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPortal>
-        <DialogOverlay className="bg-black/60 backdrop-blur-md z-50 animate-in fade-in duration-300" />
-        <DialogContent 
-          showCloseButton={false} 
-          className="p-0 border-none rounded-xl gap-0 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] bg-white max-w-2xl sm:max-w-2xl w-full z-50 animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[90vh] overflow-hidden"
-        >
-          <ModalHeader title={event ? "Edit Event" : "Create Event"} />
+    <CemsDialog open={open} onOpenChange={onOpenChange}>
+      <CemsDialogContent size="xl">
+        <CemsDialogHeader icon={<Calendar />}>
+          <CemsDialogTitle>{event ? "Edit Campus Event" : "Create Campus Event"}</CemsDialogTitle>
+          <CemsDialogDescription>Fill in the core details for your event discovery.</CemsDialogDescription>
+        </CemsDialogHeader>
           
-          <div className="flex-1 overflow-y-auto min-h-0 p-10 space-y-10">
-            <motion.div 
-               variants={containerVariants}
-               initial="hidden"
-               animate="visible"
-               className="space-y-12"
-            >
-              {/* Section 1: Event Information */}
-              <motion.div variants={itemVariants} className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
-                    <Info className="text-brand" size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Discovery Info</h3>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Title & Categorization</p>
-                  </div>
+        <div className="flex-1 overflow-y-auto min-h-0 p-6 md:p-10">
+          <motion.div 
+             variants={containerVariants}
+             initial="hidden"
+             animate="visible"
+             className="space-y-12"
+          >
+            {/* Section 1: Basic Info */}
+            <motion.div variants={itemVariants} className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center border border-brand/10 dark:border-brand/20">
+                  <Info className="text-brand" size={18} />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputController 
-                    label="Event Title"
-                    icon={Type}
-                    value={formData.title || ""} 
-                    onChange={(e) => setFormData({...formData, title: e.target.value})} 
-                    placeholder="e.g. Annual Tech Symposium" 
-                  />
-                  
-                  <div className="space-y-2 group">
-                    <div className="flex items-center gap-2 px-1">
-                       <Tag size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-gray-600 transition-colors">Category</label>
-                    </div>
-                    <Select value={formData.eventTypeId || ""} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
-                      <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
-                        {eventTypes?.map(t => (
-                          <SelectItem key={t.id} value={t.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">{t.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-[0.2em]">Discovery Info</h3>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Title & Categorization</p>
                 </div>
-
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <InputController 
-                  label="Detailed Description"
-                  icon={AlignLeft}
-                  value={formData.description || ""}
+                  label="Event Title"
+                  icon={Type}
+                  value={formData.title} 
+                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                  placeholder="e.g. Annual Tech Symposium" 
+                  error={errors.title}
+                />
+                
+                <div className="space-y-2 group">
+                  <div className="flex items-center gap-2 px-1">
+                     <Tag size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                     <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors">Category</label>
+                  </div>
+                  <Select value={formData.eventTypeId} onValueChange={(val) => setFormData({...formData, eventTypeId: val || ""})}>
+                    <SelectTrigger className={cn(
+                      "h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full",
+                      errors.eventTypeId && "border-red-200 ring-1 ring-red-100"
+                    )}>
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl p-1 bg-white dark:bg-gray-900">
+                      {eventTypes?.map(t => (
+                        <SelectItem key={t.id} value={t.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 dark:focus:bg-brand/10 focus:text-brand transition-colors">
+                          {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.eventTypeId && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest px-1">{errors.eventTypeId}</p>}
+                </div>
+              </div>
+
+              <div className="space-y-2 group">
+                <div className="flex items-center gap-2 px-1">
+                  <AlignLeft size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                  <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors">Detailed Description</label>
+                </div>
+                <Textarea 
+                  value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   placeholder="Share the vision, goals, and what to expect..."
-                  className="h-32 pt-3 items-start"
+                  className="min-h-32 rounded-lg border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-800 transition-all font-semibold p-4"
                 />
-              </motion.div>
+              </div>
+            </motion.div>
 
-              {/* Section 2: Location & Capacity */}
-              <motion.div variants={itemVariants} className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
-                    <MapPin className="text-brand" size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Venue & Space</h3>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Location & Attendance</p>
-                  </div>
+            {/* Section 2: Logistics */}
+            <motion.div variants={itemVariants} className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center border border-brand/10 dark:border-brand/20">
+                  <MapPin className="text-brand" size={18} />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2 group">
-                    <div className="flex items-center gap-2 px-1">
-                       <MapPin size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-focus-within:text-gray-600 transition-colors">Physical Venue</label>
-                    </div>
-                    <Select value={formData.venueId || ""} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
-                      <SelectTrigger className="h-12 bg-gray-50/50 border-gray-100 rounded-xl text-sm font-semibold focus:bg-white transition-all shadow-sm shadow-gray-200/20">
-                        <SelectValue placeholder="Choose a Location" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-gray-100 shadow-2xl p-1">
-                        {venues?.map(v => (
-                          <SelectItem key={v.id} value={v.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 focus:text-brand transition-colors">{v.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <InputController 
-                    label="Max Capacity"
-                    icon={Users}
-                    type="number"
-                    value={String(formData.capacity ?? "")} 
-                    onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 0})} 
-                  />
+                <div>
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-[0.2em]">Venue & Space</h3>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Location & Attendance</p>
                 </div>
-              </motion.div>
+              </div>
               
-              {/* Section 3: Schedule */}
-              <motion.div variants={itemVariants} className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-brand/5 flex items-center justify-center border border-brand/10">
-                    <Calendar className="text-brand" size={18} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2 group">
+                  <div className="flex items-center gap-2 px-1">
+                     <MapPin size={12} className="text-brand/50 group-focus-within:text-brand transition-colors" />
+                     <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest group-focus-within:text-gray-600 dark:group-focus-within:text-gray-300 transition-colors">Physical Venue</label>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Timing</h3>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Schedule & Duration</p>
-                  </div>
+                  <Select value={formData.venueId} onValueChange={(val) => setFormData({...formData, venueId: val || ""})}>
+                    <SelectTrigger className={cn(
+                      "h-12 bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 rounded-lg text-sm font-semibold focus:bg-white dark:focus:bg-gray-800 transition-all w-full",
+                      errors.venueId && "border-red-200 ring-1 ring-red-100"
+                    )}>
+                      <SelectValue placeholder="Choose a Location" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-lg border-gray-100 dark:border-gray-800 shadow-2xl p-1 bg-white dark:bg-gray-900">
+                      {venues?.map(v => (
+                        <SelectItem key={v.id} value={v.id} className="rounded-lg font-bold text-xs py-2.5 focus:bg-brand/5 dark:focus:bg-brand/10 focus:text-brand transition-colors">
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.venueId && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest px-1">{errors.venueId}</p>}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputController 
-                    label="Event Starts"
-                    icon={Clock}
-                    type="datetime-local"
-                    value={formData.startTime} 
-                    onChange={(e) => setFormData({...formData, startTime: e.target.value})} 
-                    className="cursor-pointer"
-                  />
-                  
-                  <InputController 
-                    label="Event Ends"
-                    icon={Clock}
-                    type="datetime-local"
-                    value={formData.endTime} 
-                    onChange={(e) => setFormData({...formData, endTime: e.target.value})} 
-                    className="cursor-pointer"
-                  />
-                </div>
-              </motion.div>
+                <InputController 
+                  label="Max Capacity"
+                  icon={Users}
+                  type="number"
+                  value={String(formData.capacity)} 
+                  onChange={(e) => setFormData({...formData, capacity: parseInt(e.target.value) || 0})} 
+                />
+              </div>
             </motion.div>
             
-          </div>
-          
-          <ModalFooter 
-            onSave={handleSubmit} 
-            onCancel={() => onOpenChange(false)} 
-            isSubmitting={isSaving}
-            saveText={event ? "Update Event" : "Create Event"}
-          />
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+            {/* Section 3: Schedule */}
+            <motion.div variants={itemVariants} className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center border border-brand/10 dark:border-brand/20">
+                  <Calendar className="text-brand" size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-[0.2em]">Timing</h3>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">Schedule & Duration</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <InputController 
+                  label="Event Starts"
+                  icon={Clock}
+                  type="datetime-local"
+                  value={formData.startTime} 
+                  onChange={(e) => setFormData({...formData, startTime: e.target.value})} 
+                  error={errors.startTime}
+                />
+                
+                <InputController 
+                  label="Event Ends"
+                  icon={Clock}
+                  type="datetime-local"
+                  value={formData.endTime} 
+                  onChange={(e) => setFormData({...formData, endTime: e.target.value})} 
+                  error={errors.endTime}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+        
+        <CemsDialogFooter >
+          <CemsButton
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSaving}
+            className="rounded-lg font-bold text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all text-xs uppercase tracking-widest px-6 h-10 dark:bg-gray-900"
+          >
+            Cancel
+          </CemsButton>
+          <CemsButton
+            cemsVariant="brand"
+            onClick={handleSubmit}
+            loading={isSaving}
+            disabled={isSaving}
+            className="rounded-lg font-black text-xs uppercase tracking-widest px-8 shadow-lg shadow-brand/20 transition-all active:scale-95 h-10"
+          >
+            {event ? "Update Event" : "Create Event"}
+          </CemsButton>
+        </CemsDialogFooter>
+      </CemsDialogContent>
+    </CemsDialog>
   );
 }

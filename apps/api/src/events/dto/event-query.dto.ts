@@ -38,11 +38,11 @@ export class EventQueryDto {
 
   @ApiPropertyOptional({
     description: 'Sort results by popularity or date',
-    enum: ['popularity', 'date'],
+    enum: ['popularity', 'date', 'newest'],
   })
   @IsString()
   @IsOptional()
-  sortBy?: 'popularity' | 'date';
+  sortBy?: 'popularity' | 'date' | 'newest';
 
   @ApiPropertyOptional({ description: 'Filter events by venue UUID' })
   @IsUUID()
@@ -72,4 +72,9 @@ export class EventQueryDto {
   @IsOptional()
   @Type(() => Boolean)
   upcomingOnly?: boolean;
+
+  @ApiPropertyOptional({ description: 'Filter events by category UUID' })
+  @IsUUID()
+  @IsOptional()
+  categoryId?: string;
 }

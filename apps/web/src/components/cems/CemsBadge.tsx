@@ -34,7 +34,7 @@ export function CemsBadge({
   return (
     <Badge
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border whitespace-nowrap",
+        "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest border whitespace-nowrap",
         s.bg,
         s.text,
         s.border,

@@ -16,7 +16,7 @@ export class UsersService {
     return this.prisma.user.findMany({
       where: {
         role: {
-          roleName: { in: ['Admin', 'Organizer'] },
+          roleName: { in: ['ADMIN', 'ORGANIZER'] },
         },
       },
       select: {

@@ -14,8 +14,12 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
   const sessions = data.sessions || [];
 
   const addSession = () => {
+    const newId = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : Math.random().toString(36).substring(2, 15);
+      
     const newSession = {
-      id: crypto.randomUUID(),
+      id: newId,
       title: "",
       description: "",
       startTime: data.startTime || "",
@@ -49,7 +53,7 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
           <Button
             type="button"
             onClick={addSession}
-            className="rounded-2xl bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-11 px-6 shadow-lg shadow-brand/20 transition-all active:scale-95"
+            className="rounded-lg bg-brand hover:bg-brand-hover text-white font-black text-xs uppercase tracking-widest h-11 px-6 shadow-lg shadow-brand/20 transition-all active:scale-95"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Session
@@ -62,9 +66,9 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/30"
+                className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-100 rounded-lg bg-gray-50/30"
               >
-                <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
+                <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center shadow-sm border border-gray-100 mb-4">
                   <Layers className="text-gray-300" size={24} />
                 </div>
                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest">No sessions defined yet</p>
@@ -77,9 +81,9 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-8 pb-10 bg-white rounded-xl border border-gray-100 shadow-sm relative group"
+                  className="p-8 pb-10 bg-white rounded-lg border border-gray-100 shadow-sm relative group"
                 >
-                  <div className="absolute -top-3 left-8 bg-brand text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-tighter shadow-md">
+                  <div className="absolute -top-3 left-8 bg-brand text-white text-[10px] font-black px-4 py-1 rounded-lg uppercase tracking-tighter shadow-md">
                     Session {index + 1}
                   </div>
 
@@ -89,7 +93,7 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => removeSession(session.id!)}
-                      className="h-10 w-10 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                      className="h-10 w-10 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
                     >
                       <Trash2 size={18} />
                     </Button>
@@ -136,7 +140,7 @@ export function SessionsStep({ data, onUpdate }: SessionsStepProps) {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {(session.speakers || []).map((speaker, sIndex) => (
-                        <div key={sIndex} className="flex items-center gap-2 bg-brand/5 border border-brand/10 px-3 py-1.5 rounded-xl group/speaker transition-all hover:bg-brand/10">
+                        <div key={sIndex} className="flex items-center gap-2 bg-brand/5 border border-brand/10 px-3 py-1.5 rounded-lg group/speaker transition-all hover:bg-brand/10">
                           <span className="text-xs font-bold text-brand">{speaker}</span>
                           <button 
                             type="button"

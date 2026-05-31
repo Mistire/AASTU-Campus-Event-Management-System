@@ -14,6 +14,14 @@ export class SignUpDto {
   @IsOptional()
   @IsString()
   roleName?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
 }
 
 export class LoginDto {
@@ -52,3 +60,23 @@ export class VerifyCampusIdDto {
   @IsString()
   qrPayload: string;
 }
+
+export class TelegramLoginDto {
+  @IsString()
+  initData: string;
+}
+
+export class TelegramRegisterDto {
+  @IsString()
+  initData: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  fullName: string;
+
+  @IsString()
+  departmentId: string;
+}
+

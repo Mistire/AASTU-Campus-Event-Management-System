@@ -13,7 +13,6 @@ import { RegistrationSidebar } from "@/features/events/components/RegistrationSi
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Share2, CalendarPlus } from "lucide-react";
-import { generateICS } from "@/lib/ics";
 import { toast } from "sonner";
 import { EventDetailSkeleton, EventErrorState } from "@/features/events/components/EventDetailUIStates";
 import { useMemo } from "react";
@@ -28,6 +27,7 @@ export default function EventDetailPage() {
   const { mutateAsync: cancel, isPending: isCancelling } = useCancelRegistration();
 
   const handleRegister = async () => {
+    if (!event) return;
     try {
       await register(id);
       toast.success("Registration Successful", {
@@ -60,14 +60,20 @@ export default function EventDetailPage() {
   };
 
   const handleAddToCalendar = () => {
-    generateICS({
-      title: event?.title || "Event",
-      description: event?.description || "",
-      startTime: event?.startTime || "",
-      endTime: event?.endTime || "",
-      location: event?.venue?.name || "AASTU Campus",
-    });
-    toast.success("Calendar file generated");
+    if (!event) return;
+    
+    const formatDate = (dateStr: string) => 
+      new Date(dateStr).toISOString().replace(/-|:|\.\d\d\d/g, "");
+      
+    const start = formatDate(event.startTime);
+    const end = formatDate(event.endTime);
+    const title = encodeURIComponent(event.title);
+    const details = encodeURIComponent(event.description || "");
+    const location = encodeURIComponent(event.venue?.name || "AASTU Campus");
+    
+    const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+    
+    window.open(gCalUrl, "_blank");
   };
 
   const capacityPercent = Math.min(
@@ -95,7 +101,7 @@ export default function EventDetailPage() {
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="text-gray-500 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-xl"
+          className="text-gray-500 hover:text-brand font-black uppercase tracking-widest text-[10px] gap-2 rounded-lg"
         >
           <ArrowLeft size={16} /> Back to Discover
         </Button>
@@ -106,14 +112,14 @@ export default function EventDetailPage() {
               navigator.clipboard.writeText(window.location.href);
               toast.success("Link copied!");
             }}
-            className="rounded-xl p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
+            className="rounded-lg p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
           >
             <Share2 size={16} />
           </Button>
           <Button
             variant="outline"
             onClick={handleAddToCalendar}
-            className="rounded-xl p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
+            className="rounded-lg p-2.5 h-auto text-gray-400 border-gray-100 shadow-sm"
           >
             <CalendarPlus size={16} />
           </Button>
@@ -134,10 +140,10 @@ export default function EventDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8">
         <div className="lg:col-span-8 space-y-16">
           <div className="space-y-6">
-            <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
+            <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase flex items-center gap-3">
               About <span className="text-brand">this Event</span>
             </h2>
-            <div className="prose prose-brand max-w-none text-gray-600 font-medium leading-relaxed bg-gray-50/50 p-8 rounded-3xl border border-dashed border-gray-100">
+            <div className="prose prose-brand max-w-none text-gray-600 dark:text-gray-400 font-medium leading-relaxed bg-gray-50/50 dark:bg-gray-900/50 p-8 rounded-lg border border-dashed border-gray-100 dark:border-gray-800">
               {event.description ||
                 "Organizers haven't provided a full description yet."}
             </div>
@@ -146,7 +152,7 @@ export default function EventDetailPage() {
                 <Badge
                   key={t.id}
                   variant="secondary"
-                  className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 border-none"
+                  className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-none"
                 >
                   #{t.tag.name}
                 </Badge>
@@ -156,7 +162,7 @@ export default function EventDetailPage() {
 
           {event.sessions && event.sessions.length > 0 && (
             <div className="space-y-8">
-              <h2 className="text-2xl font-black tracking-tight text-gray-900 uppercase flex items-center gap-3">
+              <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white uppercase flex items-center gap-3">
                 Agenda <span className="text-brand">& Sessions</span>
               </h2>
               <AgendaTimeline sessions={event.sessions} />
@@ -181,9 +187,9 @@ export default function EventDetailPage() {
 
       <SimilarEventsRail eventId={id} />
 
-      <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 mt-20">
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">
-          [ Event Detail — CEMS Experience ]
+      <div className="py-12 flex flex-col items-center justify-center border-t border-gray-100 dark:border-gray-800 mt-20">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500 mb-4">
+
         </div>
       </div>
     </div>
