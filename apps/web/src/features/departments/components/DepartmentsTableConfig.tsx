@@ -1,9 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-<<<<<<< HEAD
-import { Department } from '../types';
-=======
 import { Department } from '../api';
->>>>>>> efa4fee340bcb2cab6cc6f3b4692ad277750b3c7
 import { GraduationCap } from 'lucide-react';
 import { truncate } from "@/lib/utils";
 
