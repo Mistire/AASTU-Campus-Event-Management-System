@@ -153,6 +153,12 @@ export function EventCreateWizard() {
       description: "Writing records to the blockchain of truth..." 
     });
 
+  
+    const toISO = (localStr: string) => {
+      if (!localStr) return localStr;
+      return new Date(localStr).toISOString();
+    };
+
     try {
       // Find selected event type
       const selectedType = eventTypes?.find(t => t.id === formData.eventTypeId);
@@ -164,20 +170,26 @@ export function EventCreateWizard() {
       const payload = {
         ...formData,
         thumbnailUrl: formData.thumbnailUrl,
+        // Convert local datetime strings to proper UTC ISO strings
+        startTime: toISO(formData.startTime),
+        endTime: toISO(formData.endTime),
         // Ensure numbers are numbers
         capacity: Number(formData.capacity),
         // Clean sessions (remove temporary IDs if they exist)
         sessions: formData.sessions.map((s) => ({
           title: s.title,
           description: s.description,
-          startTime: s.startTime,
-          endTime: s.endTime,
+          startTime: toISO(s.startTime),
+          endTime: toISO(s.endTime),
           location: s.location,
           sessionType: s.sessionType,
           speakers: s.speakers
         })),
         // Only include hackathon config if it's a hackathon
-        hackathonConfig: isHackathon ? formData.hackathonConfig : undefined,
+        hackathonConfig: isHackathon ? {
+          ...formData.hackathonConfig,
+          submissionDeadline: toISO(formData.hackathonConfig.submissionDeadline),
+        } : undefined,
         // Only include guest limit if it's graduation (or explicitly set)
         guestLimitPerUser: (isGraduation || (formData.guestLimitPerUser ?? 0) > 0) ? Number(formData.guestLimitPerUser) : undefined,
         accessType: formData.accessType,
