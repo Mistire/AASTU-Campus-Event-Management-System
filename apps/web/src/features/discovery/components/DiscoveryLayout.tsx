@@ -10,7 +10,7 @@ export function DiscoveryLayout({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
         <DiscoveryNavbar />
         <div className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div className="flex gap-10">
+          <div className="flex gap-10 items-start">
             <DiscoverySidebar />
             <main className="flex-1 min-w-0">
               {children}
