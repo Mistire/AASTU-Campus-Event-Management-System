@@ -9,7 +9,8 @@ import {
   Loader2, 
   QrCode,
   ShieldCheck,
-  History
+  History,
+  UserCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCheckIn } from "../../api/mutations";
@@ -23,7 +24,7 @@ interface AttendeeScannerProps {
 
 export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
   const scannerRef = useRef<any>(null);
-  const [lastScan, setLastScan] = useState<{ status: "success" | "error" | "loading"; message: string } | null>(null);
+  const [lastScan, setLastScan] = useState<{ status: "success" | "warning" | "error" | "loading"; message: string } | null>(null);
   const [isLibraryLoaded, setIsLibraryLoaded] = useState(false);
   const [isSecure, setIsSecure] = useState(true);
   const { mutate: checkIn, isPending } = useCheckIn();
@@ -68,11 +69,19 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
       { eventId, ticketToken: decodedText },
       {
         onSuccess: (data) => {
-          setLastScan({ 
-            status: "success", 
-            message: data.message || "Attendee successfully checked in!" 
-          });
-          toast.success("Check-in successful");
+          if (data.alreadyCheckedIn) {
+            setLastScan({ 
+              status: "warning", 
+              message: data.message || "Attendee was already checked in" 
+            });
+            toast.warning("Already checked in");
+          } else {
+            setLastScan({ 
+              status: "success", 
+              message: data.message || "Attendee successfully checked in!" 
+            });
+            toast.success("Check-in successful");
+          }
           setTimeout(() => setLastScan(null), 3000);
         },
         onError: (error: any) => {
@@ -258,15 +267,18 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
                    className={cn(
                      "absolute inset-0 z-20 flex flex-col items-center justify-center p-8 text-center backdrop-blur-xl transition-colors",
                      lastScan.status === "success" ? "bg-emerald-500/90" : 
+                     lastScan.status === "warning" ? "bg-amber-500/90" :
                      lastScan.status === "error" ? "bg-rose-500/90" : "bg-brand/90"
                    )}
                  >
                    {lastScan.status === "loading" && <Loader2 className="text-white animate-spin mb-4" size={48} />}
                    {lastScan.status === "success" && <CheckCircle2 className="text-white mb-4" size={48} />}
+                   {lastScan.status === "warning" && <UserCheck className="text-white mb-4" size={48} />}
                    {lastScan.status === "error" && <AlertCircle className="text-white mb-4" size={48} />}
                    
                    <h3 className="text-white font-black text-xl mb-2">
                      {lastScan.status === "success" ? "Access Granted" : 
+                      lastScan.status === "warning" ? "Already Checked In" :
                       lastScan.status === "error" ? "Access Denied" : "Verifying..."}
                    </h3>
                    <p className="text-white/80 text-sm font-medium">
