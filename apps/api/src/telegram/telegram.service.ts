@@ -42,7 +42,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     const webhookUrl = this.configService.get<string>('TELEGRAM_WEBHOOK_URL');
     if (webhookUrl) {
       // Webhook mode: async but quick
-      this.bot.telegram.setWebhook(webhookUrl)
+      this.bot.telegram
+        .setWebhook(webhookUrl)
         .then(() => this.logger.log(`Telegram webhook set to ${webhookUrl}`))
         .catch((err: any) => {
           this.logger.error(`Failed to set Telegram webhook: ${err.message}`);
@@ -50,7 +51,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         });
     } else {
       // Polling mode: bot.launch() blocks internally — run it detached so onModuleInit returns immediately
-      this.bot.launch({ dropPendingUpdates: true })
+      this.bot
+        .launch({ dropPendingUpdates: true })
         .then(() => this.logger.log('Telegram bot started in polling mode (development)'))
         .catch((err: any) => {
           this.logger.error(`Failed to start Telegram bot in polling mode: ${err.message}`);
@@ -142,7 +144,9 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         data: { delivered: true, deliveredAt: new Date() },
       });
 
-      this.logger.log(`QR card sent via Telegram to chatId ${chatId} for student ${record.fullName}`);
+      this.logger.log(
+        `QR card sent via Telegram to chatId ${chatId} for student ${record.fullName}`,
+      );
     } catch (err) {
       this.logger.error(`Failed to send QR card via Telegram: ${err.message}`);
       await this.bot.telegram.sendMessage(
@@ -211,28 +215,41 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     if (!this.bot) return;
     const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
     if (!channelId) return;
-    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? this.configService.get<string>('FRONTEND_URL') ?? '').replace(/\/$/, '');
+    const webUrl = (
+      this.configService.get<string>('CEMS_WEB_URL') ??
+      this.configService.get<string>('FRONTEND_URL') ??
+      ''
+    ).replace(/\/$/, '');
 
     const date = new Date(event.startTime).toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
     });
     const time = new Date(event.startTime).toLocaleTimeString('en-US', {
-      hour: 'numeric', minute: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
     });
     const endTime = new Date(event.endTime).toLocaleTimeString('en-US', {
-      hour: 'numeric', minute: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
     });
 
-    const accessLabel = event.access?.accessType === 'INVITE_ONLY' ? '🔒 Invite Only' : '🌐 Open to All';
+    const accessLabel =
+      event.access?.accessType === 'INVITE_ONLY' ? '🔒 Invite Only' : '🌐 Open to All';
     const capacityLine = event.capacity ? `\n*Capacity:* ${event.capacity} seats` : '';
-    const organizerLine = event.creator?.fullName ? `\n👥 *Organized by:* ${event.creator.fullName}` : '';
+    const organizerLine = event.creator?.fullName
+      ? `\n👥 *Organized by:* ${event.creator.fullName}`
+      : '';
     const descLine = event.description
       ? `\n\n${event.description.length > 200 ? event.description.slice(0, 197) + '...' : event.description}`
       : '';
 
     // Convert tags to CamelCase hashtags (e.g. "Tech & Innovation" -> "#TechAndInnovation")
     const hashTags = event.tags?.length
-      ? '\n\n' + event.tags
+      ? '\n\n' +
+        event.tags
           .map((t) => `#${t.tag.name.replace(/[^a-zA-Z0-9]/g, '')}`)
           .filter((tag) => tag.length > 1)
           .join(' ')
@@ -248,7 +265,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       `${accessLabel}${capacityLine}${hashTags}`;
 
     const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
-    const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+    const hasValidUrl =
+      eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
 
     // Try to send with cover image if available
     const imageMedia = event.media?.find((m) => m.fileUrl);
@@ -261,8 +279,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
             reply_markup: {
               inline_keyboard: [
                 [
-                  { text: '📋 View Event Details', url: eventUrl },
-                  { text: '✅ Register Now', url: eventUrl },
+                  { text: '📋 View Event Details', web_app: { url: eventUrl } },
+                  { text: '✅ Register Now', web_app: { url: eventUrl } },
                 ],
               ],
             },
@@ -271,7 +289,9 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         this.logger.log(`Event announcement (with image) sent to channel for: "${event.title}"`);
         return;
       } catch (err: any) {
-        this.logger.warn(`Failed to send event announcement with image: ${err.message}. Falling back to text message.`);
+        this.logger.warn(
+          `Failed to send event announcement with image: ${err.message}. Falling back to text message.`,
+        );
       }
     }
 
@@ -283,8 +303,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '📋 View Event Details', url: eventUrl },
-                { text: '✅ Register Now', url: eventUrl },
+                { text: '📋 View Event Details', web_app: { url: eventUrl } },
+                { text: '✅ Register Now', web_app: { url: eventUrl } },
               ],
             ],
           },
@@ -309,10 +329,15 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     if (!this.bot) return;
     const channelId = this.configService.get<string>('TELEGRAM_CHANNEL_ID');
     if (!channelId) return;
-    const webUrl = (this.configService.get<string>('CEMS_WEB_URL') ?? this.configService.get<string>('FRONTEND_URL') ?? '').replace(/\/$/, '');
+    const webUrl = (
+      this.configService.get<string>('CEMS_WEB_URL') ??
+      this.configService.get<string>('FRONTEND_URL') ??
+      ''
+    ).replace(/\/$/, '');
 
     const time = new Date(event.startTime).toLocaleTimeString('en-US', {
-      hour: 'numeric', minute: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
     });
 
     const message =
@@ -323,18 +348,15 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       `_Head over now — don't miss it!_`;
 
     const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
-    const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+    const hasValidUrl =
+      eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
 
     try {
       await this.bot.telegram.sendMessage(channelId, message, {
         parse_mode: 'Markdown',
         ...(hasValidUrl && {
           reply_markup: {
-            inline_keyboard: [
-              [
-                { text: '🎟 Join Now →', url: eventUrl },
-              ],
-            ],
+            inline_keyboard: [[{ text: '🎟 Join Now →', web_app: { url: eventUrl } }]],
           },
         }),
       });
@@ -352,16 +374,20 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     event: { title: string; startTime: Date; venue?: { name: string } | null },
   ): string {
     const date = new Date(event.startTime).toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
     });
     const time = new Date(event.startTime).toLocaleTimeString('en-US', {
-      hour: 'numeric', minute: '2-digit',
+      hour: 'numeric',
+      minute: '2-digit',
     });
 
     const icons: Record<string, string> = {
       DISTINGUISHED: '★',
-      HONORS:        '⬥',
-      GRADUATE:      '■',
+      HONORS: '⬥',
+      GRADUATE: '■',
     };
     const icon = icons[record.tier] ?? '■';
 
