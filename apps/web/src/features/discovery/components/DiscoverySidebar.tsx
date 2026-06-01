@@ -51,8 +51,8 @@ export function DiscoverySidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex lg:flex-col w-72 shrink-0 sticky top-0 h-screen pt-24 pb-8">
-      <div className="flex-1 overflow-y-auto space-y-6 scrollbar-hide">
+    <aside className="hidden lg:block w-72 shrink-0">
+      <div className="sticky top-[80px] space-y-6">
         {/* Main Navigation Card */}
         <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-lg p-4 shadow-sm">
           <div className="px-4 py-2 mb-4">
