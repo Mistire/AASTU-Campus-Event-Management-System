@@ -2,6 +2,7 @@ import { Controller, Post, Req, Res } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
 import type { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../auth/decorator/public.decorator';
 
 @ApiTags('Telegram')
 @Controller('telegram')
@@ -12,6 +13,7 @@ export class TelegramController {
    * Telegram webhook endpoint — called by Telegram's servers in production.
    * In development this is unused (bot uses polling instead).
    */
+  @Public()
   @Post('webhook')
   async handleWebhook(@Req() req: Request, @Res() res: Response) {
     await this.telegramService.handleWebhookUpdate(req.body);
