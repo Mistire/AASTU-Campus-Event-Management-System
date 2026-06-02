@@ -279,8 +279,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
             reply_markup: {
               inline_keyboard: [
                 [
-                  { text: '📋 View Event Details', web_app: { url: eventUrl } },
-                  { text: '✅ Register Now', web_app: { url: eventUrl } },
+                  { text: '📋 View Event Details', url: eventUrl },
+                  { text: '✅ Register Now', url: eventUrl },
                 ],
               ],
             },
@@ -303,8 +303,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '📋 View Event Details', web_app: { url: eventUrl } },
-                { text: '✅ Register Now', web_app: { url: eventUrl } },
+                { text: '📋 View Event Details', url: eventUrl },
+                { text: '✅ Register Now', url: eventUrl },
               ],
             ],
           },
@@ -356,7 +356,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         parse_mode: 'Markdown',
         ...(hasValidUrl && {
           reply_markup: {
-            inline_keyboard: [[{ text: '🎟 Join Now →', web_app: { url: eventUrl } }]],
+            inline_keyboard: [[{ text: '🎟 Join Now →', url: eventUrl }]],
           },
         }),
       });
