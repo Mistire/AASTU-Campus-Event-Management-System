@@ -93,25 +93,27 @@ export function CemsCardHeader({
       )}
       {...props}
     >
-      <div className="flex items-center gap-3">
-        {icon && (
-          <div className="w-9 h-9 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
-            {icon}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {icon && (
+            <div className="w-9 h-9 rounded-lg bg-brand/5 dark:bg-brand/10 flex items-center justify-center text-brand shrink-0 [&_svg]:size-[18px]">
+              {icon}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            {title && (
+              <CardTitle className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+                {title}
+              </CardTitle>
+            )}
+            {description && (
+              <CardDescription className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                {description}
+              </CardDescription>
+            )}
           </div>
-        )}
-        <div className="flex-1 min-w-0">
-          {title && (
-            <CardTitle className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
-              {title}
-            </CardTitle>
-          )}
-          {description && (
-            <CardDescription className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              {description}
-            </CardDescription>
-          )}
         </div>
-        {action && <CardAction>{action}</CardAction>}
+        {action && <CardAction className="self-stretch sm:self-auto shrink-0">{action}</CardAction>}
       </div>
       {children}
     </CardHeader>
