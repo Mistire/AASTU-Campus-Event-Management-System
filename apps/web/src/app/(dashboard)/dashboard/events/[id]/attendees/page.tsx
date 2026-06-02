@@ -277,11 +277,11 @@ function EventAttendeesContent() {
           title="Attendee List"
           description="Click on an attendee to view profile or use actions to moderate"
           action={
-            <div className="relative w-72">
+            <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <Input 
                 placeholder="Search by name or email..." 
-                className="pl-10 h-10 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-900 dark:text-white"
+                className="pl-10 h-10 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-900 dark:text-white w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -290,11 +290,11 @@ function EventAttendeesContent() {
         />
         <CemsCardContent>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-1 rounded-lg h-auto">
-              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
-              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
-              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
+            <TabsList className="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-1 rounded-lg h-auto flex flex-row overflow-x-auto scrollbar-none justify-start w-full whitespace-nowrap">
+              <TabsTrigger value="all" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 shrink-0 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">All</TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 shrink-0 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
+              <TabsTrigger value="confirmed" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 shrink-0 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Confirmed</TabsTrigger>
+              <TabsTrigger value="waitlist" className="rounded-lg text-[10px] font-black uppercase tracking-widest px-6 py-2 shrink-0 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:text-brand data-[state=active]:shadow-sm">Waitlist</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all">

@@ -440,20 +440,45 @@ export class EventsService {
     }
   }
 
-  async archive(eventId: string, userId: string) {
-    await this.assertOrganizerOrCreator(eventId, userId);
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleCronArchive() {
+    const now = new Date();
+    const liveEndedEvents = await this.prisma.event.findMany({
+      where: {
+        status: { statusName: 'LIVE' },
+        endTime: { lte: now },
+      },
+    });
+
+    if (liveEndedEvents.length === 0) return;
+
+    this.logger.log(`Cron: Auto-archiving ${liveEndedEvents.length} ended events`);
+
+    for (const event of liveEndedEvents) {
+      try {
+        await this.archive(event.id);
+      } catch (error) {
+        this.logger.error(`Failed to auto-archive event ${event.id}: ${error.message}`);
+      }
+    }
+  }
+
+  async archive(eventId: string, userId?: string) {
+    if (userId) {
+      await this.assertOrganizerOrCreator(eventId, userId);
+    }
     const event = await this.findOneRaw(eventId);
     const updated = await this.transitionStatus(event.id, event.statusId, 'ARCHIVED');
 
     // Audit Log
     try {
       await this.auditLogsService.createLog({
-        userId,
+        userId: userId || event.createdBy || 'SYSTEM',
         action: 'ARCHIVE_EVENT',
         entityType: 'EVENT',
         entityId: event.id,
         outcome: 'SUCCESS',
-        details: `Event archived: "${event.title}"`,
+        details: `Event archived: "${event.title}"${!userId ? ' (auto-archived by system)' : ''}`,
         beforeState: { ...event },
         afterState: { ...updated },
       });

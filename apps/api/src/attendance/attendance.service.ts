@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -68,8 +73,10 @@ export class AttendanceService {
       throw new ForbiddenException('Invalid or expired ticket token');
     }
 
-    const attendeeId = decoded.sub;
-    const ticketEventId = decoded.eventId;
+    // Support both student ticket formats and standard formats
+    const isStudentTicket = decoded.kind === 'STUDENT_TICKET' || decoded.user_id;
+    const attendeeId = isStudentTicket ? decoded.user_id : decoded.sub;
+    const ticketEventId = isStudentTicket ? decoded.event_id : decoded.eventId;
     const isGuest = decoded.isGuest;
     const tokenType = decoded.type; // 'GUEST_PASS' for graduation parent QR codes
 
@@ -98,7 +105,11 @@ export class AttendanceService {
         where: { qrToken: ticketToken, eventId },
       });
       if (existingCheckIn) {
-        return { ...existingCheckIn, alreadyCheckedIn: true };
+        return {
+          ...existingCheckIn,
+          alreadyCheckedIn: true,
+          message: 'Guest pass already used — attendee was previously checked in',
+        };
       }
 
       const checkin = await this.prisma.attendance.create({
@@ -127,6 +138,7 @@ export class AttendanceService {
 
       return {
         ...checkin,
+        message: `Guest checked in: ${guestPass.parentLabel}`,
         guestInfo: {
           parentLabel: guestPass.parentLabel,
           studentName: guestPass.graduationRecord.fullName,
@@ -148,7 +160,7 @@ export class AttendanceService {
     if (isGuest) {
       // 4a. Check if guest invite is valid
       const invite = await this.prisma.eventInvites.findUnique({
-        where: { id: attendeeId }
+        where: { id: attendeeId },
       });
 
       if (!invite || invite.eventId !== eventId) {
@@ -164,7 +176,12 @@ export class AttendanceService {
         },
       });
 
-      if (existingCheckIn) return existingCheckIn;
+      if (existingCheckIn)
+        return {
+          ...existingCheckIn,
+          alreadyCheckedIn: true,
+          message: 'Guest was already checked in',
+        };
 
       const checkin = await this.prisma.attendance.create({
         data: {
@@ -191,15 +208,14 @@ export class AttendanceService {
         console.error(`Failed to create audit log: ${e.message}`);
       }
 
-      return checkin;
-
+      return { ...checkin, message: 'Guest successfully checked in!' };
     } else {
       // 4b. Check if attendee is registered and CONFIRMED
       const registration = await this.prisma.registration.findFirst({
         where: {
           userId: attendeeId,
           eventId,
-          status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } }
+          status: { name: { equals: 'CONFIRMED', mode: 'insensitive' } },
         },
       });
 
@@ -217,7 +233,11 @@ export class AttendanceService {
       });
 
       if (existingCheckIn) {
-        return existingCheckIn; // Already checked in
+        return {
+          ...existingCheckIn,
+          alreadyCheckedIn: true,
+          message: 'Attendee was already checked in',
+        };
       }
 
       const checkin = await this.prisma.attendance.create({
@@ -245,7 +265,7 @@ export class AttendanceService {
         console.error(`Failed to create audit log: ${e.message}`);
       }
 
-      return checkin;
+      return { ...checkin, message: 'Attendee successfully checked in!' };
     }
   }
 
@@ -338,7 +358,7 @@ export class AttendanceService {
         invite: {
           select: {
             invitedEmail: true,
-          }
+          },
         },
         session: {
           select: {

@@ -252,6 +252,7 @@ export function CemsSidebar() {
                                         <Link
                                           key={sub.title}
                                           href={sub.to}
+                                          onClick={() => setOpenMobile(false)}
                                           className={cn(
                                             "flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold tracking-tight",
                                             subActive 
@@ -270,14 +271,15 @@ export function CemsSidebar() {
                           </Collapsible>
                         )
                       }
-
+ 
                       // Simple item handling
                       const isActive = pathname === item.to || (item.to !== "/dashboard" && pathname.startsWith(item.to))
-
+ 
                       return (
                         <Link
                           key={item.title}
                           href={item.to}
+                          onClick={() => setOpenMobile(false)}
                           className={cn(
                             "group flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-300 text-sm font-bold tracking-tight",
                             isCollapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "px-4",

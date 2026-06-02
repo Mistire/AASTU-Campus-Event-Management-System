@@ -9,7 +9,7 @@ import { apiFetch } from "@/lib/api-client";
 export function TelegramAuthHandler({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { token, setAuth, _hasHydrated } = useAuthStore();
+  const { token, profile, setAuth, _hasHydrated } = useAuthStore();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [hasCheckedTelegram, setHasCheckedTelegram] = useState(false);
 
@@ -32,9 +32,25 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
 
     const initData = webApp.initData;
 
-    // If no init data (not inside Telegram WebApp query context) or already logged in, do nothing
-    if (!initData || token) {
+    const redirectUser = (role: string) => {
+      const upperRole = role.toUpperCase();
+      const isDashboardUser = upperRole === "ADMIN" || upperRole === "ORGANIZER" || upperRole === "STAFF";
+      const dest = isDashboardUser ? "/dashboard" : "/discovery";
+      if (pathname === "/" || pathname === "/login" || pathname === "/signup" || pathname === "/register") {
+        router.push(dest);
+      }
+    };
+
+    if (!initData) {
       setHasCheckedTelegram(true);
+      return;
+    }
+
+    if (token) {
+      setHasCheckedTelegram(true);
+      if (profile?.role) {
+        redirectUser(profile.role);
+      }
       return;
     }
 
@@ -62,7 +78,7 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
           router.push(`/auth/telegram-onboarding?redirectTo=${encodeURIComponent(pathname)}`);
         } else {
           // Success! Map user data to local AuthProfile schema
-          const profile = {
+          const userProfile = {
             id: data.user.id,
             full_name: data.user.fullName,
             email: data.user.email,
@@ -73,7 +89,8 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
             profileImage: data.user.profileImage || undefined,
           };
 
-          setAuth(data.access_token, data.refresh_token, profile);
+          setAuth(data.access_token, data.refresh_token, userProfile);
+          redirectUser(data.user.role);
         }
       } catch (error) {
         console.error("Auto-login via Telegram WebApp failed:", error);

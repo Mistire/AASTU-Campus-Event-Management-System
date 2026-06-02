@@ -225,9 +225,9 @@ export function CemsTable<TData>({
     <div className={cn("w-full flex flex-col", className)}>
       {/* Toolbar */}
       {!hideToolbar && (enableGlobalFilter || enableColumnVisibility) && (
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3 border-b border-gray-50 dark:border-gray-800 w-full">
           {enableGlobalFilter && (
-            <div className="relative flex-1 max-w-xs">
+            <div className="relative w-full sm:max-w-xs shrink-0">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               <input
                 value={globalFilter}
@@ -239,14 +239,16 @@ export function CemsTable<TData>({
           )}
           
           {renderToolbarActions && (
-             <div className="flex items-center gap-2">
+             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 {renderToolbarActions(table)}
              </div>
           )}
 
-          <div className="flex-1" />
+          <div className="hidden sm:block flex-1" />
           {enableColumnVisibility && (
-            <ColumnVisibilityPopover columns={visibleColumns} />
+            <div className="self-end sm:self-auto shrink-0">
+              <ColumnVisibilityPopover columns={visibleColumns} />
+            </div>
           )}
         </div>
       )}

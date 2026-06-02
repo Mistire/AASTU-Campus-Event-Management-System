@@ -12,7 +12,7 @@ import {
   Mail,
   User, 
   Phone,
-
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDepartments } from "@/features/departments/api";
@@ -44,6 +44,23 @@ export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const password = form.password;
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+  const criteria = [
+    { label: "At least 8 characters", met: hasMinLength },
+    { label: "One uppercase letter (A-Z)", met: hasUppercase },
+    { label: "One lowercase letter (a-z)", met: hasLowercase },
+    { label: "One number (0-9)", met: hasNumber },
+    { label: "One special character (e.g. !@#$)", met: hasSpecial },
+  ];
+
+  const score = criteria.filter((c) => c.met).length;
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -57,6 +74,14 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (score < 5) {
+      toast.error("Validation Error", {
+        description: "Please enter a strong password meeting all criteria.",
+      });
+      return;
+    }
+
     if (form.password !== form.confirmPassword) {
       toast.error("Validation Error", {
         description: "Passwords do not match. Please try again.",
@@ -257,6 +282,72 @@ export function SignupForm() {
               {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
+          
+          {password && (
+            <div className="space-y-2 mt-2 animate-in fade-in duration-300">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-brand font-black uppercase tracking-wider text-brand">
+                  Password Strength: {
+                    score <= 2 ? "Weak" :
+                    score === 3 ? "Fair" :
+                    score === 4 ? "Good" :
+                    "Strong"
+                  }
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-4 gap-1.5 h-1">
+                {[1, 2, 3, 4].map((index) => {
+                  let isFilled = false;
+                  if (score <= 2 && index === 1) isFilled = true;
+                  else if (score === 3 && index <= 2) isFilled = true;
+                  else if (score === 4 && index <= 3) isFilled = true;
+                  else if (score === 5 && index <= 4) isFilled = true;
+
+                  return (
+                    <div
+                      key={index}
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        isFilled
+                          ? "bg-brand shadow-xs shadow-brand/20"
+                          : "bg-brand/10 dark:bg-gray-800"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pt-1">
+                {criteria.map((c, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-1.5 transition-colors duration-200"
+                  >
+                    <div
+                      className={`w-3.5 h-3.5 rounded-full flex items-center justify-center border transition-all ${
+                        c.met
+                          ? "border-brand bg-brand/5 text-brand"
+                          : "border-gray-200 dark:border-gray-800 text-gray-300"
+                      }`}
+                    >
+                      {c.met ? (
+                        <Check size={9} className="stroke-3" />
+                      ) : (
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                      )}
+                    </div>
+                    <span
+                      className={`text-[10px] font-medium transition-colors duration-200 ${
+                        c.met ? "text-gray-900 dark:text-white" : "text-gray-400 dark:text-gray-500"
+                      }`}
+                    >
+                      {c.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Confirm Password */}
