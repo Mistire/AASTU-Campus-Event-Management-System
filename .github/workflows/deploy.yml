@@ -65,6 +65,7 @@ jobs:
               echo "FRONTEND_URL=https://cems-aastu.ooguy.com"
               echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}"
               echo "TELEGRAM_BOT_USERNAME=${{ secrets.TELEGRAM_BOT_USERNAME }}"
+              echo "TELEGRAM_MINI_APP_NAME=${{ secrets.TELEGRAM_MINI_APP_NAME }}"
               echo "TELEGRAM_CHANNEL_ID=${{ secrets.TELEGRAM_CHANNEL_ID }}"
               echo "TELEGRAM_WEBHOOK_URL=https://cems-aastu.ooguy.com/api/telegram/webhook"
               echo "NODE_ENV=production"

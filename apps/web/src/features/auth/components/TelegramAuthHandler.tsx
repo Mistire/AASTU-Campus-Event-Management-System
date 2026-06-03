@@ -32,9 +32,23 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
 
     const initData = webApp.initData;
 
-    // If no init data (not inside Telegram WebApp query context) or already logged in, do nothing
+    // Helper to perform deep link redirection using start_param
+    const handleDeepLink = () => {
+      const startParam = webApp.initDataUnsafe?.start_param;
+      if (startParam) {
+        const eventId = startParam.startsWith("event_") ? startParam.replace("event_", "") : startParam;
+        if (eventId) {
+          router.push(`/events/${eventId}`);
+        }
+      }
+    };
+
+    // If no init data (not inside Telegram WebApp query context) or already logged in, redirect and do nothing
     if (!initData || token) {
       setHasCheckedTelegram(true);
+      if (initData) {
+        handleDeepLink();
+      }
       return;
     }
 
@@ -74,6 +88,7 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
           };
 
           setAuth(data.access_token, data.refresh_token, profile);
+          handleDeepLink();
         }
       } catch (error) {
         console.error("Auto-login via Telegram WebApp failed:", error);

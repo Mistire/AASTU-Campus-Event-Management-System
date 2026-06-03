@@ -247,7 +247,12 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       `🏷 *Type:* ${event.eventType?.name ?? 'General'}${organizerLine}\n` +
       `${accessLabel}${capacityLine}${hashTags}`;
 
-    const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
+    const botUsername = this.configService.get<string>('TELEGRAM_BOT_USERNAME');
+    const miniAppName = this.configService.get<string>('TELEGRAM_MINI_APP_NAME') || 'cems';
+
+    const eventUrl = botUsername
+      ? `https://t.me/${botUsername}/${miniAppName}?startapp=${event.id}`
+      : (webUrl ? `${webUrl}/events/${event.id}` : null);
     const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
 
     // Try to send with cover image if available
@@ -322,7 +327,12 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       `🕐 *Started at:* ${time}\n\n` +
       `_Head over now — don't miss it!_`;
 
-    const eventUrl = webUrl ? `${webUrl}/events/${event.id}` : null;
+    const botUsername = this.configService.get<string>('TELEGRAM_BOT_USERNAME');
+    const miniAppName = this.configService.get<string>('TELEGRAM_MINI_APP_NAME') || 'cems';
+
+    const eventUrl = botUsername
+      ? `https://t.me/${botUsername}/${miniAppName}?startapp=${event.id}`
+      : (webUrl ? `${webUrl}/events/${event.id}` : null);
     const hasValidUrl = eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
 
     try {
