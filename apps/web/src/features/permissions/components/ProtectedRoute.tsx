@@ -17,8 +17,16 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
     console.log("[ProtectedRoute] Checking:", pathname, "Role:", profile?.role);
 
-    if (pathname === "/login" || pathname === "/register") {
-      if (token) {
+    const isPublicRoute = 
+      pathname === "/login" || 
+      pathname === "/register" || 
+      pathname === "/auth/telegram-onboarding" ||
+      pathname.startsWith("/graduation") ||
+      pathname.startsWith("/feedback") ||
+      pathname.startsWith("/support");
+
+    if (isPublicRoute) {
+      if (token && (pathname === "/login" || pathname === "/register")) {
         const searchParams = new URLSearchParams(window.location.search);
         let redirectTo = searchParams.get("redirectTo");
         const isDashboardUser = profile?.role === "ADMIN" || profile?.role === "ORGANIZER" || profile?.role === "STAFF";
