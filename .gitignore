@@ -3,6 +3,7 @@ node_modules/
 
 # Environment
 .env
+.env.production
 
 # Build
 dist/
@@ -29,3 +30,4 @@ redisdata/
 # Prisma
 apps/api/prisma/migrations/**/migration_lock.toml
 apps/api/src/generated/
+

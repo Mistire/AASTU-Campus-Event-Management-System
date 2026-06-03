@@ -52,7 +52,7 @@ export function DiscoverySidebar() {
 
   return (
     <aside className="hidden lg:block w-72 shrink-0">
-      <div className="sticky top-24 space-y-6">
+      <div className="fixed top-[80px] w-72 z-40 space-y-6">
         {/* Main Navigation Card */}
         <div className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-lg p-4 shadow-sm">
           <div className="px-4 py-2 mb-4">

@@ -18,7 +18,7 @@ import { TicketGeneratorUtil } from '../events/ticket-generator.util';
 
 const DEFAULT_CONFIG = {
   distinguishedMinGpa: 3.75,
-  honorsMinGpa: 3.50,
+  honorsMinGpa: 3.5,
   distinguishedSlots: 3,
   honorsSlots: 2,
   graduateSlots: 1,
@@ -36,10 +36,14 @@ export interface TierResult {
 
 export function computeTier(gpa: number, cfg: GraduationConfigShape = DEFAULT_CONFIG): TierResult {
   if (gpa >= cfg.distinguishedMinGpa)
-    return { tier: 'DISTINGUISHED', guestSlots: cfg.distinguishedSlots, label: 'Distinguished Graduate' };
+    return {
+      tier: 'DISTINGUISHED',
+      guestSlots: cfg.distinguishedSlots,
+      label: 'Distinguished Graduate',
+    };
   if (gpa >= cfg.honorsMinGpa)
-    return { tier: 'HONORS',        guestSlots: cfg.honorsSlots,        label: 'Honors Graduate' };
-  return   { tier: 'GRADUATE',      guestSlots: cfg.graduateSlots,      label: 'Graduate' };
+    return { tier: 'HONORS', guestSlots: cfg.honorsSlots, label: 'Honors Graduate' };
+  return { tier: 'GRADUATE', guestSlots: cfg.graduateSlots, label: 'Graduate' };
 }
 
 @Injectable()
@@ -158,7 +162,9 @@ export class GraduationService {
     // Send claim email asynchronously
     this.emailService
       .sendGraduationClaimEmail(lowerEmail, fullName, eventTitle, claimUrl)
-      .catch((err) => this.logger.error(`Failed to send claim email to ${lowerEmail}: ${err.message}`));
+      .catch((err) =>
+        this.logger.error(`Failed to send claim email to ${lowerEmail}: ${err.message}`),
+      );
 
     return { skipped: false, email: lowerEmail };
   }
@@ -175,9 +181,7 @@ export class GraduationService {
     await this.assertOrganizerOfEvent(eventId, userId);
 
     if (dto.honorsMinGpa >= dto.distinguishedMinGpa) {
-      throw new BadRequestException(
-        'honorsMinGpa must be strictly less than distinguishedMinGpa',
-      );
+      throw new BadRequestException('honorsMinGpa must be strictly less than distinguishedMinGpa');
     }
 
     const cfg = await this.prisma.graduationConfig.upsert({
@@ -228,7 +232,15 @@ export class GraduationService {
         continue;
       }
 
-      const result = await this.processStudent(eventId, userId, email, fullName, gpa, event.title, cfg);
+      const result = await this.processStudent(
+        eventId,
+        userId,
+        email,
+        fullName,
+        gpa,
+        event.title,
+        cfg,
+      );
       result.skipped ? results.skipped++ : results.imported++;
     }
 
@@ -240,7 +252,15 @@ export class GraduationService {
   async addStudent(eventId: string, userId: string, dto: AddStudentDto) {
     const event = await this.assertOrganizerOfEvent(eventId, userId);
     const cfg = await this.getEventConfig(eventId);
-    const result = await this.processStudent(eventId, userId, dto.email, dto.fullName, dto.gpa, event.title, cfg);
+    const result = await this.processStudent(
+      eventId,
+      userId,
+      dto.email,
+      dto.fullName,
+      dto.gpa,
+      event.title,
+      cfg,
+    );
     if (result.skipped) throw new BadRequestException('Student already imported for this event');
     return { message: 'Student added and invitation email sent', email: dto.email };
   }
@@ -404,7 +424,11 @@ export class GraduationService {
           const finalPass = { ...guestPass, qrToken, telegramToken };
           setImmediate(async () => {
             try {
-              const pdf = await TicketGeneratorUtil.generateGraduationGuestCard(event, finalPass, record);
+              const pdf = await TicketGeneratorUtil.generateGraduationGuestCard(
+                event,
+                finalPass,
+                record,
+              );
               await this.emailService.sendParentQREmail(
                 parent.parentEmail!,
                 record.fullName,
@@ -423,7 +447,11 @@ export class GraduationService {
         }
 
         if (isBulk) {
-          bulkPasses.push({ parentLabel: parent.parentLabel, pdfBuffer: Buffer.alloc(0), guestPassId: guestPass.id });
+          bulkPasses.push({
+            parentLabel: parent.parentLabel,
+            pdfBuffer: Buffer.alloc(0),
+            guestPassId: guestPass.id,
+          });
         }
       }
 
@@ -440,8 +468,14 @@ export class GraduationService {
         try {
           const passesWithPdf = await Promise.all(
             bulkPasses.map(async (bp) => {
-              const guestPass = await this.prisma.guestPass.findUnique({ where: { id: bp.guestPassId } });
-              const pdf = await TicketGeneratorUtil.generateGraduationGuestCard(event, guestPass!, record);
+              const guestPass = await this.prisma.guestPass.findUnique({
+                where: { id: bp.guestPassId },
+              });
+              const pdf = await TicketGeneratorUtil.generateGraduationGuestCard(
+                event,
+                guestPass!,
+                record,
+              );
               return { parentLabel: bp.parentLabel, pdfBuffer: pdf };
             }),
           );

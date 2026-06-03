@@ -1,6 +1,9 @@
-export interface DepartmentRecord {
+export interface Department {
     id: string;
     name: string;
-    faculty: string;
-    studentCount: number;
+    faculty?: string;
+    _count?: {
+        users: number;
+    };
 }
+

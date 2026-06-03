@@ -71,6 +71,8 @@ services:
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
       TELEGRAM_CHANNEL_ID: ${TELEGRAM_CHANNEL_ID:-}
       TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-}
+      ML_SERVICE_URL: http://ml-service:8000
+      CEMS_WEB_URL: ${FRONTEND_URL}
     depends_on:
       postgres:
         condition: service_healthy
@@ -86,6 +88,35 @@ services:
       resources:
         limits:
           memory: 384M
+
+  # ─── ML Recommendation Service (Production) ────────────────
+  ml-service:
+    build:
+      context: ./apps/ml-service
+      dockerfile: Dockerfile
+    container_name: cems-ml-service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cems}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-cems_db}
+      MODEL_PATH: ./trained_models
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ml-models:/app/trained_models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')\" || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   # ─── Next.js Web App (Production) ────────────────────────
   web:
@@ -154,3 +185,4 @@ networks:
 volumes:
   pgdata:
   redisdata:
+  ml-models:

@@ -5,6 +5,7 @@ on:
     branches:
       - dev
       - feat/aws-deployment
+      - main
   workflow_dispatch:
 
 jobs:
@@ -103,6 +104,11 @@ jobs:
               --build-arg NEXT_PUBLIC_API_URL=https://cems-aastu.ooguy.com \
               --build-arg NEXT_PUBLIC_SOCKET_URL=https://cems-aastu.ooguy.com
 
+            echo "==> Stopping old containers and removing any name conflicts..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            docker rm -f cems-postgres cems-postgres-test cems-redis cems-api cems-ml-service cems-web cems-nginx cems-maildev || true
+            sudo fuser -k 8000/tcp || true
+
             echo "==> Starting database services (postgres + redis)..."
             docker compose -f docker-compose.prod.yml up -d postgres redis
 
@@ -120,8 +126,35 @@ jobs:
               data-pipeline-api \
               npx prisma migrate deploy
 
-            echo "==> Migrations complete. Starting API..."
-            docker compose -f docker-compose.prod.yml up -d api
+            echo "==> Migrations complete. Starting API and ML services..."
+            docker compose -f docker-compose.prod.yml up -d api ml-service
+
+            echo "==> Waiting for ML service to become healthy..."
+            ML_HEALTH="unknown"
+            for i in $(seq 1 12); do
+              ML_HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' cems-ml-service 2>/dev/null || echo "missing")
+              if [ "$ML_HEALTH" = "healthy" ]; then
+                echo "ML service is healthy!"
+                break
+              fi
+              echo "  ML health: $ML_HEALTH ($i/12)"
+              sleep 10
+            done
+
+            if [ "$ML_HEALTH" = "healthy" ]; then
+              echo "==> Checking if ML models are loaded..."
+              MODELS_LOADED=$(docker exec cems-ml-service python -c "import urllib.request, json; d=json.loads(urllib.request.urlopen('http://127.0.0.1:8000/health').read().decode()); print(str(d.get('models_loaded','false')).lower())" 2>/dev/null || echo "false")
+              if [ "$MODELS_LOADED" != "true" ]; then
+                echo "==> No models found — triggering /retrain from production DB..."
+                docker exec cems-ml-service python -c "import urllib.request; print(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/retrain', method='POST')).read().decode())" || true
+                echo "==> Retrain request completed."
+              else
+                echo "==> Models already loaded, skipping retrain."
+              fi
+            else
+              echo "WARNING: ML service did not become healthy in time — skipping retrain."
+              docker compose -f docker-compose.prod.yml logs --tail=50 ml-service
+            fi
 
             echo "==> Waiting for API to become healthy..."
             API_HEALTH="unknown"

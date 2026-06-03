@@ -55,7 +55,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
       </head>
-      <body className="flex flex-col">
+      <body className="flex flex-col min-h-screen">
         <Toaster
           position="top-right"
           richColors

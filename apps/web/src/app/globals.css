@@ -150,10 +150,12 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    overflow-x: clip;
   }
 
   html {
     @apply font-sans;
+    overflow-x: clip;
   }
 
   h1,

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,
+  Send,
 } from "lucide-react";
 
 // ─── Image Sets ──────────────────────────────────────────────────────────────
@@ -61,6 +62,23 @@ export default function Hero() {
 
         {/* Space for aesthetic balance */}
         <div className="h-10 md:h-20" />
+
+        <motion.a
+          href="https://t.me/aastu_cems"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-3 bg-brand/5 dark:bg-brand/10 hover:bg-brand/10 dark:hover:bg-brand/20 border border-brand/20 rounded-lg pl-2 pr-4 py-2 mb-8 text-brand dark:text-brand-subtle font-brand font-black text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 hover:border-brand/45 cursor-pointer"
+        >
+          <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+            <Send size={14} className="text-white fill-white -translate-x-[0.5px] translate-y-[0.5px]" />
+          </div>
+          <span className="hidden md:inline">Join the CEMS Telegram Channel</span>
+          <span className="inline md:hidden">Telegram Channel</span>
+          <ArrowRight size={12} className="opacity-60 ml-1 shrink-0" />
+        </motion.a>
 
         <motion.h1
           initial={{ opacity: 0, y: -30 }}

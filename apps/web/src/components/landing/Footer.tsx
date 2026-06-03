@@ -23,6 +23,7 @@ export default function Footer() {
             <li><Link href="/" className="hover:text-brand transition-colors">Home</Link></li>
             <li><Link href="#features" className="hover:text-brand transition-colors">Upcoming Events</Link></li>
             <li><Link href="/login" className="hover:text-brand transition-colors">Login</Link></li>
+            <li><a href="https://t.me/aastu_cems" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">Telegram Channel</a></li>
           </ul>
         </div>
 

@@ -23,7 +23,8 @@ export const getDepartmentsColumns = (): ColumnDef<Department>[] => [
         cell: ({ row }) => <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{truncate(row.original.faculty || 'N/A', 25)}</span>,
     },
     {
-        accessorKey: "studentCount",
+        id: "studentCount",
+        accessorFn: (row) => row._count?.users || 0,
         header: "Students",
         cell: ({ row }) => (
             <div>

@@ -30,9 +30,15 @@ async def lifespan(app: FastAPI):
     logger.info("Starting ML Recommendation Service...")
     loaded = load_models()
     if loaded:
-        logger.info("Pre-trained models loaded")
+        logger.info("Pre-trained models loaded successfully.")
     else:
-        logger.info("No pre-trained models found. POST /retrain to train.")
+        logger.info("No pre-trained models found — triggering initial retrain from DB...")
+        try:
+            stats = retrain()
+            logger.info(f"Initial retrain complete: {stats}")
+        except Exception as e:
+            logger.error(f"Initial retrain failed: {e}. Service will start without models.")
+            logger.error("Use POST /retrain once the database has enough data.")
     start_scheduler()
     yield
     # Shutdown
