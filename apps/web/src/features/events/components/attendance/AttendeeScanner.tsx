@@ -34,6 +34,10 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
   const [remountKey, setRemountKey] = useState(0);
   const { mutate: checkIn, isPending } = useCheckIn();
 
+  // Cooldown tracking for scanning the same code multiple times rapidly
+  const lastScannedCodeRef = useRef<string | null>(null);
+  const lastScanTimestampRef = useRef<number>(0);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -68,6 +72,15 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
     const { isPending: pending, lastScanStatus } = stateRef.current;
     if (pending || lastScanStatus === "loading") return;
 
+    // Cooldown check: Avoid scanning the same code again within 4 seconds
+    const now = Date.now();
+    if (decodedText === lastScannedCodeRef.current && now - lastScanTimestampRef.current < 4000) {
+      return;
+    }
+
+    lastScannedCodeRef.current = decodedText;
+    lastScanTimestampRef.current = now;
+
     setLastScan({ status: "loading", message: "Verifying ticket..." });
     
     checkIn(
@@ -87,7 +100,8 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
             });
             toast.success("Check-in successful");
           }
-          setTimeout(() => setLastScan(null), 3000);
+          // Fast-clear on success/warning for rapid scanning throughput (1.5 seconds)
+          setTimeout(() => setLastScan(null), 1500);
         },
         onError: (error: any) => {
           setLastScan({ 
@@ -95,7 +109,10 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
             message: error.message || "Invalid or already used ticket" 
           });
           toast.error(error.message || "Failed to check in");
-          setTimeout(() => setLastScan(null), 5000);
+          // Clear cooldown lock on error so organizer can retry immediately if there was a temporary failure
+          lastScannedCodeRef.current = null;
+          // Clear error display after 2.5 seconds (down from 5 seconds)
+          setTimeout(() => setLastScan(null), 2500);
         }
       }
     );
@@ -121,11 +138,16 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
     if (!isLibraryLoaded || !isSecure) return;
 
     const Html5Qrcode = (window as any).Html5Qrcode;
+    const Html5QrcodeSupportedFormats = (window as any).Html5QrcodeSupportedFormats;
     if (!Html5Qrcode) return;
     
     if (scannerRef.current) return; // Prevent double init
 
-    const html5QrCode = new Html5Qrcode("reader");
+    // Optimize: Constrain scanner to QR code formats only to disable standard barcode matching.
+    // This reduces CPU utilization and speeds up QR code alignment and decoding dramatically.
+    const html5QrCode = new Html5Qrcode("reader", {
+      formatsToSupport: Html5QrcodeSupportedFormats ? [Html5QrcodeSupportedFormats.QR_CODE] : []
+    });
     scannerRef.current = html5QrCode;
 
     Html5Qrcode.getCameras()
@@ -294,29 +316,39 @@ export function AttendeeScanner({ eventId, onClose }: AttendeeScannerProps) {
                {lastScan && (
                  <motion.div
                    key={lastScan.status}
-                   initial={{ opacity: 0, scale: 0.8 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   exit={{ opacity: 0, scale: 0.8 }}
+                   initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                   animate={{ opacity: 1, y: 0, scale: 1 }}
+                   exit={{ opacity: 0, y: 50, scale: 0.95 }}
+                   onClick={() => setLastScan(null)} // Instantly dismiss on click
                    className={cn(
-                     "absolute inset-0 z-20 flex flex-col items-center justify-center p-6 sm:p-8 text-center backdrop-blur-xl transition-colors",
-                     lastScan.status === "success" ? "bg-emerald-500/90" : 
-                     lastScan.status === "warning" ? "bg-amber-500/90" :
-                     lastScan.status === "error" ? "bg-rose-500/90" : "bg-brand/90"
+                     "absolute bottom-4 left-4 right-4 z-20 flex items-center gap-3 p-4 rounded-xl shadow-2xl border backdrop-blur-md cursor-pointer transition-all duration-300 active:scale-95 hover:brightness-110",
+                     lastScan.status === "success" ? "bg-emerald-500/95 border-emerald-400/30 text-white" : 
+                     lastScan.status === "warning" ? "bg-amber-500/95 border-amber-400/30 text-white" :
+                     lastScan.status === "error" ? "bg-rose-500/95 border-rose-400/30 text-white" : 
+                     "bg-brand/95 border-brand/80 text-white"
                    )}
                  >
-                   {lastScan.status === "loading" && <Loader2 className="text-white animate-spin mb-4" size={40} />}
-                   {lastScan.status === "success" && <CheckCircle2 className="text-white mb-4" size={40} />}
-                   {lastScan.status === "warning" && <UserCheck className="text-white mb-4" size={40} />}
-                   {lastScan.status === "error" && <AlertCircle className="text-white mb-4" size={40} />}
+                   {lastScan.status === "loading" && <Loader2 className="text-white animate-spin shrink-0" size={24} />}
+                   {lastScan.status === "success" && <CheckCircle2 className="text-white shrink-0" size={24} />}
+                   {lastScan.status === "warning" && <UserCheck className="text-white shrink-0" size={24} />}
+                   {lastScan.status === "error" && <AlertCircle className="text-white shrink-0" size={24} />}
                    
-                   <h3 className="text-white font-black text-lg sm:text-xl mb-2">
-                     {lastScan.status === "success" ? "Access Granted" : 
-                      lastScan.status === "warning" ? "Already Checked In" :
-                      lastScan.status === "error" ? "Access Denied" : "Verifying..."}
-                   </h3>
-                   <p className="text-white/80 text-xs sm:text-sm font-medium">
-                     {lastScan.message}
-                   </p>
+                   <div className="flex-1 text-left min-w-0">
+                     <h3 className="font-black text-sm uppercase tracking-wider leading-none">
+                       {lastScan.status === "success" ? "Access Granted" : 
+                        lastScan.status === "warning" ? "Already Checked In" :
+                        lastScan.status === "error" ? "Access Denied" : "Verifying..."}
+                     </h3>
+                     <p className="text-[11px] font-medium opacity-90 truncate mt-1">
+                       {lastScan.message}
+                     </p>
+                   </div>
+                   
+                   {lastScan.status !== "loading" && (
+                     <span className="text-[9px] font-black uppercase tracking-widest bg-white/20 px-2 py-1 rounded text-white shrink-0">
+                       Dismiss
+                     </span>
+                   )}
                  </motion.div>
                )}
              </AnimatePresence>
