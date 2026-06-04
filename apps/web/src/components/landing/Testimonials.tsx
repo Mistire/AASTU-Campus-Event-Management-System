@@ -88,28 +88,28 @@ export default function Testimonials() {
           {doubledTestimonials.map((t, i) => (
             <div
               key={i}
-              className="w-[420px] shrink-0 p-10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-lg border border-white/40 dark:border-white/10 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
+              className="w-[290px] sm:w-[420px] shrink-0 p-6 sm:p-10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-lg border border-white/40 dark:border-white/10 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
             >
               {/* Card Meta Log */}
-              <div className="absolute top-0 right-0 p-8">
+              <div className="absolute top-0 right-0 p-4 sm:p-8">
                 <div className="font-brand font-black text-[9px] tracking-widest text-brand opacity-20 group-hover/card:opacity-100 transition-opacity">
                   VERIFIED LOG — 0{ (i % 6) + 1 }
                 </div>
               </div>
 
               <div>
-                <div className="flex gap-1 mb-8">
+                <div className="flex gap-1 mb-4 sm:mb-8">
                   {[...Array(5)].map((_, i) => (
                     <span key={i} className="text-brand drop-shadow-[0_0_8px_rgba(14,165,233,0.4)]">★</span>
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed font-medium italic whitespace-normal opacity-90">
+                <p className="text-gray-600 dark:text-gray-400 mb-6 sm:mb-10 text-sm sm:text-lg leading-relaxed font-medium italic whitespace-normal opacity-90">
                   &ldquo;{t.quote}&rdquo;
                 </p>
               </div>
               
-              <div className="flex items-center gap-5">
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 ring-4 ring-brand/5 dark:ring-brand/10">
+              <div className="flex items-center gap-3 sm:gap-5">
+                <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden shadow-lg border-2 border-white dark:border-gray-800 ring-4 ring-brand/5 dark:ring-brand/10">
                   <Image
                     src={t.img}
                     alt={t.name}
@@ -119,8 +119,8 @@ export default function Testimonials() {
                   />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-brand font-black text-gray-900 dark:text-white text-sm tracking-tight mb-1">{t.name}</h4>
-                  <p className="text-[10px] text-brand font-brand font-black uppercase tracking-widest bg-brand/5 px-2 py-1 rounded-lg">
+                  <h4 className="font-brand font-black text-gray-900 dark:text-white text-xs sm:text-sm tracking-tight mb-1">{t.name}</h4>
+                  <p className="text-[9px] sm:text-[10px] text-brand font-brand font-black uppercase tracking-widest bg-brand/5 px-2 py-1 rounded-lg">
                     {t.role}
                   </p>
                 </div>

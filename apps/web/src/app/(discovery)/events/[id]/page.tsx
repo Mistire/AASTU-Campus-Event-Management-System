@@ -59,7 +59,7 @@ export default function EventDetailPage() {
 
   const handleCancelRegistration = async () => {
     if (!regInfo || regInfo.kind === "none") return;
-    
+
     const regId = regInfo.kind === "registered" ? regInfo.registration.id : regInfo.waitlistEntry.id;
 
     try {
@@ -77,18 +77,18 @@ export default function EventDetailPage() {
 
   const handleAddToCalendar = () => {
     if (!event) return;
-    
-    const formatDate = (dateStr: string) => 
+
+    const formatDate = (dateStr: string) =>
       new Date(dateStr).toISOString().replace(/-|:|\.\d\d\d/g, "");
-      
+
     const start = formatDate(event.startTime);
     const end = formatDate(event.endTime);
     const title = encodeURIComponent(event.title);
     const details = encodeURIComponent(event.description || "");
     const location = encodeURIComponent(event.venue?.name || "AASTU Campus");
-    
+
     const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
-    
+
     window.open(gCalUrl, "_blank");
   };
 

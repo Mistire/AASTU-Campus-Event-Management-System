@@ -230,26 +230,37 @@ export function EventCreateWizard() {
           const Icon = step.icon;
           const isActive = currentStep === step.id;
           const isCompleted = currentStep > step.id;
+          const isClickable = isCompleted; // only allow going back to completed steps
 
           return (
-            <div key={step.id} className="flex flex-col items-center gap-3 relative">
-              <div 
+            <div
+              key={step.id}
+              className={cn(
+                "flex flex-col items-center gap-3 relative",
+                isClickable ? "cursor-pointer group/step" : "cursor-default"
+              )}
+              onClick={() => isClickable && setCurrentStep(step.id)}
+              title={isClickable ? `Go back to ${step.title}` : undefined}
+            >
+              <div
                 className={cn(
                   "w-10 h-10 rounded-lg flex items-center justify-center border-2 transition-all duration-300",
-                  isActive 
-                    ? "bg-brand border-brand text-white shadow-lg shadow-brand/20 scale-110" 
-                    : isCompleted 
-                      ? "bg-white border-brand text-brand" 
+                  isActive
+                    ? "bg-brand border-brand text-white shadow-lg shadow-brand/20 scale-110"
+                    : isCompleted
+                      ? "bg-white border-brand text-brand group-hover/step:bg-brand group-hover/step:text-white group-hover/step:scale-105"
                       : "bg-white border-gray-100 text-gray-300"
                 )}
               >
                 {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
               </div>
               <div className="text-center">
-                <p className={cn(
-                  "text-[10px] font-black uppercase tracking-widest transition-colors",
-                  isActive ? "text-gray-900" : "text-gray-400"
-                )}>
+                <p
+                  className={cn(
+                    "text-[10px] font-black uppercase tracking-widest transition-colors",
+                    isActive ? "text-gray-900" : isCompleted ? "text-brand group-hover/step:text-gray-900" : "text-gray-400"
+                  )}
+                >
                   {step.title}
                 </p>
               </div>
