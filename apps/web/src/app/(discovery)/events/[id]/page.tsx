@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Share2, CalendarPlus } from "lucide-react";
 import { toast } from "sonner";
 import { EventDetailSkeleton, EventErrorState } from "@/features/events/components/EventDetailUIStates";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -40,6 +40,22 @@ export default function EventDetailPage() {
       });
     }
   };
+
+  // Handle auto-registration from Telegram link
+  useEffect(() => {
+    if (isLoading || statusLoading || !event || !regInfo) return;
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const shouldAutoRegister = searchParams.get("autoRegister") === "true";
+
+    if (shouldAutoRegister && regInfo.kind === "none" && !isRegistering) {
+      // Remove query param to prevent multiple submissions on refresh
+      const newUrl = window.location.pathname;
+      window.history.replaceState({ path: newUrl }, "", newUrl);
+
+      handleRegister();
+    }
+  }, [isLoading, statusLoading, event, regInfo, isRegistering]);
 
   const handleCancelRegistration = async () => {
     if (!regInfo || regInfo.kind === "none") return;

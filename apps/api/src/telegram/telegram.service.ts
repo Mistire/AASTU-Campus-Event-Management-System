@@ -268,10 +268,17 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     const miniAppName = this.configService.get<string>('TELEGRAM_MINI_APP_NAME') || 'cems';
 
     const eventUrl = botUsername
-      ? `https://t.me/${botUsername}/${miniAppName}?startapp=${event.id}`
-      : (webUrl ? `${webUrl}/events/${event.id}` : null);
-    const hasValidUrl =
-      eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+      ? `https://t.me/${botUsername}/${miniAppName}?startapp=view_${event.id}`
+      : (webUrl ? `${webUrl}/events/${event.id}` : undefined);
+    const registerUrl = botUsername
+      ? `https://t.me/${botUsername}/${miniAppName}?startapp=register_${event.id}`
+      : (webUrl ? `${webUrl}/events/${event.id}?autoRegister=true` : undefined);
+    const hasValidUrl = !!(
+      eventUrl &&
+      registerUrl &&
+      !eventUrl.includes('localhost') &&
+      !eventUrl.includes('127.0.0.1')
+    );
 
     // Try to send with cover image if available
     const imageMedia = event.media?.find((m) => m.fileUrl);
@@ -284,8 +291,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
             reply_markup: {
               inline_keyboard: [
                 [
-                  { text: '📋 View Event Details', url: eventUrl },
-                  { text: '✅ Register Now', url: eventUrl },
+                  { text: '📋 View Event Details', url: eventUrl! },
+                  { text: '✅ Register Now', url: registerUrl! },
                 ],
               ],
             },
@@ -308,8 +315,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '📋 View Event Details', url: eventUrl },
-                { text: '✅ Register Now', url: eventUrl },
+                { text: '📋 View Event Details', url: eventUrl! },
+                { text: '✅ Register Now', url: registerUrl! },
               ],
             ],
           },
@@ -356,17 +363,20 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     const miniAppName = this.configService.get<string>('TELEGRAM_MINI_APP_NAME') || 'cems';
 
     const eventUrl = botUsername
-      ? `https://t.me/${botUsername}/${miniAppName}?startapp=${event.id}`
-      : (webUrl ? `${webUrl}/events/${event.id}` : null);
-    const hasValidUrl =
-      eventUrl && !eventUrl.includes('localhost') && !eventUrl.includes('127.0.0.1');
+      ? `https://t.me/${botUsername}/${miniAppName}?startapp=view_${event.id}`
+      : (webUrl ? `${webUrl}/events/${event.id}` : undefined);
+    const hasValidUrl = !!(
+      eventUrl &&
+      !eventUrl.includes('localhost') &&
+      !eventUrl.includes('127.0.0.1')
+    );
 
     try {
       await this.bot.telegram.sendMessage(channelId, message, {
         parse_mode: 'Markdown',
         ...(hasValidUrl && {
           reply_markup: {
-            inline_keyboard: [[{ text: '🎟 Join Now →', url: eventUrl }]],
+            inline_keyboard: [[{ text: '🎟 Join Now →', url: eventUrl! }]],
           },
         }),
       });

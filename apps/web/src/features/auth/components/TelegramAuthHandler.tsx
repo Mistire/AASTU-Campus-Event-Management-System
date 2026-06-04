@@ -36,10 +36,20 @@ export function TelegramAuthHandler({ children }: { children: React.ReactNode })
     const handleDeepLink = () => {
       const startParam = webApp.initDataUnsafe?.start_param;
       if (startParam) {
-        const eventId = startParam.startsWith("event_") ? startParam.replace("event_", "") : startParam;
-        if (eventId) {
-          router.push(`/events/${eventId}`);
-          return true; // Deep linked!
+        if (startParam.startsWith("register_")) {
+          const eventId = startParam.replace("register_", "");
+          if (eventId) {
+            router.push(`/events/${eventId}?autoRegister=true`);
+            return true;
+          }
+        } else {
+          const eventId = startParam.startsWith("view_") 
+            ? startParam.replace("view_", "") 
+            : startParam;
+          if (eventId) {
+            router.push(`/events/${eventId}`);
+            return true; // Deep linked!
+          }
         }
       }
       return false; // No deep link
