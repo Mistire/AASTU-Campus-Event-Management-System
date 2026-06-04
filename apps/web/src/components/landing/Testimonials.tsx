@@ -88,7 +88,7 @@ export default function Testimonials() {
           {doubledTestimonials.map((t, i) => (
             <div
               key={i}
-              className="w-[290px] sm:w-[420px] shrink-0 p-6 sm:p-10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-lg border border-white/40 dark:border-white/10 shadow-2xl transition-all duration-500 hover:shadow-brand/10 hover:border-brand/20 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
+              className="w-[290px] sm:w-[420px] shrink-0 p-6 sm:p-10 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-lg border border-white/40 dark:border-white/10 shadow-none sm:shadow-2xl transition-all duration-500 hover:shadow-none sm:hover:shadow-brand/10 hover:-translate-y-2 group/card flex flex-col justify-between relative overflow-hidden"
             >
               {/* Card Meta Log */}
               <div className="absolute top-0 right-0 p-4 sm:p-8">

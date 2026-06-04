@@ -67,12 +67,12 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={cn(
-            "relative aspect-video rounded-lg border-2 border-dashed transition-all duration-500 overflow-hidden group",
+            "relative aspect-video rounded-lg border-2 border-dashed transition-all duration-500 overflow-hidden group max-w-2xl mx-auto bg-transparent",
             thumbnail
-              ? "border-brand shadow-2xl shadow-brand/10"
+              ? "border-brand shadow-xl"
               : isDragging
                 ? "border-brand bg-brand/5 scale-[1.01]"
-                : "border-gray-100 bg-gray-50/30 hover:bg-white hover:border-brand/30",
+                : "border-gray-200 hover:border-brand/30",
           )}
         >
           {thumbnail ? (
@@ -80,49 +80,49 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
               <Image
                 src={thumbnail}
                 alt="Thumbnail Preview"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                 width={500}
                 height={300}
               />
-              <div className="absolute inset-0 bg-brand opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
+              <div className="absolute inset-0 bg-brand/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-[2px]">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-12 h-12 rounded-lg bg-white text-gray-900 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+                  className="w-10 h-10 rounded-lg bg-white text-gray-900 flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
                 >
-                  <Upload size={18} />
+                  <Upload size={16} />
                 </button>
                 <button
                   type="button"
                   onClick={() => onUpdate({ thumbnailUrl: "" })}
-                  className="w-12 h-12 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+                  className="w-10 h-10 rounded-lg bg-red-500 text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
-              <div className="absolute top-6 left-6 flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-sm border border-white/20">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[9px] font-black text-gray-900 uppercase tracking-widest">
+              <div className="absolute top-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-sm border border-white/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] font-black text-gray-900 uppercase tracking-widest">
                   Optimized & Ready
                 </span>
               </div>
             </>
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-24 h-24 rounded-lg bg-white shadow-2xl shadow-gray-200/50 flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform duration-500">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+              <div className="w-16 h-16 rounded-lg bg-transparent flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
                 {isUploading ? (
-                  <Loader2 className="text-brand animate-spin" size={32} />
+                  <Loader2 className="text-brand animate-spin" size={24} />
                 ) : (
                   <Upload
                     className="text-brand/40 group-hover:text-brand transition-colors"
-                    size={32}
+                    size={28}
                   />
                 )}
               </div>
-              <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-2">
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest mb-1.5">
                 {isUploading ? "Uploading..." : "Drop your masterpiece here"}
               </h4>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter max-w-[240px] leading-relaxed">
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter max-w-[200px] leading-relaxed">
                 Supports High-Res PNG, JPG or WebP. <br /> Minimum 1280x720
                 recommended.
               </p>
@@ -130,7 +130,7 @@ export function MediaStep({ data, onUpdate }: MediaStepProps) {
                 type="button"
                 disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-8 px-8 py-3.5 rounded-lg bg-brand text-white font-black text-[10px] uppercase tracking-widest hover:bg-brand-hover transition-all shadow-xl shadow-gray-200 active:scale-95 disabled:opacity-50"
+                className="mt-6 px-6 py-2.5 rounded-lg bg-brand text-white font-black text-[9px] uppercase tracking-widest hover:bg-brand-hover transition-all shadow-xl shadow-brand/10 active:scale-95 disabled:opacity-50"
               >
                 {isUploading ? "Please Wait..." : "Browse Files"}
               </button>

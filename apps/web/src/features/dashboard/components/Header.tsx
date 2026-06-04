@@ -15,7 +15,6 @@ import Image from "next/image";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { NotificationPopover } from "@/features/notifications/components/NotificationPopover";
-import { useNotificationSocket } from "@/features/notifications/hooks/useNotificationSocket";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -24,9 +23,6 @@ export function Header() {
   const { profile, clearAuth } = useAuthStore();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useClickOutside(() => setIsProfileOpen(false));
-
-  // Initialize real-time notifications
-  useNotificationSocket();
 
   const handleLogout = () => {
     clearAuth();
