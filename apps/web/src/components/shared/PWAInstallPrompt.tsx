@@ -11,7 +11,6 @@ import {
   Share,
   Plus,
   MoreVertical,
-  Wifi,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -132,7 +131,7 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
 
           {/* Feature pills */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {["Offline ready", "No app store", "Fast & native"].map((f) => (
+            {["Fast & secure", "No app store", "Fast & native"].map((f) => (
               <span
                 key={f}
                 className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-slate-400"
@@ -184,7 +183,7 @@ function NativeInstallPrompt({
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-black tracking-tight text-white">Install CEMS App</h3>
               <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
-                Get faster access, offline browsing, and a native-like experience.
+                Get faster access, instant updates, and a native-like experience.
               </p>
             </div>
 
@@ -201,7 +200,7 @@ function NativeInstallPrompt({
           <div className="mt-4 flex flex-wrap gap-2">
             {[
               { Icon: platform === "desktop" ? Laptop : Smartphone, label: platform === "desktop" ? "Desktop App" : "Mobile App" },
-              { Icon: Wifi, label: "Offline ready" },
+              { Icon: Check, label: "Instant access" },
               { Icon: Check, label: "No app store" },
             ].map(({ Icon, label }, i) => (
               <span
@@ -289,7 +288,7 @@ export function PWAInstallPrompt() {
 
     // ── iOS: no beforeinstallprompt, show manual guide after 4s ──
     if (detected === "ios") {
-      const dismissed = sessionStorage.getItem("cems-pwa-dismissed");
+      const dismissed = localStorage.getItem("cems-pwa-dismissed");
       if (dismissed) return;
       const t = setTimeout(() => setShowIOSGuide(true), 4000);
       return () => clearTimeout(t);
@@ -299,7 +298,7 @@ export function PWAInstallPrompt() {
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      const dismissed = sessionStorage.getItem("cems-pwa-dismissed");
+      const dismissed = localStorage.getItem("cems-pwa-dismissed");
       if (!dismissed) {
         setTimeout(() => setShowPrompt(true), 3000);
       }
@@ -329,13 +328,14 @@ export function PWAInstallPrompt() {
     setDeferredPrompt(null);
     if (outcome === "accepted") {
       setShowPrompt(false);
+      localStorage.setItem("cems-pwa-dismissed", "true");
     }
   }, [deferredPrompt]);
 
   const handleDismiss = useCallback(() => {
     setShowPrompt(false);
     setShowIOSGuide(false);
-    sessionStorage.setItem("cems-pwa-dismissed", "true");
+    localStorage.setItem("cems-pwa-dismissed", "true");
   }, []);
 
   // Already installed → nothing to render (unless just-installed toast)
